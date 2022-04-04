@@ -1,0 +1,4060 @@
+{
+  "data": [
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "မော်လမြိုင်",
+      "town_en": "Mawlamyine",
+      "township": "မော်လမြိုင်",
+      "township_en": "Mawlamyine"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ချောင်းဆုံ",
+      "town_en": "Chaungzon",
+      "township": "ချောင်းဆုံ",
+      "township_en": "Chaungzon"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "မုဒုံ",
+      "town_en": "Mudon",
+      "township": "မုဒုံ",
+      "township_en": "Mudon"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ကျိုက်မရော",
+      "town_en": "Kyaikmaraw",
+      "township": "ကျိုက်မရော",
+      "township_en": "Kyaikmaraw"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ကျိုက္ခမီ",
+      "town_en": "Kyaikkhami",
+      "township": "ကျိုက္ခမီ",
+      "township_en": "Kyaikkhami"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ဇင်းကျိုက်",
+      "town_en": "Zinkyaik",
+      "township": "ဇင်းကျိုက်",
+      "township_en": "Zinkyaik"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ပေါင်",
+      "town_en": "Paung",
+      "township": "ပေါင်",
+      "township_en": "Paung"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "သထုံ",
+      "town_en": "Thaton",
+      "township": "သထုံ",
+      "township_en": "Thaton"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "သုဝဏ္ဏဝတီ",
+      "town_en": "Thuwunnawady",
+      "township": "သုဝဏ္ဏဝတီ",
+      "township_en": "Thuwunnawady"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ဘီးလင်း",
+      "town_en": "Bilin",
+      "township": "ဘီးလင်း",
+      "township_en": "Bilin"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "သံဖြူဇရပ်",
+      "town_en": "Thanbyuzayat",
+      "township": "သံဖြူဇရပ်",
+      "township_en": "Thanbyuzayat"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ကမာ၀က်",
+      "town_en": "Kamarwet",
+      "township": "ကမာ၀က်",
+      "township_en": "Kamarwet"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ကျိုက်ထို",
+      "town_en": "Kyaikto",
+      "township": "ကျိုက်ထို",
+      "township_en": "Kyaikto"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "သိမ်ဇရပ်",
+      "town_en": "Thein Za Yat",
+      "township": "သိမ်ဇရပ်",
+      "township_en": "Thein Za Yat"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ရေး",
+      "town_en": "Ye",
+      "township": "ရေး",
+      "township_en": "Ye"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "လမိုင်း",
+      "town_en": "Lamaing",
+      "township": "လမိုင်း",
+      "township_en": "Lamaing"
+    },
+    {
+      "region": "မွန်ပြည်နယ်",
+      "region_en": "Mon State",
+      "town": "ခေါဇာ",
+      "town_en": "Khawzar",
+      "township": "ခေါဇာ",
+      "township_en": "Khawzar"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "သရက်",
+      "town_en": "Thayet",
+      "township": "သရက်",
+      "township_en": "Thayet"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "နန်းပန်",
+      "town_en": "Nang Pang",
+      "township": "နန်းပန်",
+      "township_en": "Nang Pang"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ဇေယျ၀တီ",
+      "town_en": "Zayyawadi",
+      "township": "ဇေယျ၀တီ",
+      "township_en": "Zayyawadi"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "နန်းမား",
+      "town_en": "Nam Mar",
+      "township": "နန်းမား",
+      "township_en": "Nam Mar"
+    },
+    {
+      "region": "နေပြည်တော် (ပြည်ထောင်စုနယ်မြေ)",
+      "region_en": "Naypyitaw Union Territory",
+      "town": "ဒက္ခိဏသီရိ",
+      "town_en": "Det Khi Na Thi Ri",
+      "township": "ဒက္ခိဏသီရိ",
+      "township_en": "Det Khi Na Thi Ri"
+    },
+    {
+      "region": "နေပြည်တော် (ပြည်ထောင်စုနယ်မြေ)",
+      "region_en": "Naypyitaw Union Territory",
+      "town": "လယ်ဝေး",
+      "town_en": "Lewe",
+      "township": "လယ်ဝေး",
+      "township_en": "Lewe"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ပန်းတောင်း",
+      "town_en": "Padaung",
+      "township": "ပန်းတောင်း",
+      "township_en": "Padaung"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "စလင်း",
+      "town_en": "Salin",
+      "township": "စလင်း",
+      "township_en": "Salin"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "အထောင်",
+      "town_en": "Ahtaung",
+      "township": "အထောင်",
+      "township_en": "Ahtaung"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "မတူပီ",
+      "town_en": "Matupi",
+      "township": "မတူပီ",
+      "township_en": "Matupi"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "တာလေ",
+      "town_en": "Tarlay",
+      "township": "တာလေ",
+      "township_en": "Tarlay"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "အေးသာယာ",
+      "town_en": "Ayetharyar",
+      "township": "အေးသာယာ",
+      "township_en": "Ayetharyar"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ဆင်ဖြူကျွန်း",
+      "town_en": "Sinphyukyun",
+      "township": "ဆင်ဖြူကျွန်း",
+      "township_en": "Sinphyukyun"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ကန်ပက်လက်",
+      "town_en": "Kanpetlet",
+      "township": "ကန်ပက်လက်",
+      "township_en": "Kanpetlet"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "အဖျောက်",
+      "town_en": "Ahpyauk",
+      "township": "အဖျောက်",
+      "township_en": "Ahpyauk"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဝန်းသို",
+      "town_en": "Wuntho",
+      "township": "ဝန်းသို",
+      "township_en": "Wuntho"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "လွိုင်လင်",
+      "town_en": "Loilen",
+      "township": "လွိုင်လင်",
+      "township_en": "Loilen"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဟင်္သာတ",
+      "town_en": "Hinthada",
+      "township": "ဟင်္သာတ",
+      "township_en": "Hinthada"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းပျဉ်း",
+      "town_en": "Mongping",
+      "township": "မိုင်းပျဉ်း",
+      "township_en": "Mongping"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ရပ်စောက်",
+      "town_en": "Lawksawk",
+      "township": "ရပ်စောက်",
+      "township_en": "Lawksawk"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "လှိုင်",
+      "town_en": "Hlaing",
+      "township": "လှိုင်",
+      "township_en": "Hlaing"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဟုမ္မလင်း",
+      "town_en": "Homalin",
+      "township": "ဟုမ္မလင်း",
+      "township_en": "Homalin"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "မင်းတပ်",
+      "town_en": "Mindat",
+      "township": "မင်းတပ်",
+      "township_en": "Mindat"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ကျိုက်ဒုံ",
+      "town_en": "Kyaikdon",
+      "township": "ကျိုက်ဒုံ",
+      "township_en": "Kyaikdon"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ရှင်ဗွေယန်",
+      "town_en": "Shin Bway Yang",
+      "township": "ရှင်ဗွေယန်",
+      "township_en": "Shin Bway Yang"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "နွားထိုးကြီး",
+      "town_en": "Natogyi",
+      "township": "နွားထိုးကြီး",
+      "township_en": "Natogyi"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "တီးတိန်",
+      "town_en": "Tedim",
+      "township": "တီးတိန်",
+      "township_en": "Tedim"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ဟားခါး",
+      "town_en": "Hakha",
+      "township": "ဟားခါး",
+      "township_en": "Hakha"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ဆမီး",
+      "town_en": "Samee",
+      "township": "ဆမီး",
+      "township_en": "Samee"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "အသုတ်",
+      "town_en": "Ahthoke",
+      "township": "အသုတ်",
+      "township_en": "Ahthoke"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "မဲဇလီကုန်း",
+      "town_en": "Me Za Li Kone",
+      "township": "မဲဇလီကုန်း",
+      "township_en": "Me Za Li Kone"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ကေတုမတီ",
+      "town_en": "Kaytumati",
+      "township": "ကေတုမတီ",
+      "township_en": "Kaytumati"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ရွှေကူ",
+      "town_en": "Shwegu",
+      "township": "ရွှေကူ",
+      "township_en": "Shwegu"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "တံတားဦး",
+      "town_en": "Tada-U",
+      "township": "တံတားဦး",
+      "township_en": "Tada-U"
+    },
+    {
+      "region": "နေပြည်တော် (ပြည်ထောင်စုနယ်မြေ)",
+      "region_en": "Naypyitaw Union Territory",
+      "town": "ဇေယျာသီရိ",
+      "town_en": "Zay Yar Thi Ri",
+      "township": "ဇေယျာသီရိ",
+      "township_en": "Zay Yar Thi Ri"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "တောင်ငူ",
+      "town_en": "Taungoo",
+      "township": "တောင်ငူ",
+      "township_en": "Taungoo"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "​ဝေါလေမြိုင် (ဝေါလေ)",
+      "town_en": "Waw Lay Myaing (Waw Lay)",
+      "township": "​ဝေါလေမြိုင် (ဝေါလေ)",
+      "township_en": "Waw Lay Myaing (Waw Lay)"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ခင်ဦး",
+      "town_en": "Khin-U",
+      "township": "ခင်ဦး",
+      "township_en": "Khin-U"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "မတ္တရာ",
+      "town_en": "Madaya",
+      "township": "မတ္တရာ",
+      "township_en": "Madaya"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ကွမ်းခြံကုန်း",
+      "town_en": "Kungyangon",
+      "township": "ကွမ်းခြံကုန်း",
+      "township_en": "Kungyangon"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ယင်းမာပင်",
+      "town_en": "Yinmarbin",
+      "township": "ယင်းမာပင်",
+      "township_en": "Yinmarbin"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "မြို့သစ်",
+      "town_en": "Myothit",
+      "township": "မြို့သစ်",
+      "township_en": "Myothit"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ကွမ်းလုံ",
+      "town_en": "Kunlong",
+      "township": "ကွမ်းလုံ",
+      "township_en": "Kunlong"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "တောင်တွင်းကြီး",
+      "town_en": "Taungdwingyi",
+      "township": "တောင်တွင်းကြီး",
+      "township_en": "Taungdwingyi"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ကြို့ပင်ကောက်",
+      "town_en": "Gyobingauk",
+      "township": "ကြို့ပင်ကောက်",
+      "township_en": "Gyobingauk"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "စစ်တွေ",
+      "town_en": "Sittwe",
+      "township": "စစ်တွေ",
+      "township_en": "Sittwe"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "လှိုင်သာယာ (အရှေ့)",
+      "town_en": "Hlaingtharya (East)",
+      "township": "လှိုင်သာယာ (အရှေ့)",
+      "township_en": "Hlaingtharya (East)"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "တမူး",
+      "town_en": "Tamu",
+      "township": "တမူး",
+      "township_en": "Tamu"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ဘောဂလိ",
+      "town_en": "Baw Ga Li",
+      "township": "ဘောဂလိ",
+      "township_en": "Baw Ga Li"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "နမ္မတီး",
+      "town_en": "Nammatee",
+      "township": "နမ္မတီး",
+      "township_en": "Nammatee"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "မောက်မယ်",
+      "town_en": "Mawkmai",
+      "township": "မောက်မယ်",
+      "township_en": "Mawkmai"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ဗန်းမော်",
+      "town_en": "Bhamo",
+      "township": "ဗန်းမော်",
+      "township_en": "Bhamo"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဟိုင်းကြီးကျွန်း",
+      "town_en": "Hainggyikyun",
+      "township": "ဟိုင်းကြီးကျွန်း",
+      "township_en": "Hainggyikyun"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ဟိုပုံး",
+      "town_en": "Hopong",
+      "township": "ဟိုပုံး",
+      "township_en": "Hopong"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "တာချီလိတ်",
+      "town_en": "Tachileik",
+      "township": "တာချီလိတ်",
+      "township_en": "Tachileik"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဒဂုံမြို့သစ် (အရှေ့ပိုင်း)",
+      "town_en": "Dagon Myothit (East)",
+      "township": "ဒဂုံမြို့သစ် (အရှေ့ပိုင်း)",
+      "township_en": "Dagon Myothit (East)"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ချီ​ဖွေ",
+      "town_en": "Chipwi",
+      "township": "ချီ​ဖွေ",
+      "township_en": "Chipwi"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ထန်းတပင်",
+      "town_en": "Htantabin",
+      "township": "ထန်းတပင်",
+      "township_en": "Htantabin"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ကျောက်ဖြူ",
+      "town_en": "Kyaukpyu",
+      "township": "ကျောက်ဖြူ",
+      "township_en": "Kyaukpyu"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "သပိတ်ကျင်း",
+      "town_en": "Thabeikkyin",
+      "township": "သပိတ်ကျင်း",
+      "township_en": "Thabeikkyin"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဒေးဒရဲ",
+      "town_en": "Dedaye",
+      "township": "ဒေးဒရဲ",
+      "township_en": "Dedaye"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "အောင်လံ",
+      "town_en": "Aunglan",
+      "township": "အောင်လံ",
+      "township_en": "Aunglan"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ပေါင်းတည်",
+      "town_en": "Paungde",
+      "township": "ပေါင်းတည်",
+      "township_en": "Paungde"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "သီပေါ",
+      "town_en": "Hsipaw",
+      "township": "သီပေါ",
+      "township_en": "Hsipaw"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "မောတောင်",
+      "town_en": "Maw Taung",
+      "township": "မောတောင်",
+      "township_en": "Maw Taung"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "အိမ်မဲ",
+      "town_en": "Einme",
+      "township": "အိမ်မဲ",
+      "township_en": "Einme"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "အမရပူရ",
+      "town_en": "Amarapura",
+      "township": "အမရပူရ",
+      "township_en": "Amarapura"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ကမမောင်း",
+      "town_en": "Kamarmaung",
+      "township": "ကမမောင်း",
+      "township_en": "Kamarmaung"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ခမောက်ကြီး",
+      "town_en": "Khamaukgyi",
+      "township": "ခမောက်ကြီး",
+      "township_en": "Khamaukgyi"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ကျိုင်းတောင်း",
+      "town_en": "Kengtawng",
+      "township": "ကျိုင်းတောင်း",
+      "township_en": "Kengtawng"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "မြစ်သား",
+      "town_en": "Myittha",
+      "township": "မြစ်သား",
+      "township_en": "Myittha"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ဘုတ်ပြင်း",
+      "town_en": "Bokpyin",
+      "township": "ဘုတ်ပြင်း",
+      "township_en": "Bokpyin"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "လှိုင်းဘွဲ့",
+      "town_en": "Hlaingbwe",
+      "township": "လှိုင်းဘွဲ့",
+      "township_en": "Hlaingbwe"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဒဂုံမြို့သစ် (မြောက်ပိုင်း)",
+      "town_en": "Dagon Myothit (North)",
+      "township": "ဒဂုံမြို့သစ် (မြောက်ပိုင်း)",
+      "township_en": "Dagon Myothit (North)"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "အင်ဂျန်းယန်",
+      "town_en": "Injangyang",
+      "township": "အင်ဂျန်းယန်",
+      "township_en": "Injangyang"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ပိန်းဇလုပ်",
+      "town_en": "Peinzalok",
+      "township": "ပိန်းဇလုပ်",
+      "township_en": "Peinzalok"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဘုတလင်",
+      "town_en": "Budalin",
+      "township": "ဘုတလင်",
+      "township_en": "Budalin"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "မြင်းခြံ",
+      "town_en": "Myingyan",
+      "township": "မြင်းခြံ",
+      "township_en": "Myingyan"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "တာပွန်",
+      "town_en": "Tar Pun",
+      "township": "တာပွန်",
+      "township_en": "Tar Pun"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ခိုလမ်",
+      "town_en": "Kho Lam",
+      "township": "ခိုလမ်",
+      "township_en": "Kho Lam"
+    },
+    {
+      "region": "နေပြည်တော် (ပြည်ထောင်စုနယ်မြေ)",
+      "region_en": "Naypyitaw Union Territory",
+      "town": "ဥတ္တရသီရိ",
+      "town_en": "Oke Ta Ra Thi Ri",
+      "township": "ဥတ္တရသီရိ",
+      "township_en": "Oke Ta Ra Thi Ri"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းခုတ်",
+      "town_en": "Mongkhoke",
+      "township": "မိုင်းခုတ်",
+      "township_en": "Mongkhoke"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ကိုကိုးကျွန်း",
+      "town_en": "Cocokyun",
+      "township": "ကိုကိုးကျွန်း",
+      "township_en": "Cocokyun"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "တနိုင်း",
+      "town_en": "Tanai",
+      "township": "တနိုင်း",
+      "township_en": "Tanai"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "အင်တော",
+      "town_en": "Intaw",
+      "township": "အင်တော",
+      "township_en": "Intaw"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ကွတ်ခိုင်",
+      "town_en": "Kutkai",
+      "township": "ကွတ်ခိုင်",
+      "township_en": "Kutkai"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဖောင်းပြင်",
+      "town_en": "Paungbyin",
+      "township": "ဖောင်းပြင်",
+      "township_en": "Paungbyin"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ညောင်ဦး",
+      "town_en": "Nyaung-U",
+      "township": "ညောင်ဦး",
+      "township_en": "Nyaung-U"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "နန်းယွန်း",
+      "town_en": "Nanyun",
+      "township": "နန်းယွန်း",
+      "township_en": "Nanyun"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "စမ်းချောင်း",
+      "town_en": "Sanchaung",
+      "township": "စမ်းချောင်း",
+      "township_en": "Sanchaung"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "ရွာသစ်",
+      "town_en": "Ywarthit",
+      "township": "ရွာသစ်",
+      "township_en": "Ywarthit"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ကညွတ်ကွင်း",
+      "town_en": "Kanyutkwin",
+      "township": "ကညွတ်ကွင်း",
+      "township_en": "Kanyutkwin"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ပန်ဝါ",
+      "town_en": "Pang War",
+      "township": "ပန်ဝါ",
+      "township_en": "Pang War"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "မြစ်ငယ်",
+      "town_en": "Myitnge",
+      "township": "မြစ်ငယ်",
+      "township_en": "Myitnge"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "တောင်ဥက္ကလာပ",
+      "town_en": "South Okkalapa",
+      "township": "တောင်ဥက္ကလာပ",
+      "township_en": "South Okkalapa"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ညောင်ရွှေ",
+      "town_en": "Nyaungshwe",
+      "township": "ညောင်ရွှေ",
+      "township_en": "Nyaungshwe"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ကျွဲပွဲ",
+      "town_en": "Kywe Pwe",
+      "township": "ကျွဲပွဲ",
+      "township_en": "Kywe Pwe"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "မော်လိုက်",
+      "town_en": "Mawlaik",
+      "township": "မော်လိုက်",
+      "township_en": "Mawlaik"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ကော့မှူး",
+      "town_en": "Kawhmu",
+      "township": "ကော့မှူး",
+      "township_en": "Kawhmu"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ပန်ဆိုင်း (ကြူကုတ်)",
+      "town_en": "Pang Hseng (Kyu Koke)",
+      "township": "ပန်ဆိုင်း (ကြူကုတ်)",
+      "township_en": "Pang Hseng (Kyu Koke)"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "မိုင်းပန်",
+      "town_en": "Mongpan",
+      "township": "မိုင်းပန်",
+      "township_en": "Mongpan"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ညောင်တုန်း",
+      "town_en": "Nyaungdon",
+      "township": "ညောင်တုန်း",
+      "township_en": "Nyaungdon"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဒဂုံ",
+      "town_en": "Dagon",
+      "township": "ဒဂုံ",
+      "township_en": "Dagon"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "မြိုင်",
+      "town_en": "Myaing",
+      "township": "မြိုင်",
+      "township_en": "Myaing"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "ဖရူဆို",
+      "town_en": "Hpruso",
+      "township": "ဖရူဆို",
+      "township_en": "Hpruso"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ကလေးဝ",
+      "town_en": "Kalewa",
+      "township": "ကလေးဝ",
+      "township_en": "Kalewa"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "အမ်း",
+      "town_en": "Ann",
+      "township": "အမ်း",
+      "township_en": "Ann"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ချောက်",
+      "town_en": "Chauk",
+      "township": "ချောက်",
+      "township_en": "Chauk"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "သိန္နီ",
+      "town_en": "Hseni",
+      "township": "သိန္နီ",
+      "township_en": "Hseni"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ပလက်ဝ",
+      "town_en": "Paletwa",
+      "township": "ပလက်ဝ",
+      "township_en": "Paletwa"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဥက္ကံ",
+      "town_en": "Okekan",
+      "township": "ဥက္ကံ",
+      "township_en": "Okekan"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "စုကလိ",
+      "town_en": "Su Ka Li",
+      "township": "စုကလိ",
+      "township_en": "Su Ka Li"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ပဲနွယ်ကုန်း",
+      "town_en": "Penwegon",
+      "township": "ပဲနွယ်ကုန်း",
+      "township_en": "Penwegon"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "အောင်ပန်း",
+      "town_en": "Aungpan",
+      "township": "အောင်ပန်း",
+      "township_en": "Aungpan"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ပုသိမ်ကြီး",
+      "town_en": "Patheingyi",
+      "township": "ပုသိမ်ကြီး",
+      "township_en": "Patheingyi"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ကျုံဒိုး",
+      "town_en": "Kyondoe",
+      "township": "ကျုံဒိုး",
+      "township_en": "Kyondoe"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "စစ်ကိုင်း",
+      "town_en": "Sagaing",
+      "township": "စစ်ကိုင်း",
+      "township_en": "Sagaing"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ကျွန်းလှ",
+      "town_en": "Kyunhla",
+      "township": "ကျွန်းလှ",
+      "township_en": "Kyunhla"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဆွမ္မရာ",
+      "town_en": "Sum Ma Rar",
+      "township": "ဆွမ္မရာ",
+      "township_en": "Sum Ma Rar"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "မအီ",
+      "town_en": "Ma-Ei",
+      "township": "မအီ",
+      "township_en": "Ma-Ei"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "လင်းခေး",
+      "town_en": "Langkho",
+      "township": "လင်းခေး",
+      "township_en": "Langkho"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ဘူးသီးတောင်",
+      "town_en": "Buthidaung",
+      "township": "ဘူးသီးတောင်",
+      "township_en": "Buthidaung"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "မရမ်းကုန်း",
+      "town_en": "Mayangone",
+      "township": "မရမ်းကုန်း",
+      "township_en": "Mayangone"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ထီးချိုင့်",
+      "town_en": "Tigyaing",
+      "township": "ထီးချိုင့်",
+      "township_en": "Tigyaing"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းယု",
+      "town_en": "Mongyu",
+      "township": "မိုင်းယု",
+      "township_en": "Mongyu"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ပခုက္ကူ",
+      "town_en": "Pakokku",
+      "township": "ပခုက္ကူ",
+      "township_en": "Pakokku"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းဖြတ်",
+      "town_en": "Monghpyak",
+      "township": "မိုင်းဖြတ်",
+      "township_en": "Monghpyak"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းဆတ်",
+      "town_en": "Monghsat",
+      "township": "မိုင်းဆတ်",
+      "township_en": "Monghsat"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ကျောက်တလုံးကြီး",
+      "town_en": "Kyauktalonegyi",
+      "township": "ကျောက်တလုံးကြီး",
+      "township_en": "Kyauktalonegyi"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မိုင်းရယ်",
+      "town_en": "Mongyai",
+      "township": "မိုင်းရယ်",
+      "township_en": "Mongyai"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "သာပေါင်း",
+      "town_en": "Thabaung",
+      "township": "သာပေါင်း",
+      "township_en": "Thabaung"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "လေရှီး",
+      "town_en": "Lay Shi",
+      "township": "လေရှီး",
+      "township_en": "Lay Shi"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "လိုင်လင်းပီ",
+      "town_en": "Lalengpi",
+      "township": "လိုင်လင်းပီ",
+      "township_en": "Lalengpi"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "တွံတေး",
+      "town_en": "Twantay",
+      "township": "တွံတေး",
+      "township_en": "Twantay"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "(မန်ဟျိုး) မန်ဟီးရိုး",
+      "town_en": "Manhlyoe (Manhero)",
+      "township": "(မန်ဟျိုး) မန်ဟီးရိုး",
+      "township_en": "Manhlyoe (Manhero)"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ရွှေဘို",
+      "town_en": "Shwebo",
+      "township": "ရွှေဘို",
+      "township_en": "Shwebo"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ပန်းတနော်",
+      "town_en": "Pantanaw",
+      "township": "ပန်းတနော်",
+      "township_en": "Pantanaw"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "အင်္ဂပူ",
+      "town_en": "Ingapu",
+      "township": "အင်္ဂပူ",
+      "township_en": "Ingapu"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ရွှေညောင်",
+      "town_en": "Shwenyaung",
+      "township": "ရွှေညောင်",
+      "township_en": "Shwenyaung"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ဝေဘူလ",
+      "town_en": "Webula",
+      "township": "ဝေဘူလ",
+      "township_en": "Webula"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "နမ္မတူ",
+      "town_en": "Namtu",
+      "township": "နမ္မတူ",
+      "township_en": "Namtu"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "နှာဟရိန်",
+      "town_en": "Hnaring",
+      "township": "နှာဟရိန်",
+      "township_en": "Hnaring"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "မလှိုင်",
+      "town_en": "Mahlaing",
+      "township": "မလှိုင်",
+      "township_en": "Mahlaing"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ရမ်းဗြဲ",
+      "town_en": "Ramree",
+      "township": "ရမ်းဗြဲ",
+      "township_en": "Ramree"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "အရာတော်",
+      "town_en": "Ayadaw",
+      "township": "အရာတော်",
+      "township_en": "Ayadaw"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "မောင်တော",
+      "town_en": "Maungdaw",
+      "township": "မောင်တော",
+      "township_en": "Maungdaw"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ကာလိ",
+      "town_en": "Kar Li",
+      "township": "ကာလိ",
+      "township_en": "Kar Li"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "လဟယ်",
+      "town_en": "Lahe",
+      "township": "လဟယ်",
+      "township_en": "Lahe"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ရွာငံ",
+      "town_en": "Ywangan",
+      "township": "ရွာငံ",
+      "township_en": "Ywangan"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "စလေ",
+      "town_en": "Sa Lay",
+      "township": "စလေ",
+      "township_en": "Sa Lay"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "အင်းတကော်",
+      "town_en": "Inntakaw",
+      "township": "အင်းတကော်",
+      "township_en": "Inntakaw"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဖျာပုံ",
+      "town_en": "Pyapon",
+      "township": "ဖျာပုံ",
+      "township_en": "Pyapon"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ရွှေပြည်သာ",
+      "town_en": "Shwepyithar",
+      "township": "ရွှေပြည်သာ",
+      "township_en": "Shwepyithar"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဒဂုံမြို့သစ် (တောင်ပိုင်း)",
+      "town_en": "Dagon Myothit (South)",
+      "township": "ဒဂုံမြို့သစ် (တောင်ပိုင်း)",
+      "township_en": "Dagon Myothit (South)"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ကျောက်ပန်းတောင်း",
+      "town_en": "Kyaukpadaung",
+      "township": "ကျောက်ပန်းတောင်း",
+      "township_en": "Kyaukpadaung"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဗဟန်း",
+      "town_en": "Bahan",
+      "township": "ဗဟန်း",
+      "township_en": "Bahan"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ဖားကန့်",
+      "town_en": "Hpakant",
+      "township": "ဖားကန့်",
+      "township_en": "Hpakant"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ပြင်စလူ",
+      "town_en": "Pyinsalu",
+      "township": "ပြင်စလူ",
+      "township_en": "Pyinsalu"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "​မော်ထိုက်",
+      "town_en": "Maw Hteik",
+      "township": "​မော်ထိုက်",
+      "township_en": "Maw Hteik"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ထောက်ကြန့်",
+      "town_en": "Htaukkyant",
+      "township": "ထောက်ကြန့်",
+      "township_en": "Htaukkyant"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "အင်းစိန်",
+      "town_en": "Insein",
+      "township": "အင်းစိန်",
+      "township_en": "Insein"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "မြို့လှ",
+      "town_en": "Myo Hla",
+      "township": "မြို့လှ",
+      "township_en": "Myo Hla"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ကျင်ဒွေး",
+      "town_en": "Kyin Dway",
+      "township": "ကျင်ဒွေး",
+      "township_en": "Kyin Dway"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "တန့်ယန်း",
+      "town_en": "Tangyan",
+      "township": "တန့်ယန်း",
+      "township_en": "Tangyan"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "သံတောင်",
+      "town_en": "Thandaung",
+      "township": "သံတောင်",
+      "township_en": "Thandaung"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ကျေးသီး",
+      "town_en": "Kyethi",
+      "township": "ကျေးသီး",
+      "township_en": "Kyethi"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "တောင်ပြိုလက်ဝဲ",
+      "town_en": "Taungpyoletwea",
+      "township": "တောင်ပြိုလက်ဝဲ",
+      "township_en": "Taungpyoletwea"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ထူးကြီး",
+      "town_en": "Htoogyi",
+      "township": "ထူးကြီး",
+      "township_en": "Htoogyi"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "မိုးကုတ်",
+      "town_en": "Mogoke",
+      "township": "မိုးကုတ်",
+      "township_en": "Mogoke"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ကန်ပိုက်တီ",
+      "town_en": "Kan Paik Ti",
+      "township": "ကန်ပိုက်တီ",
+      "township_en": "Kan Paik Ti"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "မိုပိုင်းလွတ်",
+      "town_en": "Mo Paing Lut",
+      "township": "မိုပိုင်းလွတ်",
+      "township_en": "Mo Paing Lut"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "လောက်ကိုင်",
+      "town_en": "Laukkaing",
+      "township": "လောက်ကိုင်",
+      "township_en": "Laukkaing"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "မာန်အောင်",
+      "town_en": "Munaung",
+      "township": "မာန်အောင်",
+      "township_en": "Munaung"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "ရှားတော",
+      "town_en": "Shadaw",
+      "township": "ရှားတော",
+      "township_en": "Shadaw"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "အိုးသည်ကုန်း",
+      "town_en": "Oe Thei Kone",
+      "township": "အိုးသည်ကုန်း",
+      "township_en": "Oe Thei Kone"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "ပုံပါကျင်",
+      "town_en": "Ponparkyin",
+      "township": "ပုံပါကျင်",
+      "township_en": "Ponparkyin"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ဝမ်းတွင်း",
+      "town_en": "Wundwin",
+      "township": "ဝမ်းတွင်း",
+      "township_en": "Wundwin"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဓနုဖြူ",
+      "town_en": "Danubyu",
+      "township": "ဓနုဖြူ",
+      "township_en": "Danubyu"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "လေးတောင်",
+      "town_en": "Lay Taung",
+      "township": "လေးတောင်",
+      "township_en": "Lay Taung"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "တလုတ္ထော်",
+      "town_en": "Ta Loke Htaw",
+      "township": "တလုတ္ထော်",
+      "township_en": "Ta Loke Htaw"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းပေါက်",
+      "town_en": "Mong Pawk",
+      "township": "မိုင်းပေါက်",
+      "township_en": "Mong Pawk"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ရမည်းသင်း",
+      "town_en": "Yamethin",
+      "township": "ရမည်းသင်း",
+      "township_en": "Yamethin"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "မံစီ",
+      "town_en": "Mansi",
+      "township": "မံစီ",
+      "township_en": "Mansi"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ဖြူး",
+      "town_en": "Phyu",
+      "township": "ဖြူး",
+      "township_en": "Phyu"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "တောင်သာ",
+      "town_en": "Taungtha",
+      "township": "တောင်သာ",
+      "township_en": "Taungtha"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "လဲချား",
+      "town_en": "Laihka",
+      "township": "လဲချား",
+      "township_en": "Laihka"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ပူတာအို",
+      "town_en": "Puta-O",
+      "township": "ပူတာအို",
+      "township_en": "Puta-O"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "မြေပုံ",
+      "town_en": "Myebon",
+      "township": "မြေပုံ",
+      "township_en": "Myebon"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ကလေး",
+      "town_en": "Kale",
+      "township": "ကလေး",
+      "township_en": "Kale"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "တနင်္သာရီ",
+      "town_en": "Tanintharyi",
+      "township": "တနင်္သာရီ",
+      "township_en": "Tanintharyi"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ကျောက်ဆည်",
+      "town_en": "Kyaukse",
+      "township": "ကျောက်ဆည်",
+      "township_en": "Kyaukse"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "တပ်တောင်",
+      "town_en": "Tat Taung",
+      "township": "တပ်တောင်",
+      "township_en": "Tat Taung"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ရသေ့တောင်",
+      "town_en": "Rathedaung",
+      "township": "ရသေ့တောင်",
+      "township_en": "Rathedaung"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ပြည်",
+      "town_en": "Pyay",
+      "township": "ပြည်",
+      "township_en": "Pyay"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ပိုင်ကျုံ",
+      "town_en": "Paingkyon",
+      "township": "ပိုင်ကျုံ",
+      "township_en": "Paingkyon"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ကနီ",
+      "town_en": "Kani",
+      "township": "ကနီ",
+      "township_en": "Kani"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ဇီးကုန်း",
+      "town_en": "Zigon",
+      "township": "ဇီးကုန်း",
+      "township_en": "Zigon"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "အမာ",
+      "town_en": "Ahmar",
+      "township": "အမာ",
+      "township_en": "Ahmar"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "နန်းမယ်ခုံ",
+      "town_en": "Nan Mei Khon",
+      "township": "နန်းမယ်ခုံ",
+      "township_en": "Nan Mei Khon"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ကွန်ဟိန်း",
+      "town_en": "Kunhing",
+      "township": "ကွန်ဟိန်း",
+      "township_en": "Kunhing"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ရေဇွာ",
+      "town_en": "Rezua",
+      "township": "ရေဇွာ",
+      "township_en": "Rezua"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "တာမိုးညဲ",
+      "town_en": "Tarmoenye",
+      "township": "တာမိုးညဲ",
+      "township_en": "Tarmoenye"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဗိုလ်တထောင်",
+      "town_en": "Botahtaung",
+      "township": "ဗိုလ်တထောင်",
+      "township_en": "Botahtaung"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "ကျိုင်းတုံ",
+      "town_en": "Kengtung",
+      "township": "ကျိုင်းတုံ",
+      "township_en": "Kengtung"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ပင်လုံ",
+      "town_en": "Pinlon",
+      "township": "ပင်လုံ",
+      "township_en": "Pinlon"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ထားဝယ်",
+      "town_en": "Tanintharyi",
+      "township": "ထားဝယ်",
+      "township_en": "Tanintharyi"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဒေါပုံ",
+      "town_en": "Dawbon",
+      "township": "ဒေါပုံ",
+      "township_en": "Dawbon"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "မိုးညို",
+      "town_en": "Monyo",
+      "township": "မိုးညို",
+      "township_en": "Monyo"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ကန်ကြီးထောင့်",
+      "town_en": "Kangyidaunt",
+      "township": "ကန်ကြီးထောင့်",
+      "township_en": "Kangyidaunt"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ပင်လည်ဘူး",
+      "town_en": "Pinlebu",
+      "township": "ပင်လည်ဘူး",
+      "township_en": "Pinlebu"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "တွန်းဇန်",
+      "town_en": "Tonzang",
+      "township": "တွန်းဇန်",
+      "township_en": "Tonzang"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "သင်္ဃန်းကျွန်း",
+      "town_en": "Thingangyun",
+      "township": "သင်္ဃန်းကျွန်း",
+      "township_en": "Thingangyun"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "သံတွဲ",
+      "town_en": "Thandwe",
+      "township": "သံတွဲ",
+      "township_en": "Thandwe"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "စကု",
+      "town_en": "Saku",
+      "township": "စကု",
+      "township_en": "Saku"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "ဒီးမော့ဆို",
+      "town_en": "Demoso",
+      "township": "ဒီးမော့ဆို",
+      "township_en": "Demoso"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ကော့ကရိတ်",
+      "town_en": "Kawkareik",
+      "township": "ကော့ကရိတ်",
+      "township_en": "Kawkareik"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ရေကြည်",
+      "town_en": "Yegyi",
+      "township": "ရေကြည်",
+      "township_en": "Yegyi"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ပုဏ္ဏားကျွန်း",
+      "town_en": "Ponnagyun",
+      "township": "ပုဏ္ဏားကျွန်း",
+      "township_en": "Ponnagyun"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "သုံးခွ",
+      "town_en": "Thongwa",
+      "township": "သုံးခွ",
+      "township_en": "Thongwa"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "မြောင်းမြ",
+      "town_en": "Myaungmya",
+      "township": "မြောင်းမြ",
+      "township_en": "Myaungmya"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းယောင်း",
+      "town_en": "Mongyawng",
+      "township": "မိုင်းယောင်း",
+      "township_en": "Mongyawng"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "မချမ်းဘော",
+      "town_en": "Machanbaw",
+      "township": "မချမ်းဘော",
+      "township_en": "Machanbaw"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ထန်းတပင်",
+      "town_en": "Htantabin",
+      "township": "ထန်းတပင်",
+      "township_en": "Htantabin"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "မင်းကင်း",
+      "town_en": "Mingin",
+      "township": "မင်းကင်း",
+      "township_en": "Mingin"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "နမ့်ခမ်း",
+      "town_en": "Namhkan",
+      "township": "နမ့်ခမ်း",
+      "township_en": "Namhkan"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ကျောက်ထု",
+      "town_en": "Kyaukhtu",
+      "township": "ကျောက်ထု",
+      "township_en": "Kyaukhtu"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ဒေါ့ဖုန်းယန်",
+      "town_en": "Dawthponeyan",
+      "township": "ဒေါ့ဖုန်းယန်",
+      "township_en": "Dawthponeyan"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ငပုတော",
+      "town_en": "Ngapudaw",
+      "township": "ငပုတော",
+      "township_en": "Ngapudaw"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ရေစကြို",
+      "town_en": "Yesagyo",
+      "township": "ရေစကြို",
+      "township_en": "Yesagyo"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ဆော့လော်",
+      "town_en": "Tsawlaw",
+      "township": "ဆော့လော်",
+      "township_en": "Tsawlaw"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "သဲကုန်း",
+      "town_en": "Thegon",
+      "township": "သဲကုန်း",
+      "township_en": "Thegon"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ချောင်းသာ",
+      "town_en": "Chaung Thar",
+      "township": "ချောင်းသာ",
+      "township_en": "Chaung Thar"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "မြန်အောင်",
+      "town_en": "Myanaung",
+      "township": "မြန်အောင်",
+      "township_en": "Myanaung"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ပုသိမ်",
+      "town_en": "Pathein",
+      "township": "ပုသိမ်",
+      "township_en": "Pathein"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ပလောက်",
+      "town_en": "Palauk",
+      "township": "ပလောက်",
+      "township_en": "Palauk"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ရန်ကင်း",
+      "town_en": "Yankin",
+      "township": "ရန်ကင်း",
+      "township_en": "Yankin"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ကျုံမငေး",
+      "town_en": "Kyonmangae",
+      "township": "ကျုံမငေး",
+      "township_en": "Kyonmangae"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "မုံရွာ",
+      "town_en": "Monywa",
+      "township": "မုံရွာ",
+      "township_en": "Monywa"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ချောင်းဦး",
+      "town_en": "Chaung-U",
+      "township": "ချောင်းဦး",
+      "township_en": "Chaung-U"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ငပလီ",
+      "town_en": "Ngapali",
+      "township": "ငပလီ",
+      "township_en": "Ngapali"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "မြောက်ဥက္ကလာပ",
+      "town_en": "North Okkalapa",
+      "township": "မြောက်ဥက္ကလာပ",
+      "township_en": "North Okkalapa"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "နမ့်ဆန်",
+      "town_en": "Namhsan",
+      "township": "နမ့်ဆန်",
+      "township_en": "Namhsan"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ရွှေပြည်အေး",
+      "town_en": "Shwe Pyi Aye",
+      "township": "ရွှေပြည်အေး",
+      "township_en": "Shwe Pyi Aye"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "စေတုတ္ထရာ",
+      "town_en": "Sidoktaya",
+      "township": "စေတုတ္ထရာ",
+      "township_en": "Sidoktaya"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "လေးမျက်နှာ",
+      "town_en": "Lemyethna",
+      "township": "လေးမျက်နှာ",
+      "township_en": "Lemyethna"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဒဂုံမြို့သစ် (ဆိပ်ကမ်း)",
+      "town_en": "Dagon Myothit (Seikkan)",
+      "township": "ဒဂုံမြို့သစ် (ဆိပ်ကမ်း)",
+      "township_en": "Dagon Myothit (Seikkan)"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "ဟိုတောင်း",
+      "town_en": "Ho Tawng (Ho Tao)",
+      "township": "ဟိုတောင်း",
+      "township_en": "Ho Tawng (Ho Tao)"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "မြစ်ခြေ",
+      "town_en": "Myit Chay",
+      "township": "မြစ်ခြေ",
+      "township_en": "Myit Chay"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "နောင်ချို",
+      "town_en": "Nawnghkio",
+      "township": "နောင်ချို",
+      "township_en": "Nawnghkio"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "အလုံ",
+      "town_en": "Ahlone",
+      "township": "အလုံ",
+      "township_en": "Ahlone"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ဘားအံ",
+      "town_en": "Hpa-An",
+      "township": "ဘားအံ",
+      "township_en": "Hpa-An"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "မှော်ဘီ",
+      "town_en": "Hmawbi",
+      "township": "မှော်ဘီ",
+      "township_en": "Hmawbi"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဝါးခယ်မ",
+      "town_en": "Wakema",
+      "township": "ဝါးခယ်မ",
+      "township_en": "Wakema"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "လပွတ္တာ",
+      "town_en": "Labutta",
+      "township": "လပွတ္တာ",
+      "township_en": "Labutta"
+    },
+    {
+      "region": "နေပြည်တော် (ပြည်ထောင်စုနယ်မြေ)",
+      "region_en": "Naypyitaw Union Territory",
+      "town": "ဇမ္ဗူသီရိ",
+      "town_en": "Za Bu Thi Ri",
+      "township": "ဇမ္ဗူသီရိ",
+      "township_en": "Za Bu Thi Ri"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ပြွန်တန်ဆာ",
+      "town_en": "Pyuntasa",
+      "township": "ပြွန်တန်ဆာ",
+      "township_en": "Pyuntasa"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "​ကျောက်မြောင်း",
+      "town_en": "Kyauk Myaung",
+      "township": "​ကျောက်မြောင်း",
+      "township_en": "Kyauk Myaung"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ဘုရားကြီး",
+      "town_en": "Hpayargyi",
+      "township": "ဘုရားကြီး",
+      "township_en": "Hpayargyi"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "မြင်းမူ",
+      "town_en": "Myinmu",
+      "township": "မြင်းမူ",
+      "township_en": "Myinmu"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "လသာ",
+      "town_en": "Latha",
+      "township": "လသာ",
+      "township_en": "Latha"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ဝေါ",
+      "town_en": "Waw",
+      "township": "ဝေါ",
+      "township_en": "Waw"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "မော်လမြိုင်ကျွန်း",
+      "town_en": "Mawlamyinegyun",
+      "township": "မော်လမြိုင်ကျွန်း",
+      "township_en": "Mawlamyinegyun"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "မြောက်ဦး",
+      "town_en": "Mrauk-U",
+      "township": "မြောက်ဦး",
+      "township_en": "Mrauk-U"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ငဖဲ",
+      "town_en": "Ngape",
+      "township": "ငဖဲ",
+      "township_en": "Ngape"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "နန့်မွန်း",
+      "town_en": "Nam Mun",
+      "township": "နန့်မွန်း",
+      "township_en": "Nam Mun"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "အင်းတော်ကြီး",
+      "town_en": "Inn Taw Gyi",
+      "township": "အင်းတော်ကြီး",
+      "township_en": "Inn Taw Gyi"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ဆီမီးခုံ",
+      "town_en": "Si Mee Khon",
+      "township": "ဆီမီးခုံ",
+      "township_en": "Si Mee Khon"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ချင်းရွှေဟော်",
+      "town_en": "Chinshwehaw",
+      "township": "ချင်းရွှေဟော်",
+      "township_en": "Chinshwehaw"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ပေါင်းတလည်",
+      "town_en": "Paungdale",
+      "township": "ပေါင်းတလည်",
+      "township_en": "Paungdale"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ဆိပ်ဖြူ",
+      "town_en": "Seikphyu",
+      "township": "ဆိပ်ဖြူ",
+      "township_en": "Seikphyu"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "မင်းဘူး",
+      "town_en": "Minbu",
+      "township": "မင်းဘူး",
+      "township_en": "Minbu"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "မြောင်",
+      "town_en": "Myaung",
+      "township": "မြောင်",
+      "township_en": "Myaung"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "မိုင်းကိုင်",
+      "town_en": "Mongkaing",
+      "township": "မိုင်းကိုင်",
+      "township_en": "Mongkaing"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ကောလင်း",
+      "town_en": "Kawlin",
+      "township": "ကောလင်း",
+      "township_en": "Kawlin"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ခန္တီး",
+      "town_en": "Hkamti",
+      "township": "ခန္တီး",
+      "township_en": "Hkamti"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မန်တုံ",
+      "town_en": "Manton",
+      "township": "မန်တုံ",
+      "township_en": "Manton"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ကြာအင်းဆိပ်ကြီး",
+      "town_en": "Kyainseikgyi",
+      "township": "ကြာအင်းဆိပ်ကြီး",
+      "township_en": "Kyainseikgyi"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "မင်္ဂလာတောင်ညွန့်",
+      "town_en": "Mingalartaungnyunt",
+      "township": "မင်္ဂလာတောင်ညွန့်",
+      "township_en": "Mingalartaungnyunt"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ကမ္မ (ပခုက္ကူ)",
+      "town_en": "Kamma (PKU)",
+      "township": "ကမ္မ (ပခုက္ကူ)",
+      "township_en": "Kamma (PKU)"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ဂွ",
+      "town_en": "Gwa",
+      "township": "ဂွ",
+      "township_en": "Gwa"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ရေဖြူ",
+      "town_en": "Yebyu",
+      "township": "ရေဖြူ",
+      "township_en": "Yebyu"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ကဝ",
+      "town_en": "Kawa",
+      "township": "ကဝ",
+      "township_en": "Kawa"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ခိုင်ကမ်း",
+      "town_en": "Khaikam",
+      "township": "ခိုင်ကမ်း",
+      "township_en": "Khaikam"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "သနပ်ပင်",
+      "town_en": "Thanatpin",
+      "township": "သနပ်ပင်",
+      "township_en": "Thanatpin"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ကမ်းထောင့်ကြီး",
+      "town_en": "Kanhtauntkyi",
+      "township": "ကမ်းထောင့်ကြီး",
+      "township_en": "Kanhtauntkyi"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ကျောက်တန်း",
+      "town_en": "Kyauktan",
+      "township": "ကျောက်တန်း",
+      "township_en": "Kyauktan"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ကူမဲ",
+      "town_en": "Ku Me",
+      "township": "ကူမဲ",
+      "township_en": "Ku Me"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဒီပဲယင်း",
+      "town_en": "Tabayin",
+      "township": "ဒီပဲယင်း",
+      "township_en": "Tabayin"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ထီးလင်း",
+      "town_en": "Tilin",
+      "township": "ထီးလင်း",
+      "township_en": "Tilin"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "လမ်းမတော်",
+      "town_en": "Lanmadaw",
+      "township": "လမ်းမတော်",
+      "township_en": "Lanmadaw"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "အုတ်တွင်း",
+      "town_en": "Oktwin",
+      "township": "အုတ်တွင်း",
+      "township_en": "Oktwin"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဘက်ရဲ",
+      "town_en": "Batye",
+      "township": "ဘက်ရဲ",
+      "township_en": "Batye"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ပွင့်ဖြူ",
+      "town_en": "Pwintbyu",
+      "township": "ပွင့်ဖြူ",
+      "township_en": "Pwintbyu"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "တံတား",
+      "town_en": "Tadar",
+      "township": "တံတား",
+      "township_en": "Tadar"
+    },
+    {
+      "region": "နေပြည်တော် (ပြည်ထောင်စုနယ်မြေ)",
+      "region_en": "Naypyitaw Union Territory",
+      "town": "နေပြည်တော်",
+      "town_en": "Nay Pyi Taw",
+      "township": "နေပြည်တော်",
+      "township_en": "Nay Pyi Taw"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ပန်နန်းဒင်",
+      "town_en": "Pannandin",
+      "township": "ပန်နန်းဒင်",
+      "township_en": "Pannandin"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "တန်းလွဲရွာမ",
+      "town_en": "Tan Hlwe Ywar Ma",
+      "township": "တန်းလွဲရွာမ",
+      "township_en": "Tan Hlwe Ywar Ma"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဆားတောင်",
+      "town_en": "Sar Taung",
+      "township": "ဆားတောင်",
+      "township_en": "Sar Taung"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "မိုးညှင်း",
+      "town_en": "Mohnyin",
+      "township": "မိုးညှင်း",
+      "township_en": "Mohnyin"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "မင်္ဂလာဒုံ",
+      "town_en": "Mingaladon",
+      "township": "မင်္ဂလာဒုံ",
+      "township_en": "Mingaladon"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "တာမွေ",
+      "town_en": "Tamwe",
+      "township": "တာမွေ",
+      "township_en": "Tamwe"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ဆွာ",
+      "town_en": "Hswar",
+      "township": "ဆွာ",
+      "township_en": "Hswar"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "မြဝတီ",
+      "town_en": "Myawaddy",
+      "township": "မြဝတီ",
+      "township_en": "Myawaddy"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ဖဒို",
+      "town_en": "Hpa Do",
+      "township": "ဖဒို",
+      "township_en": "Hpa Do"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မိုးမိတ်",
+      "town_en": "Mongmit",
+      "township": "မိုးမိတ်",
+      "township_en": "Mongmit"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ဝိုင်းမော်",
+      "town_en": "Waingmaw",
+      "township": "ဝိုင်းမော်",
+      "township_en": "Waingmaw"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "တောင်ကြီး",
+      "town_en": "Taunggyi",
+      "township": "တောင်ကြီး",
+      "township_en": "Taunggyi"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "မိတ္ထီလာ",
+      "town_en": "Meiktila",
+      "township": "မိတ္ထီလာ",
+      "township_en": "Meiktila"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မုံးထ",
+      "town_en": "Hmone Hta",
+      "township": "မုံးထ",
+      "township_en": "Hmone Hta"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ထန်ပါခွေ",
+      "town_en": "Htan Par Kway",
+      "township": "ထန်ပါခွေ",
+      "township_en": "Htan Par Kway"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ခမောင်းဆိပ်",
+      "town_en": "Kha Maung Seik",
+      "township": "ခမောင်းဆိပ်",
+      "township_en": "Kha Maung Seik"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "မအူပင်",
+      "town_en": "Maubin",
+      "township": "မအူပင်",
+      "township_en": "Maubin"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "လပွတ္တာ (၃) မိုင်",
+      "town_en": "Labutta (3) Mile",
+      "township": "လပွတ္တာ (၃) မိုင်",
+      "township_en": "Labutta (3) Mile"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "အုတ်ဖို",
+      "town_en": "Okpho",
+      "township": "အုတ်ဖို",
+      "township_en": "Okpho"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ရှမ်းရွာသစ်",
+      "town_en": "Shan Ywar Thit",
+      "township": "ရှမ်းရွာသစ်",
+      "township_en": "Shan Ywar Thit"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "မဒေါက်",
+      "town_en": "Madauk",
+      "township": "မဒေါက်",
+      "township_en": "Madauk"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ပင်လောင်း",
+      "town_en": "Pinlaung",
+      "township": "ပင်လောင်း",
+      "township_en": "Pinlaung"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ရေနံချောင်း",
+      "town_en": "Yenangyaung",
+      "township": "ရေနံချောင်း",
+      "township_en": "Yenangyaung"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "နတ်တလင်း",
+      "town_en": "Nattalin",
+      "township": "နတ်တလင်း",
+      "township_en": "Nattalin"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "မော်လူး",
+      "town_en": "Maw Lu",
+      "township": "မော်လူး",
+      "township_en": "Maw Lu"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "မင်းလှ",
+      "town_en": "Minhla",
+      "township": "မင်းလှ",
+      "township_en": "Minhla"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "မင်းလှ",
+      "town_en": "Minhla",
+      "township": "မင်းလှ",
+      "township_en": "Minhla"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ဥရှစ်ပင်",
+      "town_en": "Oakshitpin",
+      "township": "ဥရှစ်ပင်",
+      "township_en": "Oakshitpin"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ကျိုက်လတ်",
+      "town_en": "Kyaiklat",
+      "township": "ကျိုက်လတ်",
+      "township_en": "Kyaiklat"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "စိုင်ပြင်",
+      "town_en": "Saing Pyin",
+      "township": "စိုင်ပြင်",
+      "township_en": "Saing Pyin"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ကန့်ဘလူ",
+      "town_en": "Kanbalu",
+      "township": "ကန့်ဘလူ",
+      "township_en": "Kanbalu"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဆားလင်းကြီး",
+      "town_en": "Salingyi",
+      "township": "ဆားလင်းကြီး",
+      "township_en": "Salingyi"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မိုင်းငေါ့",
+      "town_en": "Mongngawt",
+      "township": "မိုင်းငေါ့",
+      "township_en": "Mongngawt"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "စဉ့်ကူး",
+      "town_en": "Singu",
+      "township": "စဉ့်ကူး",
+      "township_en": "Singu"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "နမ့်စန်",
+      "town_en": "Nansang",
+      "township": "နမ့်စန်",
+      "township_en": "Nansang"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "စစ်ကွင်း",
+      "town_en": "Sit Kwin",
+      "township": "စစ်ကွင်း",
+      "township_en": "Sit Kwin"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ဖယ်ခုံ",
+      "town_en": "Pekon",
+      "township": "ဖယ်ခုံ",
+      "township_en": "Pekon"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဒူးယား",
+      "town_en": "Du Yar",
+      "township": "ဒူးယား",
+      "township_en": "Du Yar"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "စဉ့်ကိုင်",
+      "town_en": "Sintgaing",
+      "township": "စဉ့်ကိုင်",
+      "township_en": "Sintgaing"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ကသာ",
+      "town_en": "Katha",
+      "township": "ကသာ",
+      "township_en": "Katha"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဘိုကလေး",
+      "town_en": "Bogale",
+      "township": "ဘိုကလေး",
+      "township_en": "Bogale"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ငါ့သရောက်",
+      "town_en": "Ngathayauk",
+      "township": "ငါ့သရောက်",
+      "township_en": "Ngathayauk"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "သာကေတ",
+      "town_en": "Thaketa",
+      "township": "သာကေတ",
+      "township_en": "Thaketa"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ပန်းဘဲတန်း",
+      "town_en": "Pabedan",
+      "township": "ပန်းဘဲတန်း",
+      "township_en": "Pabedan"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ပြည်ကြီးတံခွန်",
+      "town_en": "Pyigyitagon",
+      "township": "ပြည်ကြီးတံခွန်",
+      "township_en": "Pyigyitagon"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ကုန်းကြမ်း",
+      "town_en": "Konkyan",
+      "township": "ကုန်းကြမ်း",
+      "township_en": "Konkyan"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းယန်း",
+      "town_en": "Mongyang",
+      "township": "မိုင်းယန်း",
+      "township_en": "Mongyang"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "လှိုင်သာယာ(အနောက်)",
+      "town_en": "Hlaingtharya (West)",
+      "township": "လှိုင်သာယာ(အနောက်)",
+      "township_en": "Hlaingtharya (West)"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ငရုတ်ကောင်း",
+      "town_en": "Ngayokekaung",
+      "township": "ငရုတ်ကောင်း",
+      "township_en": "Ngayokekaung"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "အောင်မြေသာစံ",
+      "town_en": "Aungmyaythazan",
+      "township": "အောင်မြေသာစံ",
+      "township_en": "Aungmyaythazan"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "အင်းတော်",
+      "town_en": "Indaw",
+      "township": "အင်းတော်",
+      "township_en": "Indaw"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "မယ်စဲ",
+      "town_en": "Mese",
+      "township": "မယ်စဲ",
+      "township_en": "Mese"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ဂန့်ဂေါ",
+      "town_en": "Gangaw",
+      "township": "ဂန့်ဂေါ",
+      "township_en": "Gangaw"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "ဖားဆောင်း",
+      "town_en": "Hpasawng",
+      "township": "ဖားဆောင်း",
+      "township_en": "Hpasawng"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "တန့်ဆည်",
+      "town_en": "Taze",
+      "township": "တန့်ဆည်",
+      "township_en": "Taze"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "သာယာဝတီ",
+      "town_en": "Thayarwady",
+      "township": "သာယာဝတီ",
+      "township_en": "Thayarwady"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ရေနီ",
+      "town_en": "Yae Ni",
+      "township": "ရေနီ",
+      "township_en": "Yae Ni"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "တုံတာ",
+      "town_en": "Tontar",
+      "township": "တုံတာ",
+      "township_en": "Tontar"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ပလ",
+      "town_en": "Pala",
+      "township": "ပလ",
+      "township_en": "Pala"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ပေါက်တော",
+      "town_en": "Pauktaw",
+      "township": "ပေါက်တော",
+      "township_en": "Pauktaw"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "မြစ်ကြီးနား",
+      "town_en": "myintkyina",
+      "township": "မြစ်ကြီးနား",
+      "township_en": "myintkyina"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မဘိမ်း",
+      "town_en": "Mabein",
+      "township": "မဘိမ်း",
+      "township_en": "Mabein"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "နတ်မောက်",
+      "town_en": "Natmauk",
+      "township": "နတ်မောက်",
+      "township_en": "Natmauk"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ဆော",
+      "town_en": "Saw",
+      "township": "ဆော",
+      "township_en": "Saw"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "လားရှိုး",
+      "town_en": "Lashio",
+      "township": "လားရှိုး",
+      "township_en": "Lashio"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "အင်းမ",
+      "town_en": "Inn Ma",
+      "township": "အင်းမ",
+      "township_en": "Inn Ma"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "ကျိုင်းလပ်",
+      "town_en": "Kenglat",
+      "township": "ကျိုင်းလပ်",
+      "township_en": "Kenglat"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မန်ကန်",
+      "town_en": "Man Kan",
+      "township": "မန်ကန်",
+      "township_en": "Man Kan"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "တိုက်ကြီး",
+      "town_en": "Taikkyi",
+      "township": "တိုက်ကြီး",
+      "township_en": "Taikkyi"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ပြည်ကြီးမဏ္ဍိုင်",
+      "town_en": "Pyigyimandaing",
+      "township": "ပြည်ကြီးမဏ္ဍိုင်",
+      "township_en": "Pyigyimandaing"
+    },
+    {
+      "region": "နေပြည်တော် (ပြည်ထောင်စုနယ်မြေ)",
+      "region_en": "Naypyitaw Union Territory",
+      "town": "ပုဗ္ဗသီရိ",
+      "town_en": "Poke Ba Thi Ri",
+      "township": "ပုဗ္ဗသီရိ",
+      "township_en": "Poke Ba Thi Ri"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ဒိုက်ဦး",
+      "town_en": "Daik-U",
+      "township": "ဒိုက်ဦး",
+      "township_en": "Daik-U"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ဆင်ပေါင်ဝဲ",
+      "town_en": "Sinbaungwe",
+      "township": "ဆင်ပေါင်ဝဲ",
+      "township_en": "Sinbaungwe"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ပန်ဆောင်",
+      "town_en": "Pansaung",
+      "township": "ပန်ဆောင်",
+      "township_en": "Pansaung"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ဟိုမိန်း",
+      "town_en": "Homein",
+      "township": "ဟိုမိန်း",
+      "township_en": "Homein"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ပုဇွန်တောင်",
+      "town_en": "Pazundaung",
+      "township": "ပုဇွန်တောင်",
+      "township_en": "Pazundaung"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "မြို့သစ်",
+      "town_en": "Myothit",
+      "township": "မြို့သစ်",
+      "township_en": "Myothit"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "မိုင်းစံ (မုန်းဆန်း)",
+      "town_en": "Mongsan (Hmonesan)",
+      "township": "မိုင်းစံ (မုန်းဆန်း)",
+      "township_en": "Mongsan (Hmonesan)"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ပန်လုံ",
+      "town_en": "Pan Lon",
+      "township": "ပန်လုံ",
+      "township_en": "Pan Lon"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဗန်းမောက်",
+      "town_en": "Banmauk",
+      "township": "ဗန်းမောက်",
+      "township_en": "Banmauk"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ပုဂံ",
+      "town_en": "Bagan",
+      "township": "ပုဂံ",
+      "township_en": "Bagan"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ဆီဆိုင်",
+      "town_en": "Hsihseng",
+      "township": "ဆီဆိုင်",
+      "township_en": "Hsihseng"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ဆဒုံး",
+      "town_en": "Sadung",
+      "township": "ဆဒုံး",
+      "township_en": "Sadung"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ဆူရ်ခွား",
+      "town_en": "Surkhua",
+      "township": "ဆူရ်ခွား",
+      "township_en": "Surkhua"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မိုင်းလုံ",
+      "town_en": "Monglon",
+      "township": "မိုင်းလုံ",
+      "township_en": "Monglon"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ရေဦး",
+      "town_en": "Ye-U",
+      "township": "ရေဦး",
+      "township_en": "Ye-U"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ဘုရားသုံးဆူ",
+      "town_en": "Hpayarthonesu",
+      "township": "ဘုရားသုံးဆူ",
+      "township_en": "Hpayarthonesu"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "မြင်းလွှတ်",
+      "town_en": "Myin Hlut",
+      "township": "မြင်းလွှတ်",
+      "township_en": "Myin Hlut"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ကော့သောင်း",
+      "town_en": "Kawthoung",
+      "township": "ကော့သောင်း",
+      "township_en": "Kawthoung"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ချမ်းမြသာစည်",
+      "town_en": "Chanmyathazi",
+      "township": "ချမ်းမြသာစည်",
+      "township_en": "Chanmyathazi"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ဖလမ်း",
+      "town_en": "Falam",
+      "township": "ဖလမ်း",
+      "township_en": "Falam"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "သံတောင်ကြီး",
+      "town_en": "Thandaunggyi",
+      "township": "သံတောင်ကြီး",
+      "township_en": "Thandaunggyi"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ကျိန္တလီ",
+      "town_en": "Kyeintali",
+      "township": "ကျိန္တလီ",
+      "township_en": "Kyeintali"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ပုတီးကုန်း",
+      "town_en": "Puteekone",
+      "township": "ပုတီးကုန်း",
+      "township_en": "Puteekone"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ကလိန်အောင်",
+      "town_en": "Kaleinaung",
+      "township": "ကလိန်အောင်",
+      "township_en": "Kaleinaung"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ဇလွန်",
+      "town_en": "Zalun",
+      "township": "ဇလွန်",
+      "township_en": "Zalun"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ပြင်ဦးလွင်",
+      "town_en": "Pyinoolwin",
+      "township": "ပြင်ဦးလွင်",
+      "township_en": "Pyinoolwin"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "လက်ပံတန်း",
+      "town_en": "Letpadan",
+      "township": "လက်ပံတန်း",
+      "township_en": "Letpadan"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ပျော်ဘွယ်",
+      "town_en": "Pyawbwe",
+      "township": "ပျော်ဘွယ်",
+      "township_en": "Pyawbwe"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "မြိတ်",
+      "town_en": "Myeik",
+      "township": "မြိတ်",
+      "township_en": "Myeik"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ကမာရွတ်",
+      "town_en": "Kamayut",
+      "township": "ကမာရွတ်",
+      "township_en": "Kamayut"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ချမ်းအေးသာစံ",
+      "town_en": "Chanayethazan",
+      "township": "ချမ်းအေးသာစံ",
+      "township_en": "Chanayethazan"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "လောင်းလုံး",
+      "town_en": "Launglon",
+      "township": "လောင်းလုံး",
+      "township_en": "Launglon"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဝက်လက်",
+      "town_en": "Wetlet",
+      "township": "ဝက်လက်",
+      "township_en": "Wetlet"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ပန်ဆန်း (ပန်ခမ်း)",
+      "town_en": "Pangsang (Panghkam)",
+      "township": "ပန်ဆန်း (ပန်ခမ်း)",
+      "township_en": "Pangsang (Panghkam)"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "မေတ္တာ",
+      "town_en": "Myitta",
+      "township": "မေတ္တာ",
+      "township_en": "Myitta"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဆိပ်ကြီး/ခနောင်တို",
+      "town_en": "Seikgyikanaungto",
+      "township": "ဆိပ်ကြီး/ခနောင်တို",
+      "township_en": "Seikgyikanaungto"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "တောင်ကုတ်",
+      "town_en": "Toungup",
+      "township": "တောင်ကုတ်",
+      "township_en": "Toungup"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "သုံးဆယ်",
+      "town_en": "Thonse",
+      "township": "သုံးဆယ်",
+      "township_en": "Thonse"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "မိုးနဲ",
+      "town_en": "Mongnai",
+      "township": "မိုးနဲ",
+      "township_en": "Mongnai"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ဒလ",
+      "town_en": "Dala",
+      "township": "ဒလ",
+      "township_en": "Dala"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ခေါင်လန်ဖူး",
+      "town_en": "Khaunglanhpu",
+      "township": "ခေါင်လန်ဖူး",
+      "township_en": "Khaunglanhpu"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ကရသူရိ",
+      "town_en": "Karathuri",
+      "township": "ကရသူရိ",
+      "township_en": "Karathuri"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "လွိုင်လင်လေး",
+      "town_en": "Loilen Lay",
+      "township": "လွိုင်လင်လေး",
+      "township_en": "Loilen Lay"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "မဟာအောင်မြေ",
+      "town_en": "Mahaaungmyay",
+      "township": "မဟာအောင်မြေ",
+      "township_en": "Mahaaungmyay"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ငွေဆောင်",
+      "town_en": "Ngwesaung",
+      "township": "ငွေဆောင်",
+      "township_en": "Ngwesaung"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "သက္ကလ",
+      "town_en": "Thetkala",
+      "township": "သက္ကလ",
+      "township_en": "Thetkala"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းလား",
+      "town_en": "Mongla",
+      "township": "မိုင်းလား",
+      "township_en": "Mongla"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "ဖာပွန်",
+      "town_en": "Hpapun",
+      "township": "ဖာပွန်",
+      "township_en": "Hpapun"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "လှည်းကူး",
+      "town_en": "Hlegu",
+      "township": "လှည်းကူး",
+      "township_en": "Hlegu"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "မင်းတုန်း",
+      "town_en": "Mindon",
+      "township": "မင်းတုန်း",
+      "township_en": "Mindon"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ကာမိုင်း",
+      "town_en": "Kamaing",
+      "township": "ကာမိုင်း",
+      "township_en": "Kamaing"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ကျောက်ကြီး",
+      "town_en": "Kyaukkyi",
+      "township": "ကျောက်ကြီး",
+      "township_en": "Kyaukkyi"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "မိုင်းနောင်",
+      "town_en": "Mongnawng",
+      "township": "မိုင်းနောင်",
+      "township_en": "Mongnawng"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "မိုးမောက်",
+      "town_en": "Momauk",
+      "township": "မိုးမောက်",
+      "township_en": "Momauk"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ကျီခါး",
+      "town_en": "Cikha",
+      "township": "ကျီခါး",
+      "township_en": "Cikha"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "တကောင်း",
+      "town_en": "Takaung",
+      "township": "တကောင်း",
+      "township_en": "Takaung"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ကျုံပျော်",
+      "town_en": "Kyonpyaw Town",
+      "township": "ကျုံပျော်",
+      "township_en": "Kyonpyaw Town"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "သရက်ချောင်း",
+      "town_en": "Thayetchaung",
+      "township": "သရက်ချောင်း",
+      "township_en": "Thayetchaung"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ကျောက်တံတား",
+      "town_en": "Kyauktada",
+      "township": "ကျောက်တံတား",
+      "township_en": "Kyauktada"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "မကွေး",
+      "town_en": "Magway",
+      "township": "မကွေး",
+      "township_en": "Magway"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ကြံခင်း",
+      "town_en": "Kyangin",
+      "township": "ကြံခင်း",
+      "township_en": "Kyangin"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ဟဲဟိုး",
+      "town_en": "He Hoe",
+      "township": "ဟဲဟိုး",
+      "township_en": "He Hoe"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ဝိန်းကောင်",
+      "town_en": "Wein Kawn",
+      "township": "ဝိန်းကောင်",
+      "township_en": "Wein Kawn"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ပန်ဝိုင်",
+      "town_en": "Pangwaun",
+      "township": "ပန်ဝိုင်",
+      "township_en": "Pangwaun"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ကျောက်တံခါး",
+      "town_en": "Kyauktaga",
+      "township": "ကျောက်တံခါး",
+      "township_en": "Kyauktaga"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ပေါက်ခေါင်း",
+      "town_en": "Paukkhaung",
+      "township": "ပေါက်ခေါင်း",
+      "township_en": "Paukkhaung"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ရေတာရှည်",
+      "town_en": "Yedashe",
+      "township": "ရေတာရှည်",
+      "township_en": "Yedashe"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဇီးကုန်း",
+      "town_en": "Zee Kone",
+      "township": "ဇီးကုန်း",
+      "township_en": "Zee Kone"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "မကွီအိမ်နူး",
+      "town_en": "M'kuiimnu",
+      "township": "မကွီအိမ်နူး",
+      "township_en": "M'kuiimnu"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ကနောင်",
+      "town_en": "Kanaung",
+      "township": "ကနောင်",
+      "township_en": "Kanaung"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "ငါန်းဇွန်",
+      "town_en": "Ngazun",
+      "township": "ငါန်းဇွန်",
+      "township_en": "Ngazun"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ဟိုပန်",
+      "town_en": "Hopang",
+      "township": "ဟိုပန်",
+      "township_en": "Hopang"
+    },
+    {
+      "region": "ကရင်ပြည်နယ်",
+      "region_en": "Kayin State",
+      "town": "လိပ်သို",
+      "town_en": "Leik Tho",
+      "township": "လိပ်သို",
+      "township_en": "Leik Tho"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "အင်ပင်",
+      "town_en": "In Pin",
+      "township": "အင်ပင်",
+      "township_en": "In Pin"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "နောင်တရား",
+      "town_en": "Naungtayar",
+      "township": "နောင်တရား",
+      "township_en": "Naungtayar"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "လွယ်ဂျယ်",
+      "town_en": "Lwegel",
+      "township": "လွယ်ဂျယ်",
+      "township_en": "Lwegel"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မိုင်းမော",
+      "town_en": "Mongmao",
+      "township": "မိုင်းမော",
+      "township_en": "Mongmao"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "နမ့်တစ်",
+      "town_en": "Nam Tit",
+      "township": "နမ့်တစ်",
+      "township_en": "Nam Tit"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "မင်းပြား",
+      "town_en": "Minbya",
+      "township": "မင်းပြား",
+      "township_en": "Minbya"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "နားဖန်",
+      "town_en": "Narphan",
+      "township": "နားဖန်",
+      "township_en": "Narphan"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ပုလဲ",
+      "town_en": "Pale",
+      "township": "ပုလဲ",
+      "township_en": "Pale"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ကလော",
+      "town_en": "Kalaw",
+      "township": "ကလော",
+      "township_en": "Kalaw"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မက်မန်း",
+      "town_en": "Matman",
+      "township": "မက်မန်း",
+      "township_en": "Matman"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ကျွန်းစု",
+      "town_en": "Kyunsu",
+      "township": "ကျွန်းစု",
+      "township_en": "Kyunsu"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းတုံ",
+      "town_en": "Mongton",
+      "township": "မိုင်းတုံ",
+      "township_en": "Mongton"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ပဲခူး",
+      "town_en": "Bago",
+      "township": "ပဲခူး",
+      "township_en": "Bago"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ပေါက်",
+      "town_en": "Pauk",
+      "township": "ပေါက်",
+      "township_en": "Pauk"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ကျောင်းကုန်း",
+      "town_en": "Kyaunggon",
+      "township": "ကျောင်းကုန်း",
+      "township_en": "Kyaunggon"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ထန်တလန်",
+      "town_en": "Thantlang",
+      "township": "ထန်တလန်",
+      "township_en": "Thantlang"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "လွိုင်ကော်",
+      "town_en": "Loikaw",
+      "township": "လွိုင်ကော်",
+      "township_en": "Loikaw"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ကြည့်မြင်တိုင်",
+      "town_en": "Kyeemyindaing",
+      "township": "ကြည့်မြင်တိုင်",
+      "township_en": "Kyeemyindaing"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မုန်းကိုး",
+      "town_en": "Monekoe",
+      "township": "မုန်းကိုး",
+      "township_en": "Monekoe"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ခါမ်းပါတ်",
+      "town_en": "Khampat",
+      "township": "ခါမ်းပါတ်",
+      "township_en": "Khampat"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "ခရမ်း",
+      "town_en": "Kayan",
+      "township": "ခရမ်း",
+      "township_en": "Kayan"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "မြို့လှ",
+      "town_en": "Myo Hla",
+      "township": "မြို့လှ",
+      "township_en": "Myo Hla"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "မိုးကောင်း",
+      "town_en": "Mogaung",
+      "township": "မိုးကောင်း",
+      "township_en": "Mogaung"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "ကျောက်တော်",
+      "town_en": "Kyauktaw",
+      "township": "ကျောက်တော်",
+      "township_en": "Kyauktaw"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (အရှေ့)",
+      "region_en": "Shan State (East)",
+      "town": "မိုင်းခတ်",
+      "town_en": "Mongkhet",
+      "township": "မိုင်းခတ်",
+      "township_en": "Mongkhet"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "ကျောက်မဲ",
+      "town_en": "Kyaukme",
+      "township": "ကျောက်မဲ",
+      "township_en": "Kyaukme"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ရွှေကျင်",
+      "town_en": "Shwegyin",
+      "township": "ရွှေကျင်",
+      "township_en": "Shwegyin"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ဟိုပင်",
+      "town_en": "Hopin",
+      "township": "ဟိုပင်",
+      "township_en": "Hopin"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ငသိုင်းချောင်း",
+      "town_en": "Ngathaingchaung",
+      "township": "ငသိုင်းချောင်း",
+      "township_en": "Ngathaingchaung"
+    },
+    {
+      "region": "ချင်းပြည်နယ်",
+      "region_en": "Chin State",
+      "town": "ရိခေါ်ဒါရ်",
+      "town_en": "Rihkhawdar",
+      "township": "ရိခေါ်ဒါရ်",
+      "township_en": "Rihkhawdar"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (မြောက်ပိုင်း)",
+      "region_en": "Shan State (North)",
+      "town": "မူဆယ်",
+      "town_en": "Muse",
+      "township": "မူဆယ်",
+      "township_en": "Muse"
+    },
+    {
+      "region": "တနင်္သာရီတိုင်းဒေသကြီး",
+      "region_en": "Tanintharyi Region",
+      "town": "ပုလော",
+      "town_en": "Palaw",
+      "township": "ပုလော",
+      "township_en": "Palaw"
+    },
+    {
+      "region": "နေပြည်တော် (ပြည်ထောင်စုနယ်မြေ)",
+      "region_en": "Naypyitaw Union Territory",
+      "town": "တပ်ကုန်း",
+      "town_en": "Tatkon",
+      "township": "တပ်ကုန်း",
+      "township_en": "Tatkon"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ပင်းတယ",
+      "town_en": "Pindaya",
+      "township": "ပင်းတယ",
+      "township_en": "Pindaya"
+    },
+    {
+      "region": "မန္တလေးတိုင်းဒေသကြီး",
+      "region_en": "Mandalay Region",
+      "town": "သာစည်",
+      "town_en": "Thazi",
+      "township": "သာစည်",
+      "township_en": "Thazi"
+    },
+    {
+      "region": "ရန်ကုန်တိုင်းဒေသကြီး",
+      "region_en": "Yangon Region",
+      "town": "သန်လျင်",
+      "town_en": "Thanlyin",
+      "township": "သန်လျင်",
+      "township_en": "Thanlyin"
+    },
+    {
+      "region": "စစ်ကိုင်းတိုင်းဒေသကြီး",
+      "region_en": "Sagaing Region",
+      "town": "ဒုံဟီး",
+      "town_en": "Don Hee Town",
+      "township": "ဒုံဟီး",
+      "township_en": "Don Hee Town"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "မိုင်းရှူး",
+      "town_en": "Monghsu",
+      "township": "မိုင်းရှူး",
+      "township_en": "Monghsu"
+    },
+    {
+      "region": "ရှမ်းပြည်နယ် (တောင်ပိုင်း)",
+      "region_en": "Shan State (South)",
+      "town": "ပေါင်းလောင်း",
+      "town_en": "Pawng Lawng",
+      "township": "ပေါင်းလောင်း",
+      "township_en": "Pawng Lawng"
+    },
+    {
+      "region": "ရခိုင်ပြည်နယ်",
+      "region_en": "Rakhine State",
+      "town": "စနဲ",
+      "town_en": "Sa Ne",
+      "township": "စနဲ",
+      "township_en": "Sa Ne"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ကံမ",
+      "town_en": "Kamma",
+      "township": "ကံမ",
+      "township_en": "Kamma"
+    },
+    {
+      "region": "မကွေးတိုင်းဒေသကြီး",
+      "region_en": "Magway Region",
+      "town": "ကျော",
+      "town_en": "Kyaw",
+      "township": "ကျော",
+      "township_en": "Kyaw"
+    },
+    {
+      "region": "ဧရာဝတီတိုင်းဒေသကြီး",
+      "region_en": "Ayeyarwady Region",
+      "town": "ရွှေသောင်ယံ",
+      "town_en": "Shwethaungyan",
+      "township": "ရွှေသောင်ယံ",
+      "township_en": "Shwethaungyan"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "နောင်မွန်း",
+      "town_en": "Nawngmun",
+      "township": "နောင်မွန်း",
+      "township_en": "Nawngmun"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အရှေ့)",
+      "region_en": "Bago Region (East)",
+      "town": "ညောင်လေးပင်",
+      "town_en": "Nyaunglebin",
+      "township": "ညောင်လေးပင်",
+      "township_en": "Nyaunglebin"
+    },
+    {
+      "region": "ကယားပြည်နယ်",
+      "region_en": "Kayah state",
+      "town": "ဘောလခဲ",
+      "town_en": "Bawlake",
+      "township": "ဘောလခဲ",
+      "township_en": "Bawlake"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ဆင်မြီးဆွဲ",
+      "town_en": "Sin Mee Swea",
+      "township": "ဆင်မြီးဆွဲ",
+      "township_en": "Sin Mee Swea"
+    },
+    {
+      "region": "ပဲခူးတိုင်းဒေသကြီး (အနောက်)",
+      "region_en": "Bago Region (West)",
+      "town": "ရွှေတောင်",
+      "town_en": "Shwedaung",
+      "township": "ရွှေတောင်",
+      "township_en": "Shwedaung"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ဆင်ဘို",
+      "town_en": "Sinbo",
+      "township": "ဆင်ဘို",
+      "township_en": "Sinbo"
+    },
+    {
+      "region": "ကချင်ပြည်နယ်",
+      "region_en": "Kachin State",
+      "town": "ဆွမ်ပရာဘွမ်",
+      "town_en": "Sumprabum",
+      "township": "ဆွမ်ပရာဘွမ်",
+      "township_en": "Sumprabum"
+    },
+    {
+      "region": "နေပြည်တော် (ပြည်ထောင်စုနယ်မြေ)",
+      "region_en": "Naypyitaw Union Territory",
+      "town": "ပျဉ်းမနား",
+      "town_en": "Pyinmana",
+      "township": "ပျဉ်းမနား",
+      "township_en": "Pyinmana"
+    }
+  ]
+}
