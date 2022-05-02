@@ -1,9 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:http/http.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/member/member_detail.dart';
 import 'package:merchant/src/features/member/new_member.dart';
@@ -163,13 +159,12 @@ class _MemberListState extends State<MemberList> {
       body: PaginateFirestore(
         // Use SliverAppBar in header to make it sticky
         // item builder type is compulsory.
-        itemBuilderType:
-            PaginateBuilderType.listView, 
+        itemBuilderType: PaginateBuilderType.listView,
         itemsPerPage: 50,
         //Change types accordingly
         itemBuilder: (context, documentSnapshots, index) {
           final data = documentSnapshots[index].data() as Map<String, dynamic>;
-          
+
           return memberRow2(data);
         },
         // orderBy is compulsory to enable pagination
@@ -208,12 +203,12 @@ class _MemberListState extends State<MemberList> {
 
   fetchMembers() async {
     FirebaseFirestore.instance.collection('members').get().then((value) {
-      value.docs.forEach((result) {
+      for (var result in value.docs) {
         print(result.data());
         setState(() {
           allMembers.add(result.data()['name']);
         });
-      });
+      }
     });
   }
 
@@ -496,7 +491,6 @@ class _MemberListState extends State<MemberList> {
       child: Container(
         height: Responsive.isMobile(context) ? 98 : 102,
         decoration: shadowDecoration(Colors.white),
-        
         margin: const EdgeInsets.only(top: 4, left: 12, right: 20),
         padding: const EdgeInsets.only(left: 18, right: 20),
         child: Column(
@@ -537,28 +531,36 @@ class _MemberListState extends State<MemberList> {
                 // physics: const NeverScrollableScrollPhysics(),
                 children: [
                   Expanded(
-                    
+                    flex: 1,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              data['name'] ?? "-",
-                              style: TextStyle(
-                                  fontSize: Responsive.isMobile(context) ? 15 : 17,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w600),
+                            Expanded(
+                              child: Text(
+                                data['name'] ?? "-",
+                                style: TextStyle(
+                                    fontSize:
+                                        Responsive.isMobile(context) ? 15 : 17,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600),
+                              ),
                             ),
-                            const SizedBox(width: 4,),
-                            Text(
-                             "( အဖ - " + data['father_name'] +
-                                      ")" ,
-                              style: TextStyle(
-                                  fontSize:
-                                      Responsive.isMobile(context) ? 14 : 16,
-                                  color: Colors.black),
+                            Expanded(
+                              child: Text(
+                                "( အဖ - " + data['father_name'] + ")",
+                                style: TextStyle(
+                                    fontSize:
+                                        Responsive.isMobile(context) ? 14 : 16,
+                                    color: Colors.black),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 4,
                             ),
                           ],
                         ),
@@ -574,28 +576,31 @@ class _MemberListState extends State<MemberList> {
                       ],
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        data['blood_type'] ?? "-",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: Responsive.isMobile(context) ? 15 : 17,
-                            color: Colors.red),
-                      ),
-                      const SizedBox(
-                        height: 6,
-                      ),
-                      Text(
-                        data['blood_bank_card'] ?? "-",
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: Responsive.isMobile(context) ? 14 : 16,
-                            color: Colors.black),
-                      ),
-                    ],
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          data['blood_type'] ?? "-",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: Responsive.isMobile(context) ? 15 : 17,
+                              color: Colors.red),
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                        Text(
+                          data['blood_bank_card'] ?? "-",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: Responsive.isMobile(context) ? 14 : 16,
+                              color: Colors.black),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

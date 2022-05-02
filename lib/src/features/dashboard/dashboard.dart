@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:merchant/data/repository/merchant.dart';
 import 'package:merchant/data/response/label_count_response/label_count_response.dart';
+import 'package:merchant/member_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/dashboard/ui/dashboard_card.dart';
 import 'package:merchant/src/features/dashboard/ui/dashboard_card_shimmer.dart';
@@ -45,7 +48,16 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   initial() async {
     var date = DateTime.now();
     String donationYear = DateFormat('yyyy').format(date);
-
+    FirebaseFirestore.instance
+        .collection('member_count')
+        .doc("member_string")
+        .get()
+        .then((value) {
+      var members = value['members'];
+      var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
+      print("Data Length " + data.length.toString());
+      print("Data 1 Name " + data[0].name!);
+    });
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('members').get();
     QuerySnapshot querySnapshotDonar =
@@ -59,7 +71,6 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       totalDonar = querySnapshotDonar.size;
       totalDonation = querySnapshotDonation.size;
     });
-    
   }
 
   VoidCallback refresh() => initial();
