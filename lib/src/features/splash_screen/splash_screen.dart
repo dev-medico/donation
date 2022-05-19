@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/auth/login.dart';
 import 'package:merchant/src/features/home/home.dart';
-import 'package:merchant/src/features/home/slider_drawer.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

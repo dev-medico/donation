@@ -7,6 +7,7 @@ import 'package:merchant/src/features/home/custom_drawer/home_drawer.dart';
 import 'package:merchant/src/features/member/member_list.dart';
 import 'package:merchant/src/features/member/new_member.dart';
 import 'package:merchant/src/features/member/search_member.dart';
+import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 import 'package:merchant/src/features/setttings/settings.dart';
 
 class NavigationHomeScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen>
   @override
   void initState() {
     drawerIndex = DrawerIndex.DASHBOARD;
-    screenView = DashBoardScreen();
+    screenView = const DashBoardScreen();
     super.initState();
   }
 
@@ -41,7 +42,9 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen>
           backgroundColor: Colors.white,
           body: DrawerUserController(
             screenIndex: drawerIndex,
-            drawerWidth: Responsive.isMobile(context) ? MediaQuery.of(context).size.width * 0.68 : MediaQuery.of(context).size.width * 0.25,
+            drawerWidth: Responsive.isMobile(context)
+                ? MediaQuery.of(context).size.width * 0.68
+                : MediaQuery.of(context).size.width * 0.25,
             onDrawerCall: (DrawerIndex drawerIndexdata) {
               changeIndex(drawerIndexdata);
               //callback from drawer for replace screen as user need with passing DrawerIndex(Enum index)
@@ -59,11 +62,11 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen>
       drawerIndex = drawerIndexdata;
       if (drawerIndex == DrawerIndex.DASHBOARD) {
         setState(() {
-          screenView = DashBoardScreen();
+          screenView = const DashBoardScreen();
         });
       } else if (drawerIndex == DrawerIndex.NEWMEMBER) {
         setState(() {
-          screenView = MemberList();
+          screenView = const MemberListNewStyle();
         });
       } else if (drawerIndex == DrawerIndex.RECORDS) {
         setState(() {

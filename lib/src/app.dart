@@ -1,19 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:merchant/src/features/auth/login.dart';
 import 'package:merchant/src/features/dashboard/dashboard.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_label_card.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list.dart';
 import 'package:merchant/src/features/home/home.dart';
-import 'package:merchant/src/features/home/slider_drawer.dart';
-import 'package:merchant/src/features/member/member_detail.dart';
 import 'package:merchant/src/features/member/member_list.dart';
-import 'package:merchant/src/features/setttings/settings.dart';
+import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 import 'package:merchant/src/features/splash_screen/splash_screen.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
@@ -77,14 +71,12 @@ class _MyAppState extends State<MyApp> {
               case LoginScreen.routeName:
                 return const LoginScreen();
               case DashBoardScreen.routeName:
-                return DashBoardScreen();
+                return const DashBoardScreen();
 
-              case HomeScreen.routeName:
-                return const HomeScreen();
               case NavigationHomeScreen.routeName:
                 return const NavigationHomeScreen();
-              case MemberList.routeName:
-                return MemberList();
+              case MemberListNewStyle.routeName:
+                return const MemberListNewStyle();
 
               case BloodDonationList.routeName:
                 return BloodDonationList();

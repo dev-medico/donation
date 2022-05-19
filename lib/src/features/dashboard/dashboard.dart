@@ -1,32 +1,21 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:merchant/data/repository/merchant.dart';
-import 'package:merchant/data/response/label_count_response/label_count_response.dart';
-import 'package:merchant/member_list_response.dart';
+import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_card.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_card_shimmer.dart';
 import 'package:merchant/src/features/dashboard/ui/dashboard_chart.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_error.dart';
 import 'package:merchant/src/features/dashboard/ui/dashboard_label_card.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_label_shimmer.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_loading.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list.dart';
-import 'package:merchant/src/features/member/member_list.dart';
+import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 class DashBoardScreen extends StatefulWidget {
-  DashBoardScreen({Key? key}) : super(key: key);
+  const DashBoardScreen({Key? key}) : super(key: key);
   static const routeName = "/dashboard";
 
   @override
@@ -48,6 +37,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   initial() async {
     var date = DateTime.now();
     String donationYear = DateFormat('yyyy').format(date);
+
     FirebaseFirestore.instance
         .collection('member_count')
         .doc("member_string")
@@ -55,11 +45,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         .then((value) {
       var members = value['members'];
       var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
-      print("Data Length " + data.length.toString());
-      print("Data 1 Name " + data[0].name!);
+
+      setState(() {
+        totalMember = data.length;
+      });
     });
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('members').get();
+
     QuerySnapshot querySnapshotDonar =
         await FirebaseFirestore.instance.collection('donors').get();
     QuerySnapshot querySnapshotDonation = await FirebaseFirestore.instance
@@ -67,7 +58,6 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         .where('year', isEqualTo: int.parse(donationYear))
         .get();
     setState(() {
-      totalMember = querySnapshot.size;
       totalDonar = querySnapshotDonar.size;
       totalDonation = querySnapshotDonation.size;
     });
@@ -325,13 +315,13 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         child: NeumorphicButton(
           onPressed: () async {
             if (index == 0) {
-              await Navigator.pushNamed(context, MemberList.routeName);
-              QuerySnapshot querySnapshot =
-                  await FirebaseFirestore.instance.collection('members').get();
+               await Navigator.pushNamed(context, MemberListNewStyle.routeName);
+              // QuerySnapshot querySnapshot =
+              //     await FirebaseFirestore.instance.collection('members').get();
 
-              setState(() {
-                totalMember = querySnapshot.size;
-              });
+              // setState(() {
+              //   totalMember = querySnapshot.size;
+              // });
             } else if (index == 1) {
               await Navigator.pushNamed(context, BloodDonationList.routeName);
               var date = DateTime.now();

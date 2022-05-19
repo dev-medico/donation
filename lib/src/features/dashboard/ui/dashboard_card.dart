@@ -3,6 +3,7 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list.dart';
 import 'package:merchant/src/features/member/member_list.dart';
+import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 
 class DashBoardCard extends StatelessWidget {
   final int index;
@@ -32,7 +33,7 @@ class DashBoardCard extends StatelessWidget {
         child: NeumorphicButton(
           onPressed: () async {
             if (index == 0) {
-              await Navigator.pushNamed(context, MemberList.routeName);
+              await Navigator.pushNamed(context, MemberListNewStyle.routeName);
               callBack();
             } else if (index == 1) {
               await Navigator.pushNamed(context, BloodDonationList.routeName);

@@ -1,23 +1,134 @@
-class Member {
-  String? birth_date;
-  String? blood_bank_card;
-  String? blood_type;
-  String? member_id;
-  String? father_name;
-  String? name;
+class MemberListResponse {
+  List<MemberData>? data;
 
-  Member(String birth_date, String blood_bank_card, String blood_type,
-      String member_id, String father_name, String name) {
-    birth_date = birth_date;
-    blood_bank_card = blood_bank_card;
-    blood_type = blood_type;
-    member_id = member_id;
-    father_name = father_name;
-    name = name;
+  MemberListResponse({this.data});
+
+  MemberListResponse.fromJson(Map<String, dynamic> json) {
+    if (json['data'] != null) {
+      data = <MemberData>[];
+      json['data'].forEach((v) {
+        data!.add(new MemberData.fromJson(v));
+      });
+    }
   }
 
-  static Member fromMap(Map<String, dynamic> map) {
-    return Member(map['birth_date'], map['blood_bank_card'], map["blood_type"],
-        map["member_id"], map["father_name"], map["name"]);
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.data != null) {
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class MemberData {
+  String? birthDate;
+  String? bloodBankCard;
+  String? bloodType;
+  String? fatherName;
+  String? homeNo;
+  String? lastDate;
+  LastDateDetail? lastDateDetail;
+  String? memberCount;
+  String? memberId;
+  String? name;
+  String? note;
+  String? nrc;
+  String? phone;
+  String? quarter;
+  String? region;
+  String? registerDate;
+  String? street;
+  String? totalCount;
+  String? town;
+
+  MemberData(
+      {this.birthDate,
+      this.bloodBankCard,
+      this.bloodType,
+      this.fatherName,
+      this.homeNo,
+      this.lastDate,
+      this.lastDateDetail,
+      this.memberCount,
+      this.memberId,
+      this.name,
+      this.note,
+      this.nrc,
+      this.phone,
+      this.quarter,
+      this.region,
+      this.registerDate,
+      this.street,
+      this.totalCount,
+      this.town});
+
+  MemberData.fromJson(Map<String, dynamic> json) {
+    birthDate = json['birth_date'];
+    bloodBankCard = json['blood_bank_card'];
+    bloodType = json['blood_type'];
+    fatherName = json['father_name'];
+    homeNo = json['home_no'];
+    lastDate = json['last_date'];
+    lastDateDetail = json['last_date_detail'] != null
+        ? new LastDateDetail.fromJson(json['last_date_detail'])
+        : null;
+    memberCount = json['member_count'];
+    memberId = json['member_id'];
+    name = json['name'];
+    note = json['note'];
+    nrc = json['nrc'];
+    phone = json['phone'];
+    quarter = json['quarter'];
+    region = json['region'];
+    registerDate = json['register_date'];
+    street = json['street'];
+    totalCount = json['total_count'];
+    town = json['town'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['birth_date'] = this.birthDate;
+    data['blood_bank_card'] = this.bloodBankCard;
+    data['blood_type'] = this.bloodType;
+    data['father_name'] = this.fatherName;
+    data['home_no'] = this.homeNo;
+    data['last_date'] = this.lastDate;
+    if (this.lastDateDetail != null) {
+      data['last_date_detail'] = this.lastDateDetail!.toJson();
+    }
+    data['member_count'] = this.memberCount;
+    data['member_id'] = this.memberId;
+    data['name'] = this.name;
+    data['note'] = this.note;
+    data['nrc'] = this.nrc;
+    data['phone'] = this.phone;
+    data['quarter'] = this.quarter;
+    data['region'] = this.region;
+    data['register_date'] = this.registerDate;
+    data['street'] = this.street;
+    data['total_count'] = this.totalCount;
+    data['town'] = this.town;
+    return data;
+  }
+}
+
+class LastDateDetail {
+  String? sDatatype;
+  String? value;
+
+  LastDateDetail({this.sDatatype, this.value});
+
+  LastDateDetail.fromJson(Map<String, dynamic> json) {
+    sDatatype = json['__datatype__'];
+    value = json['value'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['__datatype__'] = this.sDatatype;
+    data['value'] = this.value;
+    return data;
   }
 }
