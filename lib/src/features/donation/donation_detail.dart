@@ -1253,14 +1253,14 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
         FirebaseFirestore.instance.collection('members');
     members.doc(data['member_id']).get().then((value) {
       if (value.exists) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MemberDetailScreen(
-              data: value.data() as Map<String, dynamic>,
-            ),
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => MemberDetailScreen(
+        //       data: value.data() as Map<String, dynamic>,
+        //     ),
+        //   ),
+        // );
       }
     });
     // DocumentReference documentReference =
