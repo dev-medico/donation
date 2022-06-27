@@ -112,12 +112,12 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                 ? data!.length - index * 50
                                 : 50));
                     return ListView(
-                      padding:  EdgeInsets.zero,
+                      padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
                       children: [
                         SizedBox(
-                          height: MediaQuery.of(context).size.height * 8,
+                          height: MediaQuery.of(context).size.height * 5,
                           width: MediaQuery.of(context).size.width * 2.5,
                           child: ListView(
                             shrinkWrap: true,
