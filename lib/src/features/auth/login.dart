@@ -241,7 +241,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   .collection('admin');
                               bool auth = false;
                               admins.get().then((value) {
-                                value.docs.forEach((element) {
+                                for (var element in value.docs) {
                                   print(element.data());
                                   final data =
                                       element.data() as Map<String, dynamic>;
@@ -257,7 +257,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       auth = true;
                                     });
                                   }
-                                });
+                                }
 
                                 if (auth) {
                                   setState(() {
