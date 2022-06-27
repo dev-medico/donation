@@ -30,7 +30,6 @@ class NewDonarState extends State<NewDonarScreen> {
   bool isSwitched = false;
   String operatorImg = "";
 
-
   bool _isLoading = false;
   late FirebaseFirestore firestore;
   late TownshipResponse townshipResponse;
@@ -64,7 +63,6 @@ class NewDonarState extends State<NewDonarScreen> {
           Colors.black);
       nameController.clear();
       amountController.clear();
-      
     }).catchError((error) {});
   }
 
@@ -165,7 +163,7 @@ class NewDonarState extends State<NewDonarScreen> {
                       decoration: BoxDecoration(
                           color: primaryColor,
                           borderRadius:
-                              const BorderRadius.all(Radius.circular(20.0))),
+                              const BorderRadius.all(Radius.circular(12.0))),
                       margin: const EdgeInsets.only(
                           left: 15, bottom: 16, right: 15),
                       width: double.infinity,
@@ -173,12 +171,11 @@ class NewDonarState extends State<NewDonarScreen> {
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
                           if (nameController.text.isNotEmpty &&
-                              amountController.text.isNotEmpty ) {
+                              amountController.text.isNotEmpty) {
                             setState(() {
                               _isLoading = true;
                             });
-                            addDonor(
-                                nameController.text.toString(),
+                            addDonor(nameController.text.toString(),
                                 amountController.text.toString());
                           } else {
                             Utils.messageDialog(
@@ -246,7 +243,7 @@ class NewDonarState extends State<NewDonarScreen> {
       multiLine: false,
     );
     RegExp mpt = RegExp(
-      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])\d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
+      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
       caseSensitive: false,
       multiLine: false,
     );
