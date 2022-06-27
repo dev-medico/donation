@@ -581,7 +581,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                 : Container(
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: MediaQuery.of(context).size.height * 0.4 - 20,
-                    margin:const EdgeInsets.only(top: 20,right: 90),
+                    margin: const EdgeInsets.only(top: 20, right: 90),
                     child: Row(
                       children: [
                         Expanded(
@@ -595,7 +595,9 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   : MediaQuery.of(context).size.width * 0.47,
                               decoration: shadowDecoration(Colors.white),
                               margin: const EdgeInsets.only(
-                                  left: 20, right: 8,),
+                                left: 20,
+                                right: 8,
+                              ),
                               padding: const EdgeInsets.all(20),
                               child: Column(
                                 children: [
@@ -611,7 +613,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                       ),
                                       Text("လူနာအချက်အလက်များ",
                                           style: TextStyle(
-                                              fontSize: 15, color: primaryColor)),
+                                              fontSize: 15,
+                                              color: primaryColor)),
                                     ],
                                   ),
                                   const SizedBox(
@@ -619,7 +622,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   ),
                                   Container(
                                     height: 1,
-                                    width: MediaQuery.of(context).size.width - 80,
+                                    width:
+                                        MediaQuery.of(context).size.width - 80,
                                     color: Colors.grey,
                                   ),
                                   const SizedBox(
@@ -640,7 +644,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                       ),
                                       const Text("-",
                                           style: TextStyle(
-                                              fontSize: 14, color: Colors.black)),
+                                              fontSize: 14,
+                                              color: Colors.black)),
                                       const SizedBox(
                                         width: 24,
                                       ),
@@ -649,7 +654,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                         child: Text(
                                           data["patient_name"],
                                           style: const TextStyle(
-                                              fontSize: 14, color: Colors.black),
+                                              fontSize: 14,
+                                              color: Colors.black),
                                         ),
                                       ),
                                     ],
@@ -672,7 +678,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                       ),
                                       const Text("-",
                                           style: TextStyle(
-                                              fontSize: 14, color: Colors.black)),
+                                              fontSize: 14,
+                                              color: Colors.black)),
                                       const SizedBox(
                                         width: 24,
                                       ),
@@ -682,7 +689,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                           Utils.strToMM(data["patient_age"]) +
                                               " နှစ်",
                                           style: const TextStyle(
-                                              fontSize: 14, color: Colors.black),
+                                              fontSize: 14,
+                                              color: Colors.black),
                                         ),
                                       ),
                                     ],
@@ -705,7 +713,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                       ),
                                       const Text("-",
                                           style: TextStyle(
-                                              fontSize: 14, color: Colors.black)),
+                                              fontSize: 14,
+                                              color: Colors.black)),
                                       const SizedBox(
                                         width: 24,
                                       ),
@@ -714,7 +723,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                         child: Text(
                                           data["patient_address"],
                                           style: const TextStyle(
-                                              fontSize: 14, color: Colors.black),
+                                              fontSize: 14,
+                                              color: Colors.black),
                                         ),
                                       ),
                                     ],
@@ -737,7 +747,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                       ),
                                       const Text("-",
                                           style: TextStyle(
-                                              fontSize: 14, color: Colors.black)),
+                                              fontSize: 14,
+                                              color: Colors.black)),
                                       const SizedBox(
                                         width: 24,
                                       ),
@@ -746,7 +757,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                         child: Text(
                                           data["patient_disease"],
                                           style: const TextStyle(
-                                              fontSize: 14, color: Colors.black),
+                                              fontSize: 14,
+                                              color: Colors.black),
                                         ),
                                       ),
                                     ],
@@ -759,7 +771,6 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                             ),
                           ),
                         ),
-                       
                         Expanded(
                           flex: 1,
                           child: Container(
@@ -768,7 +779,9 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 : MediaQuery.of(context).size.width * 0.47,
                             decoration: shadowDecoration(Colors.white),
                             margin: const EdgeInsets.only(
-                                left: 8, right: 20,),
+                              left: 8,
+                              right: 20,
+                            ),
                             padding: const EdgeInsets.all(20),
                             child: Column(
                               children: [
@@ -1018,7 +1031,12 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                     ),
                   ),
             Container(
-              margin: EdgeInsets.only(left: 16, right:Responsive.isMobile(context) ?  16 : MediaQuery.of(context).size.width * 0.54,top: Responsive.isMobile(context) ? 0 : 26),
+              margin: EdgeInsets.only(
+                  left: 16,
+                  right: Responsive.isMobile(context)
+                      ? 16
+                      : MediaQuery.of(context).size.width * 0.54,
+                  top: Responsive.isMobile(context) ? 0 : 26),
               child: Row(
                 children: [
                   Expanded(
@@ -1027,7 +1045,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                       decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius:
-                              BorderRadius.all(Radius.circular(20.0))),
+                              BorderRadius.all(Radius.circular(12.0))),
                       margin: const EdgeInsets.only(bottom: 16, right: 6),
                       width: double.infinity,
                       child: GestureDetector(
@@ -1063,7 +1081,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                       decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius:
-                              BorderRadius.all(Radius.circular(20.0))),
+                              BorderRadius.all(Radius.circular(12.0))),
                       margin: const EdgeInsets.only(
                         left: 6,
                         bottom: 16,
@@ -1144,7 +1162,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
         padding:
             const EdgeInsets.only(top: 24, left: 20, right: 20, bottom: 30),
         child: MaterialButton(
-            padding:  EdgeInsets.all(Responsive.isMobile(context) ? 12.0 : 24),
+            padding: EdgeInsets.all(Responsive.isMobile(context) ? 12.0 : 24),
             textColor: Colors.white,
             splashColor: primaryColor,
             color: primaryColor,
