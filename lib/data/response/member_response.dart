@@ -7,13 +7,13 @@ class MemberListResponse {
     if (json['data'] != null) {
       data = <MemberData>[];
       json['data'].forEach((v) {
-        data!.add(new MemberData.fromJson(v));
+        data!.add(MemberData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -28,7 +28,7 @@ class MemberData {
   String? fatherName;
   String? homeNo;
   String? lastDate;
-  LastDateDetail? lastDateDetail;
+  String? lastDateDetail;
   String? memberCount;
   String? memberId;
   String? name;
@@ -70,9 +70,7 @@ class MemberData {
     fatherName = json['father_name'];
     homeNo = json['home_no'];
     lastDate = json['last_date'];
-    lastDateDetail = json['last_date_detail'] != null
-        ? new LastDateDetail.fromJson(json['last_date_detail'])
-        : null;
+    lastDateDetail = json['last_date_detail'];
     memberCount = json['member_count'];
     memberId = json['member_id'];
     name = json['name'];
@@ -88,47 +86,26 @@ class MemberData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['birth_date'] = this.birthDate;
-    data['blood_bank_card'] = this.bloodBankCard;
-    data['blood_type'] = this.bloodType;
-    data['father_name'] = this.fatherName;
-    data['home_no'] = this.homeNo;
-    data['last_date'] = this.lastDate;
-    if (this.lastDateDetail != null) {
-      data['last_date_detail'] = this.lastDateDetail!.toJson();
-    }
-    data['member_count'] = this.memberCount;
-    data['member_id'] = this.memberId;
-    data['name'] = this.name;
-    data['note'] = this.note;
-    data['nrc'] = this.nrc;
-    data['phone'] = this.phone;
-    data['quarter'] = this.quarter;
-    data['region'] = this.region;
-    data['register_date'] = this.registerDate;
-    data['street'] = this.street;
-    data['total_count'] = this.totalCount;
-    data['town'] = this.town;
-    return data;
-  }
-}
-
-class LastDateDetail {
-  String? sDatatype;
-  String? value;
-
-  LastDateDetail({this.sDatatype, this.value});
-
-  LastDateDetail.fromJson(Map<String, dynamic> json) {
-    sDatatype = json['__datatype__'];
-    value = json['value'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['__datatype__'] = this.sDatatype;
-    data['value'] = this.value;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['birth_date'] = birthDate;
+    data['blood_bank_card'] = bloodBankCard;
+    data['blood_type'] = bloodType;
+    data['father_name'] = fatherName;
+    data['home_no'] = homeNo;
+    data['last_date'] = lastDate;
+    data['last_date_detail'] = lastDateDetail;
+    data['member_count'] = memberCount;
+    data['member_id'] = memberId;
+    data['name'] = name;
+    data['note'] = note;
+    data['nrc'] = nrc;
+    data['phone'] = phone;
+    data['quarter'] = quarter;
+    data['region'] = region;
+    data['register_date'] = registerDate;
+    data['street'] = street;
+    data['total_count'] = totalCount;
+    data['town'] = town;
     return data;
   }
 }
