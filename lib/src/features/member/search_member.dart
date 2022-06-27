@@ -45,11 +45,11 @@ class _SearchMemberScreenState extends State<SearchMemberScreen> {
   void initState() {
     super.initState();
     var dateNow = DateTime.now();
-    var newDate =  DateTime(dateNow.year, dateNow.month - 4, dateNow.day);
+    var newDate = DateTime(dateNow.year, dateNow.month - 4, dateNow.day);
     _usersStream = FirebaseFirestore.instance
         .collection('members_last_record')
-        .where("last_date_detail",isLessThan: newDate )
-        .orderBy("last_date_detail",descending: false)
+        .where("last_date_detail", isLessThan: newDate)
+        .orderBy("last_date_detail", descending: false)
         .snapshots();
   }
 
@@ -122,7 +122,7 @@ class _SearchMemberScreenState extends State<SearchMemberScreen> {
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
                                       color: Colors.grey, width: 1),
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 contentPadding: const EdgeInsets.only(
                                     left: 20, right: 12, bottom: 4),
@@ -310,7 +310,10 @@ class _SearchMemberScreenState extends State<SearchMemberScreen> {
                       ? MediaQuery.of(context).size.width / 3.8
                       : MediaQuery.of(context).size.width / 7,
                   child: Text(
-                    data['last_date'] != null && data['last_date'] != "01 Jan 1990" ? data['last_date'] : "-",
+                    data['last_date'] != null &&
+                            data['last_date'] != "01 Jan 1990"
+                        ? data['last_date']
+                        : "-",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: Responsive.isMobile(context) ? 14 : 17,
