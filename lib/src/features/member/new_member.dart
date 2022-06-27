@@ -1599,12 +1599,12 @@ class NewMemberState extends State<NewMemberScreen> {
             minWidth: 155,
             onPressed: () {
               Navigator.of(context, rootNavigator: true).pop('dialog');
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MemberDetailScreen(data: data),
-                ),
-              );
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => MemberDetailScreen(data: data),
+              //   ),
+              // );
             },
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),

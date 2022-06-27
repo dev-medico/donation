@@ -268,12 +268,12 @@ class _SearchMemberScreenState extends State<SearchMemberScreen> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MemberDetailScreen(data: data),
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => MemberDetailScreen(data: data),
+        //   ),
+        // );
       },
       child: Container(
         height: Responsive.isMobile(context) ? 50 : 54,

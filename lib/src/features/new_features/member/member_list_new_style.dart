@@ -6,6 +6,7 @@ import 'package:flutter_expandable_table/flutter_expandable_table.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/responsive.dart';
+import 'package:merchant/src/features/member/member_detail.dart';
 import 'package:merchant/src/features/member/new_member.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
@@ -575,38 +576,54 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                   ))),
               children: List<Widget>.generate(
                   COLUMN_COUNT - 1,
-                  (columnIndex) => Container(
-                      decoration: borderDecorationNoRadius(Colors.grey),
-                      margin: const EdgeInsets.all(1),
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            left: columnIndex == 4 ? 32 : 20.0, top: 14),
-                        child: Text(
-                          columnIndex == 0
-                              ? data[rowIndex].name.toString()
-                              : columnIndex == 1
-                                  ? data[rowIndex].fatherName.toString()
-                                  : columnIndex == 2
-                                      ? data[rowIndex].bloodType.toString()
-                                      : columnIndex == 3
-                                          ? data[rowIndex].nrc.toString()
-                                          : columnIndex == 4
-                                              ? data[rowIndex]
-                                                  .bloodBankCard
-                                                  .toString()
-                                              : columnIndex == 5
-                                                  ? data[rowIndex]
-                                                      .memberCount
-                                                      .toString()
-                                                  : "",
-                          textAlign: columnIndex == 5 || columnIndex == 2
-                              ? TextAlign.center
-                              : TextAlign.start,
-                          style: TextStyle(
-                              fontSize: Responsive.isMobile(context) ? 14 : 15,
-                              color: Colors.black),
-                        ),
-                      ))),
+                  (columnIndex) => GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MemberDetailScreen(
+                                data: data[rowIndex],
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                            decoration: borderDecorationNoRadius(Colors.grey),
+                            margin: const EdgeInsets.all(1),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: columnIndex == 4 ? 32 : 20.0, top: 14),
+                              child: Text(
+                                columnIndex == 0
+                                    ? data[rowIndex].name.toString()
+                                    : columnIndex == 1
+                                        ? data[rowIndex].fatherName.toString()
+                                        : columnIndex == 2
+                                            ? data[rowIndex]
+                                                .bloodType
+                                                .toString()
+                                            : columnIndex == 3
+                                                ? data[rowIndex].nrc.toString()
+                                                : columnIndex == 4
+                                                    ? data[rowIndex]
+                                                        .bloodBankCard
+                                                        .toString()
+                                                    : columnIndex == 5
+                                                        ? data[rowIndex]
+                                                            .memberCount
+                                                            .toString()
+                                                        : "",
+                                textAlign: columnIndex == 5 || columnIndex == 2
+                                    ? TextAlign.center
+                                    : TextAlign.start,
+                                style: TextStyle(
+                                    fontSize:
+                                        Responsive.isMobile(context) ? 14 : 15,
+                                    color: Colors.black),
+                              ),
+                            )),
+                      )),
             ));
 
     return ExpandableTable(
