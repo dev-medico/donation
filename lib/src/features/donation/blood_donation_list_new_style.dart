@@ -4,24 +4,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_expandable_table/flutter_expandable_table.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:merchant/data/response/member_response.dart';
+import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/member/new_member.dart';
+import 'package:merchant/src/features/donation/new_blood_donation.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
 
-class MemberListNewStyle extends StatefulWidget {
-  static const routeName = "/member_list";
+class BloodDonationListNewStyle extends StatefulWidget {
+  static const routeName = "/new_blood_donation_list";
 
-  const MemberListNewStyle({Key? key}) : super(key: key);
+  const BloodDonationListNewStyle({Key? key}) : super(key: key);
 
   @override
-  _MemberListNewStyleState createState() => _MemberListNewStyleState();
+  _BloodDonationListNewStyleState createState() =>
+      _BloodDonationListNewStyleState();
 }
 
-class _MemberListNewStyleState extends State<MemberListNewStyle>
+class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     with SingleTickerProviderStateMixin {
-  List<String> ranges = [];
+  List<String> ranges = [
+    "2022",
+    "2021",
+    "2020",
+    "2019",
+    "2018",
+    "2017",
+    "2016",
+    "2015",
+    "2014",
+    "2013",
+    "2012",
+  ];
   List<String> bloodTypes = [
     "A (Rh +)",
     "A (Rh -)",
@@ -32,20 +45,20 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
     "O (Rh +)",
     "O (Rh -)"
   ];
-  List<MemberData> dataSegments = [];
+  List<DonationData> dataSegments = [];
   TextStyle tabStyle = const TextStyle(fontSize: 16);
   @override
   void initState() {
     super.initState();
     FirebaseFirestore.instance
         .collection('member_count')
-        .doc("member_string")
+        .doc("donation_string")
         .get()
         .then((value) {
-      var members = value['members'];
+      var members = value['donations'];
       int tabLength = 0;
       setState(() {
-        data = MemberListResponse.fromJson(jsonDecode(members)).data!;
+        data = DonationListResponse.fromJson(jsonDecode(members)).data!;
 
         if (data!.length % 50 == 0) {
           tabLength = data!.length ~/ 50;
@@ -53,17 +66,22 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
           tabLength = data!.length ~/ 50 + 1;
         }
 
-        for (int i = 0; i < data!.length; i = i + 50) {
-          if (i + 50 > data!.length) {
-            ranges.add(data![i].memberId! +
-                " မှ " +
-                data![data!.length - 1].memberId!);
-          } else {
-            ranges.add(data![i].memberId! + " မှ " + data![i + 49].memberId!);
-          }
+        List<DonationData> filterData = [];
+        for (int i = 0; i < data!.length; i++) {
+          filterData.add(data![i]);
         }
+        filterData.sort((a, b) {
+          //sorting in ascending order
+          return DateTime.parse(b.dateDetail == null
+                  ? "2020-01-01"
+                  : b.dateDetail.toString().split("T")[0])
+              .compareTo(DateTime.parse(a.dateDetail == null
+                  ? "2020-01-01"
+                  : a.dateDetail.toString().split("T")[0]));
+        });
+
         setState(() {
-          dataSegments = data!.sublist(0, 50);
+          dataSegments = filterData;
         });
       });
     });
@@ -92,7 +110,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                               ),
                               isExpanded: true,
                               hint: const Text(
-                                "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                "နှစ် အလိုက်ကြည့်မည်",
                                 style: TextStyle(fontSize: 13),
                               ),
                               icon: const Icon(
@@ -119,25 +137,35 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                   .toList(),
                               validator: (value) {
                                 if (value == null) {
-                                  return "အမှတ်စဥ် အလိုက်ကြည့်မည်";
+                                  return "နှစ် အလိုက်ကြည့်မည်";
                                 }
                                 return null;
                               },
                               onChanged: (value) {
-                                for (int i = 0; i < ranges.length; i++) {
-                                  if (value == ranges[i]) {
-                                    if (i != ranges.length - 1) {
-                                      setState(() {
-                                        dataSegments =
-                                            data!.sublist(i * 50, (i + 1) * 50);
-                                      });
-                                    } else {
-                                      setState(() {
-                                        dataSegments = data!.sublist(i * 50);
-                                      });
-                                    }
+                                List<DonationData> filterData = [];
+                                for (int i = 0; i < data!.length; i++) {
+                                  if (data![i].date!.split(" ")[2] == value) {
+                                    filterData.add(data![i]);
                                   }
                                 }
+                                filterData.sort((a, b) {
+                                  //sorting in ascending order
+                                  return DateTime.parse(b.dateDetail == null
+                                          ? "2020-01-01"
+                                          : b.dateDetail
+                                              .toString()
+                                              .split("T")[0])
+                                      .compareTo(DateTime.parse(
+                                          a.dateDetail == null
+                                              ? "2020-01-01"
+                                              : a.dateDetail
+                                                  .toString()
+                                                  .split("T")[0]));
+                                });
+
+                                setState(() {
+                                  dataSegments = filterData;
+                                });
                               },
                               onSaved: (value) {},
                             ),
@@ -187,13 +215,28 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                 return null;
                               },
                               onChanged: (value) {
-                                List<MemberData>? filterdata = [];
+                                List<DonationData>? filterdata = [];
                                 for (int i = 0; i < data!.length; i++) {
-                                  //get memberdata from data only where bloodtype is equal to value
-                                  if (data![i].bloodType == value) {
+                                  //get DonationData from data only where bloodtype is equal to value
+                                  if (data![i].memberBloodType == value) {
                                     filterdata.add(data![i]);
                                   }
                                 }
+                                filterdata.sort((a, b) {
+                                  //sorting in ascending order
+                                  return DateTime.parse(b.dateDetail == null
+                                          ? "2020-01-01"
+                                          : b.dateDetail
+                                              .toString()
+                                              .split("T")[0])
+                                      .compareTo(DateTime.parse(
+                                          a.dateDetail == null
+                                              ? "2020-01-01"
+                                              : a.dateDetail
+                                                  .toString()
+                                                  .split("T")[0]));
+                                });
+
                                 setState(() {
                                   dataSegments = filterdata.sublist(0);
                                 });
@@ -215,11 +258,11 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                           style: const TextStyle(
                               fontSize: 15, color: Colors.black),
                           onChanged: (val) {
-                            List<MemberData>? filterdata = [];
+                            List<DonationData>? filterdata = [];
                             for (int i = 0; i < data!.length; i++) {
-                              //get memberdata from data only where bloodtype is equal to value
+                              //get DonationData from data only where bloodtype is equal to value
                               if (data![i]
-                                  .name!
+                                  .memberName!
                                   .toLowerCase()
                                   .contains(val.toString().toLowerCase())) {
                                 filterdata.add(data![i]);
@@ -281,7 +324,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                           ),
                           isExpanded: true,
                           hint: const Text(
-                            "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                            "နှစ် အလိုက်ကြည့်မည်",
                             style: TextStyle(fontSize: 14),
                           ),
                           icon: const Icon(
@@ -308,25 +351,31 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                               .toList(),
                           validator: (value) {
                             if (value == null) {
-                              return "အမှတ်စဥ် အလိုက်ကြည့်မည်";
+                              return "နှစ် အလိုက်ကြည့်မည်";
                             }
                             return null;
                           },
                           onChanged: (value) {
-                            for (int i = 0; i < ranges.length; i++) {
-                              if (value == ranges[i]) {
-                                if (i != ranges.length - 1) {
-                                  setState(() {
-                                    dataSegments =
-                                        data!.sublist(i * 50, (i + 1) * 50);
-                                  });
-                                } else {
-                                  setState(() {
-                                    dataSegments = data!.sublist(i * 50);
-                                  });
-                                }
+                            List<DonationData> filterData = [];
+                            for (int i = 0; i < data!.length; i++) {
+                              if (data![i].date!.split(" ")[2] == value) {
+                                filterData.add(data![i]);
                               }
                             }
+
+                            filterData.sort((a, b) {
+                              //sorting in ascending order
+                              return DateTime.parse(b.dateDetail == null
+                                      ? "2020-01-01"
+                                      : b.dateDetail.toString().split("T")[0])
+                                  .compareTo(DateTime.parse(a.dateDetail == null
+                                      ? "2020-01-01"
+                                      : a.dateDetail.toString().split("T")[0]));
+                            });
+
+                            setState(() {
+                              dataSegments = filterData;
+                            });
                           },
                           onSaved: (value) {},
                         ),
@@ -376,13 +425,22 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             return null;
                           },
                           onChanged: (value) {
-                            List<MemberData>? filterdata = [];
+                            List<DonationData>? filterdata = [];
                             for (int i = 0; i < data!.length; i++) {
-                              //get memberdata from data only where bloodtype is equal to value
-                              if (data![i].bloodType == value) {
+                              //get DonationData from data only where bloodtype is equal to value
+                              if (data![i].memberBloodType == value) {
                                 filterdata.add(data![i]);
                               }
                             }
+                            filterdata.sort((a, b) {
+                              //sorting in ascending order
+                              return DateTime.parse(b.dateDetail == null
+                                      ? "2020-01-01"
+                                      : b.dateDetail.toString().split("T")[0])
+                                  .compareTo(DateTime.parse(a.dateDetail == null
+                                      ? "2020-01-01"
+                                      : a.dateDetail.toString().split("T")[0]));
+                            });
                             setState(() {
                               dataSegments = filterdata.sublist(0);
                             });
@@ -402,10 +460,10 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                           style: const TextStyle(
                               fontSize: 15, color: Colors.black),
                           onChanged: (val) {
-                            List<MemberData>? filterdata = [];
+                            List<DonationData>? filterdata = [];
                             for (int i = 0; i < data!.length; i++) {
-                              //get memberdata from data only where bloodtype is equal to value
-                              if (data![i].name!.contains(val)) {
+                              //get DonationData from data only where bloodtype is equal to value
+                              if (data![i].memberName!.contains(val)) {
                                 filterdata.add(data![i]);
                               }
                             }
@@ -465,7 +523,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
   List<String> membersSelected = <String>[];
   List<String> allMembers = <String>[];
   bool inputted = false;
-  List<MemberData>? data;
+  List<DonationData>? data;
 
   @override
   Widget build(BuildContext context) {
@@ -482,7 +540,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
         centerTitle: true,
         title: Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Text("အဖွဲ့၀င်များ",
+          child: Text("သွေးလှူဒါန်းမှုစာရင်း",
               textScaleFactor: 1.0,
               style: TextStyle(
                   fontSize: Responsive.isMobile(context) ? 15 : 17,
@@ -499,7 +557,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
           await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => NewMemberScreen(),
+              builder: (context) => NewBloodDonationScreen(),
             ),
           );
         },
@@ -511,29 +569,33 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
   fetchMembers() async {
     FirebaseFirestore.instance
         .collection('member_count')
-        .doc("member_string")
+        .doc("donation_string")
         .get()
         .then((value) {
-      var members = value['members'];
-      var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
+      var members = value['donations'];
+      var data = DonationListResponse.fromJson(jsonDecode(members)).data!;
+      // order by date in descending order
+      // data.sort((a, b) => DateTime(int.parse(b.date!.split(" ")[2])).compareTo(DateTime(int.parse(a.date!.split(" ")[2]))));
       for (var element in data) {
         setState(() {
-          allMembers.add(element.name!);
+          allMembers.add(element.memberName!);
         });
       }
+      allMembers.sort((a, b) => b.compareTo(a));
     });
   }
 
-  ExpandableTable buildSimpleTable(List<MemberData> data) {
-    const int COLUMN_COUNT = 7;
+  ExpandableTable buildSimpleTable(List<DonationData> data) {
+    const int COLUMN_COUNT = 8;
     int ROWCOUNT = data.length;
     List<String> titles = [
-      "အမည်",
-      "အဖအမည်",
+      "သွေးအလှူရှင်",
       "သွေးအုပ်စု",
-      "မှတ်ပုံတင်အမှတ်",
-      "သွေးဘဏ်ကတ်",
-      "သွေးလှူမှုကြိမ်ရေ"
+      "လှူဒါန်းသည့်နေရာ",
+      "လူနာအမည်",
+      "လိပ်စာ",
+      "အသက်",
+      "ဖြစ်ပွားသည့်ရောဂါ"
     ];
 
     //Creation header
@@ -545,7 +607,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
             margin: const EdgeInsets.all(1),
             child: const Center(
                 child: Text(
-              'အမှတ်စဥ်',
+              'ရက်စွဲ',
               style: TextStyle(fontSize: 15, color: Colors.white),
             ))),
         children: List.generate(
@@ -570,7 +632,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                   margin: const EdgeInsets.all(1),
                   child: Center(
                       child: Text(
-                    data[rowIndex].memberId.toString(),
+                    data[rowIndex].date.toString(),
                     style: const TextStyle(fontSize: 15, color: Colors.black),
                   ))),
               children: List<Widget>.generate(
@@ -580,25 +642,32 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                       margin: const EdgeInsets.all(1),
                       child: Padding(
                         padding: EdgeInsets.only(
-                            left: columnIndex == 4 ? 32 : 20.0, top: 14),
+                            left: columnIndex == 4 ? 12 : 20.0,
+                            top: columnIndex == 4 ? 4 : 14),
                         child: Text(
                           columnIndex == 0
-                              ? data[rowIndex].name.toString()
+                              ? data[rowIndex].memberName.toString()
                               : columnIndex == 1
-                                  ? data[rowIndex].fatherName.toString()
+                                  ? data[rowIndex].memberBloodType.toString()
                                   : columnIndex == 2
-                                      ? data[rowIndex].bloodType.toString()
+                                      ? data[rowIndex].hospital.toString()
                                       : columnIndex == 3
-                                          ? data[rowIndex].nrc.toString()
+                                          ? data[rowIndex]
+                                              .patientName
+                                              .toString()
                                           : columnIndex == 4
                                               ? data[rowIndex]
-                                                  .bloodBankCard
+                                                  .patientAddress
                                                   .toString()
                                               : columnIndex == 5
                                                   ? data[rowIndex]
-                                                      .memberCount
+                                                      .patientAge
                                                       .toString()
-                                                  : "",
+                                                  : columnIndex == 6
+                                                      ? data[rowIndex]
+                                                          .patientDisease
+                                                          .toString()
+                                                      : "",
                           textAlign: columnIndex == 5 || columnIndex == 2
                               ? TextAlign.center
                               : TextAlign.start,
@@ -615,7 +684,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
       cellWidth: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width * 0.4
           : MediaQuery.of(context).size.width * 0.14,
-      cellHeight: 48,
+      cellHeight: 52,
       headerHeight: 52,
       firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
       scrollShadowColor: Colors.grey,

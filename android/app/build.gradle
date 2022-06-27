@@ -38,12 +38,11 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.red.juniors"
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 15
-        versionName "1.0.4"
+        versionCode 16
+        versionName "1.0.5"
     }
 
     signingConfigs {

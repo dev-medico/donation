@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/data/response/township_response/datum.dart';
 import 'package:merchant/data/response/township_response/township_response.dart';
+import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
@@ -100,10 +100,10 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
     initial();
   }
 
-  CollectionReference members =
-      FirebaseFirestore.instance.collection('blood_donations');
+  // CollectionReference members =
+  //     FirebaseFirestore.instance.collection('blood_donations');
 
-  Future<void> addDonation(
+  addDonation(
       String memberId,
       String memberBloodType,
       String memberBloodBank,
@@ -119,66 +119,106 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
 
     // String date = DateFormat('dd MMM yyyy').format(now);
     //get data from firestore by document id of member_id
-    DocumentReference documentReference =
-        FirebaseFirestore.instance.collection('members').doc(memberId);
-    FirebaseFirestore.instance
-        .runTransaction((transaction) async {
-          // Get the document
-          DocumentSnapshot snapshot = await transaction.get(documentReference);
+    // DocumentReference documentReference =
+    //     FirebaseFirestore.instance.collection('members').doc(memberId);
+    // FirebaseFirestore.instance
+    //     .runTransaction((transaction) async {
+    //       // Get the document
+    //       DocumentSnapshot snapshot = await transaction.get(documentReference);
 
-          int newMemberCount;
-          int newTotalCount;
-          print(snapshot.data());
-          Map<String, dynamic> data = snapshot.data()! as Map<String, dynamic>;
-          print(data);
-          newMemberCount = int.parse(data['member_count'].toString()) + 1;
-          newTotalCount = int.parse(data['total_count'].toString()) + 1;
-          // Perform an update on the document
-          transaction.update(
-              documentReference, {'member_count': newMemberCount.toString()});
-          transaction.update(
-              documentReference, {'total_count': newTotalCount.toString()});
-          return newMemberCount;
-        })
-        .then((value) => print("Follower count updated to $value"))
-        .catchError(
-            (error) => print("Failed to update user followers: $error"));
-    return members.add({
-      'patient_name': name,
-      'patient_age': age,
-      'date': donationDate,
-      'day': int.parse(donationDate.split(' ')[0]),
-      'month': donationDate.split(' ')[1],
-      'year': int.parse(donationDate.split(' ')[2]),
-      'date_detail': donationDateDetail,
-      'hospital': selectHospital,
-      'patient_disease': diseaseController.text.toString(),
-      'member_name': memberController.text.toString(),
-      'member_id': memberId,
-      'member_blood_type': memberBloodType,
-      'member_blood_bank_card': memberBloodBank,
-      'member_birth_date': memberBirthDate,
-      'member_father_name': memberFatherName,
-      'patient_address': quarter + "၊" + township,
-    }).then((value) {
-      setState(() {
-        _isLoading = false;
+    //       int newMemberCount;
+    //       int newTotalCount;
+    //       print(snapshot.data());
+    //       Map<String, dynamic> data = snapshot.data()! as Map<String, dynamic>;
+    //       print(data);
+    //       newMemberCount = int.parse(data['member_count'].toString()) + 1;
+    //       newTotalCount = int.parse(data['total_count'].toString()) + 1;
+    //       // Perform an update on the document
+    //       transaction.update(
+    //           documentReference, {'member_count': newMemberCount.toString()});
+    //       transaction.update(
+    //           documentReference, {'total_count': newTotalCount.toString()});
+    //       return newMemberCount;
+    //     })
+    //     .then((value) => print("Follower count updated to $value"))
+    //     .catchError(
+    //         (error) => print("Failed to update user followers: $error"));
+
+    FirebaseFirestore.instance
+        .collection('member_count')
+        .doc("member_string")
+        .get()
+        .then((value) {
+      var members = value['members'];
+      var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
+
+      data.where((element) => element.memberId == memberId).forEach((element) {
+        element.memberCount = (int.parse(element.memberCount!) + 1).toString();
+        element.totalCount = (int.parse(element.totalCount!) + 1).toString();
       });
-      Utils.messageSuccessDialog(
-          "သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-          context,
-          "အိုကေ",
-          Colors.black);
-      nameController.clear();
-      ageController.clear();
-      diseaseController.clear();
-      hospitalController.clear();
-      quarterController.clear();
-      townController.clear();
-      memberController.clear();
-      region1 = "";
-      regional = "";
-    }).catchError((error) {});
+
+      FirebaseFirestore.instance
+          .collection('member_count')
+          .doc("member_string")
+          .set({
+        'members': jsonEncode(MemberListResponse(data: data).toJson()),
+      });
+    });
+
+    FirebaseFirestore.instance
+        .collection('member_count')
+        .doc("donation_string")
+        .get()
+        .then((value) {
+      var members = value['donations'];
+      List<DonationData> data =
+          DonationListResponse.fromJson(jsonDecode(members)).data!;
+      print("Previous Data - ${data.length}");
+      data.add(DonationData(
+        memberId: memberId,
+        patientName: name,
+        patientAge: age,
+        date: donationDate,
+        day: int.parse(donationDate.split(' ')[0]),
+        month: donationDate.split(' ')[1],
+        year: int.parse(donationDate.split(' ')[2]),
+        dateDetail: donationDateDetail.toString(),
+        hospital: selectHospital,
+        patientDisease: diseaseController.text.toString(),
+        memberName: memberController.text.toString(),
+        memberBloodType: memberBloodType,
+        memberBloodBankCard: memberBloodBank,
+        memberBirthDate: memberBirthDate,
+        memberFatherName: memberFatherName,
+        patientAddress: quarter + "၊" + township,
+      ));
+
+      print("Added Data - ${data.length}");
+      FirebaseFirestore.instance
+          .collection('member_count')
+          .doc("donation_string")
+          .set({
+        'donations': jsonEncode(DonationListResponse(data: data).toJson()),
+      }).then((value) {
+        setState(() {
+          _isLoading = false;
+        });
+        Utils.messageSuccessDialog(
+            "သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+            context,
+            "အိုကေ",
+            Colors.black);
+        nameController.clear();
+        ageController.clear();
+        diseaseController.clear();
+        hospitalController.clear();
+        quarterController.clear();
+        townController.clear();
+        memberController.clear();
+        region1 = "";
+        regional = "";
+      }).catchError((error) {});
+    });
   }
 
   void initial() async {
@@ -1109,22 +1149,6 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                       "ပြင်ဆင်မည်",
                                       Colors.black);
                                 }
-
-                                // if (operatorImg == "") {
-                                //   Util.messageDialog("ဖုန်းနံပါတ် မှားယွင်းနေပါသည်",
-                                //       context, "ပြင်ဆင်မည်", Colors.black);
-                                // } else if (homeNo.text.toString() == "" ||
-                                //     street.text.toString() == "" ||
-                                //     quarter.text.toString() == "" ||
-                                //     town1.toString() == " ") {
-                                //   Util.messageDialog(
-                                //       "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
-                                //       context,
-                                //       "ဖြည့်သွင်းမည်",
-                                //       Colors.black);
-                                // } else {
-
-                                // }
                               },
                               child: const Align(
                                   alignment: Alignment.center,
@@ -1213,17 +1237,22 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
   }
 
   fetchMembers() async {
-    FirebaseFirestore.instance.collection('members').get().then((value) {
-      for (var result in value.docs) {
-        print(result.data());
+    FirebaseFirestore.instance
+        .collection('member_count')
+        .doc("member_string")
+        .get()
+        .then((value) {
+      var members = value['members'];
+      var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
+
+      for (var element in data) {
         setState(() {
-          allMembers.add(
-              result.data()['name'] + " (" + result.data()['member_id'] + ")");
-          allIDs.add(result.data()['member_id']);
-          allBTypes.add(result.data()['blood_type']);
-          allBDates.add(result.data()['birth_date']);
-          allBBCards.add(result.data()['blood_bank_card']);
-          allFatherNames.add(result.data()['father_name']);
+          allMembers.add(element.name! + " (" + element.memberId! + ")");
+          allIDs.add(element.memberId!);
+          allBTypes.add(element.bloodType!);
+          allBDates.add(element.birthDate!);
+          allBBCards.add(element.bloodBankCard!);
+          allFatherNames.add(element.fatherName!);
         });
       }
     });

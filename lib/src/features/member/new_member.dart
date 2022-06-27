@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -9,6 +8,7 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/data/response/township_response/datum.dart';
 import 'package:merchant/data/response/township_response/township_response.dart';
 import 'package:merchant/responsive.dart';
@@ -103,10 +103,10 @@ class NewMemberState extends State<NewMemberScreen> {
   }
 
   CollectionReference members =
-      FirebaseFirestore.instance.collection('members');
-  
-  Future<void> addMember(
-      String member_id,
+      FirebaseFirestore.instance.collection('member_count');
+
+  addMember(
+      String memberId,
       String name,
       String fatherName,
       String birthDate,
@@ -121,49 +121,67 @@ class NewMemberState extends State<NewMemberScreen> {
       String township) {
     DateTime now = DateTime.now();
     String date = DateFormat('dd MMM yyyy').format(now);
-    return members.doc(member_id).set({
-      'member_id': member_id,
-      'name': name,
-      'father_name': fatherName,
-      'birth_date': birthDate,
-      'nrc': nrc,
-      'phone': phone,
-      'blood_type': bloodType,
-      'blood_bank_card': bloodBankNo,
-      'member_count': "0",
-      'total_count': totalCount,
-      'home_no': homeNo,
-      'street': street,
-      'quarter': quarter,
-      'town': township,
-      'region': region1,
-      'register_date': date,
-      'note': noteController.text.toString() != ""
-          ? noteController.text.toString()
-          : "-",
-    }).then((value) {
-      setState(() {
-        _isLoading = false;
-      });
-      Utils.messageSuccessDialog("အဖွဲ့၀င် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-          context, "အိုကေ", Colors.black);
-      nameController.clear();
-      memberIDController.clear();
-      fatherNameController.clear();
-      nrcController.clear();
-      phoneController.clear();
-      selectedBloodType = "သွေးအုပ်စု";
-      birthDate = "မွေးသက္ကရာဇ်";
-      bloodBankNoController.clear();
-      totalDonationController.clear();
-      homeNoController.clear();
-      streetController.clear();
-      quarterController.clear();
-      townController.clear();
-      region1 = "";
-      regional = "";
-      noteController.clear();
-    }).catchError((error) {});
+
+    FirebaseFirestore.instance
+        .collection('member_count')
+        .doc("member_string")
+        .get()
+        .then((value) {
+      var members = value['members'];
+      List<MemberData> data =
+          MemberListResponse.fromJson(jsonDecode(members)).data!;
+      print("Previous Data - ${data.length}");
+      data.add(MemberData(
+        memberId: memberId,
+        name: name,
+        fatherName: fatherName,
+        birthDate: birthDate,
+        nrc: nrc,
+        phone: phone,
+        bloodType: bloodType,
+        bloodBankCard: bloodBankNo,
+        memberCount: "0",
+        totalCount: totalCount,
+        homeNo: homeNo,
+        street: street,
+        quarter: quarter,
+        town: township,
+        region: region1,
+        registerDate: date,
+        note: noteController.text.toString() != ""
+            ? noteController.text.toString()
+            : "-",
+      ));
+
+      print("Added Data - ${data.length}");
+      FirebaseFirestore.instance
+        .collection('member_count')
+        .doc("member_string").set({
+        'members': jsonEncode(MemberListResponse(data: data).toJson()),
+      }).then((value) {
+        setState(() {
+          _isLoading = false;
+        });
+        Utils.messageSuccessDialog("အဖွဲ့၀င် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+            context, "အိုကေ", Colors.black);
+        nameController.clear();
+        memberIDController.clear();
+        fatherNameController.clear();
+        nrcController.clear();
+        phoneController.clear();
+        selectedBloodType = "သွေးအုပ်စု";
+        birthDate = "မွေးသက္ကရာဇ်";
+        bloodBankNoController.clear();
+        totalDonationController.clear();
+        homeNoController.clear();
+        streetController.clear();
+        quarterController.clear();
+        townController.clear();
+        region1 = "";
+        regional = "";
+        noteController.clear();
+      }).catchError((error) {});
+    });
   }
 
   void initial() async {
@@ -457,7 +475,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                               value: nrc_type_options_Value,
                                               items:
                                                   nrc_type_options_dropDownMenuItems,
-                                              icon: Icon(
+                                              icon: const Icon(
                                                   Icons.keyboard_arrow_down),
                                               iconSize: 0,
                                               elevation: 16,
@@ -1036,7 +1054,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                         nrc_type_options_Value,
                                                     items:
                                                         nrc_type_options_dropDownMenuItems,
-                                                    icon: Icon(Icons
+                                                    icon: const Icon(Icons
                                                         .keyboard_arrow_down),
                                                     iconSize: 0,
                                                     elevation: 16,
@@ -1699,63 +1717,63 @@ class NewMemberState extends State<NewMemberScreen> {
             });
 
             NumberFormat formatter = NumberFormat("0000");
-            var member_id;
+            String memberId = "";
             if (id <= 1000) {
-              member_id = "A-" + formatter.format(id);
+              memberId = "A-" + formatter.format(id);
             } else if (id <= 2000) {
-              member_id = "B-" + formatter.format((id - 1000));
+              memberId = "B-" + formatter.format((id - 1000));
             } else if (id <= 3000) {
-              member_id = "C-" + formatter.format((id - 2000));
+              memberId = "C-" + formatter.format((id - 2000));
             } else if (id <= 4000) {
-              member_id = "D-" + formatter.format((id - 3000));
+              memberId = "D-" + formatter.format((id - 3000));
             } else if (id <= 5000) {
-              member_id = "E-" + formatter.format((id - 4000));
+              memberId = "E-" + formatter.format((id - 4000));
             } else if (id <= 6000) {
-              member_id = "F-" + formatter.format((id - 5000));
+              memberId = "F-" + formatter.format((id - 5000));
             } else if (id <= 7000) {
-              member_id = "G-" + formatter.format((id - 6000));
+              memberId = "G-" + formatter.format((id - 6000));
             } else if (id <= 8000) {
-              member_id = "H-" + formatter.format((id - 7000));
+              memberId = "H-" + formatter.format((id - 7000));
             } else if (id <= 9000) {
-              member_id = "I-" + formatter.format((id - 8000));
+              memberId = "I-" + formatter.format((id - 8000));
             } else if (id <= 10000) {
-              member_id = "J-" + formatter.format((id - 9000));
+              memberId = "J-" + formatter.format((id - 9000));
             } else if (id <= 11000) {
-              member_id = "K-" + formatter.format((id - 10000));
+              memberId = "K-" + formatter.format((id - 10000));
             } else if (id <= 12000) {
-              member_id = "L-" + formatter.format((id - 11000));
+              memberId = "L-" + formatter.format((id - 11000));
             } else if (id <= 13000) {
-              member_id = "M-" + formatter.format((id - 12000));
+              memberId = "M-" + formatter.format((id - 12000));
             } else if (id <= 14000) {
-              member_id = "N-" + formatter.format((id - 13000));
+              memberId = "N-" + formatter.format((id - 13000));
             } else if (id <= 15000) {
-              member_id = "O-" + formatter.format((id - 14000));
+              memberId = "O-" + formatter.format((id - 14000));
             } else if (id <= 16000) {
-              member_id = "P-" + formatter.format((id - 15000));
+              memberId = "P-" + formatter.format((id - 15000));
             } else if (id <= 17000) {
-              member_id = "Q-" + formatter.format((id - 16000));
+              memberId = "Q-" + formatter.format((id - 16000));
             } else if (id <= 18000) {
-              member_id = "R-" + formatter.format((id - 17000));
+              memberId = "R-" + formatter.format((id - 17000));
             } else if (id <= 19000) {
-              member_id = "S-" + formatter.format((id - 18000));
+              memberId = "S-" + formatter.format((id - 18000));
             } else if (id <= 20000) {
-              member_id = "T-" + formatter.format((id - 19000));
+              memberId = "T-" + formatter.format((id - 19000));
             } else if (id <= 21000) {
-              member_id = "U-" + formatter.format((id - 20000));
+              memberId = "U-" + formatter.format((id - 20000));
             } else if (id <= 22000) {
-              member_id = "V-" + formatter.format((id - 21000));
+              memberId = "V-" + formatter.format((id - 21000));
             } else if (id <= 23000) {
-              member_id = "W-" + formatter.format((id - 22000));
+              memberId = "W-" + formatter.format((id - 22000));
             } else if (id <= 24000) {
-              member_id = "X-" + formatter.format((id - 23000));
+              memberId = "X-" + formatter.format((id - 23000));
             } else if (id <= 25000) {
-              member_id = "Y-" + formatter.format((id - 24000));
+              memberId = "Y-" + formatter.format((id - 24000));
             } else if (id <= 26000) {
-              member_id = "Z-" + formatter.format((id - 25000));
+              memberId = "Z-" + formatter.format((id - 25000));
             }
 
             addMember(
-                member_id,
+                memberId,
                 nameController.text.toString(),
                 fatherNameController.text.toString(),
                 birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
@@ -1895,7 +1913,7 @@ class NewMemberState extends State<NewMemberScreen> {
       multiLine: false,
     );
     RegExp mpt = RegExp(
-      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])\d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
+      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
       caseSensitive: false,
       multiLine: false,
     );
@@ -1918,7 +1936,7 @@ class NewMemberState extends State<NewMemberScreen> {
   }
 
   _getCompletNrcInfo() {
-    return "$nrc_initial_options_Value\/$nrc_region_state_options_Value($nrc_type_options_Value)${Utils.strToMM(nrcController.text.toString())}";
+    return "$nrc_initial_options_Value/$nrc_region_state_options_Value($nrc_type_options_Value)${Utils.strToMM(nrcController.text.toString())}";
   }
 
   List<DropdownMenuItem<String>> getNrcNationalOptionDropDownMenuItems() {
@@ -1926,7 +1944,7 @@ class NewMemberState extends State<NewMemberScreen> {
     for (String city in nrc_initial_options) {
       // here we are creating the drop down menu items, you can customize the item right here
       // but I'll just use a simple text for this
-      items.add(new DropdownMenuItem(value: city, child: new Text(city)));
+      items.add(DropdownMenuItem(value: city, child: Text(city)));
     }
     return items;
   }

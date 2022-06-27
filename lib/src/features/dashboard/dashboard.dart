@@ -10,6 +10,7 @@ import 'package:merchant/src/features/dashboard/ui/dashboard_chart.dart';
 import 'package:merchant/src/features/dashboard/ui/dashboard_label_card.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list.dart';
+import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/utils.dart';
@@ -336,27 +337,43 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         child: NeumorphicButton(
           onPressed: () async {
             if (index == 0) {
+             // await Navigator.pushNamed(context, BloodDonationList.routeName);
               await Navigator.pushNamed(context, MemberListNewStyle.routeName);
-              // await Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => const ExpandableListScreen(),
-              //   ),
-              // );
-              // QuerySnapshot querySnapshot =
-              //     await FirebaseFirestore.instance.collection('members').get();
+              FirebaseFirestore.instance
+                  .collection('member_count')
+                  .doc("member_string")
+                  .get()
+                  .then((value) {
+                var members = value['members'];
+                var data =
+                    MemberListResponse.fromJson(jsonDecode(members)).data!;
 
-              // setState(() {
-              //   totalMember = querySnapshot.size;
-              // });
+                setState(() {
+                  totalMember = data.length;
+                });
+              });
             } else if (index == 1) {
+              await Navigator.pushNamed(context, BloodDonationListNewStyle.routeName);
+              FirebaseFirestore.instance
+                  .collection('member_count')
+                  .doc("donation_string")
+                  .get()
+                  .then((value) {
+                var members = value['donations'];
+                var data =
+                    MemberListResponse.fromJson(jsonDecode(members)).data!;
+
+                setState(() {
+                  totalDonation = data.length;
+                });
+              });
               // await Navigator.push(
               //   context,
               //   MaterialPageRoute(
               //     builder: (context) => const ExpandableListScreen(),
               //   ),
               // );
-              // await Navigator.pushNamed(context, BloodDonationList.routeName);
+              //  await Navigator.pushNamed(context, BloodDonationList.routeName);
               // var date = DateTime.now();
               // String donationYear = DateFormat('yyyy').format(date);
               // QuerySnapshot querySnapshotDonation = await FirebaseFirestore
