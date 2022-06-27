@@ -270,7 +270,7 @@ class MemberEditState extends State<MemberEditScreen> {
                                           borderSide: const BorderSide(
                                               color: Colors.grey, width: 1),
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                              BorderRadius.circular(12),
                                         ),
                                         contentPadding: const EdgeInsets.only(
                                             left: 20, right: 12, bottom: 4),
@@ -401,7 +401,7 @@ class MemberEditState extends State<MemberEditScreen> {
                                   decoration: const BoxDecoration(
                                       color: Color(0xFFefefef),
                                       borderRadius: BorderRadius.all(
-                                          Radius.circular(20.0))),
+                                          Radius.circular(12.0))),
                                   child: TextFormField(
                                       controller: noteController,
                                       maxLines: 4,
@@ -430,7 +430,7 @@ class MemberEditState extends State<MemberEditScreen> {
                             decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0))),
+                                    Radius.circular(12.0))),
                             margin: const EdgeInsets.only(
                                 left: 15, bottom: 16, right: 15),
                             width: double.infinity,
@@ -550,7 +550,7 @@ class MemberEditState extends State<MemberEditScreen> {
                                                     color: Colors.grey,
                                                     width: 1),
                                                 borderRadius:
-                                                    BorderRadius.circular(20),
+                                                    BorderRadius.circular(12),
                                               ),
                                               contentPadding:
                                                   const EdgeInsets.only(
@@ -837,11 +837,11 @@ class MemberEditState extends State<MemberEditScreen> {
                                 Container(
                                   width: MediaQuery.of(context).size.width / 3,
                                   margin: const EdgeInsets.only(
-                                      left: 20,  bottom: 8, right: 20),
+                                      left: 20, bottom: 8, right: 20),
                                   decoration: const BoxDecoration(
                                       color: Color(0xFFefefef),
                                       borderRadius: BorderRadius.all(
-                                          Radius.circular(20.0))),
+                                          Radius.circular(12.0))),
                                   child: TextFormField(
                                       controller: noteController,
                                       maxLines: 2,
@@ -870,7 +870,7 @@ class MemberEditState extends State<MemberEditScreen> {
                             decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0))),
+                                    Radius.circular(12.0))),
                             width: MediaQuery.of(context).size.width / 2.8,
                             margin: const EdgeInsets.only(
                                 left: 54, bottom: 16, right: 8),
@@ -916,19 +916,19 @@ class MemberEditState extends State<MemberEditScreen> {
     );
   }
 
-  getAutoIncrementKey(String member_id) {
+  getAutoIncrementKey(String memberId) {
     setState(() {
       _isLoading = true;
     });
     DocumentReference documentReference =
-        FirebaseFirestore.instance.collection('members').doc(member_id);
+        FirebaseFirestore.instance.collection('members').doc(memberId);
 
     return FirebaseFirestore.instance.runTransaction((transaction) async {
       // Get the document
       DocumentSnapshot snapshot = await transaction.get(documentReference);
       // Perform an update on the document
       transaction.update(documentReference, {
-        'member_id': member_id,
+        'member_id': memberId,
         'name': nameController.text.toString(),
         'father_name': fatherNameController.text.toString(),
         'birth_date': birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
@@ -1094,7 +1094,7 @@ class MemberEditState extends State<MemberEditScreen> {
       multiLine: false,
     );
     RegExp mpt = RegExp(
-      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])\d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
+      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
       caseSensitive: false,
       multiLine: false,
     );
