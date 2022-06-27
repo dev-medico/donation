@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:merchant/data/response/member_response.dart';
+import 'package:merchant/donation_list_response.dart';
+import 'package:merchant/expandable.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/dashboard/ui/dashboard_chart.dart';
 import 'package:merchant/src/features/dashboard/ui/dashboard_label_card.dart';
@@ -51,15 +53,35 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       });
     });
 
+    FirebaseFirestore.instance
+        .collection('member_count')
+        .doc("donation_string")
+        .get()
+        .then((value) {
+      var donations = value['donations'];
+      var data = DonationListResponse.fromJson(jsonDecode(donations)).data!;
+
+      setState(() {
+        totalDonation = data.length;
+      });
+    });
+
+    // QuerySnapshot memberSnapshot =
+    //     await FirebaseFirestore.instance.collection('members').get();
+
+    // setState(() {
+    //   totalMember = memberSnapshot.size;
+    // });
+
     QuerySnapshot querySnapshotDonar =
         await FirebaseFirestore.instance.collection('donors').get();
-    QuerySnapshot querySnapshotDonation = await FirebaseFirestore.instance
-        .collection('blood_donations')
-        .where('year', isEqualTo: int.parse(donationYear))
-        .get();
+    // QuerySnapshot querySnapshotDonation = await FirebaseFirestore.instance
+    //     .collection('blood_donations')
+    //     .where('year', isEqualTo: int.parse(donationYear))
+    //     .get();
     setState(() {
       totalDonar = querySnapshotDonar.size;
-      totalDonation = querySnapshotDonation.size;
+      // totalDonation = querySnapshotDonation.size;
     });
   }
 
@@ -315,7 +337,13 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         child: NeumorphicButton(
           onPressed: () async {
             if (index == 0) {
-               await Navigator.pushNamed(context, MemberListNewStyle.routeName);
+              await Navigator.pushNamed(context, MemberListNewStyle.routeName);
+              // await Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => const ExpandableListScreen(),
+              //   ),
+              // );
               // QuerySnapshot querySnapshot =
               //     await FirebaseFirestore.instance.collection('members').get();
 
@@ -323,17 +351,23 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               //   totalMember = querySnapshot.size;
               // });
             } else if (index == 1) {
-              await Navigator.pushNamed(context, BloodDonationList.routeName);
-              var date = DateTime.now();
-              String donationYear = DateFormat('yyyy').format(date);
-              QuerySnapshot querySnapshotDonation = await FirebaseFirestore
-                  .instance
-                  .collection('blood_donations')
-                  .where('year', isEqualTo: int.parse(donationYear))
-                  .get();
-              setState(() {
-                totalDonation = querySnapshotDonation.size;
-              });
+              // await Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => const ExpandableListScreen(),
+              //   ),
+              // );
+              // await Navigator.pushNamed(context, BloodDonationList.routeName);
+              // var date = DateTime.now();
+              // String donationYear = DateFormat('yyyy').format(date);
+              // QuerySnapshot querySnapshotDonation = await FirebaseFirestore
+              //     .instance
+              //     .collection('blood_donations')
+              //     .where('year', isEqualTo: int.parse(donationYear))
+              //     .get();
+              // setState(() {
+              //   totalDonation = querySnapshotDonation.size;
+              // });
             } else if (index == 2) {
               await Navigator.pushNamed(context, DonarList.routeName);
 
