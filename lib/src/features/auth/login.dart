@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -202,9 +203,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     fontSize:
                                         Responsive.isMobile(context) ? 16 : 18,
                                     color: Colors.black),
-                                contentPadding: const EdgeInsets.only(
-                                  left: 24,top: 12
-                                ),
+                                contentPadding:
+                                    const EdgeInsets.only(left: 24, top: 12),
                               ),
                             ),
                           ),
@@ -214,28 +214,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Padding(
                       padding: EdgeInsets.only(
                           top: MediaQuery.of(context).size.height / 12,
-                          left:  Responsive.isMobile(context) ? 12 : MediaQuery.of(context).size.width / 3.1,
-                          right: Responsive.isMobile(context) ? 12 : MediaQuery.of(context).size.width / 3.1,
+                          left: Responsive.isMobile(context)
+                              ? 12
+                              : MediaQuery.of(context).size.width / 3.1,
+                          right: Responsive.isMobile(context)
+                              ? 12
+                              : MediaQuery.of(context).size.width / 3.1,
                           bottom: 34),
                       child: MaterialButton(
                           child: Container(
-                            height:  Responsive.isMobile(context) ? 52 : 60,
+                            height: Responsive.isMobile(context) ? 52 : 60,
                             decoration: shadowDecoration(secondColor),
                             child: Center(
                               child: Text(
                                 "၀င််ရောက်မည်",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize:  Responsive.isMobile(context) ? 16: 18,
+                                    fontSize:
+                                        Responsive.isMobile(context) ? 16 : 18,
                                     color: Colors.white),
                               ),
                             ),
                           ),
                           onPressed: () async {
+                            
                             if (_formKey.currentState!.validate()) {
                               setState(() {
                                 _isLoading = true;
                               });
+                              try {
+                              //Signed in with temporary account.
+                              final userCredential = await FirebaseAuth.instance
+                                  .signInAnonymously();
+                            } on FirebaseAuthException catch (e) {
+                              switch (e.code) {
+                                case "operation-not-allowed":
+                                  print(
+                                      "Anonymous auth hasn't been enabled for this project.");
+                                  break;
+                                default:
+                                  print("Unknown error.");
+                              }
+                            }
                               CollectionReference admins = FirebaseFirestore
                                   .instance
                                   .collection('admin');
