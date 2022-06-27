@@ -104,11 +104,11 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
       FirebaseFirestore.instance.collection('blood_donations');
 
   Future<void> addDonation(
-      String member_id,
-      String member_blood_type,
-      String member_blood_bank,
-      String member_birth_date,
-      String member_father_name,
+      String memberId,
+      String memberBloodType,
+      String memberBloodBank,
+      String memberBirthDate,
+      String memberFatherName,
       String name,
       String age,
       String selectHospital,
@@ -120,7 +120,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
     // String date = DateFormat('dd MMM yyyy').format(now);
     //get data from firestore by document id of member_id
     DocumentReference documentReference =
-        FirebaseFirestore.instance.collection('members').doc(member_id);
+        FirebaseFirestore.instance.collection('members').doc(memberId);
     FirebaseFirestore.instance
         .runTransaction((transaction) async {
           // Get the document
@@ -154,11 +154,11 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
       'hospital': selectHospital,
       'patient_disease': diseaseController.text.toString(),
       'member_name': memberController.text.toString(),
-      'member_id': member_id,
-      'member_blood_type': member_blood_type,
-      'member_blood_bank_card': member_blood_bank,
-      'member_birth_date': member_birth_date,
-      'member_father_name': member_father_name,
+      'member_id': memberId,
+      'member_blood_type': memberBloodType,
+      'member_blood_bank_card': memberBloodBank,
+      'member_birth_date': memberBirthDate,
+      'member_father_name': memberFatherName,
       'patient_address': quarter + "၊" + township,
     }).then((value) {
       setState(() {
@@ -324,7 +324,9 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                     var bloodT = "-";
                                     var fatherN = "-";
                                     var memberD = "-";
-                                    for (var i = 0;i < allMembers.length; i++) {
+                                    for (var i = 0;
+                                        i < allMembers.length;
+                                        i++) {
                                       if (allMembers[i] == suggestion) {
                                         bloodT = allBTypes[i];
                                         fatherN = allFatherNames[i];
@@ -550,7 +552,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                             decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0))),
+                                    Radius.circular(12.0))),
                             margin: const EdgeInsets.only(
                                 left: 15, bottom: 16, right: 15),
                             width: double.infinity,
@@ -758,16 +760,14 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                           return Column(
                                             children: [
                                               ListTile(
-                                                title: Text(suggestion.toString()),
+                                                title:
+                                                    Text(suggestion.toString()),
                                                 subtitle: Text(
-                                                    bloodT +
-                                                        "  " +
-                                                        fatherN),
+                                                    bloodT + "  " + fatherN),
                                               ),
                                               const Divider(
                                                 height: 1,
                                               ),
-                                            
                                             ],
                                           );
                                         },
@@ -778,8 +778,9 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                                     color: Theme.of(context)
                                                         .errorColor)),
                                         onSuggestionSelected: (suggestion) {
-                                          memberController.text =
-                                              suggestion.toString().split(" ")[0];
+                                          memberController.text = suggestion
+                                              .toString()
+                                              .split(" ")[0];
                                           setMember(suggestion.toString());
                                         },
                                       ),
@@ -1063,7 +1064,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                             decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0))),
+                                    Radius.circular(12.0))),
                             width: MediaQuery.of(context).size.width / 2.8,
                             margin: const EdgeInsets.only(
                                 left: 54, bottom: 16, right: 8),
@@ -1213,17 +1214,18 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
 
   fetchMembers() async {
     FirebaseFirestore.instance.collection('members').get().then((value) {
-      value.docs.forEach((result) {
+      for (var result in value.docs) {
         print(result.data());
         setState(() {
-          allMembers.add(result.data()['name'] + " ("+result.data()['member_id'] + ")");
+          allMembers.add(
+              result.data()['name'] + " (" + result.data()['member_id'] + ")");
           allIDs.add(result.data()['member_id']);
           allBTypes.add(result.data()['blood_type']);
           allBDates.add(result.data()['birth_date']);
           allBBCards.add(result.data()['blood_bank_card']);
           allFatherNames.add(result.data()['father_name']);
         });
-      });
+      }
     });
   }
 
@@ -1296,7 +1298,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
       multiLine: false,
     );
     RegExp mpt = RegExp(
-      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])\d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
+      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
       caseSensitive: false,
       multiLine: false,
     );
