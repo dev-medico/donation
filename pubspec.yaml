@@ -16,6 +16,7 @@ dependencies:
   dio: ^4.0.4
   dotted_line: ^3.1.0
   dropdown_button2: ^1.6.2
+  firebase_auth: ^3.3.20
   firebase_core: ^1.11.0
   flutter:
     sdk: flutter
