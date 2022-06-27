@@ -366,7 +366,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                           borderSide: const BorderSide(
                                               color: Colors.grey, width: 1),
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                              BorderRadius.circular(12),
                                         ),
                                         contentPadding: const EdgeInsets.only(
                                             left: 20, right: 12, bottom: 4),
@@ -649,7 +649,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                   decoration: const BoxDecoration(
                                       color: Color(0xFFefefef),
                                       borderRadius: BorderRadius.all(
-                                          Radius.circular(20.0))),
+                                          Radius.circular(12.0))),
                                   child: TextFormField(
                                       controller: noteController,
                                       maxLines: 4,
@@ -678,7 +678,7 @@ class NewMemberState extends State<NewMemberScreen> {
                             decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0))),
+                                    Radius.circular(12.0))),
                             margin: const EdgeInsets.only(
                                 left: 15, bottom: 16, right: 15),
                             width: double.infinity,
@@ -921,7 +921,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                     color: Colors.grey,
                                                     width: 1),
                                                 borderRadius:
-                                                    BorderRadius.circular(20),
+                                                    BorderRadius.circular(12),
                                               ),
                                               contentPadding:
                                                   const EdgeInsets.only(
@@ -1328,7 +1328,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                   decoration: const BoxDecoration(
                                       color: Color(0xFFefefef),
                                       borderRadius: BorderRadius.all(
-                                          Radius.circular(20.0))),
+                                          Radius.circular(12.0))),
                                   child: TextFormField(
                                       controller: noteController,
                                       maxLines: 2,
@@ -1357,7 +1357,7 @@ class NewMemberState extends State<NewMemberScreen> {
                             decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0))),
+                                    Radius.circular(12.0))),
                             width: MediaQuery.of(context).size.width / 2.8,
                             margin: const EdgeInsets.only(
                                 left: 54, bottom: 16, right: 8),
