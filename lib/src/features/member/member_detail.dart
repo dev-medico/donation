@@ -1,53 +1,79 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:merchant/data/response/member_response.dart';
+import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/donation/donation_detail.dart';
-import 'package:merchant/src/features/member/member_edit.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
 import 'package:merchant/utils/utils.dart';
-import 'package:intl/intl.dart';
 
 class MemberDetailScreen extends StatefulWidget {
   static const routeName = '/member-detail';
-  Map<String, dynamic> data;
+  MemberData data;
   MemberDetailScreen({Key? key, required this.data}) : super(key: key);
 
   @override
-  State<MemberDetailScreen> createState() =>
-      _MemberDetailScreenState(this.data);
+  State<MemberDetailScreen> createState() => _MemberDetailScreenState(data);
 }
 
 class _MemberDetailScreenState extends State<MemberDetailScreen> {
-  Map<String, dynamic> data;
+  MemberData data;
   _MemberDetailScreenState(this.data);
-  late Stream<QuerySnapshot> _usersStream;
   int groupTotalCount = 0;
+  List<DonationData> donationDatas = [];
 
   @override
   void initState() {
     super.initState();
     fetchCount();
-    _usersStream = FirebaseFirestore.instance
-        .collection('blood_donations')
-        .where("member_id", isEqualTo: data['member_id'])
-        .orderBy("date_detail")
-        .snapshots();
+    // _usersStream = FirebaseFirestore.instance
+    //     .collection('blood_donations')
+    //     .where("member_id", isEqualTo: data['member_id'])
+    //     .orderBy("date_detail")
+    //     .snapshots();
   }
 
   fetchCount() {
     print("Fetch Count called");
     //get count of snapshots doc from firestore
+    // FirebaseFirestore.instance
+    //     .collection('blood_donations')
+    //     .where("member_id", isEqualTo: data['member_id'])
+    //     .orderBy("date_detail")
+    //     .get()
+    //     .then((value) {
+    //   print("Count: ${value.docs.length}");
+    //   setState(() {
+    //     groupTotalCount = value.docs.length;
+    //   });
+    // });
+
     FirebaseFirestore.instance
-        .collection('blood_donations')
-        .where("member_id", isEqualTo: data['member_id'])
-        .orderBy("date_detail")
+        .collection('member_count')
+        .doc("donation_string")
         .get()
         .then((value) {
-      print("Count: ${value.docs.length}");
+      var members = value['donations'];
+      List<DonationData> donations =
+          DonationListResponse.fromJson(jsonDecode(members)).data!;
+      //get DontainData of member_id from donation_list_response
+      donationDatas = donations
+          .where((element) => element.memberId == data.memberId)
+          .toList();
+      donationDatas.sort((a, b) {
+          //sorting in ascending order
+          return DateTime.parse(b.dateDetail == null
+                  ? "2020-01-01"
+                  : b.dateDetail.toString().split("T")[0])
+              .compareTo(DateTime.parse(a.dateDetail == null
+                  ? "2020-01-01"
+                  : a.dateDetail.toString().split("T")[0]));
+        });
+      print("Previous Data - ${donationDatas.length}");
       setState(() {
-        groupTotalCount = value.docs.length;
+        groupTotalCount = donationDatas.length;
       });
     });
   }
@@ -117,7 +143,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                           height: 8,
                                         ),
                                   Text(
-                                    data["member_id"],
+                                    data.memberId!,
                                     style: const TextStyle(
                                         fontSize: 14,
                                         color: Colors.black,
@@ -145,7 +171,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                         height: 8,
                                       ),
                                 Text(
-                                  data["register_date"],
+                                  data.registerDate!,
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.black,
@@ -188,7 +214,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              data["name"],
+                              data.name!,
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -219,7 +245,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              data["father_name"],
+                              data.fatherName!,
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -250,7 +276,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              data["birth_date"],
+                              data.birthDate!,
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -282,7 +308,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              data["nrc"],
+                              data.nrc!,
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -313,7 +339,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              data["blood_type"],
+                              data.bloodType!,
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -344,7 +370,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              data["blood_bank_card"],
+                              data.bloodBankCard!,
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -410,7 +436,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              Utils.strToMM(data["total_count"]) + " ကြိမ်",
+                              Utils.strToMM(data.totalCount!) + " ကြိမ်",
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -441,7 +467,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              data["phone"],
+                              data.phone!,
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -471,13 +497,13 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              data["home_no"] +
+                              data.homeNo! +
                                   "၊" +
-                                  data["street"] +
+                                  data.street! +
                                   "၊" +
-                                  data["quarter"] +
+                                  data.quarter! +
                                   "၊" +
-                                  data["town"],
+                                  data.town!,
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -521,13 +547,13 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 ],
                               ),
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        MemberEditScreen(data: data),
-                                  ),
-                                );
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) =>
+                                //         MemberEditScreen(data: data),
+                                //   ),
+                                // );
                               }),
                         ),
                       ),
@@ -568,7 +594,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                           color: Color.fromARGB(
                                               255, 116, 112, 112))),
                                   Text(
-                                    data["member_id"],
+                                    data.memberId!,
                                     style: const TextStyle(
                                         fontSize: 14,
                                         color: Colors.black,
@@ -589,7 +615,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                         color: Color.fromARGB(
                                             255, 116, 112, 112))),
                                 Text(
-                                  data["register_date"],
+                                  data.registerDate!,
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.black,
@@ -637,7 +663,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["name"],
+                                    data.name!,
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -672,7 +698,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 Expanded(
                                   flex: 6,
                                   child: Text(
-                                    data["father_name"],
+                                    data.fatherName!,
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -712,7 +738,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["birth_date"],
+                                    data.birthDate!,
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -748,7 +774,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 Expanded(
                                   flex: 6,
                                   child: Text(
-                                    data["nrc"],
+                                    data.nrc!,
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -791,7 +817,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["blood_type"],
+                                    data.bloodType!,
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -826,7 +852,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 Expanded(
                                   flex: 6,
                                   child: Text(
-                                    data["blood_bank_card"],
+                                    data.bloodBankCard!,
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -902,8 +928,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 Expanded(
                                   flex: 6,
                                   child: Text(
-                                    Utils.strToMM(data["total_count"]) +
-                                        " ကြိမ်",
+                                    Utils.strToMM(data.totalCount!) + " ကြိမ်",
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -943,7 +968,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["phone"],
+                                    data.phone!,
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -977,13 +1002,13 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 Expanded(
                                   flex: 11,
                                   child: Text(
-                                    data["home_no"] +
+                                    data.homeNo! +
                                         "၊" +
-                                        data["street"] +
+                                        data.street! +
                                         "၊" +
-                                        data["quarter"] +
+                                        data.quarter! +
                                         "၊" +
-                                        data["town"],
+                                        data.town!,
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -1031,13 +1056,13 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 ],
                               ),
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        MemberEditScreen(data: data),
-                                  ),
-                                );
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) =>
+                                //         MemberEditScreen(data: data),
+                                //   ),
+                                // );
                               }),
                         ),
                       ),
@@ -1061,61 +1086,40 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
               const SizedBox(
                 height: 12,
               ),
-              StreamBuilder<QuerySnapshot>(
-                stream: _usersStream,
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Something went wrong');
-                  }
-
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: SpinKitCircle(
-                        color: Colors.white,
-                        size: 60.0,
-                      ),
-                    );
-                  }
-
-                  return ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    children: [
-                      Container(
-                        height: snapshot.data!.docs.length > 8
-                            ? MediaQuery.of(context).size.height *
-                                (snapshot.data!.docs.length / 8)
-                            : MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width * 2.5,
-                        child: ListView(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
+              ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                children: [
+                  SizedBox(
+                    height: donationDatas.length > 8
+                        ? MediaQuery.of(context).size.height *
+                            (donationDatas.length / 8)
+                        : MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width * 2.5,
+                    child: ListView(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            header(),
                             Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                header(),
-                                Column(
-                                  // shrinkWrap: true,
-                                  // scrollDirection: Axis.vertical,
-                                  children: snapshot.data!.docs
-                                      .map((DocumentSnapshot document) {
-                                    Map<String, dynamic> data = document.data()!
-                                        as Map<String, dynamic>;
-
-                                    return blood_donationRow(data, document.id);
-                                  }).toList(),
-                                ),
-                              ],
+                              // shrinkWrap: true,
+                              // scrollDirection: Axis.vertical,
+                              children:
+                                  donationDatas.map((DonationData document) {
+                                return blood_donationRow(
+                                    document, document.id!);
+                              }).toList(),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  );
-                },
+                      ],
+                    ),
+                  ),
+                ],
               )
             ],
           )
@@ -1249,24 +1253,19 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
     );
   }
 
-  Widget blood_donationRow(Map<String, dynamic> data, String doc_id) {
+  Widget blood_donationRow(DonationData data, String docId) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () async {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DonationDetailScreen(
-              data: data,
-              doc_id: doc_id,
-            ),
-          ),
-        );
-        _usersStream = FirebaseFirestore.instance
-            .collection('blood_donations')
-            .where("member_id", isEqualTo: data['member_id'])
-            .orderBy("date_detail")
-            .snapshots();
+        // await Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => DonationDetailScreen(
+        //       data: data,
+        //       doc_id: docId,
+        //     ),
+        //   ),
+        // );
       },
       child: Container(
         height: Responsive.isMobile(context) ? 60 : 60,
@@ -1293,10 +1292,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                       : MediaQuery.of(context).size.width / 11,
                   child: Text(
                     //data['date'].toString(),
-                    data['date_detail'] != null && data['date_detail'] != ""
-                        ? DateFormat('dd MMM yyyy')
-                            .format(data['date_detail'].toDate())
-                        : data['date'].toString(),
+                    data.date.toString(),
                     style: TextStyle(
                         fontSize: Responsive.isMobile(context) ? 14 : 15,
                         color: Colors.black),
@@ -1310,7 +1306,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                       ? MediaQuery.of(context).size.width / 3.2
                       : MediaQuery.of(context).size.width / 8,
                   child: Text(
-                    data['hospital'] ?? "-",
+                    data.hospital ?? "-",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: Responsive.isMobile(context) ? 14 : 16,
@@ -1325,9 +1321,9 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                       ? MediaQuery.of(context).size.width / 3
                       : MediaQuery.of(context).size.width / 8,
                   child: Text(
-                    data["patient_name"] == null || data["patient_name"] == ""
+                    data.patientName == null || data.patientName == ""
                         ? "-"
-                        : data['patient_name'],
+                        : data.patientName!,
                     style: TextStyle(
                         fontSize: Responsive.isMobile(context) ? 14 : 16,
                         color: Colors.black),
@@ -1341,11 +1337,11 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                       ? MediaQuery.of(context).size.width / 2.8
                       : MediaQuery.of(context).size.width / 6,
                   child: Text(
-                    data["patient_address"] == null ||
-                            data["patient_address"] == "၊" ||
-                            data["patient_address"] == ""
+                    data.patientAddress == null ||
+                            data.patientAddress == "၊" ||
+                            data.patientAddress == ""
                         ? "-"
-                        : data['patient_address'],
+                        : data.patientAddress!,
                     textAlign: TextAlign.left,
                     style: TextStyle(
                         height: 1.5,
@@ -1361,9 +1357,9 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                       ? MediaQuery.of(context).size.width / 7.4
                       : MediaQuery.of(context).size.width / 18,
                   child: Text(
-                    data["patient_age"] == null || data["patient_age"] == ""
+                    data.patientAge == null || data.patientAge == ""
                         ? "-"
-                        : data['patient_age'],
+                        : data.patientAge!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: Responsive.isMobile(context) ? 15 : 17,
@@ -1378,10 +1374,9 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                       ? MediaQuery.of(context).size.width / 3.2
                       : MediaQuery.of(context).size.width / 7,
                   child: Text(
-                    data["patient_disease"] == null ||
-                            data["patient_disease"] == ""
+                    data.patientDisease == null || data.patientDisease == ""
                         ? "-"
-                        : data['patient_disease'],
+                        : data.patientDisease!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: Responsive.isMobile(context) ? 14 : 16,
