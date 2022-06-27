@@ -27,8 +27,7 @@ class BloodDonationEditScreen extends StatefulWidget {
   int selectedIndex = 0;
 
   @override
-  BloodDonationEditState createState() =>
-      BloodDonationEditState(this.data, this.doc_id);
+  BloodDonationEditState createState() => BloodDonationEditState(data, doc_id);
 }
 
 class BloodDonationEditState extends State<BloodDonationEditScreen> {
@@ -504,7 +503,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                             decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0))),
+                                    Radius.circular(12.0))),
                             margin: const EdgeInsets.only(
                                 left: 15, bottom: 16, right: 15),
                             width: double.infinity,
@@ -628,7 +627,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                               ),
                               Container(
                                 margin: const EdgeInsets.only(
-                                    left: 20, top: 16, right: 20,bottom: 12),
+                                    left: 20, top: 16, right: 20, bottom: 12),
                                 child: const Text(
                                   "သွေးလှူဒါန်းသူ အမည်",
                                   textScaleFactor: 1.0,
@@ -663,7 +662,10 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                       children: [
                                         Container(
                                           margin: const EdgeInsets.only(
-                                              left: 20, top: 16, right: 20,bottom: 12),
+                                              left: 20,
+                                              top: 16,
+                                              right: 20,
+                                              bottom: 12),
                                           child: const Text(
                                             "လှူဒါန်းသည့် ရက်စွဲ",
                                             textScaleFactor: 1.0,
@@ -960,7 +962,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                             decoration: BoxDecoration(
                                 color: primaryColor,
                                 borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0))),
+                                    Radius.circular(12.0))),
                             width: MediaQuery.of(context).size.width / 2.8,
                             margin: const EdgeInsets.only(
                                 left: 54, bottom: 16, right: 8),
@@ -1148,7 +1150,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
       multiLine: false,
     );
     RegExp mpt = RegExp(
-      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])\d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
+      "(09|\\+?959)(5\\d{6}|4\\d{7}|4\\d{8}|2\\d{6}|2\\d{7}|2\\d{8}|3\\d{7}|3\\d{8}|6\\d{6}|8\\d{6}|8\\d{7}|8\\d{8}|7\\d{7}|9(0|1|9)\\d{5}|9(0|1|9)\\d{6}|2([0-4])\\d{5}|5([0-6])\\d{5}|8([3-7])\\d{5}|3([0-369])\\d{6}|34\\d{7}|4([1379])\\d{6}|73\\d{6}|91\\d{6}|25\\d{7}|26([0-5])d{6}|40([0-4])\\d{6}|42\\d{7}|45\\d{7}|89([6789])\\d{6})",
       caseSensitive: false,
       multiLine: false,
     );
