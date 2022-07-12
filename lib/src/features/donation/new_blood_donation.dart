@@ -81,18 +81,6 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
   ];
 
   List<String> diseasesSelected = <String>[];
-  List<String> diseases = <String>[
-    "သွေးအားနည်းရောဂါ"
-        "အစာအိမ်သွေးယို",
-    "အူမကြီးကင်ဆာ"
-        "သွေးကင်ဆာ",
-    "ဆီးချို/သွေးတိုး",
-    "(---)ကင်ဆာ",
-    "မတော်တဆဖြစ်စဥ်",
-    "(---)ခွဲစိတ်",
-    "ဓမ္မတာသွေးဆင်းများ",
-    "ကိုယ်ဝန်ပျက်ကျသွေးဆင်းများ"
-  ];
 
   @override
   void initState() {
@@ -194,13 +182,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
       ));
 
       print("Added Data - ${data.length}");
-      FirebaseFirestore.instance
-          .collection('member_count')
-          .doc("donation_string")
-          .set({
-        'donations': jsonEncode(DonationListResponse(data: data).toJson()),
-      }).then((value) {
-        setState(() {
+       setState(() {
           _isLoading = false;
         });
         Utils.messageSuccessDialog(
@@ -217,6 +199,13 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
         memberController.clear();
         region1 = "";
         regional = "";
+      FirebaseFirestore.instance
+          .collection('member_count')
+          .doc("donation_string")
+          .set({
+        'donations': jsonEncode(DonationListResponse(data: data).toJson()),
+      }).then((value) {
+        print("Successfully Added Data - ${data.length}");       
       }).catchError((error) {});
     });
   }
@@ -470,44 +459,11 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                 child: Container(
                                   margin: const EdgeInsets.only(
                                       left: 20, top: 16, bottom: 8, right: 20),
-                                  child: TypeAheadField(
-                                    textFieldConfiguration:
-                                        TextFieldConfiguration(
-                                      controller: diseaseController,
-                                      autofocus: false,
-                                      decoration: inputBoxDecoration(
-                                          "ဖြစ်ပွားသည့်ရောဂါ"),
-                                    ),
-                                    suggestionsCallback: (pattern) {
-                                      diseasesSelected.clear();
-                                      diseasesSelected.addAll(diseases);
-                                      diseasesSelected.retainWhere((s) => s
-                                          .toLowerCase()
-                                          .contains(pattern.toLowerCase()));
-                                      return diseasesSelected;
-                                    },
-                                    transitionBuilder:
-                                        (context, suggestionsBox, controller) {
-                                      return suggestionsBox;
-                                    },
-                                    itemBuilder: (context, suggestion) {
-                                      return ListTile(
-                                        title: Text(
-                                          suggestion.toString(),
-                                          textScaleFactor: 1.0,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder:
-                                        (BuildContext context, Object? error) =>
-                                            Text('$error',
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .errorColor)),
-                                    onSuggestionSelected: (suggestion) {
-                                      diseaseController.text =
-                                          suggestion.toString();
-                                    },
+                                  child: TextFormField(
+                                    controller: diseaseController,
+                                    keyboardType: TextInputType.number,
+                                    decoration:
+                                        inputBoxDecoration("ဖြစ်ပွားသည့်ရောဂါ"),
                                   ),
                                 ),
                               ),
@@ -938,44 +894,18 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                             top: 16,
                                             bottom: 8,
                                             right: 20),
-                                        child: TypeAheadField(
-                                          textFieldConfiguration:
-                                              TextFieldConfiguration(
+                                        child: Container(
+                                          margin: const EdgeInsets.only(
+                                              left: 20,
+                                              top: 16,
+                                              bottom: 8,
+                                              right: 20),
+                                          child: TextFormField(
                                             controller: diseaseController,
-                                            autofocus: false,
+                                            keyboardType: TextInputType.number,
                                             decoration: inputBoxDecoration(
                                                 "ဖြစ်ပွားသည့်ရောဂါ"),
                                           ),
-                                          suggestionsCallback: (pattern) {
-                                            diseasesSelected.clear();
-                                            diseasesSelected.addAll(diseases);
-                                            diseasesSelected.retainWhere((s) =>
-                                                s.toLowerCase().contains(
-                                                    pattern.toLowerCase()));
-                                            return diseasesSelected;
-                                          },
-                                          transitionBuilder: (context,
-                                              suggestionsBox, controller) {
-                                            return suggestionsBox;
-                                          },
-                                          itemBuilder: (context, suggestion) {
-                                            return ListTile(
-                                              title: Text(
-                                                suggestion.toString(),
-                                                textScaleFactor: 1.0,
-                                              ),
-                                            );
-                                          },
-                                          errorBuilder: (BuildContext context,
-                                                  Object? error) =>
-                                              Text('$error',
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .errorColor)),
-                                          onSuggestionSelected: (suggestion) {
-                                            diseaseController.text =
-                                                suggestion.toString();
-                                          },
                                         ),
                                       ),
                                     ),

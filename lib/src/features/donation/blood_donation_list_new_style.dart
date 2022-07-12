@@ -683,7 +683,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
       header: header,
       cellWidth: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width * 0.4
-          : MediaQuery.of(context).size.width * 0.14,
+          : MediaQuery.of(context).size.width * 0.115,
       cellHeight: 52,
       headerHeight: 52,
       firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,

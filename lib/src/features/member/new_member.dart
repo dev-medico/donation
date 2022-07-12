@@ -153,18 +153,15 @@ class NewMemberState extends State<NewMemberScreen> {
             : "-",
       ));
 
-      print("Added Data - ${data.length}");
-      FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("member_string").set({
-        'members': jsonEncode(MemberListResponse(data: data).toJson()),
-      }).then((value) {
-        setState(() {
+      setState(() {
           _isLoading = false;
         });
         Utils.messageSuccessDialog("အဖွဲ့၀င် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
             context, "အိုကေ", Colors.black);
-        nameController.clear();
+        
+
+      print("Added Data - ${data.length}");
+      nameController.clear();
         memberIDController.clear();
         fatherNameController.clear();
         nrcController.clear();
@@ -180,6 +177,13 @@ class NewMemberState extends State<NewMemberScreen> {
         region1 = "";
         regional = "";
         noteController.clear();
+
+      FirebaseFirestore.instance
+        .collection('member_count')
+        .doc("member_string").set({
+        'members': jsonEncode(MemberListResponse(data: data).toJson()),
+      }).then((value) {
+        print("Successfully Added Data - ${data.length}");
       }).catchError((error) {});
     });
   }
@@ -1658,6 +1662,7 @@ class NewMemberState extends State<NewMemberScreen> {
               setState(() {
                 id = newCount;
               });
+              print("New User Updated Count to $newCount");
 
               addMember(
                   memberIDController.text.toString(),
