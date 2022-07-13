@@ -8,6 +8,7 @@ import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/donation/new_blood_donation.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
+import 'package:merchant/utils/utils.dart';
 import 'package:tab_container/tab_container.dart';
 
 class BloodDonationListNewStyle extends StatefulWidget {
@@ -374,7 +375,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                                 height: 50,
                                 decoration: shadowDecorationOnlyTop(
                                     rangesSelect[index]
-                                        ? Colors.red.withOpacity(0.9)
+                                        ? Colors.red.withOpacity(0.6)
                                         : const Color(0xffe3e3e3)),
                                 child: Center(
                                     child: Text(
@@ -397,7 +398,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height * 0.81,
                         child: TabContainer(
-                          color: primaryColor.withOpacity(0.9),
+                          color: const Color(0xffe3e3e3),
                           radius: 8,
                           tabEdge: TabEdge.top,
                           tabCurve: Curves.easeIn,
@@ -429,8 +430,10 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                           //   Color.fromARGB(255, 243, 75, 78),
                           //   Color.fromARGB(255, 243, 75, 78),
                           // ],
-                          selectedTextStyle: const TextStyle(
-                              fontSize: 15, color: Colors.white),
+                          selectedTextStyle: TextStyle(
+                              fontSize: 15,
+                              color: primaryColor,
+                              fontWeight: FontWeight.bold),
                           unselectedTextStyle: const TextStyle(
                               fontSize: 14, color: Colors.black),
                           children: [
@@ -908,6 +911,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData1 =  filterData1.reversed.toList();
     filterData2.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -917,6 +921,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData2 = filterData2.reversed.toList();
     filterData3.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -926,6 +931,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData3 = filterData3.reversed.toList();
     filterData4.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -935,6 +941,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData4 = filterData4.reversed.toList();
     filterData5.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -944,6 +951,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData5 = filterData5.reversed.toList();
     filterData6.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -953,6 +961,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData6 = filterData6.reversed.toList();
     filterData7.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -962,6 +971,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData7 = filterData7.reversed.toList();
     filterData8.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -971,6 +981,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData8 = filterData8.reversed.toList();
     filterData9.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -980,6 +991,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData9 = filterData9.reversed.toList();
     filterData10.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -989,6 +1001,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData10 = filterData10.reversed.toList();
     filterData11.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -998,6 +1011,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData11 = filterData11.reversed.toList();
     filterData12.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
@@ -1007,6 +1021,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
+    filterData12 = filterData12.reversed.toList();
 
     setState(() {
       dataSegments1 = filterData1;
@@ -1118,9 +1133,9 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                                                   .patientAddress
                                                   .toString()
                                               : columnIndex == 5
-                                                  ? data[rowIndex]
+                                                  ? Utils.strToMM(data[rowIndex]
                                                       .patientAge
-                                                      .toString()
+                                                      .toString())
                                                   : columnIndex == 6
                                                       ? data[rowIndex]
                                                           .patientDisease
