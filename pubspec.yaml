@@ -41,6 +41,7 @@ dependencies:
   paginate_firestore: ^1.0.3
   shared_preferences: ^2.0.11
   shimmer: ^2.0.0
+  tab_container: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -21,6 +21,28 @@ BoxDecoration shadowDecoration(Color color) {
   );
 }
 
+BoxDecoration shadowDecorationOnlyTop(Color color) {
+  return BoxDecoration(
+    color: color,
+    borderRadius: const BorderRadius.only(
+      topLeft: Radius.circular(12),
+      topRight: Radius.circular(12),
+    ),
+    boxShadow: const [
+      BoxShadow(
+        color: Color(0x0c000000),
+        blurRadius: 24,
+        offset: Offset(2, 2),
+      ),
+      BoxShadow(
+        color: Color(0x0c000000),
+        blurRadius: 24,
+        offset: Offset(-2, -2),
+      ),
+    ],
+  );
+}
+
 BoxDecoration borderDecoration(Color color) {
   return BoxDecoration(
     color: color,
