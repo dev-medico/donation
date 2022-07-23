@@ -12,7 +12,7 @@ const String deliverReturn = "return";
 const String baseUrl = "https://customer.exfcs-mm.com";
 const apiKey = "1ffc0105cb204ceb50bad4e63ce96c92";
 
-const version = "1.0.6";
+const version = "1.0.7";
 
 const apiKeyM = "3878eb1b-74b9-46c7-b978-80c65e797731";
 
