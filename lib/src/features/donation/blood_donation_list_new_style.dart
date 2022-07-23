@@ -5,6 +5,7 @@ import 'package:flutter_expandable_table/flutter_expandable_table.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
+import 'package:merchant/src/features/donation/blood_donation_report.dart';
 import 'package:merchant/src/features/donation/new_blood_donation.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
@@ -88,11 +89,18 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   List<DonationData> dataSegments11 = [];
   List<DonationData> dataSegments12 = [];
   TextStyle tabStyle = const TextStyle(fontSize: 16);
+  TabContainerController controller = TabContainerController(length: 12);
 
   @override
   void didChangeDependencies() {
     textTheme = Theme.of(context).textTheme;
     super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -336,61 +344,140 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                   )
                 : Column(
                     children: [
-                      Container(
-                        margin:
-                            const EdgeInsets.only(left: 20, top: 20, right: 20),
-                        height: 50,
-                        width: double.infinity,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.all(0.0),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: ranges.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  rangesSelect.clear();
-                                  rangesSelect.addAll([
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false
-                                  ]);
-                                  rangesSelect[index] = true;
-                                  selectedYear = ranges[index];
-                                });
-                                sortBySegments();
+                      Stack(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(
+                                left: 20, top: 20, right: 20),
+                            height: 50,
+                            width: double.infinity,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const BouncingScrollPhysics(),
+                              padding: const EdgeInsets.all(0.0),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: ranges.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      rangesSelect.clear();
+                                      rangesSelect.addAll([
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        false
+                                      ]);
+                                      rangesSelect[index] = true;
+                                      selectedYear = ranges[index];
+                                    });
+                                    sortBySegments();
+                                  },
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width / 13,
+                                    height: 50,
+                                    decoration: shadowDecorationOnlyTop(
+                                        rangesSelect[index]
+                                            ? Colors.red.withOpacity(0.6)
+                                            : const Color(0xffe3e3e3)),
+                                    child: Center(
+                                        child: Text(
+                                      ranges[index],
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w700,
+                                          color: rangesSelect[index]
+                                              ? Colors.white
+                                              : primaryColor),
+                                    )),
+                                  ),
+                                );
                               },
+                            ),
+                          ),
+                          Align(
+                              alignment: Alignment.topRight,
                               child: Container(
-                                width: MediaQuery.of(context).size.width / 11.5,
-                                height: 50,
-                                decoration: shadowDecorationOnlyTop(
-                                    rangesSelect[index]
-                                        ? Colors.red.withOpacity(0.6)
-                                        : const Color(0xffe3e3e3)),
-                                child: Center(
-                                    child: Text(
-                                  ranges[index],
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w700,
-                                      color: rangesSelect[index]
-                                          ? Colors.white
-                                          : primaryColor),
-                                )),
-                              ),
-                            );
-                          },
-                        ),
+                                decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(12.0))),
+                                margin: const EdgeInsets.only(
+                                    left: 15, top: 24, right: 30),
+                                width: 120,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  onTap: () {
+                                    int selectedMonth = controller.index;
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                BloodDonationReportScreen(
+                                                  month: selectedMonth,
+                                                  year: selectedYear,
+                                                  data: selectedMonth == 0
+                                                      ? dataSegments1
+                                                      : selectedMonth == 1
+                                                          ? dataSegments2
+                                                          : selectedMonth == 2
+                                                              ? dataSegments3
+                                                              : selectedMonth ==
+                                                                      3
+                                                                  ? dataSegments4
+                                                                  : selectedMonth ==
+                                                                          4
+                                                                      ? dataSegments5
+                                                                      : selectedMonth ==
+                                                                              5
+                                                                          ? dataSegments6
+                                                                          : selectedMonth == 6
+                                                                              ? dataSegments7
+                                                                              : selectedMonth == 7
+                                                                                  ? dataSegments8
+                                                                                  : selectedMonth == 8
+                                                                                      ? dataSegments9
+                                                                                      : selectedMonth == 9
+                                                                                          ? dataSegments10
+                                                                                          : selectedMonth == 10
+                                                                                              ? dataSegments11
+                                                                                              : dataSegments12,
+                                                )));
+                                  },
+                                  child: Align(
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        children: const [
+                                          SizedBox(
+                                            width: 12,
+                                          ),
+                                          Icon(Icons.list_alt_outlined,
+                                              color: Colors.white),
+                                          Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: 12,
+                                                  bottom: 12,
+                                                  left: 12),
+                                              child: Text(
+                                                "Report",
+                                                textScaleFactor: 1.0,
+                                                style: TextStyle(
+                                                    fontSize: 15.0,
+                                                    color: Colors.white),
+                                              )),
+                                        ],
+                                      )),
+                                ),
+                              )),
+                        ],
                       ),
                       Container(
                         padding:
@@ -398,6 +485,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height * 0.81,
                         child: TabContainer(
+                          controller: controller,
                           color: const Color(0xffe3e3e3),
                           radius: 8,
                           tabEdge: TabEdge.top,
@@ -911,7 +999,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
               ? "2020-01-01"
               : a.dateDetail.toString().split("T")[0]));
     });
-    filterData1 =  filterData1.reversed.toList();
+    filterData1 = filterData1.reversed.toList();
     filterData2.sort((a, b) {
       //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
