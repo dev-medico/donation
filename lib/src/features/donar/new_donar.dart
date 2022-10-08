@@ -51,6 +51,7 @@ class NewDonarState extends State<NewDonarScreen> {
     return members.add({
       'name': name,
       'amount': amount,
+      
       'date': date,
     }).then((value) {
       setState(() {
