@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -33,6 +34,8 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
     "O (Rh +)",
     "O (Rh -)"
   ];
+  String? selectedBloodType;
+  String? selectedRange;
   List<MemberData> dataSegments = [];
   TextStyle tabStyle = const TextStyle(fontSize: 16);
   @override
@@ -125,13 +128,29 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                 return null;
                               },
                               onChanged: (value) {
+                                setState(() {
+                                  selectedRange = value.toString();
+                                });
                                 for (int i = 0; i < ranges.length; i++) {
                                   if (value == ranges[i]) {
                                     if (i != ranges.length - 1) {
-                                      setState(() {
-                                        dataSegments =
-                                            data!.sublist(i * 50, (i + 1) * 50);
-                                      });
+                                      print(selectedBloodType.toString());
+                                      if (selectedBloodType != null) {
+                                        setState(() {
+                                          dataSegments = data!
+                                              .sublist(i * 50, (i + 1) * 50);
+                                          dataSegments = dataSegments
+                                              .where((element) =>
+                                                  element.bloodType ==
+                                                  selectedBloodType)
+                                              .toList();
+                                        });
+                                      } else {
+                                        setState(() {
+                                          dataSegments = data!
+                                              .sublist(i * 50, (i + 1) * 50);
+                                        });
+                                      }
                                     } else {
                                       setState(() {
                                         dataSegments = data!.sublist(i * 50);
@@ -188,16 +207,38 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                 return null;
                               },
                               onChanged: (value) {
-                                List<MemberData>? filterdata = [];
-                                for (int i = 0; i < data!.length; i++) {
-                                  //get memberdata from data only where bloodtype is equal to value
-                                  if (data![i].bloodType == value) {
-                                    filterdata.add(data![i]);
+                                setState(() {
+                                  selectedBloodType = value.toString();
+                                });
+                                log(selectedBloodType.toString());
+                                log(dataSegments.length.toString());
+                                for (int i = 0; i < ranges.length; i++) {
+                                  if (selectedRange == ranges[i]) {
+                                    if (i != ranges.length - 1) {
+                                      print(selectedBloodType.toString());
+                                      if (selectedBloodType != null) {
+                                        setState(() {
+                                          dataSegments = data!
+                                              .sublist(i * 50, (i + 1) * 50);
+                                          dataSegments = dataSegments
+                                              .where((element) =>
+                                                  element.bloodType ==
+                                                  selectedBloodType)
+                                              .toList();
+                                        });
+                                      } else {
+                                        setState(() {
+                                          dataSegments = data!
+                                              .sublist(i * 50, (i + 1) * 50);
+                                        });
+                                      }
+                                    } else {
+                                      setState(() {
+                                        dataSegments = data!.sublist(i * 50);
+                                      });
+                                    }
                                   }
                                 }
-                                setState(() {
-                                  dataSegments = filterdata.sublist(0);
-                                });
                               },
                               onSaved: (value) {},
                             ),
@@ -314,13 +355,29 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             return null;
                           },
                           onChanged: (value) {
+                            setState(() {
+                              selectedRange = value.toString();
+                            });
                             for (int i = 0; i < ranges.length; i++) {
                               if (value == ranges[i]) {
                                 if (i != ranges.length - 1) {
-                                  setState(() {
-                                    dataSegments =
-                                        data!.sublist(i * 50, (i + 1) * 50);
-                                  });
+                                  print(selectedBloodType.toString());
+                                  if (selectedBloodType != null) {
+                                    setState(() {
+                                      dataSegments =
+                                          data!.sublist(i * 50, (i + 1) * 50);
+                                      dataSegments = dataSegments
+                                          .where((element) =>
+                                              element.bloodType ==
+                                              selectedBloodType)
+                                          .toList();
+                                    });
+                                  } else {
+                                    setState(() {
+                                      dataSegments =
+                                          data!.sublist(i * 50, (i + 1) * 50);
+                                    });
+                                  }
                                 } else {
                                   setState(() {
                                     dataSegments = data!.sublist(i * 50);
@@ -377,16 +434,38 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             return null;
                           },
                           onChanged: (value) {
-                            List<MemberData>? filterdata = [];
-                            for (int i = 0; i < data!.length; i++) {
-                              //get memberdata from data only where bloodtype is equal to value
-                              if (data![i].bloodType == value) {
-                                filterdata.add(data![i]);
+                            setState(() {
+                              selectedBloodType = value.toString();
+                            });
+                            log(selectedBloodType.toString());
+                            log(dataSegments.length.toString());
+                            for (int i = 0; i < ranges.length; i++) {
+                              if (selectedRange == ranges[i]) {
+                                if (i != ranges.length - 1) {
+                                  print(selectedBloodType.toString());
+                                  if (selectedBloodType != null) {
+                                    setState(() {
+                                      dataSegments =
+                                          data!.sublist(i * 50, (i + 1) * 50);
+                                      dataSegments = dataSegments
+                                          .where((element) =>
+                                              element.bloodType ==
+                                              selectedBloodType)
+                                          .toList();
+                                    });
+                                  } else {
+                                    setState(() {
+                                      dataSegments =
+                                          data!.sublist(i * 50, (i + 1) * 50);
+                                    });
+                                  }
+                                } else {
+                                  setState(() {
+                                    dataSegments = data!.sublist(i * 50);
+                                  });
+                                }
                               }
                             }
-                            setState(() {
-                              dataSegments = filterdata.sublist(0);
-                            });
                           },
                           onSaved: (value) {},
                         ),

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -9,7 +8,6 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/data/response/township_response/datum.dart';
 import 'package:merchant/data/response/township_response/township_response.dart';
 import 'package:merchant/responsive.dart';
@@ -74,16 +72,29 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
 
   List<String> diseasesSelected = <String>[];
   List<String> diseases = <String>[
-    "သွေးအားနည်းရောဂါ"
-        "အစာအိမ်သွေးယို",
-    "အူမကြီးကင်ဆာ"
-        "သွေးကင်ဆာ",
-    "ဆီးချို/သွေးတိုး",
-    "(---)ကင်ဆာ",
-    "မတော်တဆဖြစ်စဥ်",
+    "အစာအိမ်ရောဂါ",
+    "အသည်ရောဂါ",
+    "ကျောက်ကပ်ရောဂါ",
+    "အူ/အစာအိမ်လမ်းကြောင်းရောဂါ",
+    "သားအိမ်/ကိုယ်ဝန်ပျက်/မီးဖွားရောဂါ",
     "(---)ခွဲစိတ်",
-    "ဓမ္မတာသွေးဆင်းများ",
-    "ကိုယ်ဝန်ပျက်ကျသွေးဆင်းများ"
+    "(---)ကင်ဆာ",
+    "သွေးလွန်တုပ်ကွေး",
+    "သွေးအားနည်းရောဂါ",
+    "ဆီးရောဂါ",
+    "လေးဖက်နာရောဂါ",
+    "ဆီးချို/သွေးတိုး",
+    "အရေပြားရောဂါ",
+    "စအို/လိပ်ခေါင်းရောဂါ",
+    "သည်းခြေကျောက်တည်",
+    "လည်ပင်းအကျိတ်",
+    "သွေးမတိတ်ရောဂါ",
+    "ခုခံအားကျဆင်းမှုကူးစက်ရောဂါ",
+    "နှလုံးအဆို့ရှင်/ နှလုံးသွေးကြောကျဉ်း",
+    "ခြေထောက်ကြွက်သားပုပ်နာ",
+    "အိပ်ရာနာ",
+    "မတော်တဆဖြစ်စဥ်",
+    "အဆုတ်ရောဂါ",
   ];
 
   @override

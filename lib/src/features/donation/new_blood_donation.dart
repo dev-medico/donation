@@ -81,6 +81,31 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
   ];
 
   List<String> diseasesSelected = <String>[];
+  List<String> diseases = <String>[
+    "အစာအိမ်ရောဂါ",
+    "အသည်ရောဂါ",
+    "ကျောက်ကပ်ရောဂါ",
+    "အူ/အစာအိမ်လမ်းကြောင်းရောဂါ",
+    "သားအိမ်/ကိုယ်ဝန်ပျက်/မီးဖွားရောဂါ",
+    "(---)ခွဲစိတ်",
+    "(---)ကင်ဆာ",
+    "သွေးလွန်တုပ်ကွေး",
+    "သွေးအားနည်းရောဂါ",
+    "ဆီးရောဂါ",
+    "လေးဖက်နာရောဂါ",
+    "ဆီးချို/သွေးတိုး",
+    "အရေပြားရောဂါ",
+    "စအို/လိပ်ခေါင်းရောဂါ",
+    "သည်းခြေကျောက်တည်",
+    "လည်ပင်းအကျိတ်",
+    "သွေးမတိတ်ရောဂါ",
+    "ခုခံအားကျဆင်းမှုကူးစက်ရောဂါ",
+    "နှလုံးအဆို့ရှင်/ နှလုံးသွေးကြောကျဉ်း",
+    "ခြေထောက်ကြွက်သားပုပ်နာ",
+    "အိပ်ရာနာ",
+    "မတော်တဆဖြစ်စဥ်",
+    "အဆုတ်ရောဂါ",
+  ];
 
   @override
   void initState() {
@@ -182,30 +207,30 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
       ));
 
       print("Added Data - ${data.length}");
-       setState(() {
-          _isLoading = false;
-        });
-        Utils.messageSuccessDialog(
-            "သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-            context,
-            "အိုကေ",
-            Colors.black);
-        nameController.clear();
-        ageController.clear();
-        diseaseController.clear();
-        hospitalController.clear();
-        quarterController.clear();
-        townController.clear();
-        memberController.clear();
-        region1 = "";
-        regional = "";
+      setState(() {
+        _isLoading = false;
+      });
+      Utils.messageSuccessDialog(
+          "သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+          context,
+          "အိုကေ",
+          Colors.black);
+      nameController.clear();
+      ageController.clear();
+      diseaseController.clear();
+      hospitalController.clear();
+      quarterController.clear();
+      townController.clear();
+      memberController.clear();
+      region1 = "";
+      regional = "";
       FirebaseFirestore.instance
           .collection('member_count')
           .doc("donation_string")
           .set({
         'donations': jsonEncode(DonationListResponse(data: data).toJson()),
       }).then((value) {
-        print("Successfully Added Data - ${data.length}");       
+        print("Successfully Added Data - ${data.length}");
       }).catchError((error) {});
     });
   }
@@ -894,18 +919,44 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                             top: 16,
                                             bottom: 8,
                                             right: 20),
-                                        child: Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 20,
-                                              top: 16,
-                                              bottom: 8,
-                                              right: 20),
-                                          child: TextFormField(
+                                        child: TypeAheadField(
+                                          textFieldConfiguration:
+                                              TextFieldConfiguration(
                                             controller: diseaseController,
-                                            keyboardType: TextInputType.number,
+                                            autofocus: false,
                                             decoration: inputBoxDecoration(
                                                 "ဖြစ်ပွားသည့်ရောဂါ"),
                                           ),
+                                          suggestionsCallback: (pattern) {
+                                            diseasesSelected.clear();
+                                            diseasesSelected.addAll(diseases);
+                                            diseasesSelected.retainWhere((s) =>
+                                                s.toLowerCase().contains(
+                                                    pattern.toLowerCase()));
+                                            return diseasesSelected;
+                                          },
+                                          transitionBuilder: (context,
+                                              suggestionsBox, controller) {
+                                            return suggestionsBox;
+                                          },
+                                          itemBuilder: (context, suggestion) {
+                                            return ListTile(
+                                              title: Text(
+                                                suggestion.toString(),
+                                                textScaleFactor: 1.0,
+                                              ),
+                                            );
+                                          },
+                                          errorBuilder: (BuildContext context,
+                                                  Object? error) =>
+                                              Text('$error',
+                                                  style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .errorColor)),
+                                          onSuggestionSelected: (suggestion) {
+                                            diseaseController.text =
+                                                suggestion.toString();
+                                          },
                                         ),
                                       ),
                                     ),
