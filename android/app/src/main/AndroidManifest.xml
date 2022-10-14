@@ -2,7 +2,7 @@
     package="com.red.juniors">
    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="Safe Blood"
+        android:label="Red Juniors"
         android:name="${applicationName}"
         android:roundIcon="@drawable/round_icon"
         android:icon="@mipmap/ic_launcher">
