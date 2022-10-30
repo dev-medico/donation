@@ -66,6 +66,21 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     "NOV",
     "DEC",
   ];
+
+  List<String> monthsMobile = [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+  ];
   List<String> bloodTypes = [
     "A (Rh +)",
     "A (Rh -)",
@@ -124,558 +139,417 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
         backgroundColor: Colors.white70,
         body: Stack(
           children: [
-            Responsive.isMobile(context)
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Row(
-                      //   children: [
-                      //     Container(
-                      //       width: MediaQuery.of(context).size.width / 2.22,
-                      //       margin: const EdgeInsets.only(top: 20, left: 20),
-                      //       child: DropdownButtonFormField2(
-                      //         decoration: InputDecoration(
-                      //           isDense: true,
-                      //           contentPadding: EdgeInsets.zero,
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(12),
-                      //           ),
-                      //         ),
-                      //         isExpanded: true,
-                      //         hint: const Text(
-                      //           "နှစ် အလိုက်ကြည့်မည်",
-                      //           style: TextStyle(fontSize: 13),
-                      //         ),
-                      //         icon: const Icon(
-                      //           Icons.arrow_drop_down,
-                      //           color: Colors.black45,
-                      //         ),
-                      //         iconSize: 30,
-                      //         buttonHeight: 60,
-                      //         buttonPadding:
-                      //             const EdgeInsets.only(left: 20, right: 10),
-                      //         dropdownDecoration: BoxDecoration(
-                      //           borderRadius: BorderRadius.circular(12),
-                      //         ),
-                      //         items: ranges
-                      //             .map((item) => DropdownMenuItem<String>(
-                      //                   value: item,
-                      //                   child: Text(
-                      //                     item,
-                      //                     style: const TextStyle(
-                      //                       fontSize: 14,
-                      //                     ),
-                      //                   ),
-                      //                 ))
-                      //             .toList(),
-                      //         validator: (value) {
-                      //           if (value == null) {
-                      //             return "နှစ် အလိုက်ကြည့်မည်";
-                      //           }
-                      //           return null;
-                      //         },
-                      //         onChanged: (value) {
-                      //           List<DonationData> filterData = [];
-                      //           for (int i = 0; i < data!.length; i++) {
-                      //             if (data![i].date!.split(" ")[2] == value) {
-                      //               filterData.add(data![i]);
-                      //             }
-                      //           }
-                      //           filterData.sort((a, b) {
-                      //             //sorting in ascending order
-                      //             return DateTime.parse(b.dateDetail == null
-                      //                     ? "2020-01-01"
-                      //                     : b.dateDetail
-                      //                         .toString()
-                      //                         .split("T")[0])
-                      //                 .compareTo(DateTime.parse(
-                      //                     a.dateDetail == null
-                      //                         ? "2020-01-01"
-                      //                         : a.dateDetail
-                      //                             .toString()
-                      //                             .split("T")[0]));
-                      //           });
-
-                      //           setState(() {
-                      //             dataSegments = filterData;
-                      //           });
-                      //         },
-                      //         onSaved: (value) {},
-                      //       ),
-                      //     ),
-                      //     Container(
-                      //       width: MediaQuery.of(context).size.width / 2.22,
-                      //       margin: const EdgeInsets.only(top: 20, left: 12),
-                      //       child: DropdownButtonFormField2(
-                      //         decoration: InputDecoration(
-                      //           isDense: true,
-                      //           contentPadding: EdgeInsets.zero,
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(12),
-                      //           ),
-                      //         ),
-                      //         isExpanded: true,
-                      //         hint: const Text(
-                      //           "သွေးအုပ်စု အလိုက်ကြည့်မည်",
-                      //           style: TextStyle(fontSize: 13),
-                      //         ),
-                      //         icon: const Icon(
-                      //           Icons.arrow_drop_down,
-                      //           color: Colors.black45,
-                      //         ),
-                      //         iconSize: 30,
-                      //         buttonHeight: 60,
-                      //         buttonPadding:
-                      //             const EdgeInsets.only(left: 20, right: 10),
-                      //         dropdownDecoration: BoxDecoration(
-                      //           borderRadius: BorderRadius.circular(12),
-                      //         ),
-                      //         items: bloodTypes
-                      //             .map((item) => DropdownMenuItem<String>(
-                      //                   value: item,
-                      //                   child: Text(
-                      //                     item,
-                      //                     style: const TextStyle(
-                      //                       fontSize: 14,
-                      //                     ),
-                      //                   ),
-                      //                 ))
-                      //             .toList(),
-                      //         validator: (value) {
-                      //           if (value == null) {
-                      //             return "သွေးအုပ်စု အလိုက်ကြည့်မည်";
-                      //           }
-                      //           return null;
-                      //         },
-                      //         onChanged: (value) {
-                      //           List<DonationData>? filterdata = [];
-                      //           for (int i = 0; i < data!.length; i++) {
-                      //             //get DonationData from data only where bloodtype is equal to value
-                      //             if (data![i].memberBloodType == value) {
-                      //               filterdata.add(data![i]);
-                      //             }
-                      //           }
-                      //           filterdata.sort((a, b) {
-                      //             //sorting in ascending order
-                      //             return DateTime.parse(b.dateDetail == null
-                      //                     ? "2020-01-01"
-                      //                     : b.dateDetail
-                      //                         .toString()
-                      //                         .split("T")[0])
-                      //                 .compareTo(DateTime.parse(
-                      //                     a.dateDetail == null
-                      //                         ? "2020-01-01"
-                      //                         : a.dateDetail
-                      //                             .toString()
-                      //                             .split("T")[0]));
-                      //           });
-
-                      //           setState(() {
-                      //             dataSegments = filterdata.sublist(0);
-                      //           });
-                      //         },
-                      //         onSaved: (value) {},
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-                      Container(
-                        width: MediaQuery.of(context).size.width - 40,
-                        margin:
-                            const EdgeInsets.only(right: 20, top: 12, left: 20),
-                        padding: const EdgeInsets.only(top: 8, bottom: 8),
-                        child: TextFormField(
-                          autofocus: false,
-                          controller: searchController,
-                          textAlign: TextAlign.start,
-                          style: const TextStyle(
-                              fontSize: 15, color: Colors.black),
-                          onChanged: (val) {
-                            List<DonationData>? filterdata = [];
-                            for (int i = 0; i < data!.length; i++) {
-                              //get DonationData from data only where bloodtype is equal to value
-                              if (data![i]
-                                  .memberName!
-                                  .toLowerCase()
-                                  .contains(val.toString().toLowerCase())) {
-                                filterdata.add(data![i]);
-                              }
-                            }
-                            setState(() {
-                              dataSegments1 = filterdata.sublist(0);
-                            });
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-                            hintStyle: const TextStyle(
-                                color: Colors.black, fontSize: 15.0),
-                            fillColor: Colors.white.withOpacity(0.2),
-                            filled: true,
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.search,
-                                color: primaryColor,
-                              ),
-                            ),
-                            contentPadding: const EdgeInsets.only(
-                                left: 20, right: 20, top: 4, bottom: 4),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            disabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                          ),
-                          keyboardType: TextInputType.text,
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      Stack(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(
-                                left: 20, top: 20, right: 20),
-                            height: 50,
-                            width: double.infinity,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: const BouncingScrollPhysics(),
-                              padding: const EdgeInsets.all(0.0),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: ranges.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      rangesSelect.clear();
-                                      rangesSelect.addAll([
-                                        false,
-                                        false,
-                                        false,
-                                        false,
-                                        false,
-                                        false,
-                                        false,
-                                        false,
-                                        false,
-                                        false,
-                                        false
-                                      ]);
-                                      rangesSelect[index] = true;
-                                      selectedYear = ranges[index];
-                                    });
-                                    sortBySegments();
-                                  },
-                                  child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 13,
-                                    height: 50,
-                                    decoration: shadowDecorationOnlyTop(
-                                        rangesSelect[index]
-                                            ? Colors.red.withOpacity(0.6)
-                                            : const Color(0xffe3e3e3)),
-                                    child: Center(
-                                        child: Text(
-                                      ranges[index],
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w700,
-                                          color: rangesSelect[index]
-                                              ? Colors.white
-                                              : primaryColor),
-                                    )),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          Align(
-                              alignment: Alignment.topRight,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(12.0))),
-                                margin: const EdgeInsets.only(
-                                    left: 15, top: 24, right: 30),
-                                width: 120,
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  onTap: () {
-                                    int selectedMonth = controller.index;
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                BloodDonationReportScreen(
-                                                  month: selectedMonth,
-                                                  year: selectedYear,
-                                                  data: selectedMonth == 0
-                                                      ? dataSegments1
-                                                      : selectedMonth == 1
-                                                          ? dataSegments2
-                                                          : selectedMonth == 2
-                                                              ? dataSegments3
-                                                              : selectedMonth ==
-                                                                      3
-                                                                  ? dataSegments4
-                                                                  : selectedMonth ==
-                                                                          4
-                                                                      ? dataSegments5
-                                                                      : selectedMonth ==
-                                                                              5
-                                                                          ? dataSegments6
-                                                                          : selectedMonth == 6
-                                                                              ? dataSegments7
-                                                                              : selectedMonth == 7
-                                                                                  ? dataSegments8
-                                                                                  : selectedMonth == 8
-                                                                                      ? dataSegments9
-                                                                                      : selectedMonth == 9
-                                                                                          ? dataSegments10
-                                                                                          : selectedMonth == 10
-                                                                                              ? dataSegments11
-                                                                                              : dataSegments12,
-                                                )));
-                                  },
-                                  child: Align(
-                                      alignment: Alignment.center,
-                                      child: Row(
-                                        children: const [
-                                          SizedBox(
-                                            width: 12,
-                                          ),
-                                          Icon(Icons.list_alt_outlined,
-                                              color: Colors.white),
-                                          Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: 12,
-                                                  bottom: 12,
-                                                  left: 12),
-                                              child: Text(
-                                                "Report",
-                                                textScaleFactor: 1.0,
-                                                style: TextStyle(
-                                                    fontSize: 15.0,
-                                                    color: Colors.white),
-                                              )),
-                                        ],
-                                      )),
+            ListView(
+              children: [
+                Visibility(
+                  visible: Responsive.isMobile(context),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12.0))),
+                      margin:
+                          const EdgeInsets.only(left: 15, top: 12, right: 30),
+                      width: 120,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () {
+                          int selectedMonth = controller.index;
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder:
+                                      (context) => BloodDonationReportScreen(
+                                            month: selectedMonth,
+                                            year: selectedYear,
+                                            data: selectedMonth == 0
+                                                ? dataSegments1
+                                                : selectedMonth == 1
+                                                    ? dataSegments2
+                                                    : selectedMonth == 2
+                                                        ? dataSegments3
+                                                        : selectedMonth == 3
+                                                            ? dataSegments4
+                                                            : selectedMonth == 4
+                                                                ? dataSegments5
+                                                                : selectedMonth ==
+                                                                        5
+                                                                    ? dataSegments6
+                                                                    : selectedMonth ==
+                                                                            6
+                                                                        ? dataSegments7
+                                                                        : selectedMonth ==
+                                                                                7
+                                                                            ? dataSegments8
+                                                                            : selectedMonth == 8
+                                                                                ? dataSegments9
+                                                                                : selectedMonth == 9
+                                                                                    ? dataSegments10
+                                                                                    : selectedMonth == 10
+                                                                                        ? dataSegments11
+                                                                                        : dataSegments12,
+                                          )));
+                        },
+                        child: Align(
+                            alignment: Alignment.center,
+                            child: Row(
+                              children: const [
+                                SizedBox(
+                                  width: 12,
                                 ),
+                                Icon(Icons.list_alt_outlined,
+                                    color: Colors.white),
+                                Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 12, bottom: 12, left: 12),
+                                    child: Text(
+                                      "Report",
+                                      textScaleFactor: 1.0,
+                                      style: TextStyle(
+                                          fontSize: 15.0, color: Colors.white),
+                                    )),
+                              ],
+                            )),
+                      ),
+                    ),
+                  ),
+                ),
+                Stack(
+                  children: [
+                    Container(
+                      margin:
+                          const EdgeInsets.only(left: 20, top: 20, right: 20),
+                      height: 50,
+                      width: double.infinity,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.all(0.0),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: ranges.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                rangesSelect.clear();
+                                rangesSelect.addAll([
+                                  false,
+                                  false,
+                                  false,
+                                  false,
+                                  false,
+                                  false,
+                                  false,
+                                  false,
+                                  false,
+                                  false,
+                                  false
+                                ]);
+                                rangesSelect[index] = true;
+                                selectedYear = ranges[index];
+                              });
+                              sortBySegments();
+                            },
+                            child: Container(
+                              width: Responsive.isMobile(context)
+                                  ? MediaQuery.of(context).size.width / 5
+                                  : MediaQuery.of(context).size.width / 13,
+                              height: 50,
+                              decoration: shadowDecorationOnlyTop(
+                                  rangesSelect[index]
+                                      ? Colors.red.withOpacity(0.6)
+                                      : const Color(0xffe3e3e3)),
+                              child: Center(
+                                  child: Text(
+                                ranges[index],
+                                style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    color: rangesSelect[index]
+                                        ? Colors.white
+                                        : primaryColor),
                               )),
-                        ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Visibility(
+                      visible: !Responsive.isMobile(context),
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          margin: const EdgeInsets.only(
+                              left: 15, top: 24, right: 30),
+                          width: 120,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              int selectedMonth = controller.index;
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          BloodDonationReportScreen(
+                                            month: selectedMonth,
+                                            year: selectedYear,
+                                            data: selectedMonth == 0
+                                                ? dataSegments1
+                                                : selectedMonth == 1
+                                                    ? dataSegments2
+                                                    : selectedMonth == 2
+                                                        ? dataSegments3
+                                                        : selectedMonth == 3
+                                                            ? dataSegments4
+                                                            : selectedMonth == 4
+                                                                ? dataSegments5
+                                                                : selectedMonth ==
+                                                                        5
+                                                                    ? dataSegments6
+                                                                    : selectedMonth ==
+                                                                            6
+                                                                        ? dataSegments7
+                                                                        : selectedMonth ==
+                                                                                7
+                                                                            ? dataSegments8
+                                                                            : selectedMonth == 8
+                                                                                ? dataSegments9
+                                                                                : selectedMonth == 9
+                                                                                    ? dataSegments10
+                                                                                    : selectedMonth == 10
+                                                                                        ? dataSegments11
+                                                                                        : dataSegments12,
+                                          )));
+                            },
+                            child: Align(
+                                alignment: Alignment.center,
+                                child: Row(
+                                  children: const [
+                                    SizedBox(
+                                      width: 12,
+                                    ),
+                                    Icon(Icons.list_alt_outlined,
+                                        color: Colors.white),
+                                    Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 12, bottom: 12, left: 12),
+                                        child: Text(
+                                          "Report",
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.white),
+                                        )),
+                                  ],
+                                )),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 2),
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.81,
+                  child: TabContainer(
+                    controller: controller,
+                    color: const Color(0xffe3e3e3),
+                    radius: 8,
+                    tabEdge: TabEdge.top,
+                    tabCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) {
+                      animation = CurvedAnimation(
+                          curve: Curves.easeIn, parent: animation);
+                      return SlideTransition(
+                        position: Tween(
+                          begin: const Offset(0.2, 0.0),
+                          end: const Offset(0.0, 0.0),
+                        ).animate(animation),
+                        child: FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
+                      );
+                    },
+                    // colors: const <Color>[
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    //   Color.fromARGB(255, 243, 75, 78),
+                    // ],
+                    selectedTextStyle: TextStyle(
+                        fontSize: 15,
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold),
+                    unselectedTextStyle:
+                        const TextStyle(fontSize: 14, color: Colors.black),
+                    children: [
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments1),
+                        ),
                       ),
                       Container(
-                        padding:
-                            const EdgeInsets.only(left: 20, right: 20, top: 2),
+                        color: Colors.white,
                         width: double.infinity,
-                        height: MediaQuery.of(context).size.height * 0.81,
-                        child: TabContainer(
-                          controller: controller,
-                          color: const Color(0xffe3e3e3),
-                          radius: 8,
-                          tabEdge: TabEdge.top,
-                          tabCurve: Curves.easeIn,
-                          transitionBuilder: (child, animation) {
-                            animation = CurvedAnimation(
-                                curve: Curves.easeIn, parent: animation);
-                            return SlideTransition(
-                              position: Tween(
-                                begin: const Offset(0.2, 0.0),
-                                end: const Offset(0.0, 0.0),
-                              ).animate(animation),
-                              child: FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              ),
-                            );
-                          },
-                          // colors: const <Color>[
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          //   Color.fromARGB(255, 243, 75, 78),
-                          // ],
-                          selectedTextStyle: TextStyle(
-                              fontSize: 15,
-                              color: primaryColor,
-                              fontWeight: FontWeight.bold),
-                          unselectedTextStyle: const TextStyle(
-                              fontSize: 14, color: Colors.black),
-                          children: [
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments1),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments2),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments3),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments4),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments5),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments6),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments7),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments8),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments9),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments10),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments11),
-                              ),
-                            ),
-                            Container(
-                              color: Colors.white,
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 0.0,
-                                    top: Responsive.isMobile(context) ? 160 : 0,
-                                    bottom: 12),
-                                child: buildSimpleTable(dataSegments12),
-                              ),
-                            ),
-                          ],
-                          //children: _getChildren1(),
-                          tabs: months,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments2),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments3),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments4),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments5),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments6),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments7),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments8),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments9),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments10),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments11),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              left: 0.0,
+                              top: Responsive.isMobile(context) ? 20 : 0,
+                              bottom: 12),
+                          child: buildSimpleTable(dataSegments12),
                         ),
                       ),
                     ],
+                    //children: _getChildren1(),
+                    tabs: Responsive.isMobile(context) ? monthsMobile : months,
                   ),
+                ),
+              ],
+            ),
 
             // : Row(
             //     children: [
@@ -1162,7 +1036,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     //Creation header
     ExpandableTableHeader header = ExpandableTableHeader(
         firstCell: Container(
-            width: Responsive.isMobile(context) ? 80 : 120,
+            width: Responsive.isMobile(context) ? 90 : 120,
             color: primaryColor,
             height: 60,
             margin: const EdgeInsets.all(1),
