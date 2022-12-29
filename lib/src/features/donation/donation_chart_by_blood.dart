@@ -45,6 +45,9 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
       ),
       decoration: shadowDecoration(Colors.white),
       child: ListView(
+        physics: Responsive.isMobile(context)
+            ? const NeverScrollableScrollPhysics()
+            : const BouncingScrollPhysics(),
         shrinkWrap: true,
         children: [
           Text(
@@ -80,7 +83,9 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
           ),
           ListView.builder(
             shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
+            physics: Responsive.isMobile(context)
+                ? const NeverScrollableScrollPhysics()
+                : const BouncingScrollPhysics(),
             padding: const EdgeInsets.only(top: 12.0, right: 12, left: 8),
             itemCount: bloodTypes.length,
             itemBuilder: (BuildContext context, int index) {

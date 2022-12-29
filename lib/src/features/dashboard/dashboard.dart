@@ -6,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_chart.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:merchant/src/features/donation/donation_chart_by_blood.dart';
@@ -164,8 +163,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                             DashBoardCard(
                               2,
                               primaryDark,
-                              "အလှူရှင်များ",
-                              "${Utils.strToMM(totalDonar.toString())} ဦး",
+                              "ထူးခြားဖြစ်စဉ်",
+                              "",
                               Colors.black,
                             ),
                             DashBoardCard(
@@ -180,7 +179,10 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       ),
                     ],
                   ),
-                  DashBoardChart(date: dateFormat),
+                  DonationChartByBlood(
+                    data: dataList,
+                    fromDashboard: true,
+                  ),
                 ],
               )
             : Row(

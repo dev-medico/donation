@@ -115,7 +115,7 @@ class _DonarListState extends State<DonarList> {
                               const BorderRadius.all(Radius.circular(12.0))),
                       margin:
                           const EdgeInsets.only(left: 15, top: 12, right: 30),
-                      width: 120,
+                      width: Responsive.isMobile(context) ? 145 : 120,
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () async {
@@ -703,113 +703,341 @@ class _DonarListState extends State<DonarList> {
                       ))),
             ));
 
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: ExpandableTable(
-            rows: rows,
-            header: header,
-            cellWidth: Responsive.isMobile(context)
-                ? MediaQuery.of(context).size.width * 0.4
-                : MediaQuery.of(context).size.width * 0.18,
-            cellHeight: 52,
-            headerHeight: 52,
-            firstColumnWidth: Responsive.isMobile(context) ? 94 : 180,
-            scrollShadowColor: Colors.grey,
+    if (Responsive.isMobile(context)) {
+      return ListView(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: ExpandableTable(
+              rows: rows,
+              header: header,
+              cellWidth: Responsive.isMobile(context)
+                  ? MediaQuery.of(context).size.width * 0.5
+                  : MediaQuery.of(context).size.width * 0.18,
+              cellHeight: 52,
+              headerHeight: 52,
+              firstColumnWidth: Responsive.isMobile(context) ? 94 : 180,
+              scrollShadowColor: Colors.grey,
+            ),
           ),
-        ),
-        Expanded(
-            child: Container(
-          decoration: shadowDecoration(Colors.white),
-          padding: const EdgeInsets.all(20),
-          margin: const EdgeInsets.only(left: 30),
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 24,
-              ),
-              Align(
-                  alignment: Alignment.topRight,
-                  child: GestureDetector(
-                    onTap: () {
-                      log("Select - "
-                          "${convertToMonthName(controller.index)} $selectedYear");
-                      FirebaseFirestore.instance
-                          .collection('expenses')
-                          .where('date',
-                              isEqualTo:
-                                  "${convertToMonthName(controller.index)} $selectedYear")
-                          .get()
-                          .then((value) {
-                        if (value.docs.isNotEmpty) {
-                          Map<String, dynamic> data = value.docs.first.data();
-                          setState(() {
-                            totalExpense = int.parse(data['amount']);
-                          });
-                        } else {
-                          Utils.messageDialog("ဒေတာအချက်အလက် မရှိသေးပါ။",
-                              context, "အိုကေ", Colors.black);
-                        }
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: primaryColor,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(12.0))),
-                      width: 170,
-                      child: Row(
-                        children: const [
-                          SizedBox(
-                            width: 12,
+          SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Container(
+                decoration: shadowDecoration(Colors.white),
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.only(
+                  top: 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 24,
+                    ),
+                    Align(
+                        alignment: Alignment.topRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            log("Select - "
+                                "${convertToMonthName(controller.index)} $selectedYear");
+                            FirebaseFirestore.instance
+                                .collection('expenses')
+                                .where('date',
+                                    isEqualTo:
+                                        "${convertToMonthName(controller.index)} $selectedYear")
+                                .get()
+                                .then((value) {
+                              if (value.docs.isNotEmpty) {
+                                Map<String, dynamic> data =
+                                    value.docs.first.data();
+                                setState(() {
+                                  totalExpense = int.parse(data['amount']);
+                                });
+                              } else {
+                                Utils.messageDialog("ဒေတာအချက်အလက် မရှိသေးပါ။",
+                                    context, "အိုကေ", Colors.black);
+                              }
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(12.0))),
+                            width: 170,
+                            child: Row(
+                              children: const [
+                                SizedBox(
+                                  width: 12,
+                                ),
+                                Icon(Icons.calculate_outlined,
+                                    color: Colors.white),
+                                Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 12, bottom: 12, left: 12),
+                                    child: Text(
+                                      "Calculate",
+                                      textScaleFactor: 1.0,
+                                      style: TextStyle(
+                                          fontSize: 15.0, color: Colors.white),
+                                    )),
+                              ],
+                            ),
                           ),
-                          Icon(Icons.calculate_outlined, color: Colors.white),
-                          Padding(
-                              padding: EdgeInsets.only(
-                                  top: 12, bottom: 12, left: 12),
-                              child: Text(
-                                "Calculate",
-                                textScaleFactor: 1.0,
+                        )),
+                    const SizedBox(
+                      height: 24,
+                    ),
+                    Responsive.isMobile(context)
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "ယခုလ အလှူငွေ စုစုပေါင်း ",
                                 style: TextStyle(
-                                    fontSize: 15.0, color: Colors.white),
-                              )),
-                        ],
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: NeumorphicTheme.of(context)
+                                        ?.current!
+                                        .variantColor),
+                              ),
+                              Text(
+                                "${Utils.strToMM(totalDonation.toString())} ကျပ်",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: NeumorphicTheme.of(context)
+                                        ?.current!
+                                        .variantColor),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              Text(
+                                "ယခုလ အလှူငွေ စုစုပေါင်း ",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: NeumorphicTheme.of(context)
+                                        ?.current!
+                                        .variantColor),
+                              ),
+                              Text(
+                                "${Utils.strToMM(totalDonation.toString())} ကျပ်",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: NeumorphicTheme.of(context)
+                                        ?.current!
+                                        .variantColor),
+                              ),
+                            ],
+                          ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Visibility(
+                      visible: totalExpense != 0,
+                      child: Responsive.isMobile(context)
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "ယခုလ အသုံးစာရင်း စုစုပေါင်း   -   ",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM(totalExpense.toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Text(
+                                  "ယခုလ အသုံးစာရင်း စုစုပေါင်း   -   ",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM(totalExpense.toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            ),
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    const Divider(
+                      color: Colors.grey,
+                      thickness: 1,
+                    ),
+                    Visibility(
+                      visible: totalExpense != 0,
+                      child: const SizedBox(
+                        height: 12,
                       ),
                     ),
-                  )),
-              const SizedBox(
-                height: 24,
-              ),
-              Row(
-                children: [
-                  Text(
-                    "ယခုလ အလှူငွေ စုစုပေါင်း           -   ",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            NeumorphicTheme.of(context)?.current!.variantColor),
-                  ),
-                  Text(
-                    "${Utils.strToMM(totalDonation.toString())} ကျပ်",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            NeumorphicTheme.of(context)?.current!.variantColor),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Visibility(
-                visible: totalExpense != 0,
-                child: Row(
+                    Visibility(
+                      visible: totalExpense != 0,
+                      child: Responsive.isMobile(context)
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "ယခုလ ကျန်ရှိငွေ စုစုပေါင်း",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM((totalDonation - totalExpense).toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: (totalDonation - totalExpense)
+                                              .isNegative
+                                          ? Colors.red
+                                          : Colors.green),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Text(
+                                  "ယခုလ ကျန်ရှိငွေ စုစုပေါင်း        -   ",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM((totalDonation - totalExpense).toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: (totalDonation - totalExpense)
+                                              .isNegative
+                                          ? Colors.red
+                                          : Colors.green),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ],
+                ),
+              ))
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: ExpandableTable(
+              rows: rows,
+              header: header,
+              cellWidth: Responsive.isMobile(context)
+                  ? MediaQuery.of(context).size.width * 0.4
+                  : MediaQuery.of(context).size.width * 0.18,
+              cellHeight: 52,
+              headerHeight: 52,
+              firstColumnWidth: Responsive.isMobile(context) ? 94 : 180,
+              scrollShadowColor: Colors.grey,
+            ),
+          ),
+          Expanded(
+              child: Container(
+            decoration: shadowDecoration(Colors.white),
+            padding: const EdgeInsets.all(20),
+            margin: const EdgeInsets.only(left: 30),
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 24,
+                ),
+                Align(
+                    alignment: Alignment.topRight,
+                    child: GestureDetector(
+                      onTap: () {
+                        log("Select - "
+                            "${convertToMonthName(controller.index)} $selectedYear");
+                        FirebaseFirestore.instance
+                            .collection('expenses')
+                            .where('date',
+                                isEqualTo:
+                                    "${convertToMonthName(controller.index)} $selectedYear")
+                            .get()
+                            .then((value) {
+                          if (value.docs.isNotEmpty) {
+                            Map<String, dynamic> data = value.docs.first.data();
+                            setState(() {
+                              totalExpense = int.parse(data['amount']);
+                            });
+                          } else {
+                            Utils.messageDialog("ဒေတာအချက်အလက် မရှိသေးပါ။",
+                                context, "အိုကေ", Colors.black);
+                          }
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: primaryColor,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(12.0))),
+                        width: 170,
+                        child: Row(
+                          children: const [
+                            SizedBox(
+                              width: 12,
+                            ),
+                            Icon(Icons.calculate_outlined, color: Colors.white),
+                            Padding(
+                                padding: EdgeInsets.only(
+                                    top: 12, bottom: 12, left: 12),
+                                child: Text(
+                                  "Calculate",
+                                  textScaleFactor: 1.0,
+                                  style: TextStyle(
+                                      fontSize: 15.0, color: Colors.white),
+                                )),
+                          ],
+                        ),
+                      ),
+                    )),
+                const SizedBox(
+                  height: 24,
+                ),
+                Row(
                   children: [
                     Text(
-                      "ယခုလ အသုံးစာရင်း စုစုပေါင်း   -   ",
+                      "ယခုလ အလှူငွေ စုစုပေါင်း           -   ",
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -818,7 +1046,7 @@ class _DonarListState extends State<DonarList> {
                               .variantColor),
                     ),
                     Text(
-                      "${Utils.strToMM(totalExpense.toString())} ကျပ်",
+                      "${Utils.strToMM(totalDonation.toString())} ကျပ်",
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -828,50 +1056,78 @@ class _DonarListState extends State<DonarList> {
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              const Divider(
-                color: Colors.grey,
-                thickness: 1,
-              ),
-              Visibility(
-                visible: totalExpense != 0,
-                child: const SizedBox(
+                const SizedBox(
                   height: 12,
                 ),
-              ),
-              Visibility(
-                visible: totalExpense != 0,
-                child: Row(
-                  children: [
-                    Text(
-                      "ယခုလ ကျန်ရှိငွေ စုစုပေါင်း        -   ",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: NeumorphicTheme.of(context)
-                              ?.current!
-                              .variantColor),
-                    ),
-                    Text(
-                      "${Utils.strToMM((totalDonation - totalExpense).toString())} ကျပ်",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: (totalDonation - totalExpense).isNegative
-                              ? Colors.red
-                              : Colors.green),
-                    ),
-                  ],
+                Visibility(
+                  visible: totalExpense != 0,
+                  child: Row(
+                    children: [
+                      Text(
+                        "ယခုလ အသုံးစာရင်း စုစုပေါင်း   -   ",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: NeumorphicTheme.of(context)
+                                ?.current!
+                                .variantColor),
+                      ),
+                      Text(
+                        "${Utils.strToMM(totalExpense.toString())} ကျပ်",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: NeumorphicTheme.of(context)
+                                ?.current!
+                                .variantColor),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ))
-      ],
-    );
+                const SizedBox(
+                  height: 12,
+                ),
+                const Divider(
+                  color: Colors.grey,
+                  thickness: 1,
+                ),
+                Visibility(
+                  visible: totalExpense != 0,
+                  child: const SizedBox(
+                    height: 12,
+                  ),
+                ),
+                Visibility(
+                  visible: totalExpense != 0,
+                  child: Row(
+                    children: [
+                      Text(
+                        "ယခုလ ကျန်ရှိငွေ စုစုပေါင်း        -   ",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: NeumorphicTheme.of(context)
+                                ?.current!
+                                .variantColor),
+                      ),
+                      Text(
+                        "${Utils.strToMM((totalDonation - totalExpense).toString())} ကျပ်",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: (totalDonation - totalExpense).isNegative
+                                ? Colors.red
+                                : Colors.green),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ))
+        ],
+      );
+    }
   }
 
   convertToMonthName(int month) {
