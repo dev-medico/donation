@@ -7,10 +7,9 @@ import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/dashboard/ui/dashboard_chart.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_label_card.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
-import 'package:merchant/src/features/donation/blood_donation_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
+import 'package:merchant/src/features/donation/donation_chart_by_blood.dart';
 import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/utils.dart';
@@ -33,13 +32,31 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   @override
   void initState() {
     super.initState();
+    FirebaseFirestore.instance
+        .collection('member_count')
+        .doc("donation_string")
+        .get()
+        .then((value) {
+      var members = value['donations'];
+      setState(() {
+        var data = DonationListResponse.fromJson(jsonDecode(members)).data!;
+
+        for (int i = 0; i < data.length; i++) {
+          //get current year
+          var date = DateTime.now();
+          String donationYear = DateFormat('yyyy').format(date);
+          if (data[i].date!.split(" ")[2] == donationYear) {
+            dataList.add(data[i]);
+          }
+        }
+
+        dataList = dataList.reversed.toList();
+      });
+    });
     initial();
   }
 
   initial() async {
-    var date = DateTime.now();
-    String donationYear = DateFormat('yyyy').format(date);
-
     FirebaseFirestore.instance
         .collection('member_count')
         .doc("member_string")
@@ -86,6 +103,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   }
 
   VoidCallback refresh() => initial();
+  List<DonationData> dataList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -126,14 +144,13 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                 0,
                                 primaryDark,
                                 "အဖွဲ့၀င် စာရင်း",
-                                Utils.strToMM(totalMember.toString()) + " ဦး",
+                                "${Utils.strToMM(totalMember.toString())} ဦး",
                                 Colors.black),
                             DashBoardCard(
                               1,
                               primaryDark,
                               "သွေးလှူမှု မှတ်တမ်း",
-                              Utils.strToMM(totalDonation.toString()) +
-                                  " ကြိမ်",
+                              "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
                               Colors.blue,
                             ),
                           ],
@@ -148,63 +165,27 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               2,
                               primaryDark,
                               "အလှူရှင်များ",
-                              Utils.strToMM(totalDonar.toString()) + " ဦး",
+                              "${Utils.strToMM(totalDonar.toString())} ဦး",
                               Colors.black,
                             ),
                             DashBoardCard(
                               3,
                               primaryDark,
                               "ရ/သုံး ငွေစာရင်း",
-                              "ဇန်န၀ါရီလ",
+                              "",
                               Colors.black,
                             ),
                           ],
                         ),
                       ),
-                      // SizedBox(
-                      //   height: 118,
-                      //   child: ListView(
-                      //     shrinkWrap: true,
-                      //     padding: const EdgeInsets.only(left: 10.0, top: 4),
-                      //     scrollDirection: Axis.horizontal,
-                      //     children: [
-                      //       DashBoardLabelCard(
-                      //         icon: "assets/images/lb_delivered.svg",
-                      //         title: "ရောဂါ မှတ်တမ်း",
-                      //         status: "m_delivered_count",
-                      //         count: "၂၀",
-                      //         countColor: greenDark,
-                      //       ),
-                      //       DashBoardLabelCard(
-                      //         icon: "assets/images/lb_delivering.svg",
-                      //         title: "ကျား/မ မှတ်တမ်း",
-                      //         status: "m_process_count",
-                      //         count: "၄၀/၈၉",
-                      //         countColor: blueColor,
-                      //       ),
-                      //       DashBoardLabelCard(
-                      //         icon: "assets/images/lb_pending.svg",
-                      //         title: "ထူးခြားဖြစ်စဉ်",
-                      //         status: "m_pending_count",
-                      //         count: "၁၂",
-                      //         countColor: secondColor,
-                      //       ),
-                      //       const DashBoardLabelCard(
-                      //         icon: "assets/images/lb_return.svg",
-                      //         title: "ဒေသအလိုက်",
-                      //         status: "m_returned_count",
-                      //         count: "၃၄",
-                      //         countColor: Colors.red,
-                      //       ),
-                      //     ],
-                      //   ),
-                      // )
                     ],
                   ),
                   DashBoardChart(date: dateFormat),
                 ],
               )
             : Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Column(
                     children: [
@@ -217,7 +198,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                 0,
                                 primaryDark,
                                 "အဖွဲ့၀င် စာရင်း",
-                                Utils.strToMM(totalMember.toString()) + " ဦး",
+                                "${Utils.strToMM(totalMember.toString())} ဦး",
                                 Colors.black),
                             const SizedBox(
                               width: 12,
@@ -226,24 +207,29 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               1,
                               primaryDark,
                               "သွေးလှူမှု မှတ်တမ်း",
-                              Utils.strToMM(totalDonation.toString()) +
-                                  " ကြိမ်",
+                              "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
                               Colors.blue,
                             ),
                           ],
                         ),
                       ),
                       Container(
+                        margin: const EdgeInsets.only(
+                            left: 12, right: 12, top: 20, bottom: 8),
+                        width: MediaQuery.of(context).size.width / 2.15,
+                        height: 1,
+                        color: Colors.grey,
+                      ),
+                      Container(
                         width: MediaQuery.of(context).size.width / 2,
-                        padding: const EdgeInsets.only(
-                            left: 20.0, top: 12, bottom: 12),
+                        padding: const EdgeInsets.only(left: 20.0, bottom: 12),
                         child: Row(
                           children: [
                             DashBoardCard(
                               2,
                               primaryDark,
-                              "အလှူရှင်များ",
-                              Utils.strToMM(totalDonar.toString()) + " ဦး",
+                              "ထူးခြားဖြစ်စဉ်",
+                              "",
                               Colors.black,
                             ),
                             const SizedBox(
@@ -253,74 +239,23 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               3,
                               primaryDark,
                               "ရ/သုံး ငွေစာရင်း",
-                              "ဇန်န၀ါရီလ",
+                              "",
                               Colors.black,
                             ),
                           ],
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(
-                            left: 12, right: 12, top: 8, bottom: 8),
-                        width: MediaQuery.of(context).size.width / 2.15,
-                        height: 1,
-                        color: Colors.grey,
-                      ),
-                      Row(
-                        children: [
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          DashBoardLabelCard(
-                            icon: "assets/images/record.svg",
-                            title: "ရောဂါ မှတ်တမ်း",
-                            status: "m_delivered_count",
-                            count: "၂၀",
-                            countColor: greenDark,
-                          ),
-                          const SizedBox(
-                            width: 24,
-                          ),
-                          DashBoardLabelCard(
-                            icon: "assets/images/gender.svg",
-                            title: "ကျား/မ မှတ်တမ်း",
-                            status: "m_process_count",
-                            count: "၄၀/၈၉",
-                            countColor: blueColor,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          DashBoardLabelCard(
-                            icon: "assets/images/special.svg",
-                            title: "ထူးခြားဖြစ်စဉ်",
-                            status: "m_pending_count",
-                            count: "၁၂",
-                            countColor: secondColor,
-                          ),
-                          const SizedBox(
-                            width: 24,
-                          ),
-                          const DashBoardLabelCard(
-                            icon: "assets/images/region.svg",
-                            title: "ဒေသအလိုက်",
-                            status: "m_returned_count",
-                            count: "၃၄",
-                            countColor: Colors.red,
-                          ),
-                        ],
-                      )
                     ],
                   ),
                   Expanded(
                       flex: 1,
-                      child: Padding(
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 12),
                         padding: const EdgeInsets.all(20.0),
-                        child: DashBoardChart(date: dateFormat),
+                        child: DonationChartByBlood(
+                          data: dataList,
+                          fromDashboard: true,
+                        ),
                       )),
                 ],
               ));
@@ -331,13 +266,13 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     return Expanded(
       child: Container(
         height: Responsive.isMobile(context)
-            ? MediaQuery.of(context).size.height / 7.75
-            : MediaQuery.of(context).size.height / 5.6,
+            ? MediaQuery.of(context).size.height / 4.75
+            : MediaQuery.of(context).size.height / 4,
         margin: const EdgeInsets.only(top: 12, right: 12),
         child: NeumorphicButton(
           onPressed: () async {
             if (index == 0) {
-             // await Navigator.pushNamed(context, BloodDonationList.routeName);
+              // await Navigator.pushNamed(context, BloodDonationList.routeName);
               await Navigator.pushNamed(context, MemberListNewStyle.routeName);
               FirebaseFirestore.instance
                   .collection('member_count')
@@ -353,7 +288,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                 });
               });
             } else if (index == 1) {
-              await Navigator.pushNamed(context, BloodDonationListNewStyle.routeName);
+              await Navigator.pushNamed(
+                  context, BloodDonationListNewStyle.routeName);
               FirebaseFirestore.instance
                   .collection('member_count')
                   .doc("donation_string")
@@ -367,24 +303,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   totalDonation = data.length;
                 });
               });
-              // await Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => const ExpandableListScreen(),
-              //   ),
-              // );
-              //  await Navigator.pushNamed(context, BloodDonationList.routeName);
-              // var date = DateTime.now();
-              // String donationYear = DateFormat('yyyy').format(date);
-              // QuerySnapshot querySnapshotDonation = await FirebaseFirestore
-              //     .instance
-              //     .collection('blood_donations')
-              //     .where('year', isEqualTo: int.parse(donationYear))
-              //     .get();
-              // setState(() {
-              //   totalDonation = querySnapshotDonation.size;
-              // });
-            } else if (index == 2) {
+            } else if (index == 3) {
               await Navigator.pushNamed(context, DonarList.routeName);
 
               QuerySnapshot querySnapshotDonar =

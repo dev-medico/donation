@@ -43,16 +43,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     YYDialog.init(context);
-    return Form(
-      key: _formKey,
-      child: ModalProgressHUD(
-        inAsyncCall: _isLoading,
-        color: Colors.black,
-        progressIndicator: const SpinKitCircle(
-          color: Colors.white,
-          size: 60.0,
-        ),
-        dismissible: false,
+    return ModalProgressHUD(
+      inAsyncCall: _isLoading,
+      color: Colors.black,
+      progressIndicator: const SpinKitCircle(
+        color: Colors.white,
+        size: 60.0,
+      ),
+      dismissible: false,
+      child: Form(
+        key: _formKey,
         child: Scaffold(
           backgroundColor: Colors.white,
           body: Stack(
@@ -237,25 +237,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                           onPressed: () async {
-                            
                             if (_formKey.currentState!.validate()) {
                               setState(() {
                                 _isLoading = true;
                               });
                               try {
-                              //Signed in with temporary account.
-                              final userCredential = await FirebaseAuth.instance
-                                  .signInAnonymously();
-                            } on FirebaseAuthException catch (e) {
-                              switch (e.code) {
-                                case "operation-not-allowed":
-                                  print(
-                                      "Anonymous auth hasn't been enabled for this project.");
-                                  break;
-                                default:
-                                  print("Unknown error.");
+                                //Signed in with temporary account.
+                                final userCredential = await FirebaseAuth
+                                    .instance
+                                    .signInAnonymously();
+                              } on FirebaseAuthException catch (e) {
+                                switch (e.code) {
+                                  case "operation-not-allowed":
+                                    print(
+                                        "Anonymous auth hasn't been enabled for this project.");
+                                    break;
+                                  default:
+                                    print("Unknown error.");
+                                }
                               }
-                            }
                               CollectionReference admins = FirebaseFirestore
                                   .instance
                                   .collection('admin');

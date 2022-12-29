@@ -4,10 +4,13 @@ import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/dashboard/ui/simple_chart_blood.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
+import 'package:intl/intl.dart';
 
 class DonationChartByBlood extends StatefulWidget {
   final List<DonationData> data;
-  const DonationChartByBlood({Key? key, required this.data}) : super(key: key);
+  bool? fromDashboard;
+  DonationChartByBlood({Key? key, required this.data, this.fromDashboard})
+      : super(key: key);
 
   @override
   State<DonationChartByBlood> createState() => _DonationChartByBloodState();
@@ -24,6 +27,14 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
     "O (Rh +)",
     "O (Rh -)"
   ];
+  String? donationYear;
+
+  @override
+  void initState() {
+    super.initState();
+    var date = DateTime.now();
+    donationYear = DateFormat('yyyy').format(date);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +48,9 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
         shrinkWrap: true,
         children: [
           Text(
-            "သွေးအုပ်စုအလိုက် မှတ်တမ်း",
+            widget.fromDashboard ?? false
+                ? "$donationYear ခုနှစ် သွေးအုပ်စုအလိုက် လှူဒါန်းမှု မှတ်တမ်း"
+                : "သွေးအုပ်စုအလိုက် မှတ်တမ်း",
             style: TextStyle(
                 fontSize: Responsive.isMobile(context) ? 16.5 : 17.5,
                 color: primaryColor,

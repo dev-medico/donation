@@ -9,6 +9,7 @@ import 'package:merchant/src/features/home/home.dart';
 import 'package:merchant/src/features/member/member_list.dart';
 import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 import 'package:merchant/src/features/splash_screen/splash_screen.dart';
+import 'package:merchant/utils/custom_scroll.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
@@ -28,7 +29,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return NeumorphicApp(
+    return MaterialApp(
+      scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
 
       localizationsDelegates: const [
@@ -40,23 +42,23 @@ class _MyAppState extends State<MyApp> {
         Locale('en', ''), // English, no country code
       ],
       themeMode: ThemeMode.light, //or dark / system
-      darkTheme: const NeumorphicThemeData(
-        baseColor: Color(0xff555555),
-        accentColor: Color(0xff333333),
-        variantColor: Colors.white,
-        defaultTextColor: Colors.white,
-        lightSource: LightSource.topLeft,
-        depth: 4,
-        intensity: 0.3,
+      darkTheme: ThemeData(
+        // baseColor: Color(0xff555555),
+        accentColor: const Color(0xff333333),
+        // variantColor: Colors.white,
+        // defaultTextColor: Colors.white,
+        // lightSource: LightSource.topLeft,
+        // depth: 4,
+        // intensity: 0.3,
       ),
-      theme: const NeumorphicThemeData(
-        baseColor: Color(0xffDDDDDD),
+      theme: ThemeData(
+        // baseColor: Color(0xffDDDDDD),
         accentColor: Colors.white,
-        variantColor: Color(0xffA70507),
-        defaultTextColor: Colors.black,
-        lightSource: LightSource.topLeft,
-        depth: 6,
-        intensity: 0.5,
+        // variantColor: Color(0xffA70507),
+        // defaultTextColor: Colors.black,
+        // lightSource: LightSource.topLeft,
+        // depth: 6,
+        // intensity: 0.5,
       ),
 
       // Define a function to handle named routes in order to support

@@ -378,26 +378,13 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         ),
                       );
                     },
-                    // colors: const <Color>[
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    //   Color.fromARGB(255, 243, 75, 78),
-                    // ],
                     selectedTextStyle: TextStyle(
                         fontSize: 15,
                         color: primaryColor,
                         fontWeight: FontWeight.bold),
                     unselectedTextStyle:
                         const TextStyle(fontSize: 14, color: Colors.black),
+                    tabs: Responsive.isMobile(context) ? monthsMobile : months,
                     children: [
                       Container(
                         color: Colors.white,
@@ -544,212 +531,10 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         ),
                       ),
                     ],
-                    //children: _getChildren1(),
-                    tabs: Responsive.isMobile(context) ? monthsMobile : months,
                   ),
                 ),
               ],
             ),
-
-            // : Row(
-            //     children: [
-            //       Container(
-            //         width: MediaQuery.of(context).size.width / 5,
-            //         margin: const EdgeInsets.only(top: 28, left: 24),
-            //         child: DropdownButtonFormField2(
-            //           decoration: InputDecoration(
-            //             isDense: true,
-            //             contentPadding: EdgeInsets.zero,
-            //             border: OutlineInputBorder(
-            //               borderRadius: BorderRadius.circular(12),
-            //             ),
-            //           ),
-            //           isExpanded: true,
-            //           hint: const Text(
-            //             "နှစ် အလိုက်ကြည့်မည်",
-            //             style: TextStyle(fontSize: 14),
-            //           ),
-            //           icon: const Icon(
-            //             Icons.arrow_drop_down,
-            //             color: Colors.black45,
-            //           ),
-            //           iconSize: 30,
-            //           buttonHeight: 60,
-            //           buttonPadding:
-            //               const EdgeInsets.only(left: 20, right: 10),
-            //           dropdownDecoration: BoxDecoration(
-            //             borderRadius: BorderRadius.circular(12),
-            //           ),
-            //           items: ranges
-            //               .map((item) => DropdownMenuItem<String>(
-            //                     value: item,
-            //                     child: Text(
-            //                       item,
-            //                       style: const TextStyle(
-            //                         fontSize: 14,
-            //                       ),
-            //                     ),
-            //                   ))
-            //               .toList(),
-            //           validator: (value) {
-            //             if (value == null) {
-            //               return "နှစ် အလိုက်ကြည့်မည်";
-            //             }
-            //             return null;
-            //           },
-            //           onChanged: (value) {
-            //             List<DonationData> filterData = [];
-            //             for (int i = 0; i < data!.length; i++) {
-            //               if (data![i].date!.split(" ")[2] == value) {
-            //                 filterData.add(data![i]);
-            //               }
-            //             }
-
-            //             filterData.sort((a, b) {
-            //               //sorting in ascending order
-            //               return DateTime.parse(b.dateDetail == null
-            //                       ? "2020-01-01"
-            //                       : b.dateDetail.toString().split("T")[0])
-            //                   .compareTo(DateTime.parse(a.dateDetail == null
-            //                       ? "2020-01-01"
-            //                       : a.dateDetail.toString().split("T")[0]));
-            //             });
-
-            //             setState(() {
-            //               dataSegments = filterData;
-            //             });
-            //           },
-            //           onSaved: (value) {},
-            //         ),
-            //       ),
-            //       Container(
-            //         width: MediaQuery.of(context).size.width / 5,
-            //         margin: const EdgeInsets.only(top: 28, left: 20),
-            //         child: DropdownButtonFormField2(
-            //           decoration: InputDecoration(
-            //             isDense: true,
-            //             contentPadding: EdgeInsets.zero,
-            //             border: OutlineInputBorder(
-            //               borderRadius: BorderRadius.circular(12),
-            //             ),
-            //           ),
-            //           isExpanded: true,
-            //           hint: const Text(
-            //             "သွေးအုပ်စု အလိုက်ကြည့်မည်",
-            //             style: TextStyle(fontSize: 14),
-            //           ),
-            //           icon: const Icon(
-            //             Icons.arrow_drop_down,
-            //             color: Colors.black45,
-            //           ),
-            //           iconSize: 30,
-            //           buttonHeight: 60,
-            //           buttonPadding:
-            //               const EdgeInsets.only(left: 20, right: 10),
-            //           dropdownDecoration: BoxDecoration(
-            //             borderRadius: BorderRadius.circular(12),
-            //           ),
-            //           items: bloodTypes
-            //               .map((item) => DropdownMenuItem<String>(
-            //                     value: item,
-            //                     child: Text(
-            //                       item,
-            //                       style: const TextStyle(
-            //                         fontSize: 14,
-            //                       ),
-            //                     ),
-            //                   ))
-            //               .toList(),
-            //           validator: (value) {
-            //             if (value == null) {
-            //               return "သွေးအုပ်စု အလိုက်ကြည့်မည်";
-            //             }
-            //             return null;
-            //           },
-            //           onChanged: (value) {
-            //             List<DonationData>? filterdata = [];
-            //             for (int i = 0; i < data!.length; i++) {
-            //               //get DonationData from data only where bloodtype is equal to value
-            //               if (data![i].memberBloodType == value) {
-            //                 filterdata.add(data![i]);
-            //               }
-            //             }
-            //             filterdata.sort((a, b) {
-            //               //sorting in ascending order
-            //               return DateTime.parse(b.dateDetail == null
-            //                       ? "2020-01-01"
-            //                       : b.dateDetail.toString().split("T")[0])
-            //                   .compareTo(DateTime.parse(a.dateDetail == null
-            //                       ? "2020-01-01"
-            //                       : a.dateDetail.toString().split("T")[0]));
-            //             });
-            //             setState(() {
-            //               dataSegments = filterdata.sublist(0);
-            //             });
-            //           },
-            //           onSaved: (value) {},
-            //         ),
-            //       ),
-            //       Container(
-            //         width: MediaQuery.of(context).size.width / 5,
-            //         margin:
-            //             const EdgeInsets.only(right: 40, top: 28, left: 20),
-            //         padding: const EdgeInsets.only(top: 8, bottom: 8),
-            //         child: TextFormField(
-            //           autofocus: false,
-            //           controller: searchController,
-            //           textAlign: TextAlign.start,
-            //           style: const TextStyle(
-            //               fontSize: 15, color: Colors.black),
-            //           onChanged: (val) {
-            //             List<DonationData>? filterdata = [];
-            //             for (int i = 0; i < data!.length; i++) {
-            //               //get DonationData from data only where bloodtype is equal to value
-            //               if (data![i].memberName!.contains(val)) {
-            //                 filterdata.add(data![i]);
-            //               }
-            //             }
-            //             setState(() {
-            //               dataSegments = filterdata.sublist(0);
-            //             });
-            //           },
-            //           decoration: InputDecoration(
-            //             hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-            //             hintStyle: const TextStyle(
-            //                 color: Colors.black, fontSize: 15.0),
-            //             fillColor: Colors.white.withOpacity(0.2),
-            //             filled: true,
-            //             suffixIcon: Padding(
-            //               padding: const EdgeInsets.all(8.0),
-            //               child: Icon(
-            //                 Icons.search,
-            //                 color: primaryColor,
-            //               ),
-            //             ),
-            //             contentPadding: const EdgeInsets.only(
-            //                 left: 20, right: 20, top: 4, bottom: 4),
-            //             border: OutlineInputBorder(
-            //                 borderRadius: BorderRadius.circular(12),
-            //                 borderSide:
-            //                     const BorderSide(color: Colors.grey)),
-            //             focusedBorder: OutlineInputBorder(
-            //                 borderRadius: BorderRadius.circular(12),
-            //                 borderSide:
-            //                     const BorderSide(color: Colors.grey)),
-            //             disabledBorder: OutlineInputBorder(
-            //                 borderRadius: BorderRadius.circular(12),
-            //                 borderSide:
-            //                     const BorderSide(color: Colors.grey)),
-            //             enabledBorder: OutlineInputBorder(
-            //                 borderRadius: BorderRadius.circular(12),
-            //                 borderSide:
-            //                     const BorderSide(color: Colors.grey)),
-            //           ),
-            //           keyboardType: TextInputType.text,
-            //         ),
-            //       ),
-            //     ],
-            //   ),
           ],
         ),
       );
@@ -865,7 +650,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
       }
     }
     filterData1.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -875,7 +659,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData1 = filterData1.reversed.toList();
     filterData2.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -885,7 +668,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData2 = filterData2.reversed.toList();
     filterData3.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -895,7 +677,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData3 = filterData3.reversed.toList();
     filterData4.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -905,7 +686,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData4 = filterData4.reversed.toList();
     filterData5.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -915,7 +695,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData5 = filterData5.reversed.toList();
     filterData6.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -925,7 +704,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData6 = filterData6.reversed.toList();
     filterData7.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -935,7 +713,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData7 = filterData7.reversed.toList();
     filterData8.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -945,7 +722,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData8 = filterData8.reversed.toList();
     filterData9.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -955,7 +731,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData9 = filterData9.reversed.toList();
     filterData10.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -965,7 +740,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData10 = filterData10.reversed.toList();
     filterData11.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -975,7 +749,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
     filterData11 = filterData11.reversed.toList();
     filterData12.sort((a, b) {
-      //sorting in ascending order
       return DateTime.parse(b.dateDetail == null
               ? "2020-01-01"
               : b.dateDetail.toString().split("T")[0])
@@ -1009,8 +782,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
         .then((value) {
       var members = value['donations'];
       var data = DonationListResponse.fromJson(jsonDecode(members)).data!;
-      // order by date in descending order
-      // data.sort((a, b) => DateTime(int.parse(b.date!.split(" ")[2])).compareTo(DateTime(int.parse(a.date!.split(" ")[2]))));
+
       for (var element in data) {
         setState(() {
           allMembers.add(element.memberName!);
@@ -1033,7 +805,6 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
       "ဖြစ်ပွားသည့်ရောဂါ"
     ];
 
-    //Creation header
     ExpandableTableHeader header = ExpandableTableHeader(
         firstCell: Container(
             width: Responsive.isMobile(context) ? 90 : 120,
@@ -1057,7 +828,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                       fontSize: Responsive.isMobile(context) ? 14 : 15,
                       color: Colors.white),
                 )))));
-    //Creation rows
+
     List<ExpandableTableRow> rows = List.generate(
         ROWCOUNT,
         (rowIndex) => ExpandableTableRow(

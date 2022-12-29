@@ -349,14 +349,27 @@ PODS:
     - Firebase/Firestore (~> 8.10.0)
     - firebase_core
     - FlutterMacOS
+  - Firebase/Auth (8.10.0):
+    - Firebase/CoreOnly
+    - FirebaseAuth (~> 8.10.0)
   - Firebase/CoreOnly (8.10.0):
     - FirebaseCore (= 8.10.0)
   - Firebase/Firestore (8.10.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 8.10.0)
+  - firebase_auth (3.3.20):
+    - Firebase/Auth (~> 8.10.0)
+    - Firebase/CoreOnly (~> 8.10.0)
+    - firebase_core
+    - FlutterMacOS
   - firebase_core (1.11.0):
     - Firebase/CoreOnly (~> 8.10.0)
     - FlutterMacOS
+  - FirebaseAuth (8.10.0):
+    - FirebaseCore (~> 8.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.6)
+    - GoogleUtilities/Environment (~> 7.6)
+    - GTMSessionFetcher/Core (~> 1.5)
   - FirebaseCore (8.10.0):
     - FirebaseCoreDiagnostics (~> 8.0)
     - GoogleUtilities/Environment (~> 7.6)
@@ -385,10 +398,21 @@ PODS:
     - GoogleUtilities/Logger (~> 7.7)
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
+  - GoogleUtilities/AppDelegateSwizzler (7.7.0):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Network
   - GoogleUtilities/Environment (7.7.0):
     - PromisesObjC (< 3.0, >= 1.2)
   - GoogleUtilities/Logger (7.7.0):
     - GoogleUtilities/Environment
+  - GoogleUtilities/Network (7.7.0):
+    - GoogleUtilities/Logger
+    - "GoogleUtilities/NSData+zlib"
+    - GoogleUtilities/Reachability
+  - "GoogleUtilities/NSData+zlib (7.7.0)"
+  - GoogleUtilities/Reachability (7.7.0):
+    - GoogleUtilities/Logger
   - "gRPC-C++ (1.28.2)":
     - "gRPC-C++/Implementation (= 1.28.2)"
     - "gRPC-C++/Interface (= 1.28.2)"
@@ -413,6 +437,7 @@ PODS:
     - BoringSSL-GRPC (= 0.0.7)
     - gRPC-Core/Interface (= 1.28.2)
   - gRPC-Core/Interface (1.28.2)
+  - GTMSessionFetcher/Core (1.7.2)
   - leveldb-library (1.22.1)
   - nanopb (2.30908.0):
     - nanopb/decode (= 2.30908.0)
@@ -431,6 +456,7 @@ PODS:
 
 DEPENDENCIES:
   - cloud_firestore (from `Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos`)
+  - firebase_auth (from `Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos`)
   - firebase_core (from `Flutter/ephemeral/.symlinks/plugins/firebase_core/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - objectbox_flutter_libs (from `Flutter/ephemeral/.symlinks/plugins/objectbox_flutter_libs/macos`)
@@ -442,6 +468,7 @@ SPEC REPOS:
     - abseil
     - BoringSSL-GRPC
     - Firebase
+    - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreDiagnostics
     - FirebaseFirestore
@@ -449,6 +476,7 @@ SPEC REPOS:
     - GoogleUtilities
     - "gRPC-C++"
     - gRPC-Core
+    - GTMSessionFetcher
     - leveldb-library
     - nanopb
     - ObjectBox
@@ -457,6 +485,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   cloud_firestore:
     :path: Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos
+  firebase_auth:
+    :path: Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos
   firebase_core:
     :path: Flutter/ephemeral/.symlinks/plugins/firebase_core/macos
   FlutterMacOS:
@@ -473,15 +503,18 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   cloud_firestore: 8d9de9ff9a20851b929a415f061b295128547d1b
   Firebase: 44213362f1dcc52555b935dc925ed35ac55f1b20
+  firebase_auth: 73a171e5b94a58377427a2121c92be05dd43758d
   firebase_core: b287279ad659853ebc4738fdfb6de183eb46ed9f
+  FirebaseAuth: 59a2d2b933b5b79e18fb1e6ad230c6abdaa73d26
   FirebaseCore: 04186597c095da37d90ff9fd3e53bc61a1ff2440
   FirebaseCoreDiagnostics: 92e07a649aeb66352b319d43bdd2ee3942af84cb
   FirebaseFirestore: 0e7321a508cc9de54316ec45400caba6b5719beb
-  FlutterMacOS: 57701585bf7de1b3fc2bb61f6378d73bbdea8424
+  FlutterMacOS: ae6af50a8ea7d6103d888583d46bd8328a7e9811
   GoogleDataTransport: f6eab2486453329104995371bc08d4cafbe3da1f
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
   "gRPC-C++": 13d8ccef97d5c3c441b7e3c529ef28ebee86fad2
   gRPC-Core: 4afa11bfbedf7cdecd04de535a9e046893404ed5
+  GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   ObjectBox: 6410cda891ee71682ea1b0330a9544c52b2ba988
