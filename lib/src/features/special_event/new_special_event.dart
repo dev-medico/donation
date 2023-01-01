@@ -3,12 +3,12 @@ import 'dart:developer';
 
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
+import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 
 class NewEventAddScreen extends StatefulWidget {
   const NewEventAddScreen({Key? key}) : super(key: key);
@@ -399,17 +399,10 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
     setState(() {
       isLoading = true;
     });
-    Map<String, String> headers = {
-      "Accept": "application/json",
-      "content-type": 'application/json',
-      "Authorization": "Bearer xau_n8jyl0ncOhjMYXFMQvgU5re57VDW9vSX2"
-    };
 
-    final response = await http.post(
-      Uri.parse(
-          'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Records/data?columns=id'),
-      headers: headers,
-      body: jsonEncode(
+    XataRepository()
+        .uploadNewEvent(
+      jsonEncode(
         <String, dynamic>{
           "date": dateFilter.toString(),
           "retro_test": retorTestController.text.toString().isEmpty
@@ -432,15 +425,17 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
               : int.parse(retorTestController.text.toString()),
         },
       ),
-    );
-    log(response.statusCode.toString());
-    setState(() {
-      isLoading = false;
+    )
+        .then((response) {
+      log(response.statusCode.toString());
+      setState(() {
+        isLoading = false;
+      });
+      if (response.statusCode != 201) {
+        log("Failed");
+      } else {
+        Navigator.pop(context);
+      }
     });
-    if (response.statusCode != 201) {
-      log("Failed");
-    } else {
-      Navigator.pop(context);
-    }
   }
 }

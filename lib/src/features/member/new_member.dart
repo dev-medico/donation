@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +9,8 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:merchant/data/response/member_response.dart';
+import 'package:merchant/data/repository/repository.dart';
+import 'package:merchant/data/response/total_data_response.dart';
 import 'package:merchant/data/response/township_response/datum.dart';
 import 'package:merchant/data/response/township_response/township_response.dart';
 import 'package:merchant/responsive.dart';
@@ -60,15 +62,15 @@ class NewMemberState extends State<NewMemberScreen> {
   String selectedBloodType = "သွေးအုပ်စု";
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
-      const DropdownMenuItem(child: Text("သွေးအုပ်စု"), value: "သွေးအုပ်စု"),
-      const DropdownMenuItem(child: Text("A (Rh +)"), value: "A (Rh +)"),
-      const DropdownMenuItem(child: Text("A (Rh -)"), value: "A (Rh -)"),
-      const DropdownMenuItem(child: Text("B (Rh +)"), value: "B (Rh +)"),
-      const DropdownMenuItem(child: Text("B (Rh -)"), value: "B (Rh -)"),
-      const DropdownMenuItem(child: Text("AB (Rh +)"), value: "AB (Rh +)"),
-      const DropdownMenuItem(child: Text("AB (Rh -)"), value: "AB (Rh -)"),
-      const DropdownMenuItem(child: Text("O (Rh +)"), value: "O (Rh +)"),
-      const DropdownMenuItem(child: Text("O (Rh -)"), value: "O (Rh -)"),
+      const DropdownMenuItem(value: "သွေးအုပ်စု", child: Text("သွေးအုပ်စု")),
+      const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
+      const DropdownMenuItem(value: "A (Rh -)", child: Text("A (Rh -)")),
+      const DropdownMenuItem(value: "B (Rh +)", child: Text("B (Rh +)")),
+      const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
+      const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
+      const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
+      const DropdownMenuItem(value: "O (Rh +)", child: Text("O (Rh +)")),
+      const DropdownMenuItem(value: "O (Rh -)", child: Text("O (Rh -)")),
     ];
     return menuItems;
   }
@@ -121,70 +123,102 @@ class NewMemberState extends State<NewMemberScreen> {
     DateTime now = DateTime.now();
     String date = DateFormat('dd MMM yyyy').format(now);
 
-    FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("member_string")
-        .get()
+    XataRepository()
+        .uploadNewMember(jsonEncode(<String, dynamic>{
+      "birth_date": birthDate.toString(),
+      "blood_bank_card": bloodBankNo.toString(),
+      "last_donation_date": "",
+      "donation_counts": 0,
+      "note": noteController.text.toString() != ""
+          ? noteController.text.toString()
+          : "-",
+      "nrc": nrc.toString(),
+      "phone": phone.toString(),
+      "total_count": int.parse(totalCount.toString()),
+      "father_name": fatherName.toString(),
+      "name": name.toString(),
+      "register_date": date,
+      "member_id": memberId.toString(),
+      "blood_type": bloodType.toString(),
+      "address": "$homeNo, $street, $quarter, $township, $region1"
+    }))
         .then((value) {
-      var members = value['members'];
-      List<MemberData> data =
-          MemberListResponse.fromJson(jsonDecode(members)).data!;
-      print("Previous Data - ${data.length}");
-      data.add(MemberData(
-        memberId: memberId,
-        name: name,
-        fatherName: fatherName,
-        birthDate: birthDate,
-        nrc: nrc,
-        phone: phone,
-        bloodType: bloodType,
-        bloodBankCard: bloodBankNo,
-        memberCount: "0",
-        totalCount: totalCount,
-        homeNo: homeNo,
-        street: street,
-        quarter: quarter,
-        town: township,
-        region: region1,
-        registerDate: date,
-        note: noteController.text.toString() != ""
-            ? noteController.text.toString()
-            : "-",
-      ));
+      if (value.statusCode.toString().startsWith("2")) {
+        setState(() {
+          _isLoading = false;
+        });
+        Utils.messageSuccessDialog("အဖွဲ့၀င် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+            context, "အိုကေ", Colors.black);
 
-      setState(() {
-        _isLoading = false;
-      });
-      Utils.messageSuccessDialog("အဖွဲ့၀င် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-          context, "အိုကေ", Colors.black);
+        nameController.clear();
+        memberIDController.clear();
+        fatherNameController.clear();
+        nrcController.clear();
+        phoneController.clear();
+        selectedBloodType = "သွေးအုပ်စု";
+        birthDate = "မွေးသက္ကရာဇ်";
+        bloodBankNoController.clear();
+        totalDonationController.clear();
+        homeNoController.clear();
+        streetController.clear();
+        quarterController.clear();
+        townController.clear();
+        region1 = "";
+        regional = "";
+        noteController.clear();
 
-      print("Added Data - ${data.length}");
-      nameController.clear();
-      memberIDController.clear();
-      fatherNameController.clear();
-      nrcController.clear();
-      phoneController.clear();
-      selectedBloodType = "သွေးအုပ်စု";
-      birthDate = "မွေးသက္ကရာဇ်";
-      bloodBankNoController.clear();
-      totalDonationController.clear();
-      homeNoController.clear();
-      streetController.clear();
-      quarterController.clear();
-      townController.clear();
-      region1 = "";
-      regional = "";
-      noteController.clear();
-
-      FirebaseFirestore.instance
-          .collection('member_count')
-          .doc("member_string")
-          .set({
-        'members': jsonEncode(MemberListResponse(data: data).toJson()),
-      }).then((value) {
-        print("Successfully Added Data - ${data.length}");
-      }).catchError((error) {});
+        XataRepository().getMembersTotal().then((value) {
+          var newMemberCount = int.parse(
+                  TotalDataResponse.fromJson(jsonDecode(value.body))
+                      .records!
+                      .first
+                      .value
+                      .toString()) +
+              1;
+          XataRepository().updateMembersTotal(newMemberCount);
+        });
+      } else {
+        log(value.statusCode.toString());
+        log(value.body);
+      }
     });
+
+    // FirebaseFirestore.instance
+    //     .collection('member_count')
+    //     .doc("member_string")
+    //     .get()
+    //     .then((value) {
+    //   var members = value['members'];
+    //   List<MemberData> data =
+    //       MemberListResponse.fromJson(jsonDecode(members)).data!;
+    //   print("Previous Data - ${length}");
+    //   add(MemberData(
+    //     memberId: memberId,
+    //     name: name,
+    //     fatherName: fatherName,
+    //     birthDate: birthDate,
+    //     nrc: nrc,
+    //     phone: phone,
+    //     bloodType: bloodType,
+    //     bloodBankCard: bloodBankNo,
+    //     donationCounts: 0,
+    //     totalCount: int.parse(totalCount.toString()),
+    //     address: "$homeNo,$street,$quarter,$township,$region1",
+    //     registerDate: date,
+    //     note: noteController.text.toString() != ""
+    //         ? noteController.text.toString()
+    //         : "-",
+    //   ));
+
+    //   FirebaseFirestore.instance
+    //       .collection('member_count')
+    //       .doc("member_string")
+    //       .set({
+    //     'members': jsonEncode(MemberListResponse(data: data).toJson()),
+    //   }).then((value) {
+    //     print("Successfully Added Data - ${length}");
+    //   }).catchError((error) {});
+    // });
   }
 
   void initial() async {
@@ -236,29 +270,7 @@ class NewMemberState extends State<NewMemberScreen> {
   @override
   Widget build(BuildContext context) {
     YYDialog.init(context);
-    return Scaffold(
-      backgroundColor: const Color(0xfff2f2f2),
-      appBar: AppBar(
-        flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [primaryColor, primaryDark],
-        ))),
-        centerTitle: true,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Center(
-            child: Text("အဖွဲ့၀င်အသစ် ထည့်သွင်းမည်",
-                textScaleFactor: 1.0,
-                style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15 : 17,
-                    color: Colors.white)),
-          ),
-        ),
-      ),
-      body: ModalProgressHUD(
+    return ModalProgressHUD(
         inAsyncCall: _isLoading,
         color: Colors.black,
         progressIndicator: const SpinKitCircle(
@@ -266,7 +278,29 @@ class NewMemberState extends State<NewMemberScreen> {
           size: 60.0,
         ),
         dismissible: false,
-        child: SafeArea(
+        child:Scaffold(
+        backgroundColor: const Color(0xfff2f2f2),
+        appBar: AppBar(
+          flexibleSpace: Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [primaryColor, primaryDark],
+          ))),
+          centerTitle: true,
+          title: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Center(
+              child: Text("အဖွဲ့၀င်အသစ် ထည့်သွင်းမည်",
+                  textScaleFactor: 1.0,
+                  style: TextStyle(
+                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      color: Colors.white)),
+            ),
+          ),
+        ),
+        body: SafeArea(
           child: Responsive.isMobile(context)
               ? SingleChildScrollView(
                   child: Column(
@@ -308,8 +342,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                         ),
                                         child: TextFormField(
                                           controller: nameController,
-                                          decoration:
-                                              inputBoxDecoration("အမည်"),
+                                          decoration: inputBoxDecoration("အမည်"),
                                         ),
                                       ),
                                     ),
@@ -333,9 +366,9 @@ class NewMemberState extends State<NewMemberScreen> {
                                                 FirebaseFirestore.instance
                                                     .collection('members')
                                                     .where('name',
-                                                        isEqualTo:
-                                                            nameController.text
-                                                                .toString())
+                                                        isEqualTo: nameController
+                                                            .text
+                                                            .toString())
                                                     .get()
                                                     .then((value) {
                                                   if (value.docs.isEmpty) {
@@ -386,8 +419,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                         enabledBorder: OutlineInputBorder(
                                           borderSide: const BorderSide(
                                               color: Colors.grey, width: 1),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
                                         contentPadding: const EdgeInsets.only(
                                             left: 20, right: 12, bottom: 4),
@@ -456,8 +488,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                 child: DropdownButton(
                                                   value:
                                                       nrc_region_state_options_Value,
-                                                  icon: const Icon(Icons
-                                                      .keyboard_arrow_down),
+                                                  icon: const Icon(
+                                                      Icons.keyboard_arrow_down),
                                                   iconSize: 0,
                                                   elevation: 16,
                                                   underline: const SizedBox(),
@@ -490,11 +522,10 @@ class NewMemberState extends State<NewMemberScreen> {
                                           Expanded(
                                             child: Container(
                                               height: 48,
-                                              margin: const EdgeInsets.only(
-                                                  left: 12),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12),
+                                              margin:
+                                                  const EdgeInsets.only(left: 12),
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 12),
                                               decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(10),
@@ -504,8 +535,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                 keyboardType:
                                                     TextInputType.number,
                                                 controller: nrcController,
-                                                decoration:
-                                                    const InputDecoration(
+                                                decoration: const InputDecoration(
                                                   border: InputBorder.none,
                                                 ),
                                               ),
@@ -594,8 +624,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                       left: 20, top: 16, bottom: 8, right: 20),
                                   child: TextFormField(
                                     controller: quarterController,
-                                    decoration:
-                                        inputBoxDecoration("ရပ်ကွက်အမည်"),
+                                    decoration: inputBoxDecoration("ရပ်ကွက်အမည်"),
                                   ),
                                 ),
                                 Container(
@@ -606,8 +635,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                         TextFieldConfiguration(
                                       controller: townController,
                                       autofocus: false,
-                                      decoration:
-                                          inputBoxDecoration("မြို့နယ်"),
+                                      decoration: inputBoxDecoration("မြို့နယ်"),
 
                                       // decoration: const InputDecoration(
                                       //   hintText: "မြို့",
@@ -642,15 +670,14 @@ class NewMemberState extends State<NewMemberScreen> {
                                         ),
                                       );
                                     },
-                                    errorBuilder:
-                                        (BuildContext context, Object? error) =>
-                                            Text('$error',
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .errorColor)),
+                                    errorBuilder: (BuildContext context,
+                                            Object? error) =>
+                                        Text('$error',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .errorColor)),
                                     onSuggestionSelected: (suggestion) {
-                                      townController.text =
-                                          suggestion.toString();
+                                      townController.text = suggestion.toString();
                                       setRegion(suggestion.toString());
                                     },
                                   ),
@@ -759,14 +786,12 @@ class NewMemberState extends State<NewMemberScreen> {
                               child: const Align(
                                   alignment: Alignment.center,
                                   child: Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 8, bottom: 8),
+                                      padding: EdgeInsets.only(top: 8, bottom: 8),
                                       child: Text(
                                         "ထည့်သွင်းမည်",
                                         textScaleFactor: 1.0,
                                         style: TextStyle(
-                                            fontSize: 16.0,
-                                            color: Colors.white),
+                                            fontSize: 16.0, color: Colors.white),
                                       ))),
                             ),
                           ))
@@ -842,8 +867,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                   child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
-                                                              top: 16,
-                                                              right: 4),
+                                                              top: 16, right: 4),
                                                       child: Image.asset(
                                                         "assets/images/checked.png",
                                                         height: 24,
@@ -864,8 +888,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                                       .toString())
                                                           .get()
                                                           .then((value) {
-                                                        if (value
-                                                            .docs.isEmpty) {
+                                                        if (value.docs.isEmpty) {
                                                           setState(() {
                                                             nameChecked = true;
                                                           });
@@ -876,8 +899,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                                   .data();
                                                           memberExistDialog(
                                                               context,
-                                                              nameController
-                                                                  .text
+                                                              nameController.text
                                                                   .toString(),
                                                               data);
                                                         }
@@ -886,8 +908,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
-                                                              top: 16,
-                                                              right: 4),
+                                                              top: 16, right: 4),
                                                       child: Image.asset(
                                                         "assets/images/magnifier.png",
                                                         height: 24,
@@ -939,8 +960,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                             decoration: InputDecoration(
                                               enabledBorder: OutlineInputBorder(
                                                 borderSide: const BorderSide(
-                                                    color: Colors.grey,
-                                                    width: 1),
+                                                    color: Colors.grey, width: 1),
                                                 borderRadius:
                                                     BorderRadius.circular(12),
                                               ),
@@ -992,9 +1012,9 @@ class NewMemberState extends State<NewMemberScreen> {
                                               mainAxisSize: MainAxisSize.max,
                                               children: <Widget>[
                                                 Container(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 10),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                          horizontal: 10),
                                                   decoration: shadowDecoration(
                                                       Colors.white),
                                                   child: DropdownButton(
@@ -1019,16 +1039,15 @@ class NewMemberState extends State<NewMemberScreen> {
                                                   ),
                                                 ),
                                                 Container(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 10),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                          horizontal: 10),
                                                   decoration: shadowDecoration(
                                                       Colors.white),
                                                   child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
-                                                              left: 8,
-                                                              right: 8),
+                                                              left: 8, right: 8),
                                                       child: DropdownButton(
                                                         value:
                                                             nrc_region_state_options_Value,
@@ -1045,16 +1064,15 @@ class NewMemberState extends State<NewMemberScreen> {
                                                       )),
                                                 ),
                                                 Container(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 10),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                          horizontal: 10),
                                                   margin: const EdgeInsets.only(
                                                       left: 8),
                                                   decoration: shadowDecoration(
                                                       Colors.white),
                                                   child: DropdownButton(
-                                                    value:
-                                                        nrc_type_options_Value,
+                                                    value: nrc_type_options_Value,
                                                     items:
                                                         nrc_type_options_dropDownMenuItems,
                                                     icon: const Icon(Icons
@@ -1069,9 +1087,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                 Expanded(
                                                   child: Container(
                                                     height: 48,
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                            left: 12),
+                                                    margin: const EdgeInsets.only(
+                                                        left: 12),
                                                     padding: const EdgeInsets
                                                             .symmetric(
                                                         horizontal: 12),
@@ -1079,8 +1096,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               10),
-                                                      color: const Color(
-                                                          0xffecf0f1),
+                                                      color:
+                                                          const Color(0xffecf0f1),
                                                     ),
                                                     child: TextField(
                                                       keyboardType:
@@ -1088,8 +1105,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                       controller: nrcController,
                                                       decoration:
                                                           const InputDecoration(
-                                                        border:
-                                                            InputBorder.none,
+                                                        border: InputBorder.none,
                                                       ),
                                                     ),
                                                   ),
@@ -1142,8 +1158,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                         child: Stack(
                                           children: [
                                             TextFormField(
-                                              keyboardType:
-                                                  TextInputType.number,
+                                              keyboardType: TextInputType.number,
                                               controller: phoneController,
                                               decoration: inputBoxDecoration(
                                                   "ဖုန်းနံပါတ်"),
@@ -1297,8 +1312,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                   suggestionsBox, controller) {
                                                 return suggestionsBox;
                                               },
-                                              itemBuilder:
-                                                  (context, suggestion) {
+                                              itemBuilder: (context, suggestion) {
                                                 return ListTile(
                                                   title: Text(
                                                     suggestion.toString(),
@@ -1306,20 +1320,16 @@ class NewMemberState extends State<NewMemberScreen> {
                                                   ),
                                                 );
                                               },
-                                              errorBuilder: (BuildContext
-                                                          context,
+                                              errorBuilder: (BuildContext context,
                                                       Object? error) =>
                                                   Text('$error',
                                                       style: TextStyle(
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .errorColor)),
-                                              onSuggestionSelected:
-                                                  (suggestion) {
+                                                          color: Theme.of(context)
+                                                              .errorColor)),
+                                              onSuggestionSelected: (suggestion) {
                                                 townController.text =
                                                     suggestion.toString();
-                                                setRegion(
-                                                    suggestion.toString());
+                                                setRegion(suggestion.toString());
                                               },
                                             ),
                                           ),
@@ -1373,68 +1383,66 @@ class NewMemberState extends State<NewMemberScreen> {
                             ),
                           )),
                       Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(12.0))),
-                            width: MediaQuery.of(context).size.width / 2.8,
-                            margin: const EdgeInsets.only(
-                                left: 54, bottom: 16, right: 8),
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {
-                                if (nameController.text.isNotEmpty &&
-                                    fatherNameController.text.isNotEmpty &&
-                                    phoneController.text.isNotEmpty &&
-                                    selectedBloodType != "သွေးအုပ်စု") {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  FirebaseFirestore.instance
-                                      .collection('members')
-                                      .where('name',
-                                          isEqualTo:
-                                              nameController.text.toString())
-                                      .where('father_name',
-                                          isEqualTo: fatherNameController.text
-                                              .toString())
-                                      .where('blood_type',
-                                          isEqualTo: selectedBloodType)
-                                      .get()
-                                      .then((value) {
-                                    if (value.docs.isEmpty) {
-                                      getAutoIncrementKey();
-                                    } else {
-                                      Map<String, dynamic> data =
-                                          value.docs.first.data();
-                                      memberExistDialog(context,
-                                          nameController.text.toString(), data);
-                                    }
-                                  });
-                                } else {
-                                  Utils.messageDialog(
-                                      "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
-                                      context,
-                                      "ပြင်ဆင်မည်",
-                                      Colors.black);
-                                }
-                              },
-                              child: const Align(
-                                  alignment: Alignment.center,
-                                  child: Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 16, bottom: 16),
-                                      child: Text(
-                                        "ထည့်သွင်းမည်",
-                                        textScaleFactor: 1.0,
-                                        style: TextStyle(
-                                            fontSize: 18.0,
-                                            color: Colors.white),
-                                      ))),
-                            ),
-                          ),)
+                        alignment: Alignment.bottomLeft,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(12.0))),
+                          width: MediaQuery.of(context).size.width / 2.8,
+                          margin: const EdgeInsets.only(
+                              left: 54, bottom: 16, right: 8),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              if (nameController.text.isNotEmpty &&
+                                  fatherNameController.text.isNotEmpty &&
+                                  phoneController.text.isNotEmpty &&
+                                  selectedBloodType != "သွေးအုပ်စု") {
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                FirebaseFirestore.instance
+                                    .collection('members')
+                                    .where('name',
+                                        isEqualTo: nameController.text.toString())
+                                    .where('father_name',
+                                        isEqualTo:
+                                            fatherNameController.text.toString())
+                                    .where('blood_type',
+                                        isEqualTo: selectedBloodType)
+                                    .get()
+                                    .then((value) {
+                                  if (value.docs.isEmpty) {
+                                    getAutoIncrementKey();
+                                  } else {
+                                    Map<String, dynamic> data =
+                                        value.docs.first.data();
+                                    memberExistDialog(context,
+                                        nameController.text.toString(), data);
+                                  }
+                                });
+                              } else {
+                                Utils.messageDialog(
+                                    "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
+                                    context,
+                                    "ပြင်ဆင်မည်",
+                                    Colors.black);
+                              }
+                            },
+                            child: const Align(
+                                alignment: Alignment.center,
+                                child: Padding(
+                                    padding: EdgeInsets.only(top: 16, bottom: 16),
+                                    child: Text(
+                                      "ထည့်သွင်းမည်",
+                                      textScaleFactor: 1.0,
+                                      style: TextStyle(
+                                          fontSize: 18.0, color: Colors.white),
+                                    ))),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -1625,8 +1633,8 @@ class NewMemberState extends State<NewMemberScreen> {
       ))
       ..animatedFunc = (child, animation) {
         return ScaleTransition(
-          child: child,
           scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
         );
       }
       ..show();
@@ -1636,56 +1644,22 @@ class NewMemberState extends State<NewMemberScreen> {
     if (editable && memberIDController.text.toString().isNotEmpty) {
       if (memberIDController.text.toString().contains("-") &&
           memberIDController.text.toString().length == 6) {
-        DocumentReference documentReference = FirebaseFirestore.instance
-            .collection('member_count')
-            .doc("increment");
-
-        return FirebaseFirestore.instance
-            .runTransaction((transaction) async {
-              // Get the document
-              DocumentSnapshot snapshot =
-                  await transaction.get(documentReference);
-
-              int newCount = 0;
-              if (!snapshot.exists) {
-                newCount = 1;
-              } else {
-                print(snapshot.data());
-                Map<String, dynamic> data =
-                    snapshot.data()! as Map<String, dynamic>;
-                print(data);
-                newCount = int.parse(data['count'].toString()) + 1;
-              }
-              // Perform an update on the document
-              transaction.update(documentReference, {'count': newCount});
-              setState(() {
-                id = newCount;
-              });
-              print("New User Updated Count to $newCount");
-
-              addMember(
-                  memberIDController.text.toString(),
-                  nameController.text.toString(),
-                  fatherNameController.text.toString(),
-                  birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
-                  _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
-                  phoneController.text.toString(),
-                  selectedBloodType,
-                  bloodBankNoController.text.toString() != ""
-                      ? bloodBankNoController.text.toString()
-                      : "-",
-                  totalDonationController.text.toString(),
-                  homeNoController.text.toString(),
-                  streetController.text.toString(),
-                  quarterController.text.toString(),
-                  townController.text.toString());
-
-              // Return the new count
-              return newCount;
-            })
-            .then((value) => print("Follower count updated to $value"))
-            .catchError(
-                (error) => print("Failed to update user followers: $error"));
+        addMember(
+            memberIDController.text.toString(),
+            nameController.text.toString(),
+            fatherNameController.text.toString(),
+            birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
+            _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
+            phoneController.text.toString(),
+            selectedBloodType,
+            bloodBankNoController.text.toString() != ""
+                ? bloodBankNoController.text.toString()
+                : "-",
+            totalDonationController.text.toString(),
+            homeNoController.text.toString(),
+            streetController.text.toString(),
+            quarterController.text.toString(),
+            townController.text.toString());
       } else {
         setState(() {
           _isLoading = false;
@@ -1723,57 +1697,57 @@ class NewMemberState extends State<NewMemberScreen> {
             NumberFormat formatter = NumberFormat("0000");
             String memberId = "";
             if (id <= 1000) {
-              memberId = "A-" + formatter.format(id);
+              memberId = "A-${formatter.format(id)}";
             } else if (id <= 2000) {
-              memberId = "B-" + formatter.format((id - 1000));
+              memberId = "B-${formatter.format((id - 1000))}";
             } else if (id <= 3000) {
-              memberId = "C-" + formatter.format((id - 2000));
+              memberId = "C-${formatter.format((id - 2000))}";
             } else if (id <= 4000) {
-              memberId = "D-" + formatter.format((id - 3000));
+              memberId = "D-${formatter.format((id - 3000))}";
             } else if (id <= 5000) {
-              memberId = "E-" + formatter.format((id - 4000));
+              memberId = "E-${formatter.format((id - 4000))}";
             } else if (id <= 6000) {
-              memberId = "F-" + formatter.format((id - 5000));
+              memberId = "F-${formatter.format((id - 5000))}";
             } else if (id <= 7000) {
-              memberId = "G-" + formatter.format((id - 6000));
+              memberId = "G-${formatter.format((id - 6000))}";
             } else if (id <= 8000) {
-              memberId = "H-" + formatter.format((id - 7000));
+              memberId = "H-${formatter.format((id - 7000))}";
             } else if (id <= 9000) {
-              memberId = "I-" + formatter.format((id - 8000));
+              memberId = "I-${formatter.format((id - 8000))}";
             } else if (id <= 10000) {
-              memberId = "J-" + formatter.format((id - 9000));
+              memberId = "J-${formatter.format((id - 9000))}";
             } else if (id <= 11000) {
-              memberId = "K-" + formatter.format((id - 10000));
+              memberId = "K-${formatter.format((id - 10000))}";
             } else if (id <= 12000) {
-              memberId = "L-" + formatter.format((id - 11000));
+              memberId = "L-${formatter.format((id - 11000))}";
             } else if (id <= 13000) {
-              memberId = "M-" + formatter.format((id - 12000));
+              memberId = "M-${formatter.format((id - 12000))}";
             } else if (id <= 14000) {
-              memberId = "N-" + formatter.format((id - 13000));
+              memberId = "N-${formatter.format((id - 13000))}";
             } else if (id <= 15000) {
-              memberId = "O-" + formatter.format((id - 14000));
+              memberId = "O-${formatter.format((id - 14000))}";
             } else if (id <= 16000) {
-              memberId = "P-" + formatter.format((id - 15000));
+              memberId = "P-${formatter.format((id - 15000))}";
             } else if (id <= 17000) {
-              memberId = "Q-" + formatter.format((id - 16000));
+              memberId = "Q-${formatter.format((id - 16000))}";
             } else if (id <= 18000) {
-              memberId = "R-" + formatter.format((id - 17000));
+              memberId = "R-${formatter.format((id - 17000))}";
             } else if (id <= 19000) {
-              memberId = "S-" + formatter.format((id - 18000));
+              memberId = "S-${formatter.format((id - 18000))}";
             } else if (id <= 20000) {
-              memberId = "T-" + formatter.format((id - 19000));
+              memberId = "T-${formatter.format((id - 19000))}";
             } else if (id <= 21000) {
-              memberId = "U-" + formatter.format((id - 20000));
+              memberId = "U-${formatter.format((id - 20000))}";
             } else if (id <= 22000) {
-              memberId = "V-" + formatter.format((id - 21000));
+              memberId = "V-${formatter.format((id - 21000))}";
             } else if (id <= 23000) {
-              memberId = "W-" + formatter.format((id - 22000));
+              memberId = "W-${formatter.format((id - 22000))}";
             } else if (id <= 24000) {
-              memberId = "X-" + formatter.format((id - 23000));
+              memberId = "X-${formatter.format((id - 23000))}";
             } else if (id <= 25000) {
-              memberId = "Y-" + formatter.format((id - 24000));
+              memberId = "Y-${formatter.format((id - 24000))}";
             } else if (id <= 26000) {
-              memberId = "Z-" + formatter.format((id - 25000));
+              memberId = "Z-${formatter.format((id - 25000))}";
             }
 
             addMember(
@@ -1870,7 +1844,7 @@ class NewMemberState extends State<NewMemberScreen> {
     for (var element in datas) {
       if (element.township == township) {
         setState(() {
-          regional = element.town! + ", " + element.region!;
+          regional = "${element.town!}, ${element.region!}";
           town1 = element.town!;
           region1 = element.region!;
           township1 = township;

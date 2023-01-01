@@ -381,8 +381,7 @@ class _MemberDetailNewStyleScreenState
                           Expanded(
                             flex: 4,
                             child: Text(
-                              Utils.strToMM(groupTotalCount.toString()) +
-                                  " ကြိမ်",
+                              "${Utils.strToMM(groupTotalCount.toString())} ကြိမ်",
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -413,7 +412,7 @@ class _MemberDetailNewStyleScreenState
                           Expanded(
                             flex: 4,
                             child: Text(
-                              Utils.strToMM(data.totalCount!) + " ကြိမ်",
+                              "${Utils.strToMM(data.totalCount.toString())} ကြိမ်",
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -474,13 +473,7 @@ class _MemberDetailNewStyleScreenState
                           Expanded(
                             flex: 4,
                             child: Text(
-                              data.homeNo! +
-                                  "၊" +
-                                  data.street! +
-                                  "၊" +
-                                  data.quarter! +
-                                  "၊" +
-                                  data.town!,
+                              data.address!,
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -869,8 +862,7 @@ class _MemberDetailNewStyleScreenState
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    Utils.strToMM(groupTotalCount.toString()) +
-                                        " ကြိမ်",
+                                    "${Utils.strToMM(groupTotalCount.toString())} ကြိမ်",
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -905,8 +897,7 @@ class _MemberDetailNewStyleScreenState
                                 Expanded(
                                   flex: 6,
                                   child: Text(
-                                    Utils.strToMM(data.totalCount!) +
-                                        " ကြိမ်",
+                                    "${Utils.strToMM(data.totalCount.toString())} ကြိမ်",
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -980,13 +971,7 @@ class _MemberDetailNewStyleScreenState
                                 Expanded(
                                   flex: 11,
                                   child: Text(
-                                    data.homeNo! +
-                                        "၊" +
-                                        data.street! +
-                                        "၊" +
-                                        data.quarter! +
-                                        "၊" +
-                                        data.town!,
+                                    data.address!,
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),

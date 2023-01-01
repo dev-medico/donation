@@ -63,15 +63,15 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
   String selectedBloodType = "သွေးအုပ်စု";
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
-      const DropdownMenuItem(child: Text("သွေးအုပ်စု"), value: "သွေးအုပ်စု"),
-      const DropdownMenuItem(child: Text("A (Rh +)"), value: "A (Rh +)"),
-      const DropdownMenuItem(child: Text("A (Rh -)"), value: "A (Rh -)"),
-      const DropdownMenuItem(child: Text("B (Rh +)"), value: "B (Rh +)"),
-      const DropdownMenuItem(child: Text("B (Rh -)"), value: "B (Rh -)"),
-      const DropdownMenuItem(child: Text("AB (Rh +)"), value: "AB (Rh +)"),
-      const DropdownMenuItem(child: Text("AB (Rh -)"), value: "AB (Rh -)"),
-      const DropdownMenuItem(child: Text("O (Rh +)"), value: "O (Rh +)"),
-      const DropdownMenuItem(child: Text("O (Rh -)"), value: "O (Rh -)"),
+      const DropdownMenuItem(value: "သွေးအုပ်စု", child: Text("သွေးအုပ်စု")),
+      const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
+      const DropdownMenuItem(value: "A (Rh -)", child: Text("A (Rh -)")),
+      const DropdownMenuItem(value: "B (Rh +)", child: Text("B (Rh +)")),
+      const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
+      const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
+      const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
+      const DropdownMenuItem(value: "O (Rh +)", child: Text("O (Rh +)")),
+      const DropdownMenuItem(value: "O (Rh -)", child: Text("O (Rh -)")),
     ];
     return menuItems;
   }
@@ -94,11 +94,11 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
     phoneController.text = data.phone!;
     selectedBloodType = data.bloodType!;
     bloodBankNoController.text = data.bloodBankCard!;
-    totalDonationController.text = data.totalCount!;
-    homeNoController.text = data.homeNo!;
-    streetController.text = data.street!;
-    quarterController.text = data.quarter!;
-    townController.text = data.town!;
+    totalDonationController.text = data.totalCount.toString();
+    homeNoController.text = data.address!.split(',')[0];
+    streetController.text = data.address!.split(',')[1];
+    quarterController.text = data.address!.split(',')[2];
+    townController.text = data.address!.split(',')[3];
     setRegion(townController.text.toString());
     birthDate = data.birthDate!;
 
@@ -1048,7 +1048,7 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
     for (var element in datas) {
       if (element.township == township) {
         setState(() {
-          regional = element.town! + ", " + element.region!;
+          regional = "${element.town!}, ${element.region!}";
           town1 = element.town!;
           region1 = element.region!;
           township1 = township;

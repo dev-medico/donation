@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:merchant/data/response/member_response.dart';
+import 'package:merchant/data/repository/repository.dart';
+import 'package:merchant/data/response/total_data_response.dart';
 import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
@@ -57,49 +58,51 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   }
 
   initial() async {
-    FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("member_string")
-        .get()
-        .then((value) {
-      var members = value['members'];
-      var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
-
+    XataRepository().getMembersTotal().then((value) {
       setState(() {
-        totalMember = data.length;
+        totalMember = int.parse(
+            TotalDataResponse.fromJson(jsonDecode(value.body))
+                .records!
+                .first
+                .value
+                .toString());
       });
     });
-
-    FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("donation_string")
-        .get()
-        .then((value) {
-      var donations = value['donations'];
-      var data = DonationListResponse.fromJson(jsonDecode(donations)).data!;
-
+    XataRepository().getDonationsTotal().then((value) {
       setState(() {
-        totalDonation = data.length;
+        totalDonation = int.parse(
+            TotalDataResponse.fromJson(jsonDecode(value.body))
+                .records!
+                .first
+                .value
+                .toString());
       });
     });
+    // FirebaseFirestore.instance
+    //     .collection('member_count')
+    //     .doc("member_string")
+    //     .get()
+    //     .then((value) {
+    //   var members = value['members'];
+    //   var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
 
-    // QuerySnapshot memberSnapshot =
-    //     await FirebaseFirestore.instance.collection('members').get();
-
-    // setState(() {
-    //   totalMember = memberSnapshot.size;
+    //   setState(() {
+    //     totalMember = data.length;
+    //   });
     // });
 
-    QuerySnapshot querySnapshotDonar =
-        await FirebaseFirestore.instance.collection('donors').get();
-    // QuerySnapshot querySnapshotDonation = await FirebaseFirestore.instance
-    //     .collection('blood_donations')
-    //     .where('year', isEqualTo: int.parse(donationYear))
-    //     .get();
-    setState(() {
-      totalDonar = querySnapshotDonar.size;
-      // totalDonation = querySnapshotDonation.size;
-    });
+    // FirebaseFirestore.instance
+    //     .collection('member_count')
+    //     .doc("donation_string")
+    //     .get()
+    //     .then((value) {
+    //   var donations = value['donations'];
+    //   var data = DonationListResponse.fromJson(jsonDecode(donations)).data!;
+
+    //   setState(() {
+    //     totalDonation = data.length;
+    //   });
+    // });
   }
 
   VoidCallback refresh() => initial();
@@ -277,47 +280,33 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
             if (index == 0) {
               // await Navigator.pushNamed(context, BloodDonationList.routeName);
               await Navigator.pushNamed(context, MemberListNewStyle.routeName);
-              FirebaseFirestore.instance
-                  .collection('member_count')
-                  .doc("member_string")
-                  .get()
-                  .then((value) {
-                var members = value['members'];
-                var data =
-                    MemberListResponse.fromJson(jsonDecode(members)).data!;
-
+              XataRepository().getMembersTotal().then((value) {
                 setState(() {
-                  totalMember = data.length;
+                  totalMember = int.parse(
+                      TotalDataResponse.fromJson(jsonDecode(value.body))
+                          .records!
+                          .first
+                          .value
+                          .toString());
                 });
               });
             } else if (index == 1) {
               await Navigator.pushNamed(
                   context, BloodDonationListNewStyle.routeName);
-              FirebaseFirestore.instance
-                  .collection('member_count')
-                  .doc("donation_string")
-                  .get()
-                  .then((value) {
-                var members = value['donations'];
-                var data =
-                    MemberListResponse.fromJson(jsonDecode(members)).data!;
-
+              XataRepository().getDonationsTotal().then((value) {
                 setState(() {
-                  totalDonation = data.length;
+                  totalDonation = int.parse(
+                      TotalDataResponse.fromJson(jsonDecode(value.body))
+                          .records!
+                          .first
+                          .value
+                          .toString());
                 });
               });
             } else if (index == 2) {
-              Navigator.pushNamed(
-                  context, SpecialEventListScreen.routeName);
+              Navigator.pushNamed(context, SpecialEventListScreen.routeName);
             } else if (index == 3) {
-              await Navigator.pushNamed(context, DonarList.routeName);
-
-              QuerySnapshot querySnapshotDonar =
-                  await FirebaseFirestore.instance.collection('donors').get();
-
-              setState(() {
-                totalDonar = querySnapshotDonar.size;
-              });
+              Navigator.pushNamed(context, DonarList.routeName);
             }
           },
           child: Padding(

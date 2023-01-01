@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_expandable_table/flutter_expandable_table.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/member_response.dart';
+import 'package:merchant/data/response/xata_member_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/member/member_detail.dart';
 import 'package:merchant/src/features/member/new_member.dart';
@@ -34,42 +35,14 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
     "O (Rh +)",
     "O (Rh -)"
   ];
-  String? selectedBloodType;
+  String? selectedBloodType = "သွေးအုပ်စု အလိုက်ကြည့်မည်";
   String? selectedRange;
   List<MemberData> dataSegments = [];
   TextStyle tabStyle = const TextStyle(fontSize: 16);
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("member_string")
-        .get()
-        .then((value) {
-      var members = value['members'];
-      int tabLength = 0;
-      setState(() {
-        data = MemberListResponse.fromJson(jsonDecode(members)).data!;
-
-        if (data!.length % 50 == 0) {
-          tabLength = data!.length ~/ 50;
-        } else {
-          tabLength = data!.length ~/ 50 + 1;
-        }
-
-        for (int i = 0; i < data!.length; i = i + 50) {
-          if (i + 50 > data!.length) {
-            ranges.add(
-                "${data![i].memberId!} မှ ${data![data!.length - 1].memberId!}");
-          } else {
-            ranges.add("${data![i].memberId!} မှ ${data![i + 49].memberId!}");
-          }
-        }
-        setState(() {
-          dataSegments = data!.sublist(0, 50);
-        });
-      });
-    });
+    callAPI("");
   }
 
   tabCreate() => Scaffold(
@@ -133,23 +106,10 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                 for (int i = 0; i < ranges.length; i++) {
                                   if (value == ranges[i]) {
                                     if (i != ranges.length - 1) {
-                                      print(selectedBloodType.toString());
-                                      if (selectedBloodType != null) {
-                                        setState(() {
-                                          dataSegments = data!
-                                              .sublist(i * 50, (i + 1) * 50);
-                                          dataSegments = dataSegments
-                                              .where((element) =>
-                                                  element.bloodType ==
-                                                  selectedBloodType)
-                                              .toList();
-                                        });
-                                      } else {
-                                        setState(() {
-                                          dataSegments = data!
-                                              .sublist(i * 50, (i + 1) * 50);
-                                        });
-                                      }
+                                      setState(() {
+                                        dataSegments =
+                                            data!.sublist(i * 50, (i + 1) * 50);
+                                      });
                                     } else {
                                       setState(() {
                                         dataSegments = data!.sublist(i * 50);
@@ -173,9 +133,9 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                 ),
                               ),
                               isExpanded: true,
-                              hint: const Text(
-                                "သွေးအုပ်စု အလိုက်ကြည့်မည်",
-                                style: TextStyle(fontSize: 13),
+                              hint: Text(
+                                selectedBloodType!,
+                                style: const TextStyle(fontSize: 13),
                               ),
                               icon: const Icon(
                                 Icons.arrow_drop_down,
@@ -370,23 +330,10 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             for (int i = 0; i < ranges.length; i++) {
                               if (value == ranges[i]) {
                                 if (i != ranges.length - 1) {
-                                  print(selectedBloodType.toString());
-                                  if (selectedBloodType != null) {
-                                    setState(() {
-                                      dataSegments =
-                                          data!.sublist(i * 50, (i + 1) * 50);
-                                      dataSegments = dataSegments
-                                          .where((element) =>
-                                              element.bloodType ==
-                                              selectedBloodType)
-                                          .toList();
-                                    });
-                                  } else {
-                                    setState(() {
-                                      dataSegments =
-                                          data!.sublist(i * 50, (i + 1) * 50);
-                                    });
-                                  }
+                                  setState(() {
+                                    dataSegments =
+                                        data!.sublist(i * 50, (i + 1) * 50);
+                                  });
                                 } else {
                                   setState(() {
                                     dataSegments = data!.sublist(i * 50);
@@ -410,9 +357,9 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             ),
                           ),
                           isExpanded: true,
-                          hint: const Text(
-                            "သွေးအုပ်စု အလိုက်ကြည့်မည်",
-                            style: TextStyle(fontSize: 14),
+                          hint: Text(
+                            selectedBloodType!,
+                            style: const TextStyle(fontSize: 14),
                           ),
                           icon: const Icon(
                             Icons.arrow_drop_down,
@@ -610,19 +557,54 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
     );
   }
 
-  fetchMembers() async {
-    FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("member_string")
-        .get()
-        .then((value) {
-      var members = value['members'];
-      var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
-      for (var element in data) {
-        setState(() {
-          allMembers.add(element.name!);
-        });
+  callAPI(String after) {
+    if (after.isEmpty) {
+      setState(() {
+        data = [];
+      });
+    }
+    XataRepository().getMemberList(after).then((response) {
+      log(response.body.toString());
+
+      setState(() {
+        data!.addAll(XataMemberListResponse.fromJson(jsonDecode(response.body))
+            .records!);
+      });
+
+      if (XataMemberListResponse.fromJson(jsonDecode(response.body))
+          .meta!
+          .page!
+          .more!) {
+        callAPI(XataMemberListResponse.fromJson(jsonDecode(response.body))
+            .meta!
+            .page!
+            .cursor!);
+      } else {
+        addData();
       }
+    });
+  }
+
+  addData() {
+    int tabLength = 0;
+    data!.sort((a, b) => a.memberId!.compareTo(b.memberId!));
+
+    if (data!.length % 50 == 0) {
+      tabLength = data!.length ~/ 50;
+    } else {
+      tabLength = data!.length ~/ 50 + 1;
+    }
+
+    for (int i = 0; i < data!.length; i = i + 50) {
+      if (i + 50 > data!.length) {
+        ranges.add(
+            "${data![i].memberId!} မှ ${data![data!.length - 1].memberId!}");
+      } else {
+        ranges.add("${data![i].memberId!} မှ ${data![i + 49].memberId!}");
+      }
+    }
+    setState(() {
+      dataSegments = data!.sublist(0, 50);
     });
   }
 
@@ -712,7 +694,8 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                                         .toString()
                                                     : columnIndex == 5
                                                         ? data[rowIndex]
-                                                            .memberCount
+                                                            .donationCounts
+                                                            .toString()
                                                             .toString()
                                                         : "",
                                 textAlign: columnIndex == 5 || columnIndex == 2

@@ -173,8 +173,9 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
       var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
 
       data.where((element) => element.memberId == memberId).forEach((element) {
-        element.memberCount = (int.parse(element.memberCount!) + 1).toString();
-        element.totalCount = (int.parse(element.totalCount!) + 1).toString();
+        element.donationCounts =
+            (int.parse(element.donationCounts.toString()) + 1);
+        element.totalCount = (int.parse(element.totalCount.toString()) + 1);
       });
 
       FirebaseFirestore.instance
@@ -210,7 +211,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
         memberBloodBankCard: memberBloodBank,
         memberBirthDate: memberBirthDate,
         memberFatherName: memberFatherName,
-        patientAddress: quarter + "၊" + township,
+        patientAddress: "$quarter၊$township",
       ));
 
       print("Added Data - ${data.length}");
@@ -398,8 +399,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                       children: [
                                         ListTile(
                                           title: Text(suggestion.toString()),
-                                          subtitle:
-                                              Text(bloodT + "  " + fatherN),
+                                          subtitle: Text("$bloodT  $fatherN"),
                                         ),
                                         const Divider(
                                           height: 1,
@@ -790,8 +790,8 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                               ListTile(
                                                 title:
                                                     Text(suggestion.toString()),
-                                                subtitle: Text(
-                                                    bloodT + "  " + fatherN),
+                                                subtitle:
+                                                    Text("$bloodT  $fatherN"),
                                               ),
                                               const Divider(
                                                 height: 1,
@@ -1235,7 +1235,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
 
       for (var element in data) {
         setState(() {
-          allMembers.add(element.name! + " (" + element.memberId! + ")");
+          allMembers.add("${element.name!} (${element.memberId!})");
           allIDs.add(element.memberId!);
           allBTypes.add(element.bloodType!);
           allBDates.add(element.birthDate!);
@@ -1252,7 +1252,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
     for (var element in datas) {
       if (element.township == township) {
         setState(() {
-          regional = element.town! + ", " + element.region!;
+          regional = "${element.town!}, ${element.region!}";
           town1 = element.town!;
           region1 = element.region!;
           township1 = township;

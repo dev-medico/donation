@@ -435,7 +435,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              "${Utils.strToMM(data.totalCount!)} ကြိမ်",
+                              "${Utils.strToMM(data.totalCount.toString())} ကြိမ်",
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -496,7 +496,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              "${data.homeNo!}၊${data.street!}၊${data.quarter!}၊${data.town!}",
+                              "${data.address}",
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -876,7 +876,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                               Expanded(
                                 flex: 4,
                                 child: Text(
-                                  "${Utils.strToMM(data.totalCount!)} ကြိမ်",
+                                  "${Utils.strToMM(data.totalCount.toString())} ကြိမ်",
                                   style: const TextStyle(
                                       fontSize: 14, color: Colors.black),
                                 ),
@@ -936,7 +936,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                  "${data.homeNo!}၊${data.street!}၊${data.quarter!}၊${data.town!}",
+                                  data.address!,
                                   style: const TextStyle(
                                       fontSize: 14, color: Colors.black),
                                 ),
