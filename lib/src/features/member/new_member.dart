@@ -1434,7 +1434,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                             color: Colors.white),
                                       ))),
                             ),
-                          ))
+                          ),)
                     ],
                   ),
                 ),

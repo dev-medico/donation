@@ -59,11 +59,10 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
 
         for (int i = 0; i < data!.length; i = i + 50) {
           if (i + 50 > data!.length) {
-            ranges.add(data![i].memberId! +
-                " မှ " +
-                data![data!.length - 1].memberId!);
+            ranges.add(
+                "${data![i].memberId!} မှ ${data![data!.length - 1].memberId!}");
           } else {
-            ranges.add(data![i].memberId! + " မှ " + data![i + 49].memberId!);
+            ranges.add("${data![i].memberId!} မှ ${data![i + 49].memberId!}");
           }
         }
         setState(() {
@@ -212,33 +211,43 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                 });
                                 log(selectedBloodType.toString());
                                 log(dataSegments.length.toString());
-                                for (int i = 0; i < ranges.length; i++) {
-                                  if (selectedRange == ranges[i]) {
-                                    if (i != ranges.length - 1) {
-                                      print(selectedBloodType.toString());
-                                      if (selectedBloodType != null) {
-                                        setState(() {
-                                          dataSegments = data!
-                                              .sublist(i * 50, (i + 1) * 50);
-                                          dataSegments = dataSegments
-                                              .where((element) =>
-                                                  element.bloodType ==
-                                                  selectedBloodType)
-                                              .toList();
-                                        });
-                                      } else {
-                                        setState(() {
-                                          dataSegments = data!
-                                              .sublist(i * 50, (i + 1) * 50);
-                                        });
-                                      }
-                                    } else {
-                                      setState(() {
-                                        dataSegments = data!.sublist(i * 50);
-                                      });
-                                    }
+                                List<MemberData>? filterdata = [];
+                                for (int i = 0; i < data!.length; i++) {
+                                  //get memberdata from data only where bloodtype is equal to value
+                                  if (data![i].bloodType == selectedBloodType) {
+                                    filterdata.add(data![i]);
                                   }
                                 }
+                                setState(() {
+                                  dataSegments = filterdata.sublist(0);
+                                });
+                                // for (int i = 0; i < ranges.length; i++) {
+                                //   if (selectedRange == ranges[i]) {
+                                //     if (i != ranges.length - 1) {
+                                //       print(selectedBloodType.toString());
+                                //       if (selectedBloodType != null) {
+                                //         setState(() {
+                                //           dataSegments = data!
+                                //               .sublist(i * 50, (i + 1) * 50);
+                                //           dataSegments = dataSegments
+                                //               .where((element) =>
+                                //                   element.bloodType ==
+                                //                   selectedBloodType)
+                                //               .toList();
+                                //         });
+                                //       } else {
+                                //         setState(() {
+                                //           dataSegments = data!
+                                //               .sublist(i * 50, (i + 1) * 50);
+                                //         });
+                                //       }
+                                //     } else {
+                                //       setState(() {
+                                //         dataSegments = data!.sublist(i * 50);
+                                //       });
+                                //     }
+                                //   }
+                                // }
                               },
                               onSaved: (value) {},
                             ),
@@ -439,33 +448,43 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             });
                             log(selectedBloodType.toString());
                             log(dataSegments.length.toString());
-                            for (int i = 0; i < ranges.length; i++) {
-                              if (selectedRange == ranges[i]) {
-                                if (i != ranges.length - 1) {
-                                  print(selectedBloodType.toString());
-                                  if (selectedBloodType != null) {
-                                    setState(() {
-                                      dataSegments =
-                                          data!.sublist(i * 50, (i + 1) * 50);
-                                      dataSegments = dataSegments
-                                          .where((element) =>
-                                              element.bloodType ==
-                                              selectedBloodType)
-                                          .toList();
-                                    });
-                                  } else {
-                                    setState(() {
-                                      dataSegments =
-                                          data!.sublist(i * 50, (i + 1) * 50);
-                                    });
-                                  }
-                                } else {
-                                  setState(() {
-                                    dataSegments = data!.sublist(i * 50);
-                                  });
-                                }
+                            List<MemberData>? filterdata = [];
+                            for (int i = 0; i < data!.length; i++) {
+                              //get memberdata from data only where bloodtype is equal to value
+                              if (data![i].bloodType == selectedBloodType) {
+                                filterdata.add(data![i]);
                               }
                             }
+                            setState(() {
+                              dataSegments = filterdata.sublist(0);
+                            });
+                            // for (int i = 0; i < ranges.length; i++) {
+                            //   if (selectedRange == ranges[i]) {
+                            //     if (i != ranges.length - 1) {
+                            //       print(selectedBloodType.toString());
+                            //       if (selectedBloodType != null) {
+                            //         setState(() {
+                            //           dataSegments =
+                            //               data!.sublist(i * 50, (i + 1) * 50);
+                            //           dataSegments = dataSegments
+                            //               .where((element) =>
+                            //                   element.bloodType ==
+                            //                   selectedBloodType)
+                            //               .toList();
+                            //         });
+                            //       } else {
+                            //         setState(() {
+                            //           dataSegments =
+                            //               data!.sublist(i * 50, (i + 1) * 50);
+                            //         });
+                            //       }
+                            //     } else {
+                            //       setState(() {
+                            //         dataSegments = data!.sublist(i * 50);
+                            //       });
+                            //     }
+                            //   }
+                            // }
                           },
                           onSaved: (value) {},
                         ),
@@ -485,7 +504,10 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             List<MemberData>? filterdata = [];
                             for (int i = 0; i < data!.length; i++) {
                               //get memberdata from data only where bloodtype is equal to value
-                              if (data![i].name!.contains(val)) {
+                              if (data![i]
+                                  .name!
+                                  .toLowerCase()
+                                  .contains(val.toLowerCase())) {
                                 filterdata.add(data![i]);
                               }
                             }
