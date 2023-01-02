@@ -1,11 +1,13 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_expandable_table/flutter_expandable_table.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:merchant/donation_list_response.dart';
+import 'package:merchant/data/repository/repository.dart';
+import 'package:merchant/data/response/xata_donation_list_response.dart';
+import 'package:merchant/data/response/xata_donation_search_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/donation/blood_donation_report.dart';
+import 'package:merchant/src/features/donation/donation_detail.dart';
 import 'package:merchant/src/features/donation/new_blood_donation.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
@@ -26,6 +28,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     with SingleTickerProviderStateMixin {
   late TextTheme textTheme;
   List<String> ranges = [
+    "2023",
     "2022",
     "2021",
     "2020",
@@ -50,8 +53,9 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     false,
     false,
     false,
+    false,
   ];
-  String selectedYear = "2022";
+  String selectedYear = "2023";
   List<String> months = [
     "JAN",
     "FEB",
@@ -91,19 +95,20 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     "O (Rh +)",
     "O (Rh -)"
   ];
-  List<DonationData> dataSegments1 = [];
-  List<DonationData> dataSegments2 = [];
-  List<DonationData> dataSegments3 = [];
-  List<DonationData> dataSegments4 = [];
-  List<DonationData> dataSegments5 = [];
-  List<DonationData> dataSegments6 = [];
-  List<DonationData> dataSegments7 = [];
-  List<DonationData> dataSegments8 = [];
-  List<DonationData> dataSegments9 = [];
-  List<DonationData> dataSegments10 = [];
-  List<DonationData> dataSegments11 = [];
-  List<DonationData> dataSegments12 = [];
+  List<DonationRecord> dataSegments1 = [];
+  List<DonationRecord> dataSegments2 = [];
+  List<DonationRecord> dataSegments3 = [];
+  List<DonationRecord> dataSegments4 = [];
+  List<DonationRecord> dataSegments5 = [];
+  List<DonationRecord> dataSegments6 = [];
+  List<DonationRecord> dataSegments7 = [];
+  List<DonationRecord> dataSegments8 = [];
+  List<DonationRecord> dataSegments9 = [];
+  List<DonationRecord> dataSegments10 = [];
+  List<DonationRecord> dataSegments11 = [];
+  List<DonationRecord> dataSegments12 = [];
   TextStyle tabStyle = const TextStyle(fontSize: 16);
+  bool dataFullLoaded = false;
   TabContainerController controller = TabContainerController(length: 12);
 
   @override
@@ -121,17 +126,37 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("donation_string")
-        .get()
-        .then((value) {
-      var members = value['donations'];
-      setState(() {
-        data = DonationListResponse.fromJson(jsonDecode(members)).data!;
+    callAPI("");
+  }
 
-        sortBySegments();
+  callAPI(String after) {
+    if (after.isEmpty) {
+      setState(() {
+        data = [];
       });
+    }
+    XataRepository().getDonationsList(after).then((response) {
+      setState(() {
+        data!.addAll(
+            XataDonationListResponse.fromJson(jsonDecode(response.body))
+                .records!);
+      });
+
+      if (XataDonationListResponse.fromJson(jsonDecode(response.body))
+              .meta!
+              .page!
+              .more ??
+          false) {
+        callAPI(XataDonationListResponse.fromJson(jsonDecode(response.body))
+            .meta!
+            .page!
+            .cursor!);
+      } else {
+        setState(() {
+          dataFullLoaded = true;
+        });
+        sortBySegments();
+      }
     });
   }
 
@@ -220,7 +245,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                   children: [
                     Container(
                       margin:
-                          const EdgeInsets.only(left: 20, top: 20, right: 20),
+                          const EdgeInsets.only(left: 20, top: 20, right: 40),
                       height: 50,
                       width: double.infinity,
                       child: ListView.builder(
@@ -245,6 +270,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                                   false,
                                   false,
                                   false,
+                                  false,
                                   false
                                 ]);
                                 rangesSelect[index] = true;
@@ -255,7 +281,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                             child: Container(
                               width: Responsive.isMobile(context)
                                   ? MediaQuery.of(context).size.width / 5
-                                  : MediaQuery.of(context).size.width / 13,
+                                  : MediaQuery.of(context).size.width / 14,
                               height: 50,
                               decoration: shadowDecorationOnlyTop(
                                   rangesSelect[index]
@@ -543,7 +569,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   List<String> membersSelected = <String>[];
   List<String> allMembers = <String>[];
   bool inputted = false;
-  List<DonationData>? data;
+  List<DonationRecord>? data;
 
   @override
   Widget build(BuildContext context) {
@@ -587,174 +613,197 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   }
 
   sortBySegments() {
-    List<DonationData> filterData1 = [];
-    List<DonationData> filterData2 = [];
-    List<DonationData> filterData3 = [];
-    List<DonationData> filterData4 = [];
-    List<DonationData> filterData5 = [];
-    List<DonationData> filterData6 = [];
-    List<DonationData> filterData7 = [];
-    List<DonationData> filterData8 = [];
-    List<DonationData> filterData9 = [];
-    List<DonationData> filterData10 = [];
-    List<DonationData> filterData11 = [];
-    List<DonationData> filterData12 = [];
+    List<DonationRecord> filterData1 = [];
+    List<DonationRecord> filterData2 = [];
+    List<DonationRecord> filterData3 = [];
+    List<DonationRecord> filterData4 = [];
+    List<DonationRecord> filterData5 = [];
+    List<DonationRecord> filterData6 = [];
+    List<DonationRecord> filterData7 = [];
+    List<DonationRecord> filterData8 = [];
+    List<DonationRecord> filterData9 = [];
+    List<DonationRecord> filterData10 = [];
+    List<DonationRecord> filterData11 = [];
+    List<DonationRecord> filterData12 = [];
     for (int i = 0; i < data!.length; i++) {
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Jan") {
-        filterData1.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Feb") {
-        filterData2.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Mar") {
-        filterData3.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Apr") {
-        filterData4.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "May") {
-        filterData5.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Jun") {
-        filterData6.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Jul") {
-        filterData7.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Aug") {
-        filterData8.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Sep") {
-        filterData9.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Oct") {
-        filterData10.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Nov") {
+      if (data![i].date.toString() != "null" && data![i].date != null) {
+        DateTime? dateTime;
+        if (data![i].date!.contains("T")) {
+          dateTime = DateTime.parse(data![i].date!.split("T")[0].toString());
+        } else if (data![i].date!.contains(" ")) {
+          dateTime = DateTime.parse(data![i].date!.split(" ")[0].toString());
+        }
+        if (dateTime!.year == int.parse(selectedYear) && dateTime.month == 1) {
+          filterData1.add(data![i]);
+        }
+
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 2) {
+          filterData2.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 3) {
+          filterData3.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 4) {
+          filterData4.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 5) {
+          filterData5.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 6) {
+          filterData6.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 7) {
+          filterData7.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 8) {
+          filterData8.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 9) {
+          filterData9.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 10) {
+          filterData10.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 11) {
+          filterData11.add(data![i]);
+        }
+        if (dateTime.year == int.parse(selectedYear) && dateTime.month == 12) {
+          filterData12.add(data![i]);
+        }
+      } else {
         filterData11.add(data![i]);
-      }
-      if (data![i].date!.split(" ")[2] == selectedYear &&
-          data![i].date!.split(" ")[1] == "Dec") {
-        filterData12.add(data![i]);
       }
     }
     filterData1.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData1 = filterData1.reversed.toList();
     filterData2.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData2 = filterData2.reversed.toList();
     filterData3.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData3 = filterData3.reversed.toList();
     filterData4.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData4 = filterData4.reversed.toList();
     filterData5.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData5 = filterData5.reversed.toList();
     filterData6.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData6 = filterData6.reversed.toList();
     filterData7.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData7 = filterData7.reversed.toList();
     filterData8.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData8 = filterData8.reversed.toList();
     filterData9.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData9 = filterData9.reversed.toList();
     filterData10.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData10 = filterData10.reversed.toList();
     filterData11.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData11 = filterData11.reversed.toList();
     filterData12.sort((a, b) {
-      return DateTime.parse(b.dateDetail == null
-              ? "2020-01-01"
-              : b.dateDetail.toString().split("T")[0])
-          .compareTo(DateTime.parse(a.dateDetail == null
-              ? "2020-01-01"
-              : a.dateDetail.toString().split("T")[0]));
+      return DateTime.parse(
+              b.date.toString() == "null" || !b.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : b.date.toString().split("T")[0])
+          .compareTo(DateTime.parse(
+              a.date.toString() == "null" || !a.date.toString().contains("T")
+                  ? "2020-01-01"
+                  : a.date.toString().split("T")[0]));
     });
     filterData12 = filterData12.reversed.toList();
 
@@ -774,25 +823,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
     });
   }
 
-  fetchMembers() async {
-    FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("donation_string")
-        .get()
-        .then((value) {
-      var members = value['donations'];
-      var data = DonationListResponse.fromJson(jsonDecode(members)).data!;
-
-      for (var element in data) {
-        setState(() {
-          allMembers.add(element.memberName!);
-        });
-      }
-      allMembers.sort((a, b) => b.compareTo(a));
-    });
-  }
-
-  ExpandableTable buildSimpleTable(List<DonationData> data) {
+  buildSimpleTable(List<DonationRecord> data) {
     const int COLUMN_COUNT = 8;
     int ROWCOUNT = data.length;
     List<String> titles = [
@@ -838,62 +869,122 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                   margin: const EdgeInsets.all(1),
                   child: Center(
                       child: Text(
-                    data[rowIndex].date.toString(),
+                    data[rowIndex].date!.contains("T")
+                        ? data[rowIndex].date.toString().split("T")[0]
+                        : data[rowIndex].date!.contains(" ")
+                            ? data[rowIndex].date.toString().split(" ")[0]
+                            : data[rowIndex].date.toString(),
                     style: const TextStyle(fontSize: 15, color: Colors.black),
                   ))),
               children: List<Widget>.generate(
                   COLUMN_COUNT - 1,
-                  (columnIndex) => Container(
-                      decoration: borderDecorationNoRadius(Colors.grey),
-                      margin: const EdgeInsets.all(1),
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            left: columnIndex == 4 ? 12 : 20.0,
-                            top: columnIndex == 4 ? 4 : 14),
-                        child: Text(
-                          columnIndex == 0
-                              ? data[rowIndex].memberName.toString()
-                              : columnIndex == 1
-                                  ? data[rowIndex].memberBloodType.toString()
-                                  : columnIndex == 2
-                                      ? data[rowIndex].hospital.toString()
-                                      : columnIndex == 3
-                                          ? data[rowIndex]
-                                              .patientName
-                                              .toString()
-                                          : columnIndex == 4
-                                              ? data[rowIndex]
-                                                  .patientAddress
-                                                  .toString()
-                                              : columnIndex == 5
-                                                  ? Utils.strToMM(data[rowIndex]
-                                                      .patientAge
-                                                      .toString())
-                                                  : columnIndex == 6
-                                                      ? data[rowIndex]
-                                                          .patientDisease
-                                                          .toString()
-                                                      : "",
-                          textAlign: columnIndex == 5 || columnIndex == 2
-                              ? TextAlign.center
-                              : TextAlign.start,
-                          style: TextStyle(
-                              fontSize: Responsive.isMobile(context) ? 14 : 15,
-                              color: Colors.black),
-                        ),
-                      ))),
+                  (columnIndex) => GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () async {
+                          Member member = Member(
+                            address: data[rowIndex].member!.address,
+                            birthDate: data[rowIndex].member!.birthDate,
+                            bloodBankCard: data[rowIndex].member!.bloodBankCard,
+                            bloodType: data[rowIndex].member!.bloodType,
+                            donationCounts:
+                                data[rowIndex].member!.donationCounts,
+                            fatherName: data[rowIndex].member!.fatherName,
+                            id: data[rowIndex].member!.id,
+                            lastDonationDate:
+                                data[rowIndex].member!.lastDonationDate,
+                            memberId: data[rowIndex].member!.memberId,
+                            name: data[rowIndex].member!.name,
+                            note: data[rowIndex].member!.note,
+                            nrc: data[rowIndex].member!.nrc,
+                            phone: data[rowIndex].member!.phone,
+                            registerDate: data[rowIndex].member!.registerDate,
+                            totalCount: data[rowIndex].member!.totalCount,
+                          );
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DonationDetailScreen(
+                                        data: DonationSearchRecords(
+                                          date: data[rowIndex].date,
+                                          hospital: data[rowIndex].hospital,
+                                          id: data[rowIndex].id,
+                                          member: member,
+                                          patientAddress:
+                                              data[rowIndex].patientAddress,
+                                          patientAge: data[rowIndex].patientAge,
+                                          patientDisease:
+                                              data[rowIndex].patientDisease,
+                                          patientName:
+                                              data[rowIndex].patientName,
+                                        ),
+                                      )));
+                          callAPI("");
+                        },
+                        child: Container(
+                            decoration: borderDecorationNoRadius(Colors.grey),
+                            margin: const EdgeInsets.all(1),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: columnIndex == 4 ? 12 : 20.0,
+                                  top: columnIndex == 4 || columnIndex == 6
+                                      ? 4
+                                      : 14),
+                              child: Text(
+                                columnIndex == 0
+                                    ? data[rowIndex].member!.name.toString()
+                                    : columnIndex == 1
+                                        ? data[rowIndex]
+                                            .member!
+                                            .bloodType
+                                            .toString()
+                                        : columnIndex == 2
+                                            ? data[rowIndex].hospital.toString()
+                                            : columnIndex == 3
+                                                ? data[rowIndex]
+                                                    .patientName
+                                                    .toString()
+                                                : columnIndex == 4
+                                                    ? data[rowIndex]
+                                                        .patientAddress
+                                                        .toString()
+                                                    : columnIndex == 5
+                                                        ? Utils.strToMM(
+                                                            data[rowIndex]
+                                                                .patientAge
+                                                                .toString())
+                                                        : columnIndex == 6
+                                                            ? data[rowIndex]
+                                                                .patientDisease
+                                                                .toString()
+                                                            : "",
+                                textAlign: columnIndex == 5 || columnIndex == 2
+                                    ? TextAlign.center
+                                    : TextAlign.start,
+                                style: TextStyle(
+                                    fontSize:
+                                        Responsive.isMobile(context) ? 14 : 15,
+                                    color: Colors.black),
+                              ),
+                            )),
+                      )),
             ));
 
-    return ExpandableTable(
-      rows: rows,
-      header: header,
-      cellWidth: Responsive.isMobile(context)
-          ? MediaQuery.of(context).size.width * 0.4
-          : MediaQuery.of(context).size.width * 0.115,
-      cellHeight: 52,
-      headerHeight: 52,
-      firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
-      scrollShadowColor: Colors.grey,
-    );
+    if (dataFullLoaded) {
+      return ExpandableTable(
+        rows: rows,
+        header: header,
+        cellWidth: Responsive.isMobile(context)
+            ? MediaQuery.of(context).size.width * 0.4
+            : MediaQuery.of(context).size.width * 0.115,
+        cellHeight: 52,
+        headerHeight: 52,
+        firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
+        scrollShadowColor: Colors.grey,
+      );
+    } else {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
   }
 }

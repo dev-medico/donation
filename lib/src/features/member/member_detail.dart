@@ -1,10 +1,12 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/member_response.dart';
-import 'package:merchant/donation_list_response.dart';
+import 'package:merchant/data/response/xata_donation_search_list_response.dart';
 import 'package:merchant/responsive.dart';
+import 'package:merchant/src/features/donation/donation_detail.dart';
+import 'package:merchant/src/features/member/member_edit.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
 import 'package:merchant/utils/utils.dart';
@@ -21,59 +23,41 @@ class MemberDetailScreen extends StatefulWidget {
 class _MemberDetailScreenState extends State<MemberDetailScreen> {
   MemberData data;
   _MemberDetailScreenState(this.data);
-  int groupTotalCount = 0;
-  List<DonationData> donationDatas = [];
+  List<DonationSearchRecords> donationDatas = [];
 
   @override
   void initState() {
     super.initState();
     fetchCount();
-    // _usersStream = FirebaseFirestore.instance
-    //     .collection('blood_donations')
-    //     .where("member_id", isEqualTo: data['member_id'])
-    //     .orderBy("date_detail")
-    //     .snapshots();
   }
 
   fetchCount() {
     print("Fetch Count called");
-    //get count of snapshots doc from firestore
-    // FirebaseFirestore.instance
-    //     .collection('blood_donations')
-    //     .where("member_id", isEqualTo: data['member_id'])
-    //     .orderBy("date_detail")
-    //     .get()
-    //     .then((value) {
-    //   print("Count: ${value.docs.length}");
-    //   setState(() {
-    //     groupTotalCount = value.docs.length;
-    //   });
-    // });
 
-    FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("donation_string")
-        .get()
+    XataRepository()
+        .getDonationsListByMemberId(data.memberId.toString())
         .then((value) {
-      var members = value['donations'];
-      List<DonationData> donations =
-          DonationListResponse.fromJson(jsonDecode(members)).data!;
-      //get DontainData of member_id from donation_list_response
-      donationDatas = donations
-          .where((element) => element.memberId == data.memberId)
-          .toList();
-      donationDatas.sort((a, b) {
-        //sorting in ascending order
-        return DateTime.parse(b.dateDetail == null
-                ? "2020-01-01"
-                : b.dateDetail.toString().split("T")[0])
-            .compareTo(DateTime.parse(a.dateDetail == null
-                ? "2020-01-01"
-                : a.dateDetail.toString().split("T")[0]));
-      });
-      print("Previous Data - ${donationDatas.length}");
+      print("Donation List Response - ${value.body}");
       setState(() {
-        groupTotalCount = donationDatas.length;
+        donationDatas =
+            DonationSearchListResponse.fromJson(jsonDecode(value.body))
+                .records!;
+        donationDatas.sort((a, b) {
+          return DateTime.parse(b.date == null
+                  ? "2020-01-01"
+                  : b.date.toString().contains("T")
+                      ? b.date.toString().split("T")[0]
+                      : b.date.toString().contains(" ")
+                          ? b.date.toString().split(" ")[0]
+                          : "2020-01-01")
+              .compareTo(DateTime.parse(a.date == null
+                  ? "2020-01-01"
+                  : b.date.toString().contains("T")
+                      ? b.date.toString().split("T")[0]
+                      : b.date.toString().contains(" ")
+                          ? b.date.toString().split(" ")[0]
+                          : "2020-01-01"));
+        });
       });
     });
   }
@@ -404,7 +388,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              "${Utils.strToMM(groupTotalCount.toString())} ကြိမ်",
+                              "${Utils.strToMM(data.donationCounts.toString())} ကြိမ်",
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -540,13 +524,13 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                 ],
                               ),
                               onTap: () {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) =>
-                                //         MemberEditScreen(data: data),
-                                //   ),
-                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        MemberEditScreen(data: data),
+                                  ),
+                                );
                               }),
                         ),
                       ),
@@ -844,7 +828,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                               Expanded(
                                 flex: 4,
                                 child: Text(
-                                  "${Utils.strToMM(groupTotalCount.toString())} ကြိမ်",
+                                  "${Utils.strToMM(data.donationCounts.toString())} ကြိမ်",
                                   style: const TextStyle(
                                       fontSize: 14, color: Colors.black),
                                 ),
@@ -978,13 +962,13 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                     ],
                                   ),
                                   onTap: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) =>
-                                    //         MemberEditScreen(data: data),
-                                    //   ),
-                                    // );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            MemberEditScreen(data: data),
+                                      ),
+                                    );
                                   }),
                             ),
                           ),
@@ -1032,10 +1016,10 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                             Column(
                               // shrinkWrap: true,
                               // scrollDirection: Axis.vertical,
-                              children:
-                                  donationDatas.map((DonationData document) {
+                              children: donationDatas
+                                  .map((DonationSearchRecords document) {
                                 return blood_donationRow(
-                                    document, document.id!);
+                                    document);
                               }).toList(),
                             ),
                           ],
@@ -1177,19 +1161,18 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
     );
   }
 
-  Widget blood_donationRow(DonationData data, String docId) {
+  Widget blood_donationRow(DonationSearchRecords data) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () async {
-        // await Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => DonationDetailScreen(
-        //       data: data,
-        //       doc_id: docId,
-        //     ),
-        //   ),
-        // );
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DonationDetailScreen(
+              data: data,
+            ),
+          ),
+        );
       },
       child: Container(
         height: Responsive.isMobile(context) ? 60 : 60,
@@ -1207,8 +1190,6 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
           scrollDirection: Axis.horizontal,
           children: [
             Row(
-              // scrollDirection: Axis.horizontal,
-              // physics: const NeverScrollableScrollPhysics(),
               children: [
                 SizedBox(
                   width: Responsive.isMobile(context)
@@ -1216,7 +1197,11 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                       : MediaQuery.of(context).size.width / 11,
                   child: Text(
                     //data['date'].toString(),
-                    data.date.toString(),
+                    data.date!.contains("T")
+                        ? data.date!.split("T")[0].toString()
+                        : data.date!.contains(" ")
+                            ? data.date!.split(" ")[0]
+                            : "-",
                     style: TextStyle(
                         fontSize: Responsive.isMobile(context) ? 14 : 15,
                         color: Colors.black),

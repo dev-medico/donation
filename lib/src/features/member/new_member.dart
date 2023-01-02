@@ -103,9 +103,6 @@ class NewMemberState extends State<NewMemberScreen> {
         nrc_region_state_options_dropDownMenuItems![0].value;
   }
 
-  CollectionReference members =
-      FirebaseFirestore.instance.collection('member_count');
-
   addMember(
       String memberId,
       String name,
@@ -183,42 +180,6 @@ class NewMemberState extends State<NewMemberScreen> {
       }
     });
 
-    // FirebaseFirestore.instance
-    //     .collection('member_count')
-    //     .doc("member_string")
-    //     .get()
-    //     .then((value) {
-    //   var members = value['members'];
-    //   List<MemberData> data =
-    //       MemberListResponse.fromJson(jsonDecode(members)).data!;
-    //   print("Previous Data - ${length}");
-    //   add(MemberData(
-    //     memberId: memberId,
-    //     name: name,
-    //     fatherName: fatherName,
-    //     birthDate: birthDate,
-    //     nrc: nrc,
-    //     phone: phone,
-    //     bloodType: bloodType,
-    //     bloodBankCard: bloodBankNo,
-    //     donationCounts: 0,
-    //     totalCount: int.parse(totalCount.toString()),
-    //     address: "$homeNo,$street,$quarter,$township,$region1",
-    //     registerDate: date,
-    //     note: noteController.text.toString() != ""
-    //         ? noteController.text.toString()
-    //         : "-",
-    //   ));
-
-    //   FirebaseFirestore.instance
-    //       .collection('member_count')
-    //       .doc("member_string")
-    //       .set({
-    //     'members': jsonEncode(MemberListResponse(data: data).toJson()),
-    //   }).then((value) {
-    //     print("Successfully Added Data - ${length}");
-    //   }).catchError((error) {});
-    // });
   }
 
   void initial() async {

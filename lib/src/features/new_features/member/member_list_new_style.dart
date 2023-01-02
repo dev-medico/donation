@@ -499,13 +499,17 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                       ),
                     ],
                   ),
-            Container(
-              padding: EdgeInsets.only(
-                  left: 20.0,
-                  top: Responsive.isMobile(context) ? 160 : 100,
-                  bottom: 12),
-              child: buildSimpleTable(dataSegments),
-            ),
+            dataFullLoad
+                ? Container(
+                    padding: EdgeInsets.only(
+                        left: 20.0,
+                        top: Responsive.isMobile(context) ? 160 : 100,
+                        bottom: 12),
+                    child: buildSimpleTable(dataSegments),
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(),
+                  ),
           ],
         ),
       );
@@ -514,6 +518,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
   List<String> membersSelected = <String>[];
   List<String> allMembers = <String>[];
   bool inputted = false;
+  bool dataFullLoad = false;
   List<MemberData>? data;
 
   @override
@@ -604,6 +609,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
       }
     }
     setState(() {
+      dataFullLoad = true;
       dataSegments = data!.sublist(0, 50);
     });
   }
@@ -661,8 +667,8 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                   COLUMN_COUNT - 1,
                   (columnIndex) => GestureDetector(
                         behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => MemberDetailScreen(
@@ -670,6 +676,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                               ),
                             ),
                           );
+                          callAPI("");
                         },
                         child: Container(
                             decoration: borderDecorationNoRadius(Colors.grey),

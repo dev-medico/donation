@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:merchant/data/response/xata_donation_list_response.dart';
 import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/dashboard/ui/simple_chart_blood.dart';
@@ -7,7 +8,7 @@ import 'package:merchant/utils/tool_widgets.dart';
 import 'package:intl/intl.dart';
 
 class DonationChartByBlood extends StatefulWidget {
-  final List<DonationData> data;
+  final List<DonationRecord> data;
   bool? fromDashboard;
   DonationChartByBlood({Key? key, required this.data, this.fromDashboard})
       : super(key: key);
@@ -92,7 +93,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
               return Visibility(
                 visible: widget.data
                     .where((element) =>
-                        element.memberBloodType == bloodTypes[index])
+                        element.member!.id == bloodTypes[index])
                     .isNotEmpty,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -109,7 +110,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                       Text(
                         widget.data
                             .where((element) =>
-                                element.memberBloodType == bloodTypes[index])
+                                element.member!.bloodType.toString() == bloodTypes[index])
                             .length
                             .toString(),
                         style: TextStyle(

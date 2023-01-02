@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -9,6 +9,8 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:merchant/data/repository/repository.dart';
+import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/data/response/township_response/datum.dart';
 import 'package:merchant/data/response/township_response/township_response.dart';
 import 'package:merchant/responsive.dart';
@@ -19,7 +21,7 @@ import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class MemberEditScreen extends StatefulWidget {
-  Map<String, dynamic> data;
+  MemberData data;
   MemberEditScreen({Key? key, required this.data}) : super(key: key);
   int selectedIndex = 0;
 
@@ -28,7 +30,7 @@ class MemberEditScreen extends StatefulWidget {
 }
 
 class MemberEditState extends State<MemberEditScreen> {
-  Map<String, dynamic> data;
+  MemberData data;
   MemberEditState(this.data);
   final nameController = TextEditingController();
   final fatherNameController = TextEditingController();
@@ -62,15 +64,15 @@ class MemberEditState extends State<MemberEditScreen> {
   String selectedBloodType = "သွေးအုပ်စု";
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
-      const DropdownMenuItem(child: Text("သွေးအုပ်စု"), value: "သွေးအုပ်စု"),
-      const DropdownMenuItem(child: Text("A (Rh +)"), value: "A (Rh +)"),
-      const DropdownMenuItem(child: Text("A (Rh -)"), value: "A (Rh -)"),
-      const DropdownMenuItem(child: Text("B (Rh +)"), value: "B (Rh +)"),
-      const DropdownMenuItem(child: Text("B (Rh -)"), value: "B (Rh -)"),
-      const DropdownMenuItem(child: Text("AB (Rh +)"), value: "AB (Rh +)"),
-      const DropdownMenuItem(child: Text("AB (Rh -)"), value: "AB (Rh -)"),
-      const DropdownMenuItem(child: Text("O (Rh +)"), value: "O (Rh +)"),
-      const DropdownMenuItem(child: Text("O (Rh -)"), value: "O (Rh -)"),
+      const DropdownMenuItem(value: "သွေးအုပ်စု", child: Text("သွေးအုပ်စု")),
+      const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
+      const DropdownMenuItem(value: "A (Rh -)", child: Text("A (Rh -)")),
+      const DropdownMenuItem(value: "B (Rh +)", child: Text("B (Rh +)")),
+      const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
+      const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
+      const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
+      const DropdownMenuItem(value: "O (Rh +)", child: Text("O (Rh +)")),
+      const DropdownMenuItem(value: "O (Rh -)", child: Text("O (Rh -)")),
     ];
     return menuItems;
   }
@@ -87,19 +89,23 @@ class MemberEditState extends State<MemberEditScreen> {
   void initial() async {
     firestore = FirebaseFirestore.instance;
 
-    nameController.text = data['name'];
-    fatherNameController.text = data['father_name'];
-    nrcController.text = data['nrc'];
-    phoneController.text = data['phone'];
-    selectedBloodType = data['blood_type'];
-    bloodBankNoController.text = data['blood_bank_card'];
-    totalDonationController.text = data['total_count'];
-    homeNoController.text = data['home_no'];
-    streetController.text = data['street'];
-    quarterController.text = data['quarter'];
-    townController.text = data['town'];
+    nameController.text = data.name ?? "";
+    fatherNameController.text = data.fatherName ?? "";
+    nrcController.text = data.nrc ?? "";
+    phoneController.text = data.phone ?? "";
+    selectedBloodType = data.bloodType ?? "";
+    bloodBankNoController.text = data.bloodBankCard ?? "";
+    totalDonationController.text = data.totalCount ?? "";
+    homeNoController.text =
+        data.address != null ? data.address!.split(',')[0] : "";
+    streetController.text =
+        data.address != null ? data.address!.split(',')[1] : "";
+    quarterController.text =
+        data.address != null ? data.address!.split(',')[2] : "";
+    townController.text =
+        data.address != null ? data.address!.split(',')[3] : "";
     setRegion(townController.text.toString());
-    birthDate = data['birth_date'];
+    birthDate = data.birthDate ?? "";
 
     final String response =
         await rootBundle.loadString('assets/json/township.json');
@@ -445,7 +451,7 @@ class MemberEditState extends State<MemberEditScreen> {
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  getAutoIncrementKey(data['member_id']);
+                                  updateMember(data.id.toString());
                                 } else {
                                   Utils.messageDialog(
                                       "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
@@ -885,7 +891,7 @@ class MemberEditState extends State<MemberEditScreen> {
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  getAutoIncrementKey(data['member_id']);
+                                  updateMember(data.id.toString());
                                 } else {
                                   Utils.messageDialog(
                                       "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
@@ -916,67 +922,60 @@ class MemberEditState extends State<MemberEditScreen> {
     );
   }
 
-  getAutoIncrementKey(String memberId) {
+  updateMember(String memberId) {
     setState(() {
       _isLoading = true;
     });
-    DocumentReference documentReference =
-        FirebaseFirestore.instance.collection('members').doc(memberId);
-
-    return FirebaseFirestore.instance.runTransaction((transaction) async {
-      // Get the document
-      DocumentSnapshot snapshot = await transaction.get(documentReference);
-      // Perform an update on the document
-      transaction.update(documentReference, {
-        'member_id': memberId,
-        'name': nameController.text.toString(),
-        'father_name': fatherNameController.text.toString(),
-        'birth_date': birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
-        'nrc': nrcController.text.toString() != ""
-            ? nrcController.text.toString()
-            : "-",
-        'phone': phoneController.text.toString(),
-        'blood_type': selectedBloodType,
-        'blood_bank_card': bloodBankNoController.text.toString() != ""
-            ? bloodBankNoController.text.toString()
-            : "-",
-        'total_count': totalDonationController.text.toString() != ""
-            ? totalDonationController.text.toString()
-            : "0",
-        'note': noteController.text.toString() != ""
-            ? noteController.text.toString()
-            : "-",
-        'home_no': homeNoController.text.toString(),
-        'street': streetController.text.toString(),
-        'quarter': quarterController.text.toString(),
-        'town': townController.text.toString(),
-        'region': region1,
-      });
-
-      // Return the new count
-      return true;
-    }).then((value) {
-      print("Member updated to $value");
-      setState(() {
-        _isLoading = false;
-      });
-      Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
-          context, "အိုကေ", Colors.black);
-      nameController.clear();
-      fatherNameController.clear();
-      nrcController.clear();
-      phoneController.clear();
-      selectedBloodType = "သွေးအုပ်စု";
-      bloodBankNoController.clear();
-      totalDonationController.clear();
-      homeNoController.clear();
-      streetController.clear();
-      quarterController.clear();
-      townController.clear();
-      region1 = "";
-      regional = "";
-      noteController.clear();
-    }).catchError((error) => print("Failed to update Member: $error"));
+    XataRepository()
+        .updateMemberData(
+            memberId,
+            jsonEncode(<String, dynamic>{
+              'name': nameController.text.toString(),
+              'father_name': fatherNameController.text.toString(),
+              'birth_date': birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
+              'nrc': nrcController.text.toString() != ""
+                  ? nrcController.text.toString()
+                  : "-",
+              'phone': phoneController.text.toString(),
+              'blood_type': selectedBloodType,
+              'blood_bank_card': bloodBankNoController.text.toString() != ""
+                  ? bloodBankNoController.text.toString()
+                  : "-",
+              'total_count': totalDonationController.text.toString() != ""
+                  ? int.parse(totalDonationController.text.toString())
+                  : 0,
+              'note': noteController.text.toString() != ""
+                  ? noteController.text.toString()
+                  : "-",
+              'address':
+                  "${homeNoController.text}, ${streetController.text}, ${quarterController.text}, ${townController.text}, $region1",
+            }))
+        .then((value) {
+      if (value.statusCode.toString().startsWith("2")) {
+        setState(() {
+          _isLoading = false;
+        });
+        Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
+            context, "အိုကေ", Colors.black);
+        nameController.clear();
+        fatherNameController.clear();
+        nrcController.clear();
+        phoneController.clear();
+        selectedBloodType = "သွေးအုပ်စု";
+        bloodBankNoController.clear();
+        totalDonationController.clear();
+        homeNoController.clear();
+        streetController.clear();
+        quarterController.clear();
+        townController.clear();
+        region1 = "";
+        regional = "";
+        noteController.clear();
+      } else {
+        log(value.statusCode.toString());
+        log(value.body);
+      }
+    });
   }
 
   showDatePicker() async {
@@ -1047,7 +1046,7 @@ class MemberEditState extends State<MemberEditScreen> {
     for (var element in datas) {
       if (element.township == township) {
         setState(() {
-          regional = element.town! + ", " + element.region!;
+          regional = "${element.town!}, ${element.region!}";
           town1 = element.town!;
           region1 = element.region!;
           township1 = township;

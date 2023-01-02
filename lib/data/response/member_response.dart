@@ -36,7 +36,7 @@ class MemberData {
   String? nrc;
   String? phone;
   String? registerDate;
-  int? totalCount;
+  dynamic totalCount;
 
   MemberData(
       {this.address,

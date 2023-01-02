@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/dashboard/dashboard.dart';
-import 'package:merchant/src/features/donation/blood_donation_list.dart';
+import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:merchant/src/features/home/custom_drawer/drawer_user_controller.dart';
 import 'package:merchant/src/features/home/custom_drawer/home_drawer.dart';
-import 'package:merchant/src/features/member/member_list.dart';
-import 'package:merchant/src/features/member/new_member.dart';
 import 'package:merchant/src/features/member/search_member.dart';
 import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 import 'package:merchant/src/features/setttings/settings.dart';
@@ -72,7 +70,7 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen>
         setState(() {
           animationController = AnimationController(
               duration: const Duration(milliseconds: 600), vsync: this);
-          screenView = BloodDonationList();
+          screenView = const BloodDonationListNewStyle();
         });
       } else if (drawerIndex == DrawerIndex.SEARCH) {
         setState(() {

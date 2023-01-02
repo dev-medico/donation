@@ -1,6 +1,6 @@
 import 'dart:convert';
+import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -8,8 +8,10 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/township_response/datum.dart';
 import 'package:merchant/data/response/township_response/township_response.dart';
+import 'package:merchant/data/response/xata_donation_search_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
@@ -18,20 +20,20 @@ import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class BloodDonationEditScreen extends StatefulWidget {
-  String doc_id;
-  Map<String, dynamic> data;
-  BloodDonationEditScreen({Key? key, required this.data, required this.doc_id})
-      : super(key: key);
+  DonationSearchRecords data;
+  BloodDonationEditScreen({
+    Key? key,
+    required this.data,
+  }) : super(key: key);
   int selectedIndex = 0;
 
   @override
-  BloodDonationEditState createState() => BloodDonationEditState(data, doc_id);
+  BloodDonationEditState createState() => BloodDonationEditState(data);
 }
 
 class BloodDonationEditState extends State<BloodDonationEditScreen> {
-  Map<String, dynamic> data;
-  String doc_id;
-  BloodDonationEditState(this.data, this.doc_id);
+  DonationSearchRecords data;
+  BloodDonationEditState(this.data);
   final nameController = TextEditingController();
   final ageController = TextEditingController();
   final quarterController = TextEditingController();
@@ -48,7 +50,6 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
   String regional = " ";
   String post_code = " ";
   bool _isLoading = false;
-  late FirebaseFirestore firestore;
   late TownshipResponse townshipResponse;
   List<String> townships = <String>[];
   List<String> townshipsSelected = <String>[];
@@ -100,70 +101,63 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
   @override
   void initState() {
     super.initState();
-    print("Doc ID - " + doc_id);
     initial();
   }
 
-  Future<void> editDonation(String name, String age, String selectHospital,
+  editDonation(String name, String age, String selectHospital,
       String selectDisease, String quarter, String township) {
-    DocumentReference documentReference =
-        FirebaseFirestore.instance.collection('blood_donations').doc(doc_id);
-
-    return FirebaseFirestore.instance.runTransaction((transaction) async {
-      // Get the document
-      DocumentSnapshot snapshot = await transaction.get(documentReference);
-      // Perform an update on the document
-      transaction.update(documentReference, {
-        'patient_name': name,
-        'patient_age': age,
-        'date': donationDate,
-        'day': int.parse(donationDate.split(' ')[0]),
-        'month': donationDate.split(' ')[1],
-        'year': int.parse(donationDate.split(' ')[2]),
-        'date_detail': donationDateDetail,
-        'hospital': selectHospital,
-        'patient_disease': diseaseController.text.toString(),
-        'member_name': data['member_name'],
-        'member_id': data['member_id'],
-        'member_blood_type': data['member_blood_type'],
-        'member_blood_bank_card': data['member_blood_bank_card'],
-        'member_birth_date': data['member_birth_date'],
-        'member_father_name': data['member_father_name'],
-        'patient_address': quarter + "၊" + township,
-      });
-
-      // Return the new count
-      return true;
-    }).then((value) {
-      print("Member updated to $value");
-      setState(() {
-        _isLoading = false;
-      });
-      Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
-          context, "အိုကေ", Colors.black);
-      nameController.clear();
-      ageController.clear();
-      diseaseController.clear();
-      hospitalController.clear();
-      quarterController.clear();
-      townController.clear();
-      region1 = "";
-      regional = "";
-    }).catchError((error) => print("Failed to update Member: $error"));
+    setState(() {
+      _isLoading = true;
+    });
+    XataRepository()
+        .updateDonationData(
+            data.id.toString(),
+            jsonEncode(<String, dynamic>{
+              'patient_name': name,
+              'patient_age': age,
+              'date': donationDateDetail == null
+                  ? data.date
+                  : donationDateDetail.toString(),
+              'hospital': selectHospital,
+              'patient_disease': diseaseController.text.toString(),
+              'patient_address': "$quarter၊$township",
+            }))
+        .then((value) {
+      if (value.statusCode.toString().startsWith("2")) {
+        setState(() {
+          _isLoading = false;
+        });
+        Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
+            context, "အိုကေ", Colors.black);
+        nameController.clear();
+        ageController.clear();
+        diseaseController.clear();
+        hospitalController.clear();
+        quarterController.clear();
+        townController.clear();
+        region1 = "";
+        regional = "";
+      } else {
+        log(value.statusCode.toString());
+        log(value.body);
+      }
+    });
   }
 
   void initial() async {
-    firestore = FirebaseFirestore.instance;
-
-    nameController.text = data['patient_name'];
-    ageController.text = data['patient_age'];
-    quarterController.text = data['patient_address'].split("၊")[0] ?? "";
-    townController.text = data['patient_address'].split("၊")[1] ?? "";
-    hospitalController.text = data['hospital'];
-    diseaseController.text = data['patient_disease'];
-    donationDate = data['date'];
+    nameController.text = data.patientName ?? "";
+    ageController.text = data.patientAge ?? "";
+    quarterController.text = data.patientAddress.toString().split("၊")[0];
+    townController.text = data.patientAddress.toString().split("၊")[1];
+    hospitalController.text = data.hospital ?? "";
+    diseaseController.text = data.patientDisease ?? "";
+    donationDate = data.date!.contains("T")
+        ? data.date!.split("T")[0]
+        : data.date!.contains(" ")
+            ? data.date!.split(" ")[0]
+            : "";
     setRegion(townController.text.toString());
-    if (data['patient_name'] == null || data['patient_name'] == "") {
+    if (data.patientName == null || data.patientName == "") {
       setState(() {
         switchNew = false;
       });
@@ -281,10 +275,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                 margin: const EdgeInsets.only(
                                     left: 20, top: 4, right: 20),
                                 child: Text(
-                                  data['member_name'] +
-                                      " (  " +
-                                      data['member_id'] +
-                                      "  )",
+                                  "${data.member!.name} (  ${data.member!.memberId}  )",
                                   textScaleFactor: 1.0,
                                   style: const TextStyle(
                                       fontSize: 15, color: Colors.black),
@@ -652,10 +643,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                 margin: const EdgeInsets.only(
                                     left: 20, top: 4, right: 20),
                                 child: Text(
-                                  data['member_name'] +
-                                      " (  " +
-                                      data['member_id'] +
-                                      "  )",
+                                  "${data.member!.name} (  ${data.member!.memberId}  )",
                                   textScaleFactor: 1.0,
                                   style: const TextStyle(
                                       fontSize: 15, color: Colors.black),
@@ -1114,7 +1102,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
     for (var element in datas) {
       if (element.township == township) {
         setState(() {
-          regional = element.town! + ", " + element.region!;
+          regional = "${element.town!}, ${element.region!}";
           town1 = element.town!;
           region1 = element.region!;
           township1 = township;

@@ -1,6 +1,6 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
-import 'package:merchant/src/features/donation/blood_donation_list.dart';
+import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 import 'package:merchant/src/features/special_event/special_event_list.dart';
 
@@ -35,7 +35,8 @@ class DashBoardCard extends StatelessWidget {
               await Navigator.pushNamed(context, MemberListNewStyle.routeName);
               callBack();
             } else if (index == 1) {
-              await Navigator.pushNamed(context, BloodDonationList.routeName);
+              await Navigator.pushNamed(
+                  context, BloodDonationListNewStyle.routeName);
               callBack();
             } else if (index == 2) {
               await Navigator.pushNamed(

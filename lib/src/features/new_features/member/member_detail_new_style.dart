@@ -1241,15 +1241,15 @@ class _MemberDetailNewStyleScreenState
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () async {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DonationDetailScreen(
-              data: data,
-              doc_id: docId,
-            ),
-          ),
-        );
+        // await Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => DonationDetailScreen(
+        //       data: data,
+        //       doc_id: docId,
+        //     ),
+        //   ),
+        // );
         _usersStream = FirebaseFirestore.instance
             .collection('blood_donations')
             .where("member_id", isEqualTo: data['member_id'])

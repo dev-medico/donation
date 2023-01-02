@@ -1,11 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/total_data_response.dart';
-import 'package:merchant/donation_list_response.dart';
+import 'package:merchant/data/response/xata_donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
@@ -29,35 +29,18 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   late int totalDonar = 0;
   late int totalDonation = 0;
   bool finance = false;
+  List<DonationRecord> dataList = [];
+  List<DonationRecord> data = [];
 
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection('member_count')
-        .doc("donation_string")
-        .get()
-        .then((value) {
-      var members = value['donations'];
-      setState(() {
-        var data = DonationListResponse.fromJson(jsonDecode(members)).data!;
 
-        for (int i = 0; i < data.length; i++) {
-          //get current year
-          var date = DateTime.now();
-          String donationYear = DateFormat('yyyy').format(date);
-          if (data[i].date!.split(" ")[2] == donationYear) {
-            dataList.add(data[i]);
-          }
-        }
-
-        dataList = dataList.reversed.toList();
-      });
-    });
     initial();
   }
 
   initial() async {
+    callAPI("");
     XataRepository().getMembersTotal().then((value) {
       setState(() {
         totalMember = int.parse(
@@ -78,35 +61,63 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                 .toString());
       });
     });
-    // FirebaseFirestore.instance
-    //     .collection('member_count')
-    //     .doc("member_string")
-    //     .get()
-    //     .then((value) {
-    //   var members = value['members'];
-    //   var data = MemberListResponse.fromJson(jsonDecode(members)).data!;
+  }
 
-    //   setState(() {
-    //     totalMember = data.length;
-    //   });
-    // });
+  callAPI(String after) {
+    if (after.isEmpty) {
+      setState(() {
+        dataList = [];
+        data = [];
+      });
+    }
+    XataRepository().getDonationsList(after).then((response) {
+      setState(() {
+        dataList.addAll(
+            XataDonationListResponse.fromJson(jsonDecode(response.body))
+                .records!);
+      });
 
-    // FirebaseFirestore.instance
-    //     .collection('member_count')
-    //     .doc("donation_string")
-    //     .get()
-    //     .then((value) {
-    //   var donations = value['donations'];
-    //   var data = DonationListResponse.fromJson(jsonDecode(donations)).data!;
+      if (XataDonationListResponse.fromJson(jsonDecode(response.body))
+              .meta!
+              .page!
+              .more ??
+          false) {
+        callAPI(XataDonationListResponse.fromJson(jsonDecode(response.body))
+            .meta!
+            .page!
+            .cursor!);
+      } else {
+        data = [];
+        for (int i = 0; i < dataList.length; i++) {
+          //get current year
+          var date = DateTime.now();
+          String donationYear = DateFormat('yyyy').format(date);
+          log("Donation Year - $donationYear");
+          // get donation year from dataList[i].date
+          var tempDate = "";
+          if (dataList[i].date!.toString().contains("T")) {
+            tempDate = dataList[i].date!.toString().split("T")[0];
+          } else if (dataList[i].date!.toString().contains(" ")) {
+            tempDate = dataList[i].date!.toString().split(" ")[0];
+          }
 
-    //   setState(() {
-    //     totalDonation = data.length;
-    //   });
-    // });
+          log("Temp $tempDate");
+
+          if (tempDate.split("-")[0] == donationYear) {
+            setState(() {
+              data.add(dataList[i]);
+            });
+          }
+        }
+
+        setState(() {
+          data = data.reversed.toList();
+        });
+      }
+    });
   }
 
   VoidCallback refresh() => initial();
-  List<DonationData> dataList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +195,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     ],
                   ),
                   DonationChartByBlood(
-                    data: dataList,
+                    data: data,
                     fromDashboard: true,
                   ),
                 ],
@@ -259,7 +270,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                         margin: const EdgeInsets.only(top: 12),
                         padding: const EdgeInsets.all(20.0),
                         child: DonationChartByBlood(
-                          data: dataList,
+                          data: data,
                           fromDashboard: true,
                         ),
                       )),
@@ -278,35 +289,19 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         child: NeumorphicButton(
           onPressed: () async {
             if (index == 0) {
-              // await Navigator.pushNamed(context, BloodDonationList.routeName);
               await Navigator.pushNamed(context, MemberListNewStyle.routeName);
-              XataRepository().getMembersTotal().then((value) {
-                setState(() {
-                  totalMember = int.parse(
-                      TotalDataResponse.fromJson(jsonDecode(value.body))
-                          .records!
-                          .first
-                          .value
-                          .toString());
-                });
-              });
+              initial();
             } else if (index == 1) {
               await Navigator.pushNamed(
                   context, BloodDonationListNewStyle.routeName);
-              XataRepository().getDonationsTotal().then((value) {
-                setState(() {
-                  totalDonation = int.parse(
-                      TotalDataResponse.fromJson(jsonDecode(value.body))
-                          .records!
-                          .first
-                          .value
-                          .toString());
-                });
-              });
+              initial();
             } else if (index == 2) {
-              Navigator.pushNamed(context, SpecialEventListScreen.routeName);
+              await Navigator.pushNamed(
+                  context, SpecialEventListScreen.routeName);
+              initial();
             } else if (index == 3) {
-              Navigator.pushNamed(context, DonarList.routeName);
+              await Navigator.pushNamed(context, DonarList.routeName);
+              initial();
             }
           },
           child: Padding(

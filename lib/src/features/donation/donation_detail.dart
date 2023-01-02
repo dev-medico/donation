@@ -1,8 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:merchant/data/repository/repository.dart';
+import 'package:merchant/data/response/member_response.dart';
+import 'package:merchant/data/response/total_data_response.dart';
+import 'package:merchant/data/response/xata_donation_search_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/donation/blood_donation_edit.dart';
 import 'package:merchant/src/features/member/member_detail.dart';
@@ -12,20 +18,19 @@ import 'package:merchant/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class DonationDetailScreen extends StatefulWidget {
-  Map<String, dynamic> data;
-  String doc_id;
-  DonationDetailScreen({Key? key, required this.data, required this.doc_id})
-      : super(key: key);
+  DonationSearchRecords data;
+  DonationDetailScreen({
+    Key? key,
+    required this.data,
+  }) : super(key: key);
 
   @override
-  State<DonationDetailScreen> createState() =>
-      _DonationDetailScreenState(data, doc_id);
+  State<DonationDetailScreen> createState() => _DonationDetailScreenState(data);
 }
 
 class _DonationDetailScreenState extends State<DonationDetailScreen> {
-  Map<String, dynamic> data;
-  String doc_id;
-  _DonationDetailScreenState(this.data, this.doc_id);
+  DonationSearchRecords data;
+  _DonationDetailScreenState(this.data);
   bool _isLoading = false;
 
   @override
@@ -70,7 +75,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                 left: 20,
                 right: Responsive.isMobile(context)
                     ? 20
-                    : MediaQuery.of(context).size.width * 0.5 + 20,
+                    : MediaQuery.of(context).size.width * 0.5 + 40,
                 top: 20,
               ),
               padding: const EdgeInsets.all(20),
@@ -99,7 +104,11 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                       Expanded(
                         flex: 5,
                         child: Text(
-                          data["date"] ?? "-",
+                          data.date!.contains("T")
+                              ? data.date!.split("T")[0]
+                              : data.date!.contains(" ")
+                                  ? data.date!.split(" ")[0]
+                                  : "-",
                           style: const TextStyle(
                               fontSize: 14, color: Colors.black),
                         ),
@@ -107,7 +116,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                     ],
                   ),
                   const SizedBox(
-                    height: 4,
+                    height: 8,
                   ),
                   Row(
                     children: [
@@ -132,7 +141,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                       Expanded(
                         flex: 5,
                         child: Text(
-                          data["hospital"],
+                          data.hospital.toString(),
                           style: const TextStyle(
                               fontSize: 14, color: Colors.black),
                         ),
@@ -151,8 +160,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       Visibility(
-                        visible: data["patient_name"] != null &&
-                            data["patient_name"] != "",
+                        visible:
+                            data.patientName != null && data.patientName != "",
                         child: Container(
                           width: Responsive.isMobile(context)
                               ? double.infinity
@@ -211,7 +220,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      data["patient_name"],
+                                      data.patientName.toString(),
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -219,7 +228,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 ],
                               ),
                               const SizedBox(
-                                height: 4,
+                                height: 8,
                               ),
                               Row(
                                 children: [
@@ -243,8 +252,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      Utils.strToMM(data["patient_age"]) +
-                                          " နှစ်",
+                                      "${Utils.strToMM(data.patientAge.toString())} နှစ်",
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -252,7 +260,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 ],
                               ),
                               const SizedBox(
-                                height: 4,
+                                height: 8,
                               ),
                               Row(
                                 children: [
@@ -276,7 +284,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      data["patient_address"],
+                                      data.patientAddress.toString(),
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -284,7 +292,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 ],
                               ),
                               const SizedBox(
-                                height: 4,
+                                height: 8,
                               ),
                               Row(
                                 children: [
@@ -308,7 +316,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      data["patient_disease"],
+                                      data.patientDisease.toString(),
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -316,15 +324,14 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 ],
                               ),
                               const SizedBox(
-                                height: 4,
+                                height: 8,
                               ),
                             ],
                           ),
                         ),
                       ),
                       Visibility(
-                        visible: data["patient_name"] == null ||
-                            data["patient_name"] == "",
+                        visible: data.patientName.toString() == "",
                         child: const SizedBox(
                           height: 12,
                         ),
@@ -403,7 +410,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["member_id"],
+                                    data.member!.memberId.toString(),
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -411,7 +418,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                               ],
                             ),
                             const SizedBox(
-                              height: 4,
+                              height: 8,
                             ),
                             Row(
                               children: [
@@ -435,7 +442,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["member_name"],
+                                    data.member!.name.toString(),
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -443,14 +450,14 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                               ],
                             ),
                             const SizedBox(
-                              height: 4,
+                              height: 8,
                             ),
                             Row(
-                              children: [
-                                const SizedBox(
+                              children: const [
+                                SizedBox(
                                   width: 12,
                                 ),
-                                const Expanded(
+                                Expanded(
                                   flex: 2,
                                   child: Text("အဖအမည်",
                                       style: TextStyle(
@@ -458,31 +465,31 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                           color: Color.fromARGB(
                                               255, 116, 112, 112))),
                                 ),
-                                const Text("-",
+                                Text("-",
                                     style: TextStyle(
                                         fontSize: 14, color: Colors.black)),
-                                const SizedBox(
+                                SizedBox(
                                   width: 24,
                                 ),
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["member_father_name"],
-                                    style: const TextStyle(
+                                    "father_name",
+                                    style: TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(
-                              height: 4,
+                              height: 8,
                             ),
                             Row(
-                              children: [
-                                const SizedBox(
+                              children: const [
+                                SizedBox(
                                   width: 12,
                                 ),
-                                const Expanded(
+                                Expanded(
                                   flex: 2,
                                   child: Text("သွေးအုပ်စု",
                                       style: TextStyle(
@@ -490,24 +497,24 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                           color: Color.fromARGB(
                                               255, 116, 112, 112))),
                                 ),
-                                const Text("-",
+                                Text("-",
                                     style: TextStyle(
                                         fontSize: 14, color: Colors.black)),
-                                const SizedBox(
+                                SizedBox(
                                   width: 24,
                                 ),
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["member_blood_type"],
-                                    style: const TextStyle(
+                                    "bolood type",
+                                    style: TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(
-                              height: 4,
+                              height: 8,
                             ),
                             Row(
                               children: [
@@ -531,7 +538,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["member_birth_date"],
+                                    data.member!.birthDate.toString(),
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -539,7 +546,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                               ],
                             ),
                             const SizedBox(
-                              height: 4,
+                              height: 8,
                             ),
                             Row(
                               children: [
@@ -563,7 +570,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    data["member_blood_bank_card"] ?? "-",
+                                    data.member!.bloodBankCard.toString(),
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
@@ -571,7 +578,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                               ],
                             ),
                             const SizedBox(
-                              height: 4,
+                              height: 8,
                             ),
                           ],
                         ),
@@ -586,188 +593,173 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                       children: [
                         Expanded(
                           flex: 1,
-                          child: Visibility(
-                            visible: data["patient_name"] == null ||
-                                data["patient_name"] == "",
-                            child: Container(
-                              width: Responsive.isMobile(context)
-                                  ? double.infinity
-                                  : MediaQuery.of(context).size.width * 0.47,
-                              decoration: shadowDecoration(Colors.white),
-                              margin: const EdgeInsets.only(
-                                left: 20,
-                                right: 8,
-                              ),
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      const SizedBox(
-                                        width: 12,
-                                      ),
-                                      Image.asset("assets/images/donation.png",
-                                          width: 38, color: primaryColor),
-                                      const SizedBox(
-                                        width: 16,
-                                      ),
-                                      Text("လူနာအချက်အလက်များ",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: primaryColor)),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                  Container(
-                                    height: 1,
-                                    width:
-                                        MediaQuery.of(context).size.width - 80,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                  Row(
-                                    children: [
-                                      const SizedBox(
-                                        width: 12,
-                                      ),
-                                      const Expanded(
-                                        flex: 2,
-                                        child: Text("လူနာအမည်",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: Color.fromARGB(
-                                                    255, 116, 112, 112))),
-                                      ),
-                                      const Text("-",
+                          child: Container(
+                            width: Responsive.isMobile(context)
+                                ? double.infinity
+                                : MediaQuery.of(context).size.width * 0.47,
+                            decoration: shadowDecoration(Colors.white),
+                            margin: const EdgeInsets.only(
+                              left: 20,
+                              right: 8,
+                            ),
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 12,
+                                    ),
+                                    Image.asset("assets/images/donation.png",
+                                        width: 38, color: primaryColor),
+                                    const SizedBox(
+                                      width: 16,
+                                    ),
+                                    Text("လူနာအချက်အလက်များ",
+                                        style: TextStyle(
+                                            fontSize: 15, color: primaryColor)),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Container(
+                                  height: 1,
+                                  width: MediaQuery.of(context).size.width - 80,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 12,
+                                    ),
+                                    const Expanded(
+                                      flex: 2,
+                                      child: Text("လူနာအမည်",
                                           style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.black)),
-                                      const SizedBox(
-                                        width: 24,
+                                              color: Color.fromARGB(
+                                                  255, 116, 112, 112))),
+                                    ),
+                                    const Text("-",
+                                        style: TextStyle(
+                                            fontSize: 14, color: Colors.black)),
+                                    const SizedBox(
+                                      width: 24,
+                                    ),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Text(
+                                        data.patientName.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 14, color: Colors.black),
                                       ),
-                                      Expanded(
-                                        flex: 4,
-                                        child: Text(
-                                          data["patient_name"],
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 4,
-                                  ),
-                                  Row(
-                                    children: [
-                                      const SizedBox(
-                                        width: 12,
-                                      ),
-                                      const Expanded(
-                                        flex: 2,
-                                        child: Text("အသက်",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: Color.fromARGB(
-                                                    255, 116, 112, 112))),
-                                      ),
-                                      const Text("-",
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 12,
+                                    ),
+                                    const Expanded(
+                                      flex: 2,
+                                      child: Text("အသက်",
                                           style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.black)),
-                                      const SizedBox(
-                                        width: 24,
+                                              color: Color.fromARGB(
+                                                  255, 116, 112, 112))),
+                                    ),
+                                    const Text("-",
+                                        style: TextStyle(
+                                            fontSize: 14, color: Colors.black)),
+                                    const SizedBox(
+                                      width: 24,
+                                    ),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Text(
+                                        "${Utils.strToMM(data.patientAge.toString())} နှစ်",
+                                        style: const TextStyle(
+                                            fontSize: 14, color: Colors.black),
                                       ),
-                                      Expanded(
-                                        flex: 4,
-                                        child: Text(
-                                          Utils.strToMM(data["patient_age"]) +
-                                              " နှစ်",
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 4,
-                                  ),
-                                  Row(
-                                    children: [
-                                      const SizedBox(
-                                        width: 12,
-                                      ),
-                                      const Expanded(
-                                        flex: 2,
-                                        child: Text("နေရပ်လိပ်စာ",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: Color.fromARGB(
-                                                    255, 116, 112, 112))),
-                                      ),
-                                      const Text("-",
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 12,
+                                    ),
+                                    const Expanded(
+                                      flex: 2,
+                                      child: Text("နေရပ်လိပ်စာ",
                                           style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.black)),
-                                      const SizedBox(
-                                        width: 24,
+                                              color: Color.fromARGB(
+                                                  255, 116, 112, 112))),
+                                    ),
+                                    const Text("-",
+                                        style: TextStyle(
+                                            fontSize: 14, color: Colors.black)),
+                                    const SizedBox(
+                                      width: 24,
+                                    ),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Text(
+                                        data.patientAddress.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 14, color: Colors.black),
                                       ),
-                                      Expanded(
-                                        flex: 4,
-                                        child: Text(
-                                          data["patient_address"],
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 4,
-                                  ),
-                                  Row(
-                                    children: [
-                                      const SizedBox(
-                                        width: 12,
-                                      ),
-                                      const Expanded(
-                                        flex: 2,
-                                        child: Text("ဖြစ်ပွားသည့်ရောဂါ",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: Color.fromARGB(
-                                                    255, 116, 112, 112))),
-                                      ),
-                                      const Text("-",
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 12,
+                                    ),
+                                    const Expanded(
+                                      flex: 2,
+                                      child: Text("ဖြစ်ပွားသည့်ရောဂါ",
                                           style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.black)),
-                                      const SizedBox(
-                                        width: 24,
+                                              color: Color.fromARGB(
+                                                  255, 116, 112, 112))),
+                                    ),
+                                    const Text("-",
+                                        style: TextStyle(
+                                            fontSize: 14, color: Colors.black)),
+                                    const SizedBox(
+                                      width: 24,
+                                    ),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Text(
+                                        data.patientDisease.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 14, color: Colors.black),
                                       ),
-                                      Expanded(
-                                        flex: 4,
-                                        child: Text(
-                                          data["patient_disease"],
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 4,
-                                  ),
-                                ],
-                              ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -821,7 +813,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 8,
+                                  height: 12,
                                 ),
                                 Container(
                                   height: 1,
@@ -829,7 +821,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   color: Colors.grey,
                                 ),
                                 const SizedBox(
-                                  height: 8,
+                                  height: 12,
                                 ),
                                 Row(
                                   children: [
@@ -853,7 +845,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                     Expanded(
                                       flex: 4,
                                       child: Text(
-                                        data["member_id"],
+                                        data.member!.memberId.toString(),
                                         style: const TextStyle(
                                             fontSize: 14, color: Colors.black),
                                       ),
@@ -861,7 +853,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 4,
+                                  height: 8,
                                 ),
                                 Row(
                                   children: [
@@ -885,7 +877,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                     Expanded(
                                       flex: 4,
                                       child: Text(
-                                        data["member_name"],
+                                        data.member!.name.toString(),
                                         style: const TextStyle(
                                             fontSize: 14, color: Colors.black),
                                       ),
@@ -893,7 +885,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 4,
+                                  height: 8,
                                 ),
                                 Row(
                                   children: [
@@ -917,7 +909,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                     Expanded(
                                       flex: 4,
                                       child: Text(
-                                        data["member_father_name"],
+                                        data.member!.fatherName.toString(),
                                         style: const TextStyle(
                                             fontSize: 14, color: Colors.black),
                                       ),
@@ -925,7 +917,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 4,
+                                  height: 8,
                                 ),
                                 Row(
                                   children: [
@@ -949,7 +941,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                     Expanded(
                                       flex: 4,
                                       child: Text(
-                                        data["member_blood_type"],
+                                        data.member!.bloodType.toString(),
                                         style: const TextStyle(
                                             fontSize: 14, color: Colors.black),
                                       ),
@@ -957,7 +949,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 4,
+                                  height: 8,
                                 ),
                                 Row(
                                   children: [
@@ -981,7 +973,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                     Expanded(
                                       flex: 4,
                                       child: Text(
-                                        data["member_birth_date"],
+                                        data.member!.birthDate.toString(),
                                         style: const TextStyle(
                                             fontSize: 14, color: Colors.black),
                                       ),
@@ -989,7 +981,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 4,
+                                  height: 8,
                                 ),
                                 Row(
                                   children: [
@@ -1013,7 +1005,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                     Expanded(
                                       flex: 4,
                                       child: Text(
-                                        data["member_blood_bank_card"] ?? "-",
+                                        data.member!.bloodBankCard.toString(),
                                         style: const TextStyle(
                                             fontSize: 14, color: Colors.black),
                                       ),
@@ -1021,7 +1013,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 4,
+                                  height: 8,
                                 ),
                               ],
                             ),
@@ -1110,7 +1102,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => BloodDonationEditScreen(
-                                    data: data, doc_id: doc_id),
+                                  data: data,
+                                ),
                               ),
                             );
                           }),
@@ -1189,93 +1182,77 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
       ))
       ..animatedFunc = (child, animation) {
         return ScaleTransition(
-          child: child,
           scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
         );
       }
       ..show();
   }
 
-  Future<void> deleteDonation() {
+  deleteDonation() {
     setState(() {
       _isLoading = true;
     });
-    DocumentReference memberdocumentReference =
-        FirebaseFirestore.instance.collection('members').doc(data['member_id']);
-    FirebaseFirestore.instance
-        .runTransaction((transaction) async {
-          // Get the document
-          DocumentSnapshot snapshot =
-              await transaction.get(memberdocumentReference);
+    XataRepository().deleteDonationByID(data.id.toString()).then((value) {
+      if (value.statusCode.toString().startsWith("2")) {
+        setState(() {
+          _isLoading = false;
+        });
+        Utils.messageSuccessDialog("စာရင်း ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+            context, "အိုကေ", Colors.black);
 
-          int newMemberCount;
-          int newTotalCount;
-          print(snapshot.data());
-          Map<String, dynamic> memberData =
-              snapshot.data()! as Map<String, dynamic>;
-          print(memberData);
-          newMemberCount = int.parse(memberData['member_count'].toString()) - 1;
-          newTotalCount = int.parse(memberData['total_count'].toString()) - 1;
-          // Perform an update on the document
-          transaction.update(memberdocumentReference,
-              {'member_count': newMemberCount.toString()});
-          transaction.update(memberdocumentReference,
-              {'total_count': newTotalCount.toString()});
-          return newMemberCount;
-        })
-        .then((value) => print("Follower count updated to $value"))
-        .catchError(
-            (error) => print("Failed to update user followers: $error"));
-    DocumentReference documentReference =
-        FirebaseFirestore.instance.collection('blood_donations').doc(doc_id);
+        XataRepository().getDonationsTotal().then((value) {
+          var newMemberCount = int.parse(
+                  TotalDataResponse.fromJson(jsonDecode(value.body))
+                      .records!
+                      .first
+                      .value
+                      .toString()) -
+              1;
+          XataRepository().updateDonationsTotal(newMemberCount);
 
-    return FirebaseFirestore.instance.runTransaction((transaction) async {
-      // Get the document
-      DocumentSnapshot snapshot = await transaction.get(documentReference);
-      // Perform an update on the document
-      transaction.delete(documentReference);
-
-      // Return the new count
-      return true;
-    }).then((value) {
-      print("Member updated to $value");
-      setState(() {
-        _isLoading = false;
-      });
-      Utils.messageSuccessDialog("စာရင်း ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-          context, "အိုကေ", Colors.black);
-    }).catchError((error) => print("Failed to update Member: $error"));
+          int donationCount = data.member!.donationCounts == null ||
+                  data.member!.donationCounts == 0
+              ? 0
+              : (data.member!.donationCounts ?? 0) - 1;
+          int totalCount =
+              data.member!.totalCount == null || data.member!.totalCount == 0
+                  ? 0
+                  : (data.member!.totalCount ?? 0) - 1;
+          XataRepository().updateMember(
+              data.member!.id.toString(), donationCount, totalCount);
+        });
+      } else {
+        log(value.statusCode.toString());
+        log(value.body);
+      }
+    });
   }
 
   goToDetail() {
-    print(data['member_id']);
-    CollectionReference members =
-        FirebaseFirestore.instance.collection('members');
-    members.doc(data['member_id']).get().then((value) {
-      if (value.exists) {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => MemberDetailScreen(
-        //       data: value.data() as Map<String, dynamic>,
-        //     ),
-        //   ),
-        // );
-      }
-    });
-    // DocumentReference documentReference =
-    //     FirebaseFirestore.instance.collection('members').doc(data["member_id"]);
-    // documentReference.get().then((datasnapshot) {
-    //   if (datasnapshot.exists) {
-    //     Navigator.push(
-    //         context,
-    //         MaterialPageRoute(
-    //             builder: (context) => MemberDetailScreen(
-    //                   data: datasnapshot.data as Map<String, dynamic>,
-    //                 )));
-    //   }
-    // }).catchError((e) {
-    //   print(e);
-    // });
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MemberDetailScreen(
+          data: MemberData(
+            address: data.member!.address,
+            birthDate: data.member!.birthDate,
+            bloodBankCard: data.member!.bloodBankCard,
+            bloodType: data.member!.bloodType,
+            donationCounts: data.member!.donationCounts,
+            fatherName: data.member!.fatherName,
+            id: data.member!.id,
+            lastDonationDate: data.member!.lastDonationDate,
+            memberId: data.member!.memberId,
+            name: data.member!.name,
+            note: data.member!.note,
+            nrc: data.member!.nrc,
+            phone: data.member!.phone,
+            registerDate: data.member!.registerDate,
+            totalCount: data.member!.totalCount,
+          ),
+        ),
+      ),
+    );
   }
 }

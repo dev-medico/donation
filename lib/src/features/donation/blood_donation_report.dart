@@ -1,4 +1,5 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:merchant/data/response/xata_donation_list_response.dart';
 import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/donation/donation_chart_by_blood.dart';
@@ -7,7 +8,7 @@ import 'package:merchant/src/features/donation/donation_chart_by_hospital.dart';
 import 'package:merchant/utils/Colors.dart';
 
 class BloodDonationReportScreen extends StatefulWidget {
-  final List<DonationData> data;
+  final List<DonationRecord> data;
   final int month;
   final String year;
   const BloodDonationReportScreen(
@@ -57,10 +58,7 @@ class _BloodDonationReportScreenState extends State<BloodDonationReportScreen> {
           title: Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
-                widget.year +
-                    " " +
-                    months[widget.month] +
-                    " သွေးလှူဒါန်းမှုမှတ်တမ်း",
+                "${widget.year} ${months[widget.month]} သွေးလှူဒါန်းမှုမှတ်တမ်း",
                 textScaleFactor: 1.0,
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 15 : 17,

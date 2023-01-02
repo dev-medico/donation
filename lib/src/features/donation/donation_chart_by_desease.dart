@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:merchant/data/response/xata_donation_list_response.dart';
 import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
 
 class DonationChartByDisease extends StatefulWidget {
-  final List<DonationData> data;
+  final List<DonationRecord> data;
   const DonationChartByDisease({Key? key, required this.data})
       : super(key: key);
 

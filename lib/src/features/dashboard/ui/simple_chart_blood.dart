@@ -1,5 +1,6 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
+import 'package:merchant/data/response/xata_donation_list_response.dart';
 import 'package:merchant/donation_list_response.dart';
 
 class SimpleBarChartBlood extends StatelessWidget {
@@ -9,7 +10,7 @@ class SimpleBarChartBlood extends StatelessWidget {
   const SimpleBarChartBlood(this.seriesList, {this.animate});
 
   /// Creates a [BarChart] with sample data and no transition.
-  factory SimpleBarChartBlood.withSampleData(List<DonationData> data) {
+  factory SimpleBarChartBlood.withSampleData(List<DonationRecord> data) {
     return SimpleBarChartBlood(
       chartWithData(data),
       animate: false,
@@ -26,7 +27,7 @@ class SimpleBarChartBlood extends StatelessWidget {
 
   /// Create one series with sample hard coded data.
   static List<charts.Series<OrdinalSales, String>> chartWithData(
-      List<DonationData> data) {
+      List<DonationRecord> data) {
     List<OrdinalSales> sales = [];
 
     List<String> bloodTypes = [
@@ -42,12 +43,12 @@ class SimpleBarChartBlood extends StatelessWidget {
 
     for (var bloodType in bloodTypes) {
       if (data
-          .where((element) => element.memberBloodType == bloodType)
+          .where((element) => element.member!.bloodType.toString() == bloodType)
           .isNotEmpty) {
         sales.add(OrdinalSales(
             bloodType,
             data
-                .where((element) => element.memberBloodType == bloodType)
+                .where((element) => element.member!.bloodType.toString() == bloodType)
                 .length));
       }
     }
