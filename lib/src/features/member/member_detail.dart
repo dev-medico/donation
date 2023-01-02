@@ -544,7 +544,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.32,
                       decoration: shadowDecoration(Colors.white),
-                      height: MediaQuery.of(context).size.height * .41,
+                      height: MediaQuery.of(context).size.height * .44,
                       margin: const EdgeInsets.only(
                           top: 40, bottom: 20, left: 52, right: 20),
                       child: ListView(
@@ -733,7 +733,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         top: 40,
                       ),
                       width: MediaQuery.of(context).size.width * 0.32,
-                      height: MediaQuery.of(context).size.height * .41,
+                      height: MediaQuery.of(context).size.height * .44,
                       decoration: shadowDecoration(Colors.white),
                       child: ListView(
                         physics: const NeverScrollableScrollPhysics(),
@@ -1018,8 +1018,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                               // scrollDirection: Axis.vertical,
                               children: donationDatas
                                   .map((DonationSearchRecords document) {
-                                return blood_donationRow(
-                                    document);
+                                return blood_donationRow(document);
                               }).toList(),
                             ),
                           ],
