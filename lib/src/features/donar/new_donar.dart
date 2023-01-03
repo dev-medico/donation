@@ -144,6 +144,9 @@ class NewDonarState extends State<NewDonarScreen> {
                               children: [
                                 TextFormField(
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
                                   controller: amountController,
                                   decoration: inputBoxDecoration("ငွေပမာဏ"),
                                 ),

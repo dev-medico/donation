@@ -179,7 +179,6 @@ class NewMemberState extends State<NewMemberScreen> {
         log(value.body);
       }
     });
-
   }
 
   void initial() async {
@@ -232,14 +231,14 @@ class NewMemberState extends State<NewMemberScreen> {
   Widget build(BuildContext context) {
     YYDialog.init(context);
     return ModalProgressHUD(
-        inAsyncCall: _isLoading,
-        color: Colors.black,
-        progressIndicator: const SpinKitCircle(
-          color: Colors.white,
-          size: 60.0,
-        ),
-        dismissible: false,
-        child:Scaffold(
+      inAsyncCall: _isLoading,
+      color: Colors.black,
+      progressIndicator: const SpinKitCircle(
+        color: Colors.white,
+        size: 60.0,
+      ),
+      dismissible: false,
+      child: Scaffold(
         backgroundColor: const Color(0xfff2f2f2),
         appBar: AppBar(
           flexibleSpace: Container(
@@ -303,7 +302,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                         ),
                                         child: TextFormField(
                                           controller: nameController,
-                                          decoration: inputBoxDecoration("အမည်"),
+                                          decoration:
+                                              inputBoxDecoration("အမည်"),
                                         ),
                                       ),
                                     ),
@@ -327,9 +327,9 @@ class NewMemberState extends State<NewMemberScreen> {
                                                 FirebaseFirestore.instance
                                                     .collection('members')
                                                     .where('name',
-                                                        isEqualTo: nameController
-                                                            .text
-                                                            .toString())
+                                                        isEqualTo:
+                                                            nameController.text
+                                                                .toString())
                                                     .get()
                                                     .then((value) {
                                                   if (value.docs.isEmpty) {
@@ -380,7 +380,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                         enabledBorder: OutlineInputBorder(
                                           borderSide: const BorderSide(
                                               color: Colors.grey, width: 1),
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         contentPadding: const EdgeInsets.only(
                                             left: 20, right: 12, bottom: 4),
@@ -449,8 +450,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                 child: DropdownButton(
                                                   value:
                                                       nrc_region_state_options_Value,
-                                                  icon: const Icon(
-                                                      Icons.keyboard_arrow_down),
+                                                  icon: const Icon(Icons
+                                                      .keyboard_arrow_down),
                                                   iconSize: 0,
                                                   elevation: 16,
                                                   underline: const SizedBox(),
@@ -483,10 +484,11 @@ class NewMemberState extends State<NewMemberScreen> {
                                           Expanded(
                                             child: Container(
                                               height: 48,
-                                              margin:
-                                                  const EdgeInsets.only(left: 12),
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 12),
+                                              margin: const EdgeInsets.only(
+                                                  left: 12),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12),
                                               decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(10),
@@ -495,8 +497,14 @@ class NewMemberState extends State<NewMemberScreen> {
                                               child: TextField(
                                                 keyboardType:
                                                     TextInputType.number,
+                                                inputFormatters: <
+                                                    TextInputFormatter>[
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly
+                                                ],
                                                 controller: nrcController,
-                                                decoration: const InputDecoration(
+                                                decoration:
+                                                    const InputDecoration(
                                                   border: InputBorder.none,
                                                 ),
                                               ),
@@ -531,6 +539,9 @@ class NewMemberState extends State<NewMemberScreen> {
                                       TextFormField(
                                         keyboardType: TextInputType.number,
                                         controller: phoneController,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
                                         decoration:
                                             inputBoxDecoration("ဖုန်းနံပါတ်"),
                                       ),
@@ -559,6 +570,9 @@ class NewMemberState extends State<NewMemberScreen> {
                                   child: TextFormField(
                                     controller: totalDonationController,
                                     keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
                                     decoration: inputBoxDecoration(
                                         "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
                                   ),
@@ -585,7 +599,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                       left: 20, top: 16, bottom: 8, right: 20),
                                   child: TextFormField(
                                     controller: quarterController,
-                                    decoration: inputBoxDecoration("ရပ်ကွက်အမည်"),
+                                    decoration:
+                                        inputBoxDecoration("ရပ်ကွက်အမည်"),
                                   ),
                                 ),
                                 Container(
@@ -596,7 +611,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                         TextFieldConfiguration(
                                       controller: townController,
                                       autofocus: false,
-                                      decoration: inputBoxDecoration("မြို့နယ်"),
+                                      decoration:
+                                          inputBoxDecoration("မြို့နယ်"),
 
                                       // decoration: const InputDecoration(
                                       //   hintText: "မြို့",
@@ -631,14 +647,15 @@ class NewMemberState extends State<NewMemberScreen> {
                                         ),
                                       );
                                     },
-                                    errorBuilder: (BuildContext context,
-                                            Object? error) =>
-                                        Text('$error',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .errorColor)),
+                                    errorBuilder:
+                                        (BuildContext context, Object? error) =>
+                                            Text('$error',
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .errorColor)),
                                     onSuggestionSelected: (suggestion) {
-                                      townController.text = suggestion.toString();
+                                      townController.text =
+                                          suggestion.toString();
                                       setRegion(suggestion.toString());
                                     },
                                   ),
@@ -747,12 +764,14 @@ class NewMemberState extends State<NewMemberScreen> {
                               child: const Align(
                                   alignment: Alignment.center,
                                   child: Padding(
-                                      padding: EdgeInsets.only(top: 8, bottom: 8),
+                                      padding:
+                                          EdgeInsets.only(top: 8, bottom: 8),
                                       child: Text(
                                         "ထည့်သွင်းမည်",
                                         textScaleFactor: 1.0,
                                         style: TextStyle(
-                                            fontSize: 16.0, color: Colors.white),
+                                            fontSize: 16.0,
+                                            color: Colors.white),
                                       ))),
                             ),
                           ))
@@ -828,7 +847,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                   child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
-                                                              top: 16, right: 4),
+                                                              top: 16,
+                                                              right: 4),
                                                       child: Image.asset(
                                                         "assets/images/checked.png",
                                                         height: 24,
@@ -849,7 +869,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                                       .toString())
                                                           .get()
                                                           .then((value) {
-                                                        if (value.docs.isEmpty) {
+                                                        if (value
+                                                            .docs.isEmpty) {
                                                           setState(() {
                                                             nameChecked = true;
                                                           });
@@ -860,7 +881,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                                   .data();
                                                           memberExistDialog(
                                                               context,
-                                                              nameController.text
+                                                              nameController
+                                                                  .text
                                                                   .toString(),
                                                               data);
                                                         }
@@ -869,7 +891,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
-                                                              top: 16, right: 4),
+                                                              top: 16,
+                                                              right: 4),
                                                       child: Image.asset(
                                                         "assets/images/magnifier.png",
                                                         height: 24,
@@ -921,7 +944,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                             decoration: InputDecoration(
                                               enabledBorder: OutlineInputBorder(
                                                 borderSide: const BorderSide(
-                                                    color: Colors.grey, width: 1),
+                                                    color: Colors.grey,
+                                                    width: 1),
                                                 borderRadius:
                                                     BorderRadius.circular(12),
                                               ),
@@ -973,9 +997,9 @@ class NewMemberState extends State<NewMemberScreen> {
                                               mainAxisSize: MainAxisSize.max,
                                               children: <Widget>[
                                                 Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                          horizontal: 10),
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 10),
                                                   decoration: shadowDecoration(
                                                       Colors.white),
                                                   child: DropdownButton(
@@ -1000,15 +1024,16 @@ class NewMemberState extends State<NewMemberScreen> {
                                                   ),
                                                 ),
                                                 Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                          horizontal: 10),
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 10),
                                                   decoration: shadowDecoration(
                                                       Colors.white),
                                                   child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
-                                                              left: 8, right: 8),
+                                                              left: 8,
+                                                              right: 8),
                                                       child: DropdownButton(
                                                         value:
                                                             nrc_region_state_options_Value,
@@ -1025,15 +1050,16 @@ class NewMemberState extends State<NewMemberScreen> {
                                                       )),
                                                 ),
                                                 Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                          horizontal: 10),
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 10),
                                                   margin: const EdgeInsets.only(
                                                       left: 8),
                                                   decoration: shadowDecoration(
                                                       Colors.white),
                                                   child: DropdownButton(
-                                                    value: nrc_type_options_Value,
+                                                    value:
+                                                        nrc_type_options_Value,
                                                     items:
                                                         nrc_type_options_dropDownMenuItems,
                                                     icon: const Icon(Icons
@@ -1048,8 +1074,9 @@ class NewMemberState extends State<NewMemberScreen> {
                                                 Expanded(
                                                   child: Container(
                                                     height: 48,
-                                                    margin: const EdgeInsets.only(
-                                                        left: 12),
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            left: 12),
                                                     padding: const EdgeInsets
                                                             .symmetric(
                                                         horizontal: 12),
@@ -1057,16 +1084,22 @@ class NewMemberState extends State<NewMemberScreen> {
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               10),
-                                                      color:
-                                                          const Color(0xffecf0f1),
+                                                      color: const Color(
+                                                          0xffecf0f1),
                                                     ),
                                                     child: TextField(
                                                       keyboardType:
                                                           TextInputType.number,
+                                                      inputFormatters: <
+                                                          TextInputFormatter>[
+                                                        FilteringTextInputFormatter
+                                                            .digitsOnly
+                                                      ],
                                                       controller: nrcController,
                                                       decoration:
                                                           const InputDecoration(
-                                                        border: InputBorder.none,
+                                                        border:
+                                                            InputBorder.none,
                                                       ),
                                                     ),
                                                   ),
@@ -1119,8 +1152,14 @@ class NewMemberState extends State<NewMemberScreen> {
                                         child: Stack(
                                           children: [
                                             TextFormField(
-                                              keyboardType: TextInputType.number,
+                                              keyboardType:
+                                                  TextInputType.number,
                                               controller: phoneController,
+                                              inputFormatters: <
+                                                  TextInputFormatter>[
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly
+                                              ],
                                               decoration: inputBoxDecoration(
                                                   "ဖုန်းနံပါတ်"),
                                             ),
@@ -1170,6 +1209,10 @@ class NewMemberState extends State<NewMemberScreen> {
                                         child: TextFormField(
                                           controller: totalDonationController,
                                           keyboardType: TextInputType.number,
+                                          inputFormatters: <TextInputFormatter>[
+                                            FilteringTextInputFormatter
+                                                .digitsOnly
+                                          ],
                                           decoration: inputBoxDecoration(
                                               "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
                                         ),
@@ -1273,7 +1316,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                   suggestionsBox, controller) {
                                                 return suggestionsBox;
                                               },
-                                              itemBuilder: (context, suggestion) {
+                                              itemBuilder:
+                                                  (context, suggestion) {
                                                 return ListTile(
                                                   title: Text(
                                                     suggestion.toString(),
@@ -1281,16 +1325,20 @@ class NewMemberState extends State<NewMemberScreen> {
                                                   ),
                                                 );
                                               },
-                                              errorBuilder: (BuildContext context,
+                                              errorBuilder: (BuildContext
+                                                          context,
                                                       Object? error) =>
                                                   Text('$error',
                                                       style: TextStyle(
-                                                          color: Theme.of(context)
-                                                              .errorColor)),
-                                              onSuggestionSelected: (suggestion) {
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .errorColor)),
+                                              onSuggestionSelected:
+                                                  (suggestion) {
                                                 townController.text =
                                                     suggestion.toString();
-                                                setRegion(suggestion.toString());
+                                                setRegion(
+                                                    suggestion.toString());
                                               },
                                             ),
                                           ),
@@ -1348,8 +1396,8 @@ class NewMemberState extends State<NewMemberScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                               color: primaryColor,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(12.0))),
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
                           width: MediaQuery.of(context).size.width / 2.8,
                           margin: const EdgeInsets.only(
                               left: 54, bottom: 16, right: 8),
@@ -1366,10 +1414,11 @@ class NewMemberState extends State<NewMemberScreen> {
                                 FirebaseFirestore.instance
                                     .collection('members')
                                     .where('name',
-                                        isEqualTo: nameController.text.toString())
-                                    .where('father_name',
                                         isEqualTo:
-                                            fatherNameController.text.toString())
+                                            nameController.text.toString())
+                                    .where('father_name',
+                                        isEqualTo: fatherNameController.text
+                                            .toString())
                                     .where('blood_type',
                                         isEqualTo: selectedBloodType)
                                     .get()
@@ -1394,7 +1443,8 @@ class NewMemberState extends State<NewMemberScreen> {
                             child: const Align(
                                 alignment: Alignment.center,
                                 child: Padding(
-                                    padding: EdgeInsets.only(top: 16, bottom: 16),
+                                    padding:
+                                        EdgeInsets.only(top: 16, bottom: 16),
                                     child: Text(
                                       "ထည့်သွင်းမည်",
                                       textScaleFactor: 1.0,

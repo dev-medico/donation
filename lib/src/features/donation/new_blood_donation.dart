@@ -427,6 +427,11 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                     child: TextFormField(
                                       controller: ageController,
                                       keyboardType: TextInputType.number,
+                                      inputFormatters: <
+                                                    TextInputFormatter>[
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly
+                                                ],
                                       decoration:
                                           inputBoxDecoration("လူနာအသက်"),
                                     ),
@@ -485,7 +490,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                         right: 20),
                                     child: TextFormField(
                                       controller: diseaseController,
-                                      keyboardType: TextInputType.number,
+                                      keyboardType: TextInputType.text,
                                       decoration: inputBoxDecoration(
                                           "ဖြစ်ပွားသည့်ရောဂါ"),
                                     ),

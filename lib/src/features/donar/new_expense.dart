@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -117,6 +118,11 @@ class NewDonarState extends State<NewExpense> {
                               children: [
                                 TextFormField(
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: <
+                                                    TextInputFormatter>[
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly
+                                                ],
                                   controller: amountController,
                                   decoration: inputBoxDecoration("ငွေပမာဏ"),
                                 ),

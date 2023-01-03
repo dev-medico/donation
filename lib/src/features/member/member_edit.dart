@@ -249,6 +249,9 @@ class MemberEditState extends State<MemberEditScreen> {
                                     children: [
                                       TextFormField(
                                         keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
                                         controller: phoneController,
                                         decoration:
                                             inputBoxDecoration("ဖုန်းနံပါတ်"),
@@ -305,6 +308,11 @@ class MemberEditState extends State<MemberEditScreen> {
                                   child: TextFormField(
                                     controller: totalDonationController,
                                     keyboardType: TextInputType.number,
+                                    inputFormatters: <
+                                                    TextInputFormatter>[
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly
+                                                ],
                                     decoration: inputBoxDecoration(
                                         "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
                                   ),
@@ -692,6 +700,11 @@ class MemberEditState extends State<MemberEditScreen> {
                                         child: TextFormField(
                                           controller: totalDonationController,
                                           keyboardType: TextInputType.number,
+                                          inputFormatters: <
+                                                    TextInputFormatter>[
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly
+                                                ],
                                           decoration: inputBoxDecoration(
                                               "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
                                         ),

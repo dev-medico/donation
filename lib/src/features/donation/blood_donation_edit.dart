@@ -771,6 +771,11 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                         child: TextFormField(
                                           controller: ageController,
                                           keyboardType: TextInputType.number,
+                                          inputFormatters: <
+                                                    TextInputFormatter>[
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly
+                                                ],
                                           decoration:
                                               inputBoxDecoration("လူနာအသက်"),
                                         ),
