@@ -497,7 +497,6 @@ class NewMemberState extends State<NewMemberScreen> {
                                               child: TextField(
                                                 keyboardType:
                                                     TextInputType.number,
-                                                
                                                 controller: nrcController,
                                                 decoration:
                                                     const InputDecoration(
@@ -535,9 +534,6 @@ class NewMemberState extends State<NewMemberScreen> {
                                       TextFormField(
                                         keyboardType: TextInputType.number,
                                         controller: phoneController,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter.digitsOnly
-                                        ],
                                         decoration:
                                             inputBoxDecoration("ဖုန်းနံပါတ်"),
                                       ),
@@ -1086,7 +1082,6 @@ class NewMemberState extends State<NewMemberScreen> {
                                                     child: TextField(
                                                       keyboardType:
                                                           TextInputType.number,
-                                                      
                                                       controller: nrcController,
                                                       decoration:
                                                           const InputDecoration(
@@ -1147,11 +1142,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                               keyboardType:
                                                   TextInputType.number,
                                               controller: phoneController,
-                                              inputFormatters: <
-                                                  TextInputFormatter>[
-                                                FilteringTextInputFormatter
-                                                    .digitsOnly
-                                              ],
+                                              
                                               decoration: inputBoxDecoration(
                                                   "ဖုန်းနံပါတ်"),
                                             ),

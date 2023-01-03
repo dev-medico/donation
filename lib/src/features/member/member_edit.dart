@@ -249,9 +249,7 @@ class MemberEditState extends State<MemberEditScreen> {
                                     children: [
                                       TextFormField(
                                         keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter.digitsOnly
-                                        ],
+                                        
                                         controller: phoneController,
                                         decoration:
                                             inputBoxDecoration("ဖုန်းနံပါတ်"),
