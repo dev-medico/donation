@@ -497,11 +497,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                               child: TextField(
                                                 keyboardType:
                                                     TextInputType.number,
-                                                inputFormatters: <
-                                                    TextInputFormatter>[
-                                                  FilteringTextInputFormatter
-                                                      .digitsOnly
-                                                ],
+                                                
                                                 controller: nrcController,
                                                 decoration:
                                                     const InputDecoration(
@@ -1090,11 +1086,7 @@ class NewMemberState extends State<NewMemberScreen> {
                                                     child: TextField(
                                                       keyboardType:
                                                           TextInputType.number,
-                                                      inputFormatters: <
-                                                          TextInputFormatter>[
-                                                        FilteringTextInputFormatter
-                                                            .digitsOnly
-                                                      ],
+                                                      
                                                       controller: nrcController,
                                                       decoration:
                                                           const InputDecoration(
