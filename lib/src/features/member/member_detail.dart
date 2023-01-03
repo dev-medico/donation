@@ -86,11 +86,11 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
           ),
         ),
       ),
-      body: ListView(
-        shrinkWrap: true,
-        children: [
-          Responsive.isMobile(context)
-              ? Container(
+      body: Responsive.isMobile(context)
+          ? ListView(
+              shrinkWrap: true,
+              children: [
+                Container(
                   width: double.infinity,
                   decoration: shadowDecoration(Colors.white),
                   margin: const EdgeInsets.all(20),
@@ -124,7 +124,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                           height: 0,
                                         )
                                       : const SizedBox(
-                                          height: 8,
+                                          height: 12,
                                         ),
                                   Text(
                                     data.memberId!,
@@ -152,7 +152,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                         height: 0,
                                       )
                                     : const SizedBox(
-                                        height: 8,
+                                        height: 12,
                                       ),
                                 Text(
                                   data.registerDate!,
@@ -167,7 +167,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Container(
                         height: 1,
@@ -175,7 +175,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         color: Colors.grey,
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         children: [
@@ -206,7 +206,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         children: [
@@ -237,7 +237,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         children: [
@@ -268,7 +268,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         children: [
@@ -300,7 +300,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         children: [
@@ -331,7 +331,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         children: [
@@ -362,10 +362,10 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         children: [
@@ -396,7 +396,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         children: [
@@ -427,7 +427,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         children: [
@@ -458,7 +458,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         ],
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 12,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -536,502 +536,577 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                       ),
                     ],
                   ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.only(top: 4, left: 18, bottom: 12),
                   children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.32,
-                      decoration: shadowDecoration(Colors.white),
-                      height: MediaQuery.of(context).size.height * .5,
-                      margin: const EdgeInsets.only(
-                          top: 40, bottom: 20, left: 52, right: 20),
-                      child: ListView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(12),
-                        children: [
-                          Row(
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: Responsive.isMobile(context) ? 8.0 : 40),
+                      child: const Text("အဖွဲ့နှင့် သွေးလှူဒါန်းမှုများ",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black)),
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    ListView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      children: [
+                        SizedBox(
+                          height: donationDatas.length > 8
+                              ? MediaQuery.of(context).size.height *
+                                  (donationDatas.length / 8)
+                              : MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width * 2.5,
+                          child: ListView(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
                             children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Image.asset("assets/images/card.png", width: 54),
-                              const SizedBox(
-                                width: 16,
-                              ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text("အဖွဲ့၀င်အမှတ်",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color.fromARGB(
-                                              255, 116, 112, 112))),
-                                  Text(
-                                    data.memberId!,
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
+                                  header(),
+                                  Column(
+                                    // shrinkWrap: true,
+                                    // scrollDirection: Axis.vertical,
+                                    children: donationDatas
+                                        .map((DonationSearchRecords document) {
+                                      return blood_donationRow(document);
+                                    }).toList(),
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Container(
-                            height: 1,
-                            width: MediaQuery.of(context).size.width - 80,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Row(
-                            children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              const Expanded(
-                                flex: 4,
-                                child: Text("အမည်",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                              ),
-                              const Text("-",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.black)),
-                              const SizedBox(
-                                width: 24,
-                              ),
-                              Expanded(
-                                flex: 4,
-                                child: Text(
-                                  data.name!,
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Row(
-                            children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              const Expanded(
-                                flex: 4,
-                                child: Text("အဖအမည်",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                              ),
-                              const Text("-",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.black)),
-                              const SizedBox(
-                                width: 24,
-                              ),
-                              Expanded(
-                                flex: 4,
-                                child: Text(
-                                  data.fatherName!,
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Row(
-                            children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              const Expanded(
-                                flex: 4,
-                                child: Text("မွေးသက္ကရာဇ်",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                              ),
-                              const Text("-",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.black)),
-                              const SizedBox(
-                                width: 24,
-                              ),
-                              Expanded(
-                                flex: 4,
-                                child: Text(
-                                  data.birthDate!,
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Row(
-                            children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              const Expanded(
-                                flex: 4,
-                                child: Text("နိုင်ငံသားစီစစ်ရေး\nကတ်ပြားအမှတ်",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color:
-                                            Color.fromARGB(255, 116, 112, 112),
-                                        height: 1.8)),
-                              ),
-                              const Text("-",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.black)),
-                              const SizedBox(
-                                width: 24,
-                              ),
-                              Expanded(
-                                flex: 4,
-                                child: Text(
-                                  data.nrc!,
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 58,
-                          ),
-                          Container(
-                            height: 1,
-                            width: MediaQuery.of(context).size.width - 80,
-                            color: Colors.grey,
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    )
+                  ],
+                )
+              ],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: shadowDecoration(Colors.white),
+                    margin: const EdgeInsets.only(
+                      left: 20,
+                      top: 30,
+                      bottom: 20,
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(
-                        top: 40,
-                      ),
-                      width: MediaQuery.of(context).size.width * 0.32,
-                      height: MediaQuery.of(context).size.height * .5,
-                      decoration: shadowDecoration(Colors.white),
-                      child: ListView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(12),
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                right: 8.0, top: 8, bottom: 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                    child: ListView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(12),
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
                               children: [
-                                const Text("အဖွဲ့ဝင်သည့်ရက်စွဲ",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                                Text(
-                                  data.registerDate!,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                  ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Image.asset("assets/images/card.png",
+                                    width: 54),
+                                const SizedBox(
+                                  width: 16,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text("အဖွဲ့၀င်အမှတ်",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Color.fromARGB(
+                                                255, 116, 112, 112))),
+                                    Responsive.isMobile(context)
+                                        ? const SizedBox(
+                                            height: 0,
+                                          )
+                                        : const SizedBox(
+                                            height: 12,
+                                          ),
+                                    Text(
+                                      data.memberId!,
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Container(
-                            height: 1,
-                            width: MediaQuery.of(context).size.width - 80,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Row(
-                            children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              const Expanded(
-                                flex: 4,
-                                child: Text("သွေးအုပ်စု",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                              ),
-                              const Text("-",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.black)),
-                              const SizedBox(
-                                width: 24,
-                              ),
-                              Expanded(
-                                flex: 4,
-                                child: Text(
-                                  data.bloodType!,
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Row(
-                            children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              const Expanded(
-                                flex: 4,
-                                child: Text("အဖွဲ့နှင့်သွေးလှူဒါန်းမှု",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                              ),
-                              const Text("-",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.black)),
-                              const SizedBox(
-                                width: 24,
-                              ),
-                              Expanded(
-                                flex: 4,
-                                child: Text(
-                                  "${Utils.strToMM(data.donationCounts.toString())} ကြိမ်",
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Row(
-                            children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              const Expanded(
-                                flex: 4,
-                                child: Text("စုစုပေါင်းသွေးလှူဒါန်းမှု",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                              ),
-                              const Text("-",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.black)),
-                              const SizedBox(
-                                width: 24,
-                              ),
-                              Expanded(
-                                flex: 4,
-                                child: Text(
-                                  "${Utils.strToMM(data.totalCount.toString())} ကြိမ်",
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Row(
-                            children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              const Expanded(
-                                flex: 4,
-                                child: Text("ဖုန်းနံပါတ်",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                              ),
-                              const Text("-",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.black)),
-                              const SizedBox(
-                                width: 24,
-                              ),
-                              Expanded(
-                                flex: 4,
-                                child: Text(
-                                  data.phone!,
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text("နေရပ်လိပ်စာ   - ",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  data.address!,
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 18,
-                          ),
-                          Container(
-                            height: 1,
-                            width: MediaQuery.of(context).size.width - 80,
-                            color: Colors.grey,
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                top: 12,
-                                right: 12,
-                              ),
-                              child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text("ပြင်ဆင်မည်",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: primaryColor)),
-                                      const SizedBox(
-                                        width: 8,
-                                      ),
-                                      Image.asset(
-                                        "assets/images/edit.png",
-                                        width: 24,
-                                        color: primaryColor,
-                                      ),
-                                    ],
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  const Text("အဖွဲ့ဝင်သည့်ရက်စွဲ",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Color.fromARGB(
+                                              255, 116, 112, 112))),
+                                  Responsive.isMobile(context)
+                                      ? const SizedBox(
+                                          height: 0,
+                                        )
+                                      : const SizedBox(
+                                          height: 12,
+                                        ),
+                                  Text(
+                                    data.registerDate!,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black,
+                                    ),
                                   ),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            MemberEditScreen(data: data),
-                                      ),
-                                    );
-                                  }),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-          ListView(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(top: 4, left: 18, bottom: 12),
-            children: [
-              Padding(
-                padding: EdgeInsets.only(
-                    left: Responsive.isMobile(context) ? 8.0 : 40),
-                child: const Text("အဖွဲ့နှင့် သွေးလှူဒါန်းမှုများ",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black)),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                children: [
-                  SizedBox(
-                    height: donationDatas.length > 8
-                        ? MediaQuery.of(context).size.height *
-                            (donationDatas.length / 8)
-                        : MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width * 2.5,
-                    child: ListView(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            header(),
-                            Column(
-                              // shrinkWrap: true,
-                              // scrollDirection: Axis.vertical,
-                              children: donationDatas
-                                  .map((DonationSearchRecords document) {
-                                return blood_donationRow(document);
-                              }).toList(),
+                                ],
+                              ),
                             ),
                           ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Container(
+                          height: 1,
+                          width: MediaQuery.of(context).size.width - 80,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("အမည်",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                data.name!,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("အဖအမည်",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                data.fatherName!,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("မွေးသက္ကရာဇ်",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                data.birthDate!,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("နိုင်ငံသားစီစစ်ရေး\nကတ်ပြားအမှတ်",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color.fromARGB(255, 116, 112, 112),
+                                      height: 1.8)),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                data.nrc!,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("သွေးအုပ်စု",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                data.bloodType!,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("သွေးဘဏ်ကတ်နံပါတ်",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                data.bloodBankCard!,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("အဖွဲ့နှင့်သွေးလှူဒါန်းမှု",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                "${Utils.strToMM(data.donationCounts.toString())} ကြိမ်",
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("စုစုပေါင်းသွေးလှူဒါန်းမှု",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                "${Utils.strToMM(data.totalCount.toString())} ကြိမ်",
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("ဖုန်းနံပါတ်",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                data.phone!,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 2,
+                              child: Text("နေရပ်လိပ်စာ   - ",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                "${data.address}",
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 24,
+                        ),
+                        Container(
+                          height: 1,
+                          width: MediaQuery.of(context).size.width - 80,
+                          color: Colors.grey,
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 24, right: 12, bottom: 24),
+                            child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text("ပြင်ဆင်မည်",
+                                        style: TextStyle(
+                                            fontSize: 15, color: primaryColor)),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    Image.asset(
+                                      "assets/images/edit.png",
+                                      width: 24,
+                                      color: primaryColor,
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          MemberEditScreen(data: data),
+                                    ),
+                                  );
+                                }),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              )
-            ],
-          )
-        ],
-      ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 20, left: 8, bottom: 12),
+                    height: MediaQuery.of(context).size.height * 0.9,
+                    child: ListView(
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        ListView(
+                          shrinkWrap: true,
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          children: [
+                            SizedBox(
+                              height: donationDatas.length > 8
+                                  ? MediaQuery.of(context).size.height *
+                                      (donationDatas.length / 8)
+                                  : MediaQuery.of(context).size.height,
+                              width: MediaQuery.of(context).size.width * 0.575,
+                              child: ListView(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      header(),
+                                      Column(
+                                        // shrinkWrap: true,
+                                        // scrollDirection: Axis.vertical,
+                                        children: donationDatas.map(
+                                            (DonationSearchRecords document) {
+                                          return blood_donationRow(document);
+                                        }).toList(),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
     );
   }
 
@@ -1040,7 +1115,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
       height: Responsive.isMobile(context) ? 60 : 60,
       width: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width * 2
-          : MediaQuery.of(context).size.width * 0.89,
+          : MediaQuery.of(context).size.width * 0.575,
       margin: EdgeInsets.only(
           top: Responsive.isMobile(context) ? 0 : 12,
           left: Responsive.isMobile(context) ? 4 : 32,
@@ -1063,11 +1138,11 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
               SizedBox(
                 width: Responsive.isMobile(context)
                     ? MediaQuery.of(context).size.width / 4.3
-                    : MediaQuery.of(context).size.width / 11,
+                    : MediaQuery.of(context).size.width / 13,
                 child: Text(
                   "ရက်စွဲ",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 14 : 15,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1078,11 +1153,11 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
               SizedBox(
                 width: Responsive.isMobile(context)
                     ? MediaQuery.of(context).size.width / 3
-                    : MediaQuery.of(context).size.width / 8,
+                    : MediaQuery.of(context).size.width / 10,
                 child: Text(
                   "လှူဒါန်းသည့်နေရာ",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 14 : 15,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1093,11 +1168,11 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
               SizedBox(
                 width: Responsive.isMobile(context)
                     ? MediaQuery.of(context).size.width / 3
-                    : MediaQuery.of(context).size.width / 8,
+                    : MediaQuery.of(context).size.width / 10,
                 child: Text(
                   "လူနာအမည်",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 14 : 15,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1108,12 +1183,12 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
               SizedBox(
                 width: Responsive.isMobile(context)
                     ? MediaQuery.of(context).size.width / 2.8
-                    : MediaQuery.of(context).size.width / 6,
+                    : MediaQuery.of(context).size.width / 12,
                 child: Text(
                   "လိပ်စာ",
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15 : 17,
+                    fontSize: Responsive.isMobile(context) ? 14 : 15,
                     color: primaryColor,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1125,11 +1200,11 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
               SizedBox(
                 width: Responsive.isMobile(context)
                     ? MediaQuery.of(context).size.width / 7.4
-                    : MediaQuery.of(context).size.width / 18,
+                    : MediaQuery.of(context).size.width / 22,
                 child: Text(
                   "အသက်",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 14 : 15,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1140,12 +1215,12 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
               SizedBox(
                 width: Responsive.isMobile(context)
                     ? MediaQuery.of(context).size.width / 3
-                    : MediaQuery.of(context).size.width / 7,
+                    : MediaQuery.of(context).size.width / 9,
                 child: Text(
                   "ဖြစ်ပွားသည့်ရောဂါ",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 14 : 15,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1178,7 +1253,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
         decoration: shadowDecoration(Colors.white),
         width: Responsive.isMobile(context)
             ? MediaQuery.of(context).size.width * 2
-            : MediaQuery.of(context).size.width * 0.89,
+            : MediaQuery.of(context).size.width * 0.575,
         margin: EdgeInsets.only(
             top: 4,
             left: Responsive.isMobile(context) ? 4 : 32,
@@ -1193,7 +1268,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 SizedBox(
                   width: Responsive.isMobile(context)
                       ? MediaQuery.of(context).size.width / 4.1
-                      : MediaQuery.of(context).size.width / 11,
+                      : MediaQuery.of(context).size.width / 13,
                   child: Text(
                     //data['date'].toString(),
                     data.date!.contains("T")
@@ -1212,7 +1287,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 SizedBox(
                   width: Responsive.isMobile(context)
                       ? MediaQuery.of(context).size.width / 3.2
-                      : MediaQuery.of(context).size.width / 8,
+                      : MediaQuery.of(context).size.width / 10,
                   child: Text(
                     data.hospital ?? "-",
                     textAlign: TextAlign.center,
@@ -1227,7 +1302,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 SizedBox(
                   width: Responsive.isMobile(context)
                       ? MediaQuery.of(context).size.width / 3
-                      : MediaQuery.of(context).size.width / 8,
+                      : MediaQuery.of(context).size.width / 10,
                   child: Text(
                     data.patientName == null || data.patientName == ""
                         ? "-"
@@ -1243,7 +1318,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 SizedBox(
                   width: Responsive.isMobile(context)
                       ? MediaQuery.of(context).size.width / 2.8
-                      : MediaQuery.of(context).size.width / 6,
+                      : MediaQuery.of(context).size.width / 12,
                   child: Text(
                     data.patientAddress == null ||
                             data.patientAddress == "၊" ||
@@ -1263,14 +1338,14 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 SizedBox(
                   width: Responsive.isMobile(context)
                       ? MediaQuery.of(context).size.width / 7.4
-                      : MediaQuery.of(context).size.width / 18,
+                      : MediaQuery.of(context).size.width / 22,
                   child: Text(
                     data.patientAge == null || data.patientAge == ""
                         ? "-"
                         : data.patientAge!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 15 : 17,
+                        fontSize: Responsive.isMobile(context) ? 14 : 15,
                         color: Colors.black),
                   ),
                 ),
@@ -1280,7 +1355,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 SizedBox(
                   width: Responsive.isMobile(context)
                       ? MediaQuery.of(context).size.width / 3.2
-                      : MediaQuery.of(context).size.width / 7,
+                      : MediaQuery.of(context).size.width / 9,
                   child: Text(
                     data.patientDisease == null || data.patientDisease == ""
                         ? "-"

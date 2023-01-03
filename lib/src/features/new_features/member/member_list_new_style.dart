@@ -117,6 +117,12 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                     }
                                   }
                                 }
+                                setState(() {
+                                  searchController.text = "";
+                                  selectedBloodType =
+                                      "သွေးအုပ်စု အလိုက်ကြည့်မည်";
+                                });
+                                log(selectedBloodType.toString());
                               },
                               onSaved: (value) {},
                             ),
@@ -174,40 +180,25 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                 List<MemberData>? filterdata = [];
                                 for (int i = 0; i < data!.length; i++) {
                                   //get memberdata from data only where bloodtype is equal to value
-                                  if (data![i].bloodType == selectedBloodType) {
-                                    filterdata.add(data![i]);
+                                  if (searchController.text.isNotEmpty) {
+                                    if (data![i].name!.toLowerCase().contains(
+                                            searchController.text
+                                                .toString()
+                                                .toLowerCase()) &&
+                                        data![i].bloodType ==
+                                            selectedBloodType) {
+                                      filterdata.add(data![i]);
+                                    }
+                                  } else {
+                                    if (data![i].bloodType ==
+                                        selectedBloodType) {
+                                      filterdata.add(data![i]);
+                                    }
                                   }
                                 }
                                 setState(() {
                                   dataSegments = filterdata.sublist(0);
                                 });
-                                // for (int i = 0; i < ranges.length; i++) {
-                                //   if (selectedRange == ranges[i]) {
-                                //     if (i != ranges.length - 1) {
-                                //       print(selectedBloodType.toString());
-                                //       if (selectedBloodType != null) {
-                                //         setState(() {
-                                //           dataSegments = data!
-                                //               .sublist(i * 50, (i + 1) * 50);
-                                //           dataSegments = dataSegments
-                                //               .where((element) =>
-                                //                   element.bloodType ==
-                                //                   selectedBloodType)
-                                //               .toList();
-                                //         });
-                                //       } else {
-                                //         setState(() {
-                                //           dataSegments = data!
-                                //               .sublist(i * 50, (i + 1) * 50);
-                                //         });
-                                //       }
-                                //     } else {
-                                //       setState(() {
-                                //         dataSegments = data!.sublist(i * 50);
-                                //       });
-                                //     }
-                                //   }
-                                // }
                               },
                               onSaved: (value) {},
                             ),
@@ -229,11 +220,22 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             List<MemberData>? filterdata = [];
                             for (int i = 0; i < data!.length; i++) {
                               //get memberdata from data only where bloodtype is equal to value
-                              if (data![i]
-                                  .name!
-                                  .toLowerCase()
-                                  .contains(val.toString().toLowerCase())) {
-                                filterdata.add(data![i]);
+                              if (selectedBloodType !=
+                                  "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
+                                if (data![i].name!.toLowerCase().contains(
+                                        searchController.text
+                                            .toString()
+                                            .toLowerCase()) &&
+                                    data![i].bloodType == selectedBloodType) {
+                                  filterdata.add(data![i]);
+                                }
+                              } else {
+                                if (data![i]
+                                    .name!
+                                    .toLowerCase()
+                                    .contains(val.toLowerCase())) {
+                                  filterdata.add(data![i]);
+                                }
                               }
                             }
                             setState(() {
@@ -341,6 +343,11 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                                 }
                               }
                             }
+                            setState(() {
+                              searchController.text = "";
+                              selectedBloodType = "သွေးအုပ်စု အလိုက်ကြည့်မည်";
+                            });
+                            log(selectedBloodType.toString());
                           },
                           onSaved: (value) {},
                         ),
@@ -397,41 +404,23 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             log(dataSegments.length.toString());
                             List<MemberData>? filterdata = [];
                             for (int i = 0; i < data!.length; i++) {
-                              //get memberdata from data only where bloodtype is equal to value
-                              if (data![i].bloodType == selectedBloodType) {
-                                filterdata.add(data![i]);
+                              if (searchController.text.isNotEmpty) {
+                                if (data![i].name!.toLowerCase().contains(
+                                        searchController.text
+                                            .toString()
+                                            .toLowerCase()) &&
+                                    data![i].bloodType == selectedBloodType) {
+                                  filterdata.add(data![i]);
+                                }
+                              } else {
+                                if (data![i].bloodType == selectedBloodType) {
+                                  filterdata.add(data![i]);
+                                }
                               }
                             }
                             setState(() {
                               dataSegments = filterdata.sublist(0);
                             });
-                            // for (int i = 0; i < ranges.length; i++) {
-                            //   if (selectedRange == ranges[i]) {
-                            //     if (i != ranges.length - 1) {
-                            //       print(selectedBloodType.toString());
-                            //       if (selectedBloodType != null) {
-                            //         setState(() {
-                            //           dataSegments =
-                            //               data!.sublist(i * 50, (i + 1) * 50);
-                            //           dataSegments = dataSegments
-                            //               .where((element) =>
-                            //                   element.bloodType ==
-                            //                   selectedBloodType)
-                            //               .toList();
-                            //         });
-                            //       } else {
-                            //         setState(() {
-                            //           dataSegments =
-                            //               data!.sublist(i * 50, (i + 1) * 50);
-                            //         });
-                            //       }
-                            //     } else {
-                            //       setState(() {
-                            //         dataSegments = data!.sublist(i * 50);
-                            //       });
-                            //     }
-                            //   }
-                            // }
                           },
                           onSaved: (value) {},
                         ),
@@ -451,11 +440,22 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
                             List<MemberData>? filterdata = [];
                             for (int i = 0; i < data!.length; i++) {
                               //get memberdata from data only where bloodtype is equal to value
-                              if (data![i]
-                                  .name!
-                                  .toLowerCase()
-                                  .contains(val.toLowerCase())) {
-                                filterdata.add(data![i]);
+                              if (selectedBloodType !=
+                                  "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
+                                if (data![i].name!.toLowerCase().contains(
+                                        searchController.text
+                                            .toString()
+                                            .toLowerCase()) &&
+                                    data![i].bloodType == selectedBloodType) {
+                                  filterdata.add(data![i]);
+                                }
+                              } else {
+                                if (data![i]
+                                    .name!
+                                    .toLowerCase()
+                                    .contains(val.toLowerCase())) {
+                                  filterdata.add(data![i]);
+                                }
                               }
                             }
                             setState(() {
