@@ -83,11 +83,7 @@ class MemberEditState extends State<MemberEditScreen> {
     initial();
   }
 
-  CollectionReference members =
-      FirebaseFirestore.instance.collection('members');
-
   void initial() async {
-    firestore = FirebaseFirestore.instance;
 
     nameController.text = data.name ?? "";
     fatherNameController.text = data.fatherName ?? "";
@@ -95,7 +91,7 @@ class MemberEditState extends State<MemberEditScreen> {
     phoneController.text = data.phone ?? "";
     selectedBloodType = data.bloodType ?? "";
     bloodBankNoController.text = data.bloodBankCard ?? "";
-    totalDonationController.text = data.totalCount ?? "";
+    totalDonationController.text = data.totalCount.toString();
     homeNoController.text =
         data.address != null ? data.address!.split(',')[0] : "";
     streetController.text =

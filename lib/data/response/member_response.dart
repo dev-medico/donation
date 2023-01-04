@@ -22,20 +22,20 @@ class MemberListResponse {
 }
 
 class MemberData {
-  String? address;
-  String? birthDate;
-  String? bloodBankCard;
-  String? bloodType;
+  dynamic address;
+  dynamic birthDate;
+  dynamic bloodBankCard;
+  dynamic bloodType;
   int? donationCounts;
-  String? fatherName;
-  String? id;
-  String? lastDonationDate;
-  String? memberId;
-  String? name;
-  String? note;
-  String? nrc;
-  String? phone;
-  String? registerDate;
+  dynamic fatherName;
+  dynamic id;
+  dynamic lastDonationDate;
+  dynamic memberId;
+  dynamic name;
+  dynamic note;
+  dynamic nrc;
+  dynamic phone;
+  dynamic registerDate;
   dynamic totalCount;
 
   MemberData(

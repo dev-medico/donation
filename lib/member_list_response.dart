@@ -8,7 +8,7 @@ class Data {
   String? homeNo;
   String? lastDate;
   LastDateDetail? lastDateDetail;
-  String? memberCount;
+  dynamic memberCount;
   String? memberId;
   String? name;
   String? note;
@@ -18,7 +18,7 @@ class Data {
   String? region;
   String? registerDate;
   String? street;
-  String? totalCount;
+  dynamic totalCount;
   String? town;
 
   Data(
