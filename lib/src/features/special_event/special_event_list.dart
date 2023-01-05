@@ -57,6 +57,7 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
               builder: (context) => const NewEventAddScreen(),
             ),
           );
+          getEventsFromXata();
         },
         child: const Icon(Icons.add),
       ),
@@ -68,15 +69,17 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
   }
 
   ExpandableTable buildSimpleTable(List<SpecialEventData> data) {
-    const int COLUMN_COUNT = 7;
+    const int COLUMN_COUNT = 9;
     int ROWCOUNT = data.length;
     List<String> titles = [
       "Retro Test\n ခုခံအားကျဆင်းမှု ကူးစက်ရောဂါ",
-      "Hbs AG\n အသည်းရောင် အသားဝါ(ဘီ)ပိုး",
-      "HCV AB\n အသည်းရောင် အသားဝါ(စီ)ပိုး",
+      "Hbs Ag\n အသည်းရောင် အသားဝါ(ဘီ)ပိုး",
+      "HCV Ab\n အသည်းရောင် အသားဝါ(စီ)ပိုး",
       "VDRL Test\n ကာလသားရောဂါ",
-      "M.P (I.C.T)\n ငှက်ဖျားရောဂါ",
-      "Haemoglobin\n သွေးအားနည်းရောဂါ",
+      "M.P ( I.C.T )\n ငှက်ဖျားရောဂါ",
+      "Haemoglobin ( Hb% )\n သွေးအားရာခိုင်နှုန်း",
+      "Lab Name\n ဓါတ်ခွဲခန်းအမည်",
+      "Total\n စုစုပေါင်း"
     ];
 
     //Creation header
@@ -153,7 +156,24 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
                                                             data[rowIndex]
                                                                 .haemoglobin
                                                                 .toString())
-                                                        : "",
+                                                        : columnIndex == 6
+                                                            ? data[rowIndex]
+                                                                        .labName !=
+                                                                    null
+                                                                ? data[rowIndex]
+                                                                    .labName
+                                                                    .toString()
+                                                                : "-"
+                                                            : columnIndex == 7
+                                                                ? data[rowIndex]
+                                                                            .total !=
+                                                                        null
+                                                                    ? Utils.strToMM(data[
+                                                                            rowIndex]
+                                                                        .total
+                                                                        .toString())
+                                                                    : "-"
+                                                                : "",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize:

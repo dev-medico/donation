@@ -26,6 +26,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
   TextEditingController vdrlController = TextEditingController();
   TextEditingController mpICTController = TextEditingController();
   TextEditingController haemoglobinController = TextEditingController();
+  TextEditingController labNameController = TextEditingController();
 
   @override
   void initState() {
@@ -33,12 +34,6 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
     var now = DateTime.now();
     String formattedDate = DateFormat('dd MMM yyyy').format(now);
     dateFilter = formattedDate;
-    retorTestController.text = "0";
-    hbsAgController.text = "0";
-    hcvAbController.text = "0";
-    vdrlController.text = "0";
-    mpICTController.text = "0";
-    haemoglobinController.text = "0";
   }
 
   @override
@@ -65,9 +60,6 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
           ),
         ),
       ),
-      // "VDRL Test\n ကာလသားရောဂါ",
-      // "M.P (I.C.T)\n ငှက်ဖျားရောဂါ",
-      // "Haemoglobin\n သွေးအားနည်းရောဂါ",
       body: ModalProgressHUD(
           inAsyncCall: isLoading,
           child: Responsive.isMobile(context)
@@ -108,7 +100,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                         keyboardType: TextInputType.number,
                         controller: hbsAgController,
                         decoration: inputBoxDecoration(
-                            "Hbs AG (အသည်းရောင် အသားဝါ(ဘီ)ပိုး)"),
+                            "Hbs Ag (အသည်းရောင် အသားဝါ(ဘီ)ပိုး)"),
                       ),
                     ),
                     Container(
@@ -118,7 +110,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                         keyboardType: TextInputType.number,
                         controller: hcvAbController,
                         decoration: inputBoxDecoration(
-                            "HCV AB (အသည်းရောင် အသားဝါ(စီ)ပိုး)"),
+                            "HCV Ab (အသည်းရောင် အသားဝါ(စီ)ပိုး)"),
                       ),
                     ),
                     Container(
@@ -148,7 +140,17 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                         keyboardType: TextInputType.number,
                         controller: haemoglobinController,
                         decoration: inputBoxDecoration(
-                            "Haemoglobin (သွေးအားနည်းရောဂါ)"),
+                            "Haemoglobin ( Hb% ) (သွေးအားရာခိုင်နှုန်း)"),
+                      ),
+                    ),
+                    Container(
+                      margin:
+                          const EdgeInsets.only(left: 20, top: 16, right: 20),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        controller: labNameController,
+                        decoration:
+                            inputBoxDecoration("Lab Name (ဓါတ်ခွဲခန်းအမည်)"),
                       ),
                     ),
                     Container(
@@ -228,7 +230,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                                     keyboardType: TextInputType.number,
                                     controller: hbsAgController,
                                     decoration: inputBoxDecoration(
-                                        "Hbs AG (အသည်းရောင် အသားဝါ(ဘီ)ပိုး)"),
+                                        "Hbs Ag (အသည်းရောင် အသားဝါ(ဘီ)ပိုး)"),
                                   ),
                                 ),
                               ),
@@ -241,7 +243,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                                     keyboardType: TextInputType.number,
                                     controller: hcvAbController,
                                     decoration: inputBoxDecoration(
-                                        "HCV AB (အသည်းရောင် အသားဝါ(စီ)ပိုး)"),
+                                        "HCV Ab (အသည်းရောင် အသားဝါ(စီ)ပိုး)"),
                                   ),
                                 ),
                               ),
@@ -289,7 +291,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                                     keyboardType: TextInputType.number,
                                     controller: haemoglobinController,
                                     decoration: inputBoxDecoration(
-                                        "Haemoglobin (သွေးအားနည်းရောဂါ)"),
+                                        "Haemoglobin ( Hb% )"),
                                   ),
                                 ),
                               ),
@@ -400,6 +402,25 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
       isLoading = true;
     });
 
+    int total = (retorTestController.text.toString().isEmpty
+            ? 0
+            : int.parse(retorTestController.text.toString())) +
+        (hbsAgController.text.toString().isEmpty
+            ? 0
+            : int.parse(hbsAgController.text.toString())) +
+        (hcvAbController.text.toString().isEmpty
+            ? 0
+            : int.parse(hcvAbController.text.toString())) +
+        (vdrlController.text.toString().isEmpty
+            ? 0
+            : int.parse(vdrlController.text.toString())) +
+        (mpICTController.text.toString().isEmpty
+            ? 0
+            : int.parse(mpICTController.text.toString())) +
+        (haemoglobinController.text.toString().isEmpty
+            ? 0
+            : int.parse(retorTestController.text.toString()));
+
     XataRepository()
         .uploadNewEvent(
       jsonEncode(
@@ -423,6 +444,10 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
           "haemoglobin": haemoglobinController.text.toString().isEmpty
               ? 0
               : int.parse(retorTestController.text.toString()),
+          "lab_name": labNameController.text.isEmpty
+              ? ""
+              : labNameController.text.toString(),
+          "total": total
         },
       ),
     )

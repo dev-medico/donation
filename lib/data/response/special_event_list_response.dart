@@ -20,8 +20,7 @@ class SpecialEventListResponse {
       data['meta'] = meta!.toJson();
     }
     if (specialEventData != null) {
-      data['records'] =
-          specialEventData!.map((v) => v.toJson()).toList();
+      data['records'] = specialEventData!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -73,6 +72,8 @@ class SpecialEventData {
   int? mpIct;
   int? retroTest;
   int? vdrlTest;
+  String? labName;
+  int? total;
   Xata? xata;
 
   SpecialEventData(
@@ -84,6 +85,8 @@ class SpecialEventData {
       this.mpIct,
       this.retroTest,
       this.vdrlTest,
+      this.labName,
+      this.total,
       this.xata});
 
   SpecialEventData.fromJson(Map<String, dynamic> json) {
@@ -95,6 +98,8 @@ class SpecialEventData {
     mpIct = json['mp_ict'];
     retroTest = json['retro_test'];
     vdrlTest = json['vdrl_test'];
+    labName = json['lab_name'];
+    total = json['total'];
     xata = json['xata'] != null ? Xata.fromJson(json['xata']) : null;
   }
 
@@ -108,6 +113,8 @@ class SpecialEventData {
     data['mp_ict'] = mpIct;
     data['retro_test'] = retroTest;
     data['vdrl_test'] = vdrlTest;
+    data['lab_name'] = labName;
+    data['total'] = total;
     if (xata != null) {
       data['xata'] = xata!.toJson();
     }
