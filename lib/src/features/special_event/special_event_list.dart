@@ -105,7 +105,7 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
                   titles[index],
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 15,
+                      fontSize: Responsive.isMobile(context) ? 13 : 15,
                       color: Colors.white),
                 )))));
     //Creation rows
@@ -189,7 +189,7 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
       rows: rows,
       header: header,
       cellWidth: Responsive.isMobile(context)
-          ? MediaQuery.of(context).size.width * 0.4
+          ? MediaQuery.of(context).size.width * 0.23
           : MediaQuery.of(context).size.width * 0.135,
       cellHeight: 48,
       headerHeight: 74,
