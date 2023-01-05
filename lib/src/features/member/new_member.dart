@@ -63,14 +63,14 @@ class NewMemberState extends State<NewMemberScreen> {
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
       const DropdownMenuItem(value: "သွေးအုပ်စု", child: Text("သွေးအုပ်စု")),
-      const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
-      const DropdownMenuItem(value: "A (Rh -)", child: Text("A (Rh -)")),
+            const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
       const DropdownMenuItem(value: "B (Rh +)", child: Text("B (Rh +)")),
-      const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
-      const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
-      const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
       const DropdownMenuItem(value: "O (Rh +)", child: Text("O (Rh +)")),
+      const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
+      const DropdownMenuItem(value: "A (Rh -)", child: Text("A (Rh -)")),
+      const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
       const DropdownMenuItem(value: "O (Rh -)", child: Text("O (Rh -)")),
+      const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
     ];
     return menuItems;
   }

@@ -32,13 +32,13 @@ class SimpleBarChartBlood extends StatelessWidget {
 
     List<String> bloodTypes = [
       "A (Rh +)",
-      "A (Rh -)",
       "B (Rh +)",
-      "B (Rh -)",
-      "AB (Rh +)",
-      "AB (Rh -)",
       "O (Rh +)",
-      "O (Rh -)"
+      "AB (Rh +)",
+      "A (Rh -)",   
+      "B (Rh -)",
+       "O (Rh -)",
+      "AB (Rh -)"
     ];
 
     for (var bloodType in bloodTypes) {

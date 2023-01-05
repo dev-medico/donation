@@ -27,13 +27,13 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
   List<String> ranges = [];
   List<String> bloodTypes = [
     "A (Rh +)",
-    "A (Rh -)",
     "B (Rh +)",
-    "B (Rh -)",
-    "AB (Rh +)",
-    "AB (Rh -)",
     "O (Rh +)",
-    "O (Rh -)"
+    "AB (Rh +)",
+    "A (Rh -)",
+    "B (Rh -)",
+    "O (Rh -)",
+    "AB (Rh -)"
   ];
   String? selectedBloodType = "သွေးအုပ်စု အလိုက်ကြည့်မည်";
   String? selectedRange;

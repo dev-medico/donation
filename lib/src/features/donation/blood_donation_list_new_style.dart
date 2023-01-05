@@ -87,13 +87,13 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   ];
   List<String> bloodTypes = [
     "A (Rh +)",
-    "A (Rh -)",
     "B (Rh +)",
-    "B (Rh -)",
-    "AB (Rh +)",
-    "AB (Rh -)",
     "O (Rh +)",
-    "O (Rh -)"
+    "AB (Rh +)",
+    "A (Rh -)",
+    "B (Rh -)",
+    "O (Rh -)",
+    "AB (Rh -)"
   ];
   List<DonationRecord> dataSegments1 = [];
   List<DonationRecord> dataSegments2 = [];

@@ -66,13 +66,13 @@ class MemberEditState extends State<MemberEditScreen> {
     List<DropdownMenuItem<String>> menuItems = [
       const DropdownMenuItem(value: "သွေးအုပ်စု", child: Text("သွေးအုပ်စု")),
       const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
-      const DropdownMenuItem(value: "A (Rh -)", child: Text("A (Rh -)")),
       const DropdownMenuItem(value: "B (Rh +)", child: Text("B (Rh +)")),
-      const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
-      const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
-      const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
       const DropdownMenuItem(value: "O (Rh +)", child: Text("O (Rh +)")),
+      const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
+      const DropdownMenuItem(value: "A (Rh -)", child: Text("A (Rh -)")),
+      const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
       const DropdownMenuItem(value: "O (Rh -)", child: Text("O (Rh -)")),
+      const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
     ];
     return menuItems;
   }
@@ -84,7 +84,6 @@ class MemberEditState extends State<MemberEditScreen> {
   }
 
   void initial() async {
-
     nameController.text = data.name ?? "";
     fatherNameController.text = data.fatherName ?? "";
     nrcController.text = data.nrc ?? "";
@@ -245,7 +244,6 @@ class MemberEditState extends State<MemberEditScreen> {
                                     children: [
                                       TextFormField(
                                         keyboardType: TextInputType.number,
-                                        
                                         controller: phoneController,
                                         decoration:
                                             inputBoxDecoration("ဖုန်းနံပါတ်"),
@@ -302,11 +300,9 @@ class MemberEditState extends State<MemberEditScreen> {
                                   child: TextFormField(
                                     controller: totalDonationController,
                                     keyboardType: TextInputType.number,
-                                    inputFormatters: <
-                                                    TextInputFormatter>[
-                                                  FilteringTextInputFormatter
-                                                      .digitsOnly
-                                                ],
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
                                     decoration: inputBoxDecoration(
                                         "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
                                   ),
@@ -694,11 +690,10 @@ class MemberEditState extends State<MemberEditScreen> {
                                         child: TextFormField(
                                           controller: totalDonationController,
                                           keyboardType: TextInputType.number,
-                                          inputFormatters: <
-                                                    TextInputFormatter>[
-                                                  FilteringTextInputFormatter
-                                                      .digitsOnly
-                                                ],
+                                          inputFormatters: <TextInputFormatter>[
+                                            FilteringTextInputFormatter
+                                                .digitsOnly
+                                          ],
                                           decoration: inputBoxDecoration(
                                               "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
                                         ),

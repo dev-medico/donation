@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/data/response/xata_donation_list_response.dart';
-import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/dashboard/ui/simple_chart_blood.dart';
 import 'package:merchant/utils/Colors.dart';
@@ -20,13 +19,13 @@ class DonationChartByBlood extends StatefulWidget {
 class _DonationChartByBloodState extends State<DonationChartByBlood> {
   List<String> bloodTypes = [
     "A (Rh +)",
-    "A (Rh -)",
     "B (Rh +)",
-    "B (Rh -)",
-    "AB (Rh +)",
-    "AB (Rh -)",
     "O (Rh +)",
-    "O (Rh -)"
+    "AB (Rh +)",
+    "A (Rh -)",
+    "B (Rh -)",
+    "O (Rh -)",
+    "AB (Rh -)"
   ];
   String? donationYear;
 
@@ -92,8 +91,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
             itemBuilder: (BuildContext context, int index) {
               return Visibility(
                 visible: widget.data
-                    .where((element) =>
-                        element.member!.id == bloodTypes[index])
+                    .where((element) => element.member!.id == bloodTypes[index])
                     .isNotEmpty,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -110,7 +108,8 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                       Text(
                         widget.data
                             .where((element) =>
-                                element.member!.bloodType.toString() == bloodTypes[index])
+                                element.member!.bloodType.toString() ==
+                                bloodTypes[index])
                             .length
                             .toString(),
                         style: TextStyle(
