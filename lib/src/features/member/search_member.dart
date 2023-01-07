@@ -27,16 +27,16 @@ class _SearchMemberScreenState extends State<SearchMemberScreen> {
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
       const DropdownMenuItem(
-          child: Text("သွေးအုပ်စု ရွေးချယ်ရန်"),
-          value: "သွေးအုပ်စု ရွေးချယ်ရန်"),
-      const DropdownMenuItem(child: Text("A (Rh +)"), value: "A (Rh +)"),
-      const DropdownMenuItem(child: Text("A (Rh -)"), value: "A (Rh -)"),
-      const DropdownMenuItem(child: Text("B (Rh +)"), value: "B (Rh +)"),
-      const DropdownMenuItem(child: Text("B (Rh -)"), value: "B (Rh -)"),
-      const DropdownMenuItem(child: Text("AB (Rh +)"), value: "AB (Rh +)"),
-      const DropdownMenuItem(child: Text("AB (Rh -)"), value: "AB (Rh -)"),
-      const DropdownMenuItem(child: Text("O (Rh +)"), value: "O (Rh +)"),
-      const DropdownMenuItem(child: Text("O (Rh -)"), value: "O (Rh -)"),
+          value: "သွေးအုပ်စု ရွေးချယ်ရန်",
+          child: Text("သွေးအုပ်စု ရွေးချယ်ရန်")),
+      const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
+      const DropdownMenuItem(value: "A (Rh -)", child: Text("A (Rh -)")),
+      const DropdownMenuItem(value: "B (Rh +)", child: Text("B (Rh +)")),
+      const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
+      const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
+      const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
+      const DropdownMenuItem(value: "O (Rh +)", child: Text("O (Rh +)")),
+      const DropdownMenuItem(value: "O (Rh -)", child: Text("O (Rh -)")),
     ];
     return menuItems;
   }
@@ -56,7 +56,7 @@ class _SearchMemberScreenState extends State<SearchMemberScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NeumorphicTheme.of(context)?.current!.accentColor,
+      backgroundColor: const Color.fromARGB(255, 254, 252, 231),
       appBar: AppBar(
         flexibleSpace: Container(
             decoration: BoxDecoration(
@@ -79,7 +79,7 @@ class _SearchMemberScreenState extends State<SearchMemberScreen> {
         stream: _usersStream,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Text('Something went wrong');
+            return const Text('Something went wrong');
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -94,7 +94,7 @@ class _SearchMemberScreenState extends State<SearchMemberScreen> {
             shrinkWrap: true,
             scrollDirection: Axis.vertical,
             children: [
-              Container(
+              SizedBox(
                 height: snapshot.data!.docs.length > 8
                     ? MediaQuery.of(context).size.height *
                         (snapshot.data!.docs.length / 8)

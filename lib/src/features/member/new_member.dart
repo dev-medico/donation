@@ -63,7 +63,7 @@ class NewMemberState extends State<NewMemberScreen> {
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
       const DropdownMenuItem(value: "သွေးအုပ်စု", child: Text("သွေးအုပ်စု")),
-            const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
+      const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
       const DropdownMenuItem(value: "B (Rh +)", child: Text("B (Rh +)")),
       const DropdownMenuItem(value: "O (Rh +)", child: Text("O (Rh +)")),
       const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
@@ -141,12 +141,6 @@ class NewMemberState extends State<NewMemberScreen> {
     }))
         .then((value) {
       if (value.statusCode.toString().startsWith("2")) {
-        setState(() {
-          _isLoading = false;
-        });
-        Utils.messageSuccessDialog("အဖွဲ့၀င် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-            context, "အိုကေ", Colors.black);
-
         nameController.clear();
         memberIDController.clear();
         fatherNameController.clear();
@@ -173,6 +167,11 @@ class NewMemberState extends State<NewMemberScreen> {
                       .toString()) +
               1;
           XataRepository().updateMembersTotal(newMemberCount);
+          setState(() {
+            _isLoading = false;
+          });
+          Utils.messageSuccessDialog("အဖွဲ့၀င် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+              context, "အိုကေ", Colors.black);
         });
       } else {
         log(value.statusCode.toString());
@@ -1142,7 +1141,6 @@ class NewMemberState extends State<NewMemberScreen> {
                                               keyboardType:
                                                   TextInputType.number,
                                               controller: phoneController,
-                                              
                                               decoration: inputBoxDecoration(
                                                   "ဖုန်းနံပါတ်"),
                                             ),

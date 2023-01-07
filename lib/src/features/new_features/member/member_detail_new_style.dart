@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/donation/donation_detail.dart';
-import 'package:merchant/src/features/member/member_edit.dart';
 import 'package:merchant/src/features/new_features/member/member_edit_new_style.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
@@ -1286,7 +1284,7 @@ class _MemberDetailNewStyleScreenState
                             .format(data['date_detail'].toDate())
                         : data['date'].toString(),
                     style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 14 : 15,
+                        fontSize: Responsive.isMobile(context) ? 13 : 14,
                         color: Colors.black),
                   ),
                 ),

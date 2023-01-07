@@ -92,6 +92,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           //get current year
           var date = DateTime.now();
           String donationYear = DateFormat('yyyy').format(date);
+         // donationYear = (int.parse(donationYear) - 1).toString();
           log("Donation Year - $donationYear");
           // get donation year from dataList[i].date
           var tempDate = "";
@@ -125,7 +126,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     String dateFormat = DateFormat('dd MMM yyyy ( EEEE )').format(date);
 
     return Scaffold(
-        backgroundColor: NeumorphicTheme.of(context)?.current!.accentColor,
+        backgroundColor: const Color.fromARGB(255, 254, 252, 231),
         appBar: AppBar(
           title: const Padding(
             padding: EdgeInsets.only(top: 4.0),
@@ -158,12 +159,14 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                 0,
                                 primaryDark,
                                 "အဖွဲ့၀င် စာရင်း",
+                                "စုစုပေါင်း အရေအတွက်",
                                 "${Utils.strToMM(totalMember.toString())} ဦး",
                                 Colors.black),
                             DashBoardCard(
                               1,
                               primaryDark,
                               "သွေးလှူမှု မှတ်တမ်း",
+                              "စုစုပေါင်း အကြိမ်ရေ",
                               "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
                               Colors.blue,
                             ),
@@ -180,12 +183,14 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               primaryDark,
                               "ထူးခြားဖြစ်စဉ်",
                               "",
+                              "",
                               Colors.black,
                             ),
                             DashBoardCard(
                               3,
                               primaryDark,
                               "ရ/သုံး ငွေစာရင်း",
+                              "",
                               "",
                               Colors.black,
                             ),
@@ -215,6 +220,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                 0,
                                 primaryDark,
                                 "အဖွဲ့၀င် စာရင်း",
+                                "စုစုပေါင်း အရေအတွက်",
                                 "${Utils.strToMM(totalMember.toString())} ဦး",
                                 Colors.black),
                             const SizedBox(
@@ -224,6 +230,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               1,
                               primaryDark,
                               "သွေးလှူမှု မှတ်တမ်း",
+                              "စုစုပေါင်း အကြိမ်ရေ",
                               "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
                               Colors.blue,
                             ),
@@ -246,6 +253,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               2,
                               primaryDark,
                               "ထူးခြားဖြစ်စဉ်",
+                              "အသေးစိတ် ကြည့်မည်",
                               "",
                               Colors.black,
                             ),
@@ -256,6 +264,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               3,
                               primaryDark,
                               "ရ/သုံး ငွေစာရင်း",
+                              "အသေးစိတ် ကြည့်မည်",
                               "",
                               Colors.black,
                             ),
@@ -278,13 +287,15 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               ));
   }
 
-  Widget DashBoardCard(
-      int index, Color color, String title, String amount, Color amountColor) {
+  Widget DashBoardCard(int index, Color color, String title, String subtitle,
+      String amount, Color amountColor) {
     return Expanded(
       child: Container(
         height: Responsive.isMobile(context)
             ? MediaQuery.of(context).size.height / 4.75
-            : MediaQuery.of(context).size.height / 4,
+            : amount == ""
+                ? MediaQuery.of(context).size.height / 5.2
+                : MediaQuery.of(context).size.height / 4,
         margin: const EdgeInsets.only(top: 12, right: 12),
         child: NeumorphicButton(
           onPressed: () async {
@@ -313,15 +324,27 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                 Text(
                   title,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 16 : 18,
+                      fontWeight: FontWeight.bold,
                       color:
                           NeumorphicTheme.of(context)?.current!.variantColor),
                 ),
                 const Spacer(),
                 Text(
+                  subtitle,
+                  style: TextStyle(
+                      fontSize: Responsive.isMobile(context) ? 14 : 16,
+                      color:
+                          NeumorphicTheme.of(context)?.current!.variantColor),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                Text(
                   amount,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 17 : 20,
+                      fontWeight: FontWeight.bold,
                       color: NeumorphicTheme.of(context)
                           ?.current!
                           .defaultTextColor),

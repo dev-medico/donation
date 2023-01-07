@@ -1142,7 +1142,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 child: Text(
                   "ရက်စွဲ",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 15,
+                      fontSize: Responsive.isMobile(context) ? 13 : 14,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1157,7 +1157,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 child: Text(
                   "လှူဒါန်းသည့်နေရာ",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 15,
+                      fontSize: Responsive.isMobile(context) ? 13 : 14,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1172,7 +1172,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 child: Text(
                   "လူနာအမည်",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 15,
+                      fontSize: Responsive.isMobile(context) ? 13 : 14,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1188,7 +1188,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                   "လိပ်စာ",
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 14 : 15,
+                    fontSize: Responsive.isMobile(context) ? 13 : 14,
                     color: primaryColor,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1204,7 +1204,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                 child: Text(
                   "အသက်",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 15,
+                      fontSize: Responsive.isMobile(context) ? 13 : 14,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1220,7 +1220,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                   "ဖြစ်ပွားသည့်ရောဂါ",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 15,
+                      fontSize: Responsive.isMobile(context) ? 13 : 14,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1277,7 +1277,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                             ? data.date!.split(" ")[0]
                             : "-",
                     style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 14 : 15,
+                        fontSize: Responsive.isMobile(context) ? 13 : 14,
                         color: Colors.black),
                   ),
                 ),
@@ -1345,7 +1345,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                         : data.patientAge!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 14 : 15,
+                        fontSize: Responsive.isMobile(context) ? 13 : 14,
                         color: Colors.black),
                   ),
                 ),

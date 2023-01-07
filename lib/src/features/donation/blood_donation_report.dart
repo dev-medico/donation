@@ -1,6 +1,5 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:merchant/data/response/xata_donation_list_response.dart';
-import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/donation/donation_chart_by_blood.dart';
 import 'package:merchant/src/features/donation/donation_chart_by_desease.dart';
@@ -45,7 +44,7 @@ class _BloodDonationReportScreenState extends State<BloodDonationReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: NeumorphicTheme.of(context)?.current!.accentColor,
+        backgroundColor: const Color.fromARGB(255, 254, 252, 231),
         appBar: AppBar(
           flexibleSpace: Container(
               decoration: BoxDecoration(

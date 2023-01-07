@@ -8,12 +8,32 @@ BoxDecoration shadowDecoration(Color color) {
     borderRadius: BorderRadius.circular(12),
     boxShadow: const [
       BoxShadow(
-        color: Color(0x0c000000),
+        color: Color.fromARGB(11, 254, 245, 245),
         blurRadius: 24,
         offset: Offset(2, 2),
       ),
       BoxShadow(
-        color: Color(0x0c000000),
+        color: Color.fromARGB(11, 254, 245, 245),
+        blurRadius: 24,
+        offset: Offset(-2, -2),
+      ),
+    ],
+  );
+}
+
+BoxDecoration shadowDecorationWithBorder(Color color, Color borderColor) {
+  return BoxDecoration(
+    color: color,
+    borderRadius: BorderRadius.circular(12),
+    border: Border.all(color: borderColor, width: 1.4),
+    boxShadow: const [
+      BoxShadow(
+        color: Color.fromARGB(11, 254, 245, 245),
+        blurRadius: 24,
+        offset: Offset(2, 2),
+      ),
+      BoxShadow(
+        color: Color.fromARGB(11, 254, 245, 245),
         blurRadius: 24,
         offset: Offset(-2, -2),
       ),

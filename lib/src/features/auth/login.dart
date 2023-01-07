@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +56,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       child: Form(
         key: _formKey,
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: const Color.fromARGB(255, 254, 252, 231),
           body: Stack(
             children: [
               ListView(
@@ -81,7 +83,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     Container(
-                      decoration: shadowDecoration(Colors.white),
+                      decoration: shadowDecoration(const Color(0xfff1f1f1)),
                       margin: EdgeInsets.only(
                           left: Responsive.isMobile(context)
                               ? 30.0
@@ -140,7 +142,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     Container(
-                      decoration: shadowDecoration(Colors.white),
+                      decoration: shadowDecoration(const Color(0xfff1f1f1)),
                       margin: EdgeInsets.only(
                           left: Responsive.isMobile(context)
                               ? 30.0
@@ -262,11 +264,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               bool auth = false;
                               admins.get().then((value) {
                                 for (var element in value.docs) {
-                                  print(element.data());
+                                  log(element.data().toString());
                                   final data =
                                       element.data() as Map<String, dynamic>;
-                                  print(data["email"]);
-                                  print(data["password"]);
+                                  log(data["email"]);
+                                  log(data["password"]);
                                   if (data["email"] == email.text.toString() &&
                                       data["password"] ==
                                           password.text.toString()) {

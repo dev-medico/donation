@@ -30,7 +30,7 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NeumorphicTheme.of(context)?.current!.accentColor,
+      backgroundColor: const Color.fromARGB(255, 254, 252, 231),
       appBar: AppBar(
         flexibleSpace: Container(
             decoration: BoxDecoration(

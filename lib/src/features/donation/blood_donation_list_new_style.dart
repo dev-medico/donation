@@ -161,7 +161,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   }
 
   tabCreate() => Scaffold(
-        backgroundColor: Colors.white70,
+        backgroundColor: const Color.fromARGB(255, 254, 252, 231),
         body: Stack(
           children: [
             ListView(
@@ -418,8 +418,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments1),
                         ),
@@ -430,8 +430,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments2),
                         ),
@@ -442,8 +442,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments3),
                         ),
@@ -454,8 +454,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments4),
                         ),
@@ -466,8 +466,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments5),
                         ),
@@ -478,8 +478,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments6),
                         ),
@@ -490,8 +490,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments7),
                         ),
@@ -502,8 +502,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments8),
                         ),
@@ -514,8 +514,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments9),
                         ),
@@ -526,8 +526,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments10),
                         ),
@@ -538,8 +538,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments11),
                         ),
@@ -550,8 +550,8 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                         height: double.infinity,
                         child: Container(
                           padding: EdgeInsets.only(
-                              left: 0.0,
-                              top: Responsive.isMobile(context) ? 20 : 0,
+                              left: Responsive.isMobile(context) ? 0 : 12,
+                              top: Responsive.isMobile(context) ? 20 : 12,
                               bottom: 12),
                           child: buildSimpleTable(dataSegments12),
                         ),
@@ -574,7 +574,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NeumorphicTheme.of(context)?.current!.accentColor,
+      backgroundColor: const Color.fromARGB(255, 254, 252, 231),
       appBar: AppBar(
         flexibleSpace: Container(
             decoration: BoxDecoration(
@@ -856,7 +856,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                     child: Text(
                   titles[index],
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 15,
+                      fontSize: Responsive.isMobile(context) ? 13 : 14,
                       color: Colors.white),
                 )))));
 
@@ -962,7 +962,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
                                     : TextAlign.start,
                                 style: TextStyle(
                                     fontSize:
-                                        Responsive.isMobile(context) ? 14 : 15,
+                                        Responsive.isMobile(context) ? 13 : 14,
                                     color: Colors.black),
                               ),
                             )),

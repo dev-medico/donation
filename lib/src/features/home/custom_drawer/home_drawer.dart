@@ -85,13 +85,14 @@ class _HomeDrawerState extends State<HomeDrawer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white.withOpacity(0.5),
+      backgroundColor:
+          const Color.fromARGB(255, 254, 252, 231).withOpacity(0.5),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Container(
-            color: const Color(0xffF4F4F4),
+            color: const Color.fromARGB(255, 254, 252, 231),
             padding: const EdgeInsets.fromLTRB(0, 46, 0, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,8 +114,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                 360),
                         child: Padding(
                           padding: const EdgeInsets.only(left: 18),
-                          child: SvgPicture.asset(
-                            'assets/images/profile.svg',
+                          child: Image.asset(
+                            'assets/images/round_icon.png',
+                            width: 84,
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -272,7 +274,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                       listData.labelName,
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
-                        fontSize: Responsive.isMobile(context) ? 14.5 : 16,
+                        fontSize: Responsive.isMobile(context) ? 14.5 : 15,
                         color: widget.screenIndex == listData.index
                             ? Colors.red
                             : Colors.black,

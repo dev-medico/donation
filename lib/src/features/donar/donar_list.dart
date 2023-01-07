@@ -99,7 +99,7 @@ class _DonarListState extends State<DonarList> {
   List<Map<String, dynamic>> data = [];
 
   tabCreate() => Scaffold(
-        backgroundColor: Colors.white70,
+        backgroundColor: const Color.fromARGB(255, 254, 252, 231),
         body: Stack(
           children: [
             ListView(
@@ -486,7 +486,7 @@ class _DonarListState extends State<DonarList> {
   Widget build(BuildContext context) {
     YYDialog.init(context);
     return Scaffold(
-      backgroundColor: NeumorphicTheme.of(context)?.current!.accentColor,
+      backgroundColor: const Color.fromARGB(255, 254, 252, 231),
       appBar: AppBar(
         flexibleSpace: Container(
             decoration: BoxDecoration(
@@ -661,7 +661,7 @@ class _DonarListState extends State<DonarList> {
                     child: Text(
                   titles[index],
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 15,
+                      fontSize: Responsive.isMobile(context) ? 13 : 14,
                       color: Colors.white),
                 )))));
 
@@ -697,7 +697,7 @@ class _DonarListState extends State<DonarList> {
                               ? TextAlign.right
                               : TextAlign.start,
                           style: TextStyle(
-                              fontSize: Responsive.isMobile(context) ? 14 : 15,
+                              fontSize: Responsive.isMobile(context) ? 13 : 14,
                               color: Colors.black),
                         ),
                       ))),

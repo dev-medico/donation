@@ -43,7 +43,8 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
       margin: const EdgeInsets.all(
         2,
       ),
-      decoration: shadowDecoration(Colors.white),
+      decoration: shadowDecorationWithBorder(
+          const Color.fromARGB(255, 254, 252, 231), Colors.grey),
       child: ListView(
         physics: Responsive.isMobile(context)
             ? const NeverScrollableScrollPhysics()

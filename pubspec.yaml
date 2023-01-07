@@ -65,6 +65,9 @@ flutter:
     - family: YT
       fonts:
         - asset: assets/fonts/yt.ttf
+    - family: MS
+      fonts:
+        - asset: assets/fonts/myan_san.ttf
 
 msix_config:
   display_name: Safe Blood
