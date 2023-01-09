@@ -187,4 +187,48 @@ class XataRepository {
 
     return response;
   }
+
+  Future<http.Response> uploadNewDonor(String data) async {
+    final response = await http.post(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Donors/data?columns=id'),
+        headers: headers,
+        body: data);
+
+    return response;
+  }
+
+  Future<http.Response> uploadNewExpense(String data) async {
+    final response = await http.post(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Expenses/data?columns=id'),
+        headers: headers,
+        body: data);
+
+    return response;
+  }
+
+  Future<http.Response> getDonorsList(String after) async {
+    final response = await http.post(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Donors/query'),
+        headers: headers,
+        body: jsonEncode(<String, dynamic>{
+          "page": {"size": 200, if (after != "") "after": after},
+        }));
+
+    return response;
+  }
+
+  Future<http.Response> getExpensesList(String after) async {
+    final response = await http.post(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Expenses/query'),
+        headers: headers,
+        body: jsonEncode(<String, dynamic>{
+          "page": {"size": 200, if (after != "") "after": after},
+        }));
+
+    return response;
+  }
 }

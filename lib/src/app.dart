@@ -42,7 +42,7 @@ class _MyAppState extends State<MyApp> {
       ],
       themeMode: ThemeMode.light, //or dark / system
       darkTheme: ThemeData(
-        fontFamily: 'MS',
+        //fontFamily: 'MS',
         // baseColor: Color(0xff555555),
         accentColor: const Color(0xff333333),
         // variantColor: Colors.white,
@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
         // intensity: 0.3,
       ),
       theme: ThemeData(
-        fontFamily: 'MS',
+        //fontFamily: 'MS',
         // baseColor: Color(0xffDDDDDD),
         accentColor: Colors.white,
         // variantColor: Color(0xffA70507),

@@ -17,15 +17,15 @@ import 'package:merchant/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:intl/intl.dart';
 
-class NewDonarScreen extends StatefulWidget {
-  NewDonarScreen({Key? key}) : super(key: key);
+class NewExpenseRecordScreen extends StatefulWidget {
+  NewExpenseRecordScreen({Key? key}) : super(key: key);
   int selectedIndex = 0;
 
   @override
   NewDonarState createState() => NewDonarState();
 }
 
-class NewDonarState extends State<NewDonarScreen> {
+class NewDonarState extends State<NewExpenseRecordScreen> {
   final nameController = TextEditingController();
   final amountController = TextEditingController();
   bool isSwitched = false;
@@ -37,7 +37,7 @@ class NewDonarState extends State<NewDonarScreen> {
   List<String> townshipsSelected = <String>[];
   List<Datum> datas = <Datum>[];
   DateTime? donationDateDetail;
-  String donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
+  String donationDate = "ရက်စွဲ ရွေးမည်";
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class NewDonarState extends State<NewDonarScreen> {
     );
     logger.i(donationDateDetail.toString());
     XataRepository()
-        .uploadNewDonor(jsonEncode(<String, dynamic>{
+        .uploadNewExpense(jsonEncode(<String, dynamic>{
       "name": name,
       "amount": int.parse(amount),
       "date": "${donationDateDetail.toString().replaceAll(" ", "T")}Z",
@@ -62,7 +62,7 @@ class NewDonarState extends State<NewDonarScreen> {
           _isLoading = false;
         });
         Utils.messageSuccessDialog(
-            "အလှူရှင်မှတ်တမ်း အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+            "အသုံးစားရိတ် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
             context,
             "အိုကေ",
             Colors.black);
@@ -105,7 +105,7 @@ class NewDonarState extends State<NewDonarScreen> {
         title: const Padding(
           padding: EdgeInsets.only(top: 4),
           child: Center(
-            child: Text("အလှူရှင်မှတ်တမ်း ထည့်သွင်းမည်",
+            child: Text("အသုံးစားရိတ် ထည့်သွင်းမည်",
                 textScaleFactor: 1.0,
                 style: TextStyle(fontSize: 15, color: Colors.white)),
           ),
@@ -160,7 +160,7 @@ class NewDonarState extends State<NewDonarScreen> {
                                 left: 20, top: 24, bottom: 8, right: 20),
                             child: TextFormField(
                               controller: nameController,
-                              decoration: inputBoxDecoration("အမည်"),
+                              decoration: inputBoxDecoration("အကြောင်းအရာ"),
                             ),
                           ),
                           Container(
