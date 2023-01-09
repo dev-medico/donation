@@ -35,7 +35,8 @@ class _SplashScreenState extends State<SplashScreen> {
     });
     Future.delayed(const Duration(seconds: 3), () {
       if (name == "") {
-        Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        Navigator.pushReplacementNamed(context, NavigationHomeScreen.routeName);
+        //Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       } else {
         Navigator.pushReplacementNamed(context, NavigationHomeScreen.routeName);
       }
