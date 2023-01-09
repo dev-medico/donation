@@ -61,7 +61,7 @@ class NewDonarState extends State<NewExpenseRecordScreen> {
         setState(() {
           _isLoading = false;
         });
-        Utils.messageSuccessDialog(
+        Utils.messageSuccessSinglePopDialog(
             "အသုံးစားရိတ် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
             context,
             "အိုကေ",

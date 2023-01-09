@@ -198,6 +198,16 @@ class XataRepository {
     return response;
   }
 
+  Future<http.Response> updateDonor(String id, String data) async {
+    final response = await http.post(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Donors/data/$id?columns=id'),
+        headers: headers,
+        body: data);
+
+    return response;
+  }
+
   Future<http.Response> uploadNewExpense(String data) async {
     final response = await http.post(
         Uri.parse(
@@ -227,6 +237,62 @@ class XataRepository {
         headers: headers,
         body: jsonEncode(<String, dynamic>{
           "page": {"size": 200, if (after != "") "after": after},
+        }));
+
+    return response;
+  }
+
+  Future<http.Response> deleteDonorByID(String donorID) async {
+    final response = await http.delete(
+      Uri.parse(
+          'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Donors/data/$donorID?columns=id'),
+      headers: headers,
+    );
+    log(response.statusCode.toString());
+    log(response.body);
+
+    return response;
+  }
+
+  Future<http.Response> deleteExpenseByID(String expenseID) async {
+    final response = await http.delete(
+      Uri.parse(
+          'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Expenses/data/$expenseID?columns=id'),
+      headers: headers,
+    );
+    log(response.statusCode.toString());
+    log(response.body);
+
+    return response;
+  }
+
+  Future<http.Response> uploadNewClosingBalance(String data) async {
+    final response = await http.post(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/ClosingBalances/data?columns=id'),
+        headers: headers,
+        body: data);
+
+    return response;
+  }
+
+   Future<http.Response> updatewClosingBalance(String id,String data) async {
+    final response = await http.post(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/ClosingBalances/data/$id?columns=id'),
+        headers: headers,
+        body: data);
+
+    return response;
+  }
+
+  Future<http.Response> getClosingBalance(int month, String year) async {
+    final response = await http.post(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/ClosingBalances/query'),
+        headers: headers,
+        body: jsonEncode(<String, dynamic>{
+          "filter": {"month": "$month-$year"}
         }));
 
     return response;

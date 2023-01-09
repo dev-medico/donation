@@ -53,8 +53,8 @@ class Utils {
               msg,
               textAlign: TextAlign.center,
               maxLines: 4,
-              style:  TextStyle(
-                  fontSize: Responsive.isMobile(context) ?16 : 18,
+              style: TextStyle(
+                  fontSize: Responsive.isMobile(context) ? 16 : 18,
                   height: 1.5,
                   fontWeight: FontWeight.normal,
                   color: Colors.black),
@@ -66,7 +66,7 @@ class Utils {
         padding:
             const EdgeInsets.only(top: 24, left: 20, right: 20, bottom: 30),
         child: MaterialButton(
-            padding:  EdgeInsets.all(Responsive.isMobile(context) ? 12.0 : 24),
+            padding: EdgeInsets.all(Responsive.isMobile(context) ? 12.0 : 24),
             textColor: Colors.white,
             splashColor: primaryColor,
             color: primaryColor,
@@ -75,7 +75,7 @@ class Utils {
             onPressed: () {
               Navigator.of(context, rootNavigator: true).pop('dialog');
               Navigator.pop(context);
-              if(Navigator.canPop(context)) {
+              if (Navigator.canPop(context)) {
                 Navigator.pop(context);
               }
             },
@@ -96,8 +96,149 @@ class Utils {
       ))
       ..animatedFunc = (child, animation) {
         return ScaleTransition(
-          child: child,
           scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
+        );
+      }
+      ..show();
+  }
+
+  static YYDialog messageSuccessSinglePopDialog(
+      String msg, BuildContext context, String buttonMsg, Color color) {
+    return YYDialog().build()
+      ..width = Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width - 60
+          : MediaQuery.of(context).size.width / 3
+      ..backgroundColor = Colors.white
+      ..borderRadius = 20.0
+      ..showCallBack = () {}
+      ..dismissCallBack = () {}
+      ..widget(Column(
+        children: [
+          const SizedBox(height: 30),
+          Image.asset(
+            "assets/images/checked.png",
+            height: 50,
+            width: 50,
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(5, 24, 0, 12),
+            child: Text(
+              msg,
+              textAlign: TextAlign.center,
+              maxLines: 4,
+              style: TextStyle(
+                  fontSize: Responsive.isMobile(context) ? 16 : 18,
+                  height: 1.5,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.black),
+            ),
+          ),
+        ],
+      ))
+      ..widget(Padding(
+        padding:
+            const EdgeInsets.only(top: 24, left: 20, right: 20, bottom: 30),
+        child: MaterialButton(
+            padding: EdgeInsets.all(Responsive.isMobile(context) ? 12.0 : 24),
+            textColor: Colors.white,
+            splashColor: primaryColor,
+            color: primaryColor,
+            elevation: 2.0,
+            minWidth: 155,
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop('dialog');
+              Navigator.pop(context);
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: Center(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(buttonMsg,
+                        textScaleFactor: 1.0,
+                        textAlign: TextAlign.center,
+                        style:
+                            const TextStyle(fontSize: 15, color: Colors.white))
+                  ]),
+            )),
+      ))
+      ..animatedFunc = (child, animation) {
+        return ScaleTransition(
+          scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
+        );
+      }
+      ..show();
+  }
+
+  static YYDialog messageSuccessNoPopDialog(
+      String msg, BuildContext context, String buttonMsg, Color color) {
+    return YYDialog().build()
+      ..width = Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width - 60
+          : MediaQuery.of(context).size.width / 3
+      ..backgroundColor = Colors.white
+      ..borderRadius = 20.0
+      ..showCallBack = () {}
+      ..dismissCallBack = () {}
+      ..widget(Column(
+        children: [
+          const SizedBox(height: 30),
+          Image.asset(
+            "assets/images/checked.png",
+            height: 50,
+            width: 50,
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(5, 24, 0, 12),
+            child: Text(
+              msg,
+              textAlign: TextAlign.center,
+              maxLines: 4,
+              style: TextStyle(
+                  fontSize: Responsive.isMobile(context) ? 16 : 18,
+                  height: 1.5,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.black),
+            ),
+          ),
+        ],
+      ))
+      ..widget(Padding(
+        padding:
+            const EdgeInsets.only(top: 24, left: 20, right: 20, bottom: 30),
+        child: MaterialButton(
+            padding: EdgeInsets.all(Responsive.isMobile(context) ? 12.0 : 24),
+            textColor: Colors.white,
+            splashColor: primaryColor,
+            color: primaryColor,
+            elevation: 2.0,
+            minWidth: 155,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: Center(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(buttonMsg,
+                        textScaleFactor: 1.0,
+                        textAlign: TextAlign.center,
+                        style:
+                            const TextStyle(fontSize: 15, color: Colors.white))
+                  ]),
+            )),
+      ))
+      ..animatedFunc = (child, animation) {
+        return ScaleTransition(
+          scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
         );
       }
       ..show();
@@ -106,7 +247,9 @@ class Utils {
   static YYDialog messageDialog(
       String msg, BuildContext context, String buttonMsg, Color color) {
     return YYDialog().build()
-      ..width = Responsive.isMobile(context)? MediaQuery.of(context).size.width - 60 : MediaQuery.of(context).size.width / 3
+      ..width = Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width - 60
+          : MediaQuery.of(context).size.width / 3
       ..backgroundColor = Colors.white
       ..borderRadius = 20.0
       ..showCallBack = () {}
@@ -125,7 +268,7 @@ class Utils {
               msg,
               textAlign: TextAlign.center,
               maxLines: 4,
-              style:  TextStyle(
+              style: TextStyle(
                   fontSize: Responsive.isMobile(context) ? 16 : 18,
                   height: 1.5,
                   fontWeight: FontWeight.normal,
@@ -138,8 +281,7 @@ class Utils {
         padding:
             const EdgeInsets.only(top: 24, left: 20, right: 20, bottom: 30),
         child: MaterialButton(
-            padding:  EdgeInsets.all(
-                Responsive.isMobile(context) ?  12.0 : 24),
+            padding: EdgeInsets.all(Responsive.isMobile(context) ? 12.0 : 24),
             textColor: Colors.white,
             splashColor: primaryColor,
             color: primaryColor,
@@ -165,8 +307,8 @@ class Utils {
       ))
       ..animatedFunc = (child, animation) {
         return ScaleTransition(
-          child: child,
           scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
         );
       }
       ..show();

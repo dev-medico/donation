@@ -92,7 +92,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           //get current year
           var date = DateTime.now();
           String donationYear = DateFormat('yyyy').format(date);
-         // donationYear = (int.parse(donationYear) - 1).toString();
+          // donationYear = (int.parse(donationYear) - 1).toString();
           log("Donation Year - $donationYear");
           // get donation year from dataList[i].date
           var tempDate = "";
@@ -199,9 +199,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       ),
                     ],
                   ),
-                  DonationChartByBlood(
-                    data: data,
-                    fromDashboard: true,
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: DonationChartByBlood(
+                      data: data,
+                      fromDashboard: true,
+                    ),
                   ),
                 ],
               )

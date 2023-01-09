@@ -10,6 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/township_response/datum.dart';
 import 'package:merchant/data/response/township_response/township_response.dart';
+import 'package:merchant/data/response/xata_donors_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
@@ -17,15 +18,16 @@ import 'package:merchant/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:intl/intl.dart';
 
-class NewDonarScreen extends StatefulWidget {
-  NewDonarScreen({Key? key}) : super(key: key);
+class EditDonarScreen extends StatefulWidget {
+  DonorData? donor;
+  EditDonarScreen({Key? key, required this.donor}) : super(key: key);
   int selectedIndex = 0;
 
   @override
   NewDonarState createState() => NewDonarState();
 }
 
-class NewDonarState extends State<NewDonarScreen> {
+class NewDonarState extends State<EditDonarScreen> {
   final nameController = TextEditingController();
   final amountController = TextEditingController();
   bool isSwitched = false;
@@ -45,24 +47,26 @@ class NewDonarState extends State<NewDonarScreen> {
     initial();
   }
 
-  addDonor(String name, String amount) {
+  editDonor(String name, String amount) {
     var logger = Logger(
       printer: PrettyPrinter(),
     );
     logger.i(donationDateDetail.toString());
     XataRepository()
-        .uploadNewDonor(jsonEncode(<String, dynamic>{
-      "name": name,
-      "amount": int.parse(amount),
-      "date": "${donationDateDetail.toString().replaceAll(" ", "T")}Z",
-    }))
+        .updateDonor(
+            widget.donor!.id!.toString(),
+            jsonEncode(<String, dynamic>{
+              "name": name,
+              "amount": int.parse(amount),
+              "date": "${donationDateDetail.toString().replaceAll(" ", "T")}Z",
+            }))
         .then((value) {
       if (value.statusCode.toString().startsWith("2")) {
         setState(() {
           _isLoading = false;
         });
         Utils.messageSuccessSinglePopDialog(
-            "အလှူရှင်မှတ်တမ်း အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+            "အလှူရှင်မှတ်တမ်း ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
             context,
             "အိုကေ",
             Colors.black);
@@ -78,6 +82,9 @@ class NewDonarState extends State<NewDonarScreen> {
   void initial() async {
     donationDateDetail = DateTime.now();
     donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
+
+    nameController.text = widget.donor!.name!;
+    amountController.text = widget.donor!.amount.toString();
 
     final String response =
         await rootBundle.loadString('assets/json/township.json');
@@ -105,7 +112,7 @@ class NewDonarState extends State<NewDonarScreen> {
         title: const Padding(
           padding: EdgeInsets.only(top: 4),
           child: Center(
-            child: Text("အလှူရှင်မှတ်တမ်း ထည့်သွင်းမည်",
+            child: Text("အလှူရှင်မှတ်တမ်း ပြင်ဆင်မည်",
                 textScaleFactor: 1.0,
                 style: TextStyle(fontSize: 15, color: Colors.white)),
           ),
@@ -202,7 +209,7 @@ class NewDonarState extends State<NewDonarScreen> {
                             setState(() {
                               _isLoading = true;
                             });
-                            addDonor(nameController.text.toString(),
+                            editDonor(nameController.text.toString(),
                                 amountController.text.toString());
                           } else {
                             Utils.messageDialog(
@@ -217,7 +224,7 @@ class NewDonarState extends State<NewDonarScreen> {
                             child: Padding(
                                 padding: EdgeInsets.only(top: 8, bottom: 8),
                                 child: Text(
-                                  "ထည့်သွင်းမည်",
+                                  "ပြင်ဆင်မည်",
                                   textScaleFactor: 1.0,
                                   style: TextStyle(
                                       fontSize: 16.0, color: Colors.white),
