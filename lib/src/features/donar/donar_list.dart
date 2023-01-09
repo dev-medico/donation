@@ -246,8 +246,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments1, expensedataSegments1, 0,leftBalance1),
+                          child: buildSimpleTable(dataSegments1,
+                              expensedataSegments1, 0, leftBalance1),
                         ),
                       ),
                       Container(
@@ -260,8 +260,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments2, expensedataSegments2, 1,leftBalance2),
+                          child: buildSimpleTable(dataSegments2,
+                              expensedataSegments2, 1, leftBalance2),
                         ),
                       ),
                       Container(
@@ -274,8 +274,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments3, expensedataSegments3, 2,leftBalance3),
+                          child: buildSimpleTable(dataSegments3,
+                              expensedataSegments3, 2, leftBalance3),
                         ),
                       ),
                       Container(
@@ -288,8 +288,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments4, expensedataSegments4, 3,leftBalance4),
+                          child: buildSimpleTable(dataSegments4,
+                              expensedataSegments4, 3, leftBalance4),
                         ),
                       ),
                       Container(
@@ -302,8 +302,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments5, expensedataSegments5, 4,leftBalance5),
+                          child: buildSimpleTable(dataSegments5,
+                              expensedataSegments5, 4, leftBalance5),
                         ),
                       ),
                       Container(
@@ -316,8 +316,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments6, expensedataSegments6, 5,leftBalance6),
+                          child: buildSimpleTable(dataSegments6,
+                              expensedataSegments6, 5, leftBalance6),
                         ),
                       ),
                       Container(
@@ -330,8 +330,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments7, expensedataSegments7, 6,leftBalance7),
+                          child: buildSimpleTable(dataSegments7,
+                              expensedataSegments7, 6, leftBalance7),
                         ),
                       ),
                       Container(
@@ -344,8 +344,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments8, expensedataSegments8, 7,leftBalance8),
+                          child: buildSimpleTable(dataSegments8,
+                              expensedataSegments8, 7, leftBalance8),
                         ),
                       ),
                       Container(
@@ -358,8 +358,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments9, expensedataSegments9, 8,leftBalance9),
+                          child: buildSimpleTable(dataSegments9,
+                              expensedataSegments9, 8, leftBalance9),
                         ),
                       ),
                       Container(
@@ -372,8 +372,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments10, expensedataSegments10, 9,leftBalance10),
+                          child: buildSimpleTable(dataSegments10,
+                              expensedataSegments10, 9, leftBalance10),
                         ),
                       ),
                       Container(
@@ -386,8 +386,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments11, expensedataSegments11, 10,leftBalance11),
+                          child: buildSimpleTable(dataSegments11,
+                              expensedataSegments11, 10, leftBalance11),
                         ),
                       ),
                       Container(
@@ -400,8 +400,8 @@ class _DonarListState extends State<DonarList> {
                               left: 0.0,
                               top: Responsive.isMobile(context) ? 20 : 0,
                               bottom: 12),
-                          child: buildSimpleTable(
-                              dataSegments12, expensedataSegments12, 11,leftBalance12),
+                          child: buildSimpleTable(dataSegments12,
+                              expensedataSegments12, 11, leftBalance12),
                         ),
                       ),
                     ],
@@ -427,7 +427,11 @@ class _DonarListState extends State<DonarList> {
   calculateLeftBalance() {
     for (int month = 0; month < 12; month++) {
       XataRepository()
-          .getClosingBalance(month == 0 ? 12 : month, month == 0 ? (int.parse(selectedYear) - 1).toString() :selectedYear)
+          .getClosingBalance(
+              month == 0 ? 12 : month,
+              month == 0
+                  ? (int.parse(selectedYear) - 1).toString()
+                  : selectedYear)
           .then((value) {
         logger.i("Month $month - ${value.body}");
         if (XataClosingBalanceResponse.fromJson(jsonDecode(value.body))
@@ -856,7 +860,7 @@ class _DonarListState extends State<DonarList> {
       var tempDate = DateFormat('dd MMM yyyy').format(DateTime.parse(
           (data[rowIndex].date!.replaceAll("T", " ")).replaceAll("Z", "")));
       return ExpandableTableRow(
-        height: 64,
+        height: 58,
         firstCell: Container(
             color: const Color(0xffe1e1e1),
             margin: const EdgeInsets.all(1),
@@ -871,7 +875,7 @@ class _DonarListState extends State<DonarList> {
                 decoration: borderDecorationNoRadius(Colors.grey),
                 margin: const EdgeInsets.all(1),
                 child: Container(
-                  height: 64,
+                  height: 58,
                   padding: EdgeInsets.only(
                       right: 12,
                       left: columnIndex == 4 ? 12 : 20.0,
@@ -921,7 +925,9 @@ class _DonarListState extends State<DonarList> {
                           ],
                         )
                       : Align(
-                          alignment: Alignment.centerLeft,
+                          alignment: columnIndex == 2
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
                           child: Text(
                             columnIndex == 0
                                 ? tempDate.toString()
@@ -936,7 +942,7 @@ class _DonarListState extends State<DonarList> {
                                     ? TextAlign.left
                                     : TextAlign.start,
                             style: TextStyle(
-                                height: 1.7,
+                                height: 1.4,
                                 fontSize:
                                     Responsive.isMobile(context) ? 13 : 14,
                                 color: Colors.black),
@@ -957,7 +963,7 @@ class _DonarListState extends State<DonarList> {
               cellWidth: Responsive.isMobile(context)
                   ? MediaQuery.of(context).size.width * 0.3
                   : MediaQuery.of(context).size.width * 0.12,
-              cellHeight: 60,
+              cellHeight: 58,
               headerHeight: 60,
               firstColumnWidth: Responsive.isMobile(context) ? 44 : 50,
               scrollShadowColor: Colors.grey,
@@ -1559,7 +1565,7 @@ class _DonarListState extends State<DonarList> {
               cellWidth: Responsive.isMobile(context)
                   ? MediaQuery.of(context).size.width * 0.4
                   : MediaQuery.of(context).size.width * 0.12,
-              cellHeight: 60,
+              cellHeight: 58,
               headerHeight: 60,
               firstColumnWidth: Responsive.isMobile(context) ? 44 : 50,
               scrollShadowColor: Colors.grey,
