@@ -7,6 +7,7 @@ import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/xata_closing_balance_response.dart';
 import 'package:merchant/data/response/xata_donors_list_response.dart';
 import 'package:merchant/responsive.dart';
+import 'package:merchant/src/features/donar/donar_yearly_report.dart';
 import 'package:merchant/src/features/donar/edit_donar.dart';
 import 'package:merchant/src/features/donar/new_donar.dart';
 import 'package:merchant/src/features/donar/new_expense_record.dart';
@@ -139,6 +140,46 @@ class _DonarListState extends State<DonarList> {
           children: [
             ListView(
               children: [
+                Visibility(
+                  visible: Responsive.isMobile(context),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      width: 160,
+                      margin: const EdgeInsets.only(right: 12),
+                      padding: const EdgeInsets.only(top: 20, right: 12),
+                      child: GestureDetector(
+                        onTap: () {
+                          goToYearlyReport();
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          child: Row(
+                            children: const [
+                              SizedBox(
+                                width: 12,
+                              ),
+                              Icon(Icons.calculate_outlined,
+                                  color: Colors.white),
+                              Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 12, bottom: 12, left: 12),
+                                  child: Text(
+                                    "နှစ်ချုပ်စာရင်း",
+                                    textScaleFactor: 1.0,
+                                    style: TextStyle(
+                                        fontSize: 15.0, color: Colors.white),
+                                  )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 Stack(
                   children: [
                     Container(
@@ -200,6 +241,47 @@ class _DonarListState extends State<DonarList> {
                             ),
                           );
                         },
+                      ),
+                    ),
+                    Visibility(
+                      visible: !Responsive.isMobile(context),
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                          width: 160,
+                          margin: const EdgeInsets.only(right: 12),
+                          padding: const EdgeInsets.only(top: 20, right: 12),
+                          child: GestureDetector(
+                            onTap: () {
+                              goToYearlyReport();
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: primaryColor,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(12.0))),
+                              child: Row(
+                                children: const [
+                                  SizedBox(
+                                    width: 12,
+                                  ),
+                                  Icon(Icons.calculate_outlined,
+                                      color: Colors.white),
+                                  Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 12, bottom: 12, left: 12),
+                                      child: Text(
+                                        "နှစ်ချုပ်စာရင်း",
+                                        textScaleFactor: 1.0,
+                                        style: TextStyle(
+                                            fontSize: 15.0,
+                                            color: Colors.white),
+                                      )),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -416,6 +498,182 @@ class _DonarListState extends State<DonarList> {
   var logger = Logger(
     printer: PrettyPrinter(),
   );
+
+  goToYearlyReport() {
+    List<int> monthlyDonation = [];
+    List<int> monthlyExpense = [];
+    int closingBalance = 0;
+    int totalExpense = 0;
+    int totalDonationAmount = 0;
+
+    int janDonation = 0;
+    for (var element in dataSegments1) {
+      janDonation += element.amount ?? 0;
+    }
+
+    int febDonation = 0;
+    for (var element in dataSegments2) {
+      febDonation += element.amount ?? 0;
+    }
+
+    int marDonation = 0;
+    for (var element in dataSegments3) {
+      marDonation += element.amount ?? 0;
+    }
+
+    int aprDonation = 0;
+    for (var element in dataSegments4) {
+      aprDonation += element.amount ?? 0;
+    }
+
+    int mayDonation = 0;
+    for (var element in dataSegments5) {
+      mayDonation += element.amount ?? 0;
+    }
+
+    int junDonation = 0;
+    for (var element in dataSegments6) {
+      junDonation += element.amount ?? 0;
+    }
+
+    int julDonation = 0;
+    for (var element in dataSegments7) {
+      julDonation += element.amount ?? 0;
+    }
+
+    int augDonation = 0;
+    for (var element in dataSegments8) {
+      augDonation += element.amount ?? 0;
+    }
+
+    int sepDonation = 0;
+    for (var element in dataSegments9) {
+      sepDonation += element.amount ?? 0;
+    }
+
+    int octDonation = 0;
+    for (var element in dataSegments10) {
+      octDonation += element.amount ?? 0;
+    }
+
+    int novDonation = 0;
+    for (var element in dataSegments11) {
+      novDonation += element.amount ?? 0;
+    }
+
+    int decDonation = 0;
+    for (var element in dataSegments12) {
+      decDonation += element.amount ?? 0;
+    }
+
+    monthlyDonation.addAll([
+      janDonation,
+      febDonation,
+      marDonation,
+      aprDonation,
+      mayDonation,
+      junDonation,
+      julDonation,
+      augDonation,
+      sepDonation,
+      octDonation,
+      novDonation,
+      decDonation
+    ]);
+
+    int janExpense = 0;
+    for (var element in expensedataSegments1) {
+      janExpense += element.amount ?? 0;
+    }
+
+    int febExpense = 0;
+    for (var element in expensedataSegments2) {
+      febExpense += element.amount ?? 0;
+    }
+
+    int marExpense = 0;
+    for (var element in expensedataSegments3) {
+      marExpense += element.amount ?? 0;
+    }
+
+    int aprExpense = 0;
+    for (var element in expensedataSegments4) {
+      aprExpense += element.amount ?? 0;
+    }
+
+    int mayExpense = 0;
+    for (var element in expensedataSegments5) {
+      mayExpense += element.amount ?? 0;
+    }
+
+    int junExpense = 0;
+    for (var element in expensedataSegments6) {
+      junExpense += element.amount ?? 0;
+    }
+
+    int julExpense = 0;
+    for (var element in expensedataSegments7) {
+      julExpense += element.amount ?? 0;
+    }
+
+    int augExpense = 0;
+    for (var element in expensedataSegments8) {
+      augExpense += element.amount ?? 0;
+    }
+
+    int sepExpense = 0;
+    for (var element in expensedataSegments9) {
+      sepExpense += element.amount ?? 0;
+    }
+
+    int octExpense = 0;
+    for (var element in expensedataSegments10) {
+      octExpense += element.amount ?? 0;
+    }
+
+    int novExpense = 0;
+    for (var element in expensedataSegments11) {
+      novExpense += element.amount ?? 0;
+    }
+
+    int decExpense = 0;
+    for (var element in expensedataSegments12) {
+      decExpense += element.amount ?? 0;
+    }
+
+    monthlyExpense.addAll([
+      janExpense,
+      febExpense,
+      marExpense,
+      aprExpense,
+      mayExpense,
+      junExpense,
+      julExpense,
+      augExpense,
+      sepExpense,
+      octExpense,
+      novExpense,
+      decExpense
+    ]);
+
+    totalExpense = monthlyExpense.reduce((a, b) => a + b);
+    totalDonationAmount = monthlyDonation.reduce((a, b) => a + b);
+
+    closingBalance = (leftBalance1 + totalDonationAmount) - totalExpense;
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DonationYearlyReport(
+                  openingBalance: leftBalance1,
+                  monthlyDonation: monthlyDonation,
+                  monthlyExpense: monthlyExpense,
+                  closingBalance: closingBalance,
+                  totalExpense: totalExpense,
+                  totalDonationAmount: totalDonationAmount,
+                  selectedYear: int.parse(selectedYear),
+                )));
+  }
 
   @override
   void initState() {
@@ -662,29 +920,29 @@ class _DonarListState extends State<DonarList> {
       });
     }
 
-    filterData1 = filterData1.reversed.toList();
+    // filterData1 = filterData1.reversed.toList();
 
-    filterData2 = filterData2.reversed.toList();
+    // filterData2 = filterData2.reversed.toList();
 
-    filterData3 = filterData3.reversed.toList();
+    // filterData3 = filterData3.reversed.toList();
 
-    filterData4 = filterData4.reversed.toList();
+    // filterData4 = filterData4.reversed.toList();
 
-    filterData5 = filterData5.reversed.toList();
+    // filterData5 = filterData5.reversed.toList();
 
-    filterData6 = filterData6.reversed.toList();
+    // filterData6 = filterData6.reversed.toList();
 
-    filterData7 = filterData7.reversed.toList();
+    // filterData7 = filterData7.reversed.toList();
 
-    filterData8 = filterData8.reversed.toList();
+    // filterData8 = filterData8.reversed.toList();
 
-    filterData9 = filterData9.reversed.toList();
+    // filterData9 = filterData9.reversed.toList();
 
-    filterData10 = filterData10.reversed.toList();
+    // filterData10 = filterData10.reversed.toList();
 
-    filterData11 = filterData11.reversed.toList();
+    // filterData11 = filterData11.reversed.toList();
 
-    filterData12 = filterData12.reversed.toList();
+    // filterData12 = filterData12.reversed.toList();
 
     setState(() {
       dataSegments1 = filterData1;
@@ -772,29 +1030,29 @@ class _DonarListState extends State<DonarList> {
       });
     }
 
-    expensefilterData1 = expensefilterData1.reversed.toList();
+    // expensefilterData1 = expensefilterData1.reversed.toList();
 
-    expensefilterData2 = expensefilterData2.reversed.toList();
+    // expensefilterData2 = expensefilterData2.reversed.toList();
 
-    expensefilterData3 = expensefilterData3.reversed.toList();
+    // expensefilterData3 = expensefilterData3.reversed.toList();
 
-    expensefilterData4 = expensefilterData4.reversed.toList();
+    // expensefilterData4 = expensefilterData4.reversed.toList();
 
-    expensefilterData5 = expensefilterData5.reversed.toList();
+    // expensefilterData5 = expensefilterData5.reversed.toList();
 
-    expensefilterData6 = expensefilterData6.reversed.toList();
+    // expensefilterData6 = expensefilterData6.reversed.toList();
 
-    expensefilterData7 = expensefilterData7.reversed.toList();
+    // expensefilterData7 = expensefilterData7.reversed.toList();
 
-    expensefilterData8 = expensefilterData8.reversed.toList();
+    // expensefilterData8 = expensefilterData8.reversed.toList();
 
-    expensefilterData9 = expensefilterData9.reversed.toList();
+    // expensefilterData9 = expensefilterData9.reversed.toList();
 
-    expensefilterData10 = expensefilterData10.reversed.toList();
+    // expensefilterData10 = expensefilterData10.reversed.toList();
 
-    expensefilterData11 = expensefilterData11.reversed.toList();
+    // expensefilterData11 = expensefilterData11.reversed.toList();
 
-    expensefilterData12 = expensefilterData12.reversed.toList();
+    // expensefilterData12 = expensefilterData12.reversed.toList();
 
     setState(() {
       expensedataSegments1 = expensefilterData1;
@@ -810,6 +1068,169 @@ class _DonarListState extends State<DonarList> {
       expensedataSegments11 = expensefilterData11;
       expensedataSegments12 = expensefilterData12;
     });
+  }
+
+  YYDialog confirmDeleteDialog(String title, String msg, BuildContext context,
+      String buttonMsg, Color color, Function onTap) {
+    return YYDialog().build()
+      ..width = Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width * 0.8
+          : MediaQuery.of(context).size.width * 0.3
+//      ..height = 110
+      ..backgroundColor =
+          Colors.white //Colors.black.withOpacity(0.8)//main_theme_color
+      ..borderRadius = 10.0
+      ..barrierColor = const Color(0xDD000000)
+      ..showCallBack = () {
+        debugPrint("showCallBack invoke");
+      }
+      ..dismissCallBack = () {
+        debugPrint("dismissCallBack invoke");
+      }
+      ..widget(Container(
+        color: Colors.red,
+        padding: const EdgeInsets.only(top: 8),
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4, left: 20, bottom: 12),
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context, rootNavigator: true).pop('dialog');
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                      right: 12,
+                      bottom: 12,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+      ..widget(Padding(
+        padding: EdgeInsets.only(
+            top: Responsive.isMobile(context) ? 26 : 42, bottom: 26),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(
+                left: 8,
+                right: 18,
+              ),
+              child: Image.asset(
+                'assets/images/question_mark.png',
+                height: 56,
+                width: 56,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(
+                left: 12,
+                right: 20,
+              ),
+              child: Text(
+                msg,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: color,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+      ..widget(Align(
+        alignment: Alignment.bottomRight,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context, rootNavigator: true).pop('dialog');
+              },
+              child: Container(
+                decoration:
+                    shadowDecorationWithBorder(Colors.white, Colors.black),
+                height: 50,
+                width: 120,
+                margin: EdgeInsets.only(
+                  left: 20,
+                  bottom: 30,
+                  right: Responsive.isMobile(context) ? 12 : 20,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "မလုပ်တော့ပါ",
+                    textScaleFactor: 1.0,
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontSize: Responsive.isMobile(context) ? 12 : 14),
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () async {
+                onTap.call();
+                Navigator.of(context, rootNavigator: true).pop('dialog');
+              },
+              child: Container(
+                decoration: shadowDecoration(const Color(0xffFF5F17)),
+                height: 50,
+                width: 120,
+                margin: EdgeInsets.only(
+                  bottom: 30,
+                  right: Responsive.isMobile(context) ? 12 : 30,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "ဖျက်မည်",
+                    textScaleFactor: 1.0,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: Responsive.isMobile(context) ? 12 : 14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+      ..animatedFunc = (child, animation) {
+        return ScaleTransition(
+          scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
+        );
+      }
+      ..show();
   }
 
   buildSimpleTable(List<DonorData> data, List<DonorData> expenses, int month,
@@ -906,20 +1327,28 @@ class _DonarListState extends State<DonarList> {
                                   color: Colors.red,
                                 ),
                                 onPressed: () {
-                                  XataRepository()
-                                      .deleteDonorByID(
-                                          data[rowIndex].id.toString())
-                                      .then((value) {
-                                    if (value.statusCode
-                                        .toString()
-                                        .startsWith("2")) {
-                                      Utils.messageSuccessNoPopDialog(
-                                          "အလှူစာရင်း ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-                                          context,
-                                          "အိုကေ",
-                                          Colors.black);
-                                      callAPI("");
-                                    }
+                                  confirmDeleteDialog(
+                                      "ဖျက်မည်မှာ သေချာပါသလား?",
+                                      "အလှူရှင်စာရင်းအား ဖျက်မည်မှာ \nသေချာပါသလား?",
+                                      context,
+                                      "အိုကေ",
+                                      Colors.black, () {
+                                    XataRepository()
+                                        .deleteDonorByID(
+                                      data[rowIndex].id.toString(),
+                                    )
+                                        .then((value) {
+                                      if (value.statusCode
+                                          .toString()
+                                          .startsWith("2")) {
+                                        Utils.messageSuccessNoPopDialog(
+                                            "အလှူစာရင်း ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                            context,
+                                            "အိုကေ",
+                                            Colors.black);
+                                        callAPI("");
+                                      }
+                                    });
                                   });
                                 }),
                           ],
@@ -1167,22 +1596,30 @@ class _DonarListState extends State<DonarList> {
                                                       color: Colors.red,
                                                     ),
                                                     onPressed: () {
-                                                      XataRepository()
-                                                          .deleteExpenseByID(
-                                                              expenses[index]
-                                                                  .id
-                                                                  .toString())
-                                                          .then((value) {
-                                                        if (value.statusCode
-                                                            .toString()
-                                                            .startsWith("2")) {
-                                                          Utils.messageSuccessNoPopDialog(
-                                                              "အသုံးစားရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-                                                              context,
-                                                              "အိုကေ",
-                                                              Colors.black);
-                                                          callAPI("");
-                                                        }
+                                                      confirmDeleteDialog(
+                                                          "ဖျက်မည်မှာ သေချာပါသလား?",
+                                                          "အသုံးစားရိတ်အား ဖျက်မည်မှာ \nသေချာပါသလား?",
+                                                          context,
+                                                          "အိုကေ",
+                                                          Colors.black, () {
+                                                        XataRepository()
+                                                            .deleteExpenseByID(
+                                                                expenses[index]
+                                                                    .id
+                                                                    .toString())
+                                                            .then((value) {
+                                                          if (value.statusCode
+                                                              .toString()
+                                                              .startsWith(
+                                                                  "2")) {
+                                                            Utils.messageSuccessNoPopDialog(
+                                                                "အသုံးစားရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                                context,
+                                                                "အိုကေ",
+                                                                Colors.black);
+                                                            callAPI("");
+                                                          }
+                                                        });
                                                       });
                                                     }),
                                               ],

@@ -64,16 +64,25 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
 
   List<String> hospitalsSelected = <String>[];
   List<String> hospitals = <String>[
-    "ဆေးရုံကြီး",
-    "အမေရိကန်ဆေးရုံ",
-    "ငွေမိုး",
-    "ဇာနည်ဘွား",
-    "တော်ဝင်",
-    "ရတနာမွန်",
-    "အေးသန္တာ",
-    "အရေပြားဆေးရုံ",
-    "ရွှေလမင်း",
-    "ဇာနည်အောင်",
+    "ငွေမိုးဆေးရုံ",
+    "မော်လမြိုင်ပြည်သူ့ဆေးရုံကြီး",
+    "ဇာနည်ဘွားဆေးရုံ",
+    "ရတနာမွန်ဆေးရုံ",
+    "တော်ဝင်ဆေးရုံ",
+    "ရွှေလမင်းဆေးရုံ",
+    "ခရစ်ယာန်အရေပြားဆေးရုံ",
+    "အေးသန္တာဆေးရုံ",
+    "မေတ္တရိပ်ဆေးခန်း",
+    "ဇာနည်အောင်ဆေးရုံ",
+    "ဇာသပြင်တိုက်နယ်ဆေးရုံ",
+    "လွမ်းသာဆေးခန်း",
+    "ချမ်းသာသုခဆေးခန်း",
+    "ချမ်းမြေ့ဂုဏ်ဆေးခန်း",
+    "အေဝမ်းဆေးခန်း",
+    "ကျိုက်မရောမြို့နယ်ဆေးရုံ",
+    "ကောင်းဆေးခန်း",
+    "မုတ္တမတိုက်နယ်ဆေးရုံ",
+    "အမေရိကန်ဆေးရုံ"
   ];
   List<MemberData> allMember = [];
 
@@ -427,11 +436,9 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                     child: TextFormField(
                                       controller: ageController,
                                       keyboardType: TextInputType.number,
-                                      inputFormatters: <
-                                                    TextInputFormatter>[
-                                                  FilteringTextInputFormatter
-                                                      .digitsOnly
-                                                ],
+                                      inputFormatters: <TextInputFormatter>[
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
                                       decoration:
                                           inputBoxDecoration("လူနာအသက်"),
                                     ),
