@@ -22,6 +22,31 @@ class XataRepository {
     return response;
   }
 
+  Future<http.Response> updateSpecialEvent(
+    String id,
+    String data,
+  ) async {
+    final response = await http.patch(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Records/data/$id?columns=id'),
+        headers: headers,
+        body: data);
+
+    return response;
+  }
+
+  Future<http.Response> deleteSpecialEventByID(String donorID) async {
+    final response = await http.delete(
+      Uri.parse(
+          'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Records/data/$donorID?columns=id'),
+      headers: headers,
+    );
+    log(response.statusCode.toString());
+    log(response.body);
+
+    return response;
+  }
+
   Future<http.Response> getMembersTotal() async {
     final response = await http.post(
         Uri.parse(
@@ -276,7 +301,7 @@ class XataRepository {
     return response;
   }
 
-   Future<http.Response> updatewClosingBalance(String id,String data) async {
+  Future<http.Response> updatewClosingBalance(String id, String data) async {
     final response = await http.post(
         Uri.parse(
             'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/ClosingBalances/data/$id?columns=id'),

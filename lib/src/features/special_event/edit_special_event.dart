@@ -1,23 +1,27 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:merchant/data/repository/repository.dart';
+import 'package:merchant/data/response/special_event_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
+import 'package:merchant/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:intl/intl.dart';
 
-class NewEventAddScreen extends StatefulWidget {
-  const NewEventAddScreen({Key? key}) : super(key: key);
+class EditSpecialEventScreen extends StatefulWidget {
+  SpecialEventData event;
+  EditSpecialEventScreen({Key? key, required this.event}) : super(key: key);
 
   @override
-  State<NewEventAddScreen> createState() => _NewEventAddScreenState();
+  State<EditSpecialEventScreen> createState() => _EditSpecialEventScreenState();
 }
 
-class _NewEventAddScreenState extends State<NewEventAddScreen> {
+class _EditSpecialEventScreenState extends State<EditSpecialEventScreen> {
   bool isLoading = false;
   String dateFilter = "-";
   TextEditingController retorTestController = TextEditingController();
@@ -31,13 +35,31 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
   @override
   void initState() {
     super.initState();
-    var now = DateTime.now();
-    String formattedDate = DateFormat('dd MMM yyyy').format(now);
-    dateFilter = formattedDate;
+    dateFilter = widget.event.date!;
+    retorTestController.text = widget.event.retroTest.toString() == "0"
+        ? ""
+        : widget.event.retroTest.toString();
+    hbsAgController.text = widget.event.hbsAg.toString() == "0"
+        ? ""
+        : widget.event.hbsAg.toString();
+    hcvAbController.text = widget.event.hcvAb.toString() == "0"
+        ? ""
+        : widget.event.hcvAb.toString();
+    vdrlController.text = widget.event.vdrlTest.toString() == "0"
+        ? ""
+        : widget.event.vdrlTest.toString();
+    mpICTController.text = widget.event.mpIct.toString() == "0"
+        ? ""
+        : widget.event.mpIct.toString();
+    haemoglobinController.text = widget.event.haemoglobin.toString() == "0"
+        ? ""
+        : widget.event.haemoglobin.toString();
+    labNameController.text = widget.event.labName ?? "";
   }
 
   @override
   Widget build(BuildContext context) {
+    YYDialog.init(context);
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(
@@ -52,7 +74,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
         title: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Center(
-            child: Text("ထူးခြားဖြစ်စဥ်အသစ် ထည့်သွင်းမည်",
+            child: Text("ထူးခြားဖြစ်စဥ်အား ပြင်ဆင်မည်",
                 textScaleFactor: 1.0,
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 15 : 17,
@@ -164,14 +186,14 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
-                          uploadNewEventToXata();
+                          updateSpecialEvent();
                         },
                         child: const Align(
                             alignment: Alignment.center,
                             child: Padding(
                                 padding: EdgeInsets.only(top: 16, bottom: 16),
                                 child: Text(
-                                  "ထည့်သွင်းမည်",
+                                  "ပြင်ဆင်မည်",
                                   textScaleFactor: 1.0,
                                   style: TextStyle(
                                       fontSize: 18.0, color: Colors.white),
@@ -335,14 +357,14 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: () {
-                            uploadNewEventToXata();
+                            updateSpecialEvent();
                           },
                           child: const Align(
                               alignment: Alignment.center,
                               child: Padding(
                                   padding: EdgeInsets.only(top: 16, bottom: 16),
                                   child: Text(
-                                    "ထည့်သွင်းမည်",
+                                    "ပြင်ဆင်မည်",
                                     textScaleFactor: 1.0,
                                     style: TextStyle(
                                         fontSize: 17, color: Colors.white),
@@ -419,7 +441,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
     });
   }
 
-  uploadNewEventToXata() async {
+  updateSpecialEvent() async {
     setState(() {
       isLoading = true;
     });
@@ -442,9 +464,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
         (haemoglobinController.text.toString().isEmpty
             ? 0
             : int.parse(haemoglobinController.text.toString()));
-
-    XataRepository()
-        .uploadNewEvent(
+    log(
       jsonEncode(
         <String, dynamic>{
           "date": dateFilter.toString(),
@@ -472,14 +492,49 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
           "total": total
         },
       ),
+    );
+    XataRepository()
+        .updateSpecialEvent(
+      widget.event.id!,
+      jsonEncode(
+        <String, dynamic>{
+          "date": dateFilter.toString(),
+          "retro_test": retorTestController.text.toString().isEmpty
+              ? 0
+              : int.parse(retorTestController.text.toString()),
+          "hbs_ag": hbsAgController.text.toString().isEmpty
+              ? 0
+              : int.parse(hbsAgController.text.toString()),
+          "hcv_ab": hcvAbController.text.toString().isEmpty
+              ? 0
+              : int.parse(hcvAbController.text.toString()),
+          "vdrl_test": vdrlController.text.toString().isEmpty
+              ? 0
+              : int.parse(vdrlController.text.toString()),
+          "mp_ict": mpICTController.text.toString().isEmpty
+              ? 0
+              : int.parse(mpICTController.text.toString()),
+          "haemoglobin": haemoglobinController.text.toString().isEmpty
+              ? 0
+              : int.parse(retorTestController.text.toString()),
+          "lab_name": labNameController.text.isEmpty
+              ? ""
+              : labNameController.text.toString(),
+          "total": total
+        },
+      ),
     )
         .then((response) {
       log(response.statusCode.toString());
       setState(() {
         isLoading = false;
       });
-      if (response.statusCode != 201) {
-        log("Failed");
+      if (response.statusCode.toString().startsWith("2")) {
+        Utils.messageSuccessDialog(
+            "ထူးခြားဖြစ်စဥ် ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
+            context,
+            "အိုကေ",
+            Colors.black);
       } else {
         Navigator.pop(context);
       }

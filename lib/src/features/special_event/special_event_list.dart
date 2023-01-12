@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_expandable_table/flutter_expandable_table.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/special_event_list_response.dart';
 import 'package:merchant/responsive.dart';
+import 'package:merchant/src/features/special_event/edit_special_event.dart';
 import 'package:merchant/src/features/special_event/new_special_event.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
@@ -29,6 +32,7 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    YYDialog.init(context);
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 254, 252, 231),
       appBar: AppBar(
@@ -69,7 +73,7 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
   }
 
   ExpandableTable buildSimpleTable(List<SpecialEventData> data) {
-    const int COLUMN_COUNT = 9;
+    const int COLUMN_COUNT = 10;
     int ROWCOUNT = data.length;
     List<String> titles = [
       "Retro Test\n ခုခံအားကျဆင်းမှု ကူးစက်ရောဂါ",
@@ -79,7 +83,8 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
       "M.P ( I.C.T )\n ငှက်ဖျားရောဂါ",
       "Haemoglobin ( Hb% )\n သွေးအားရာခိုင်နှုန်း",
       "Lab Name\n ဓါတ်ခွဲခန်းအမည်",
-      "Total\n စုစုပေါင်း"
+      "Total\n စုစုပေါင်း",
+      "လုပ်ဆောင်ချက်"
     ];
 
     //Creation header
@@ -125,63 +130,133 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
                   COLUMN_COUNT - 1,
                   (columnIndex) => GestureDetector(
                         behavior: HitTestBehavior.translucent,
-                        onTap: () {},
-                        child: Container(
-                            decoration: borderDecorationNoRadius(Colors.grey),
-                            margin: const EdgeInsets.all(1),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20.0, top: 14),
-                              child: Text(
-                                columnIndex == 0
-                                    ? Utils.strToMM(
-                                        data[rowIndex].retroTest.toString())
-                                    : columnIndex == 1
+                        onTap: () async {
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => EditSpecialEventScreen(
+                                        event: data[rowIndex],
+                                      )));
+                          getEventsFromXata();
+                        },
+                        child: columnIndex == 8
+                            ? Container(
+                                decoration:
+                                    borderDecorationNoRadius(Colors.grey),
+                                margin: const EdgeInsets.all(1),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                        icon: const Icon(
+                                          Icons.edit,
+                                          color: Colors.black,
+                                        ),
+                                        onPressed: () async {
+                                          await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EditSpecialEventScreen(
+                                                        event: data[rowIndex],
+                                                      )));
+                                          getEventsFromXata();
+                                        }),
+                                    const SizedBox(
+                                      width: 4,
+                                    ),
+                                    IconButton(
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () {
+                                          confirmDeleteDialog(
+                                              "ဖျက်မည်မှာ သေချာပါသလား?",
+                                              "ထူးခြားဖြစ်စဥ်အား ဖျက်မည်မှာ \nသေချာပါသလား?",
+                                              context,
+                                              "အိုကေ",
+                                              Colors.black, () {
+                                            XataRepository()
+                                                .deleteSpecialEventByID(
+                                              data[rowIndex].id.toString(),
+                                            )
+                                                .then((value) {
+                                              if (value.statusCode
+                                                  .toString()
+                                                  .startsWith("2")) {
+                                                Utils.messageSuccessNoPopDialog(
+                                                    "ထူးခြားဖြစ်စဥ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                    context,
+                                                    "အိုကေ",
+                                                    Colors.black);
+                                                getEventsFromXata();
+                                              }
+                                            });
+                                          });
+                                        }),
+                                  ],
+                                ),
+                              )
+                            : Container(
+                                decoration:
+                                    borderDecorationNoRadius(Colors.grey),
+                                margin: const EdgeInsets.all(1),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20.0, top: 14),
+                                  child: Text(
+                                    columnIndex == 0
                                         ? Utils.strToMM(
-                                            data[rowIndex].hbsAg.toString())
-                                        : columnIndex == 2
+                                            data[rowIndex].retroTest.toString())
+                                        : columnIndex == 1
                                             ? Utils.strToMM(
-                                                data[rowIndex].hcvAb.toString())
-                                            : columnIndex == 3
+                                                data[rowIndex].hbsAg.toString())
+                                            : columnIndex == 2
                                                 ? Utils.strToMM(data[rowIndex]
-                                                    .vdrlTest
+                                                    .hcvAb
                                                     .toString())
-                                                : columnIndex == 4
+                                                : columnIndex == 3
                                                     ? Utils.strToMM(
                                                         data[rowIndex]
-                                                            .mpIct
+                                                            .vdrlTest
                                                             .toString())
-                                                    : columnIndex == 5
+                                                    : columnIndex == 4
                                                         ? Utils.strToMM(
                                                             data[rowIndex]
-                                                                .haemoglobin
+                                                                .mpIct
                                                                 .toString())
-                                                        : columnIndex == 6
-                                                            ? data[rowIndex]
-                                                                        .labName !=
-                                                                    null
+                                                        : columnIndex == 5
+                                                            ? Utils.strToMM(
+                                                                data[rowIndex]
+                                                                    .haemoglobin
+                                                                    .toString())
+                                                            : columnIndex == 6
                                                                 ? data[rowIndex]
-                                                                    .labName
-                                                                    .toString()
-                                                                : "-"
-                                                            : columnIndex == 7
-                                                                ? data[rowIndex]
-                                                                            .total !=
+                                                                            .labName !=
                                                                         null
-                                                                    ? Utils.strToMM(data[
-                                                                            rowIndex]
-                                                                        .total
-                                                                        .toString())
+                                                                    ? data[rowIndex]
+                                                                        .labName
+                                                                        .toString()
                                                                     : "-"
-                                                                : "",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize:
-                                        Responsive.isMobile(context) ? 16 : 17,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            )),
+                                                                : columnIndex ==
+                                                                        7
+                                                                    ? data[rowIndex].total !=
+                                                                            null
+                                                                        ? Utils.strToMM(data[rowIndex]
+                                                                            .total
+                                                                            .toString())
+                                                                        : "-"
+                                                                    : "",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: Responsive.isMobile(context)
+                                            ? 16
+                                            : 17,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                )),
                       )),
             ));
 
@@ -196,6 +271,169 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
       firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
       scrollShadowColor: Colors.grey,
     );
+  }
+
+  YYDialog confirmDeleteDialog(String title, String msg, BuildContext context,
+      String buttonMsg, Color color, Function onTap) {
+    return YYDialog().build()
+      ..width = Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width * 0.8
+          : MediaQuery.of(context).size.width * 0.3
+//      ..height = 110
+      ..backgroundColor =
+          Colors.white //Colors.black.withOpacity(0.8)//main_theme_color
+      ..borderRadius = 10.0
+      ..barrierColor = const Color(0xDD000000)
+      ..showCallBack = () {
+        debugPrint("showCallBack invoke");
+      }
+      ..dismissCallBack = () {
+        debugPrint("dismissCallBack invoke");
+      }
+      ..widget(Container(
+        color: Colors.red,
+        padding: const EdgeInsets.only(top: 8),
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4, left: 20, bottom: 12),
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context, rootNavigator: true).pop('dialog');
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                      right: 12,
+                      bottom: 12,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+      ..widget(Padding(
+        padding: EdgeInsets.only(
+            top: Responsive.isMobile(context) ? 26 : 42, bottom: 26),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(
+                left: 8,
+                right: 18,
+              ),
+              child: Image.asset(
+                'assets/images/question_mark.png',
+                height: 56,
+                width: 56,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(
+                left: 12,
+                right: 20,
+              ),
+              child: Text(
+                msg,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: color,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+      ..widget(Align(
+        alignment: Alignment.bottomRight,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context, rootNavigator: true).pop('dialog');
+              },
+              child: Container(
+                decoration:
+                    shadowDecorationWithBorder(Colors.white, Colors.black),
+                height: 50,
+                width: 120,
+                margin: EdgeInsets.only(
+                  left: 20,
+                  bottom: 30,
+                  right: Responsive.isMobile(context) ? 12 : 20,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "မလုပ်တော့ပါ",
+                    textScaleFactor: 1.0,
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontSize: Responsive.isMobile(context) ? 12 : 14),
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () async {
+                onTap.call();
+                Navigator.of(context, rootNavigator: true).pop('dialog');
+              },
+              child: Container(
+                decoration: shadowDecoration(const Color(0xffFF5F17)),
+                height: 50,
+                width: 120,
+                margin: EdgeInsets.only(
+                  bottom: 30,
+                  right: Responsive.isMobile(context) ? 12 : 30,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "ဖျက်မည်",
+                    textScaleFactor: 1.0,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: Responsive.isMobile(context) ? 12 : 14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+      ..animatedFunc = (child, animation) {
+        return ScaleTransition(
+          scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
+        );
+      }
+      ..show();
   }
 
   getEventsFromXata() async {
