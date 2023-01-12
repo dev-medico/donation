@@ -39,6 +39,7 @@ class NewDonarState extends State<EditDonarScreen> {
   List<String> townshipsSelected = <String>[];
   List<Datum> datas = <Datum>[];
   DateTime? donationDateDetail;
+  String? oldDate;
   String donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
 
   @override
@@ -80,8 +81,14 @@ class NewDonarState extends State<EditDonarScreen> {
   }
 
   void initial() async {
-    donationDateDetail = DateTime.now();
-    donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
+    if(widget.donor!.date != null){
+      donationDateDetail = DateTime.parse(widget.donor!.date!);
+      donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
+    }
+    else{
+      donationDateDetail = DateTime.now();
+      donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
+    }
 
     nameController.text = widget.donor!.name!;
     amountController.text = widget.donor!.amount.toString();

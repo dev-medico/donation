@@ -1240,6 +1240,13 @@ class _DonarListState extends State<DonarList> {
     int totalDonation = 0;
     int totalExpense = 0;
     int thisMonthLeftBalance = 0;
+    int longTextCount = 0;
+
+    for (var element in expenses) {
+      if (element.name!.length > 22) {
+        longTextCount++;
+      }
+    }
 
     for (var element in data) {
       totalDonation += int.parse(element.amount.toString());
@@ -1550,7 +1557,8 @@ class _DonarListState extends State<DonarList> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    height: expenses.length * 30,
+                                    height: expenses.length * 30 +
+                                        (longTextCount * 30),
                                     child: ListView.builder(
                                         itemCount: expenses.length,
                                         itemBuilder: ((context, index) {
@@ -1559,13 +1567,17 @@ class _DonarListState extends State<DonarList> {
                                                 bottom: 4),
                                             height:
                                                 expenses[index].name!.length >
-                                                        30
+                                                        22
                                                     ? 60
                                                     : 30,
                                             child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
-                                                SizedBox(
-                                                  width: 190,
+                                                Expanded(
                                                   child: Text(
                                                     expenses[index].name ?? "-",
                                                     maxLines: 2,
@@ -1580,51 +1592,74 @@ class _DonarListState extends State<DonarList> {
                                                                 .variantColor),
                                                   ),
                                                 ),
-                                                Text(
-                                                  "${Utils.strToMM(expenses[index].amount.toString())} ကျပ်",
-                                                  style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: NeumorphicTheme.of(
-                                                              context)
-                                                          ?.current!
-                                                          .variantColor),
-                                                ),
-                                                IconButton(
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      size: 16,
-                                                      color: Colors.red,
+                                                Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "${Utils.strToMM(expenses[index].amount.toString())} ကျပ်",
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: NeumorphicTheme
+                                                                  .of(context)
+                                                              ?.current!
+                                                              .variantColor),
                                                     ),
-                                                    onPressed: () {
-                                                      confirmDeleteDialog(
-                                                          "ဖျက်မည်မှာ သေချာပါသလား?",
-                                                          "အသုံးစားရိတ်အား ဖျက်မည်မှာ \nသေချာပါသလား?",
-                                                          context,
-                                                          "အိုကေ",
-                                                          Colors.black, () {
-                                                        XataRepository()
-                                                            .deleteExpenseByID(
-                                                                expenses[index]
-                                                                    .id
-                                                                    .toString())
-                                                            .then((value) {
-                                                          if (value.statusCode
-                                                              .toString()
-                                                              .startsWith(
-                                                                  "2")) {
-                                                            Utils.messageSuccessNoPopDialog(
-                                                                "အသုံးစားရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          bottom: expenses[
+                                                                          index]
+                                                                      .name!
+                                                                      .length >
+                                                                  22
+                                                              ? 8
+                                                              : 0),
+                                                      child: IconButton(
+                                                          icon: const Icon(
+                                                            Icons.delete,
+                                                            size: 16,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onPressed: () {
+                                                            confirmDeleteDialog(
+                                                                "ဖျက်မည်မှာ သေချာပါသလား?",
+                                                                "အသုံးစားရိတ်အား ဖျက်မည်မှာ \nသေချာပါသလား?",
                                                                 context,
                                                                 "အိုကေ",
-                                                                Colors.black);
-                                                            calculateLeftBalance();
-                                                            callAPI("");
-                                                          }
-                                                        });
-                                                      });
-                                                    }),
+                                                                Colors.black,
+                                                                () {
+                                                              XataRepository()
+                                                                  .deleteExpenseByID(
+                                                                      expenses[
+                                                                              index]
+                                                                          .id
+                                                                          .toString())
+                                                                  .then(
+                                                                      (value) {
+                                                                if (value
+                                                                    .statusCode
+                                                                    .toString()
+                                                                    .startsWith(
+                                                                        "2")) {
+                                                                  Utils.messageSuccessNoPopDialog(
+                                                                      "အသုံးစားရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                                      context,
+                                                                      "အိုကေ",
+                                                                      Colors
+                                                                          .black);
+                                                                  calculateLeftBalance();
+                                                                  callAPI("");
+                                                                }
+                                                              });
+                                                            });
+                                                          }),
+                                                    ),
+                                                  ],
+                                                )
                                               ],
                                             ),
                                           );
@@ -2165,7 +2200,8 @@ class _DonarListState extends State<DonarList> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(
-                                height: expenses.length * 30,
+                                height:
+                                    expenses.length * 30 + (longTextCount * 30),
                                 child: ListView.builder(
                                     itemCount: expenses.length,
                                     itemBuilder: ((context, index) {
@@ -2173,13 +2209,16 @@ class _DonarListState extends State<DonarList> {
                                         margin:
                                             const EdgeInsets.only(bottom: 4),
                                         height:
-                                            expenses[index].name!.length > 30
+                                            expenses[index].name!.length > 22
                                                 ? 60
                                                 : 30,
                                         child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            SizedBox(
-                                              width: 190,
+                                            Expanded(
                                               child: Text(
                                                 expenses[index].name ?? "-",
                                                 maxLines: 2,
@@ -2192,42 +2231,61 @@ class _DonarListState extends State<DonarList> {
                                                         .variantColor),
                                               ),
                                             ),
-                                            Text(
-                                              "${Utils.strToMM(expenses[index].amount.toString())} ကျပ်",
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: NeumorphicTheme.of(
-                                                          context)
-                                                      ?.current!
-                                                      .variantColor),
-                                            ),
-                                            IconButton(
-                                                icon: const Icon(
-                                                  Icons.delete,
-                                                  size: 20,
-                                                  color: Colors.red,
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${Utils.strToMM(expenses[index].amount.toString())} ကျပ်",
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: NeumorphicTheme.of(
+                                                              context)
+                                                          ?.current!
+                                                          .variantColor),
                                                 ),
-                                                onPressed: () {
-                                                  XataRepository()
-                                                      .deleteExpenseByID(
-                                                          expenses[index]
-                                                              .id
-                                                              .toString())
-                                                      .then((value) {
-                                                    if (value.statusCode
-                                                        .toString()
-                                                        .startsWith("2")) {
-                                                      Utils.messageSuccessNoPopDialog(
-                                                          "အသုံးစားရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-                                                          context,
-                                                          "အိုကေ",
-                                                          Colors.black);
-                                                      calculateLeftBalance();
-                                                      callAPI("");
-                                                    }
-                                                  });
-                                                }),
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                      bottom: expenses[index]
+                                                                  .name!
+                                                                  .length >
+                                                              22
+                                                          ? 8
+                                                          : 0),
+                                                  child: IconButton(
+                                                      icon: const Icon(
+                                                        Icons.delete,
+                                                        size: 20,
+                                                        color: Colors.red,
+                                                      ),
+                                                      onPressed: () {
+                                                        XataRepository()
+                                                            .deleteExpenseByID(
+                                                                expenses[index]
+                                                                    .id
+                                                                    .toString())
+                                                            .then((value) {
+                                                          if (value.statusCode
+                                                              .toString()
+                                                              .startsWith(
+                                                                  "2")) {
+                                                            Utils.messageSuccessNoPopDialog(
+                                                                "အသုံးစားရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                                context,
+                                                                "အိုကေ",
+                                                                Colors.black);
+                                                            calculateLeftBalance();
+                                                            callAPI("");
+                                                          }
+                                                        });
+                                                      }),
+                                                ),
+                                              ],
+                                            )
                                           ],
                                         ),
                                       );
