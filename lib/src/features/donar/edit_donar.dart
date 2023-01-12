@@ -59,7 +59,7 @@ class NewDonarState extends State<EditDonarScreen> {
             jsonEncode(<String, dynamic>{
               "name": name,
               "amount": int.parse(amount),
-              "date": "${donationDateDetail.toString().replaceAll(" ", "T")}Z",
+              "date": donationDateDetail.toString().replaceAll(" ", "T"),
             }))
         .then((value) {
       if (value.statusCode.toString().startsWith("2")) {
@@ -81,11 +81,10 @@ class NewDonarState extends State<EditDonarScreen> {
   }
 
   void initial() async {
-    if(widget.donor!.date != null){
+    if (widget.donor!.date != null) {
       donationDateDetail = DateTime.parse(widget.donor!.date!);
       donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
-    }
-    else{
+    } else {
       donationDateDetail = DateTime.now();
       donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
     }
@@ -214,7 +213,7 @@ class NewDonarState extends State<EditDonarScreen> {
                           if (nameController.text.isNotEmpty &&
                               amountController.text.isNotEmpty) {
                             setState(() {
-                              _isLoading = true;
+                               _isLoading = true;
                             });
                             editDonor(nameController.text.toString(),
                                 amountController.text.toString());
