@@ -1316,6 +1316,7 @@ class _DonarListState extends State<DonarList> {
                                           builder: (context) => EditDonarScreen(
                                                 donor: data[rowIndex],
                                               )));
+                                  calculateLeftBalance();
                                   callAPI("");
                                 }),
                             const SizedBox(
@@ -1346,6 +1347,7 @@ class _DonarListState extends State<DonarList> {
                                             context,
                                             "အိုကေ",
                                             Colors.black);
+                                        calculateLeftBalance();
                                         callAPI("");
                                       }
                                     });
@@ -1617,6 +1619,7 @@ class _DonarListState extends State<DonarList> {
                                                                 context,
                                                                 "အိုကေ",
                                                                 Colors.black);
+                                                            calculateLeftBalance();
                                                             callAPI("");
                                                           }
                                                         });
@@ -1790,6 +1793,7 @@ class _DonarListState extends State<DonarList> {
                                   builder: (context) => NewDonarScreen(),
                                 ),
                               );
+                              calculateLeftBalance();
                               callAPI("");
                             },
                             child: Container(
@@ -1833,6 +1837,7 @@ class _DonarListState extends State<DonarList> {
                                       NewExpenseRecordScreen(),
                                 ),
                               );
+                              calculateLeftBalance();
                               callAPI("");
                             },
                             child: Container(
@@ -1891,6 +1896,8 @@ class _DonarListState extends State<DonarList> {
                                           context,
                                           "အိုကေ",
                                           Colors.black);
+                                      calculateLeftBalance();
+                                      callAPI("");
                                     });
                                   } else {
                                     XataRepository()
@@ -1911,6 +1918,8 @@ class _DonarListState extends State<DonarList> {
                                           context,
                                           "အိုကေ",
                                           Colors.black);
+                                      calculateLeftBalance();
+                                      callAPI("");
                                     });
                                   }
                                 });
@@ -2214,6 +2223,7 @@ class _DonarListState extends State<DonarList> {
                                                           context,
                                                           "အိုကေ",
                                                           Colors.black);
+                                                      calculateLeftBalance();
                                                       callAPI("");
                                                     }
                                                   });
@@ -2383,6 +2393,7 @@ class _DonarListState extends State<DonarList> {
                               builder: (context) => NewDonarScreen(),
                             ),
                           );
+                          calculateLeftBalance();
                           callAPI("");
                         },
                         child: Container(
@@ -2424,6 +2435,7 @@ class _DonarListState extends State<DonarList> {
                               builder: (context) => NewExpenseRecordScreen(),
                             ),
                           );
+                          calculateLeftBalance();
                           callAPI("");
                         },
                         child: Container(
@@ -2481,6 +2493,8 @@ class _DonarListState extends State<DonarList> {
                                       context,
                                       "အိုကေ",
                                       Colors.black);
+                                  calculateLeftBalance();
+                                  callAPI("");
                                 });
                               } else {
                                 XataRepository()
@@ -2500,6 +2514,8 @@ class _DonarListState extends State<DonarList> {
                                       context,
                                       "အိုကေ",
                                       Colors.black);
+                                  calculateLeftBalance();
+                                  callAPI("");
                                 });
                               }
                             });
