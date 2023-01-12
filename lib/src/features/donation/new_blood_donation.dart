@@ -1182,6 +1182,8 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
     DateTime? newDateTime = await showRoundedDatePicker(
         context: context,
         initialDate: DateTime.now(),
+         textPositiveButton: "ရွေးချယ်မည်",
+        textNegativeButton: "မရွေးချယ်ပါ",
         firstDate: DateTime(DateTime.now().year - 150),
         lastDate: DateTime(DateTime.now().year + 1),
         theme: ThemeData(primarySwatch: Colors.red),

@@ -298,6 +298,8 @@ class NewDonarState extends State<NewDonarScreen> {
         initialDate: DateTime.now(),
         firstDate: DateTime(DateTime.now().year - 150),
         lastDate: DateTime(DateTime.now().year + 1),
+         textPositiveButton: "ရွေးချယ်မည်",
+        textNegativeButton: "မရွေးချယ်ပါ",
         theme: ThemeData(primarySwatch: Colors.red),
         styleDatePicker: MaterialRoundedDatePickerStyle(
           textStyleDayButton:

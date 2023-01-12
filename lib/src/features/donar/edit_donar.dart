@@ -213,7 +213,7 @@ class NewDonarState extends State<EditDonarScreen> {
                           if (nameController.text.isNotEmpty &&
                               amountController.text.isNotEmpty) {
                             setState(() {
-                               _isLoading = true;
+                              _isLoading = true;
                             });
                             editDonor(nameController.text.toString(),
                                 amountController.text.toString());
@@ -228,12 +228,40 @@ class NewDonarState extends State<EditDonarScreen> {
                         child: const Align(
                             alignment: Alignment.center,
                             child: Padding(
-                                padding: EdgeInsets.only(top: 8, bottom: 8),
+                                padding: EdgeInsets.only(top: 10, bottom: 10),
                                 child: Text(
                                   "ပြင်ဆင်မည်",
                                   textScaleFactor: 1.0,
                                   style: TextStyle(
                                       fontSize: 16.0, color: Colors.white),
+                                ))),
+                      ),
+                    )),
+                Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Container(
+                      width: Responsive.isMobile(context)
+                          ? MediaQuery.of(context).size.width
+                          : MediaQuery.of(context).size.width * 0.3,
+                      decoration: shadowDecorationWithBorder(
+                          Colors.white, Colors.black),
+                      margin: const EdgeInsets.only(
+                          left: 15, bottom: 16, right: 15),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 8, bottom: 8),
+                                child: Text(
+                                  "မပြင်ဆင်တော့ပါ",
+                                  textScaleFactor: 1.0,
+                                  style: TextStyle(
+                                      fontSize: 16.0, color: primaryColor),
                                 ))),
                       ),
                     ))
@@ -312,6 +340,8 @@ class NewDonarState extends State<EditDonarScreen> {
         firstDate: DateTime(DateTime.now().year - 150),
         lastDate: DateTime(DateTime.now().year + 1),
         theme: ThemeData(primarySwatch: Colors.red),
+        textPositiveButton: "ရွေးချယ်မည်",
+        textNegativeButton: "မရွေးချယ်ပါ",
         styleDatePicker: MaterialRoundedDatePickerStyle(
           textStyleDayButton:
               const TextStyle(fontSize: 20, color: Colors.white),
@@ -345,9 +375,9 @@ class NewDonarState extends State<EditDonarScreen> {
           textStyleButtonAction:
               const TextStyle(fontSize: 28, color: Colors.white),
           textStyleButtonPositive: const TextStyle(
-              fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+              fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold),
           textStyleButtonNegative:
-              TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.5)),
+              TextStyle(fontSize: 17, color: Colors.white.withOpacity(0.5)),
           decorationDateSelected:
               BoxDecoration(color: Colors.orange[600], shape: BoxShape.circle),
           backgroundPicker: Colors.red[400],
