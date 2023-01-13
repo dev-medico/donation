@@ -516,7 +516,7 @@ class _EditSpecialEventScreenState extends State<EditSpecialEventScreen> {
               : int.parse(mpICTController.text.toString()),
           "haemoglobin": haemoglobinController.text.toString().isEmpty
               ? 0
-              : int.parse(retorTestController.text.toString()),
+              : int.parse(haemoglobinController.text.toString()),
           "lab_name": labNameController.text.isEmpty
               ? ""
               : labNameController.text.toString(),
@@ -530,7 +530,7 @@ class _EditSpecialEventScreenState extends State<EditSpecialEventScreen> {
         isLoading = false;
       });
       if (response.statusCode.toString().startsWith("2")) {
-        Utils.messageSuccessDialog(
+        Utils.messageSuccessSinglePopDialog(
             "ထူးခြားဖြစ်စဥ် ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
             context,
             "အိုကေ",
