@@ -1100,9 +1100,6 @@ class _DonarListState extends State<DonarList> {
     });
     filterData12 = filterData12.reversed.toList();
 
-    
-
-
     setState(() {
       dataSegments1 = filterData1;
       dataSegments2 = filterData2;
@@ -1616,7 +1613,7 @@ class _DonarListState extends State<DonarList> {
                               padding: EdgeInsets.all(
                                   Responsive.isMobile(context) ? 8 : 12),
                               child: const Text(
-                                "အသုံးစားရိတ်",
+                                "အသုံးစရိတ်",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   // fontFamily: "Times New Roman",
@@ -1786,7 +1783,7 @@ class _DonarListState extends State<DonarList> {
                                                           onPressed: () {
                                                             confirmDeleteDialog(
                                                                 "ဖျက်မည်မှာ သေချာပါသလား?",
-                                                                "အသုံးစားရိတ်အား ဖျက်မည်မှာ \nသေချာပါသလား?",
+                                                                "အသုံးစရိတ်အား ဖျက်မည်မှာ \nသေချာပါသလား?",
                                                                 context,
                                                                 "အိုကေ",
                                                                 Colors.black,
@@ -1805,7 +1802,7 @@ class _DonarListState extends State<DonarList> {
                                                                     .startsWith(
                                                                         "2")) {
                                                                   Utils.messageSuccessNoPopDialog(
-                                                                      "အသုံးစားရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                                      "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
                                                                       context,
                                                                       "အိုကေ",
                                                                       Colors
@@ -2260,7 +2257,7 @@ class _DonarListState extends State<DonarList> {
                           padding: EdgeInsets.all(
                               Responsive.isMobile(context) ? 8 : 12),
                           child: const Text(
-                            "အသုံးစားရိတ်",
+                            "အသုံးစရိတ်",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               // fontFamily: "Times New Roman",
@@ -2433,7 +2430,7 @@ class _DonarListState extends State<DonarList> {
                                                               .startsWith(
                                                                   "2")) {
                                                             Utils.messageSuccessNoPopDialog(
-                                                                "အသုံးစားရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                                "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
                                                                 context,
                                                                 "အိုကေ",
                                                                 Colors.black);

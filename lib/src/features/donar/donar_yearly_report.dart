@@ -58,7 +58,7 @@ class DonationYearlyReport extends StatelessWidget {
           shrinkWrap: true,
           children: [
             Text(
-                "${"${Utils.strToMM(selectedYear.toString())} "} ခုနှစ် တစ်နှစ်တာ အလှူငွေ ရရှိမှုနှင့် \n အသုံးစားရိတ် စာရင်းရှင်းတမ်း",
+                "${"${Utils.strToMM(selectedYear.toString())} "} ခုနှစ် တစ်နှစ်တာ အလှူငွေ ရရှိမှုနှင့် \n အသုံးစရိတ် စာရင်းရှင်းတမ်း",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 18,
@@ -98,7 +98,7 @@ class DonationYearlyReport extends StatelessWidget {
                       padding:
                           EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
                       child: const Text(
-                        "အသုံးစားရိတ်",
+                        "အသုံးစရိတ်",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           // fontFamily: "Times New Roman",

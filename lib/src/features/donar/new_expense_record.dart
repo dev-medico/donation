@@ -62,7 +62,7 @@ class NewDonarState extends State<NewExpenseRecordScreen> {
           _isLoading = false;
         });
         Utils.messageSuccessSinglePopDialog(
-            "အသုံးစားရိတ် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+            "အသုံးစရိတ် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
             context,
             "အိုကေ",
             Colors.black);
@@ -105,7 +105,7 @@ class NewDonarState extends State<NewExpenseRecordScreen> {
         title: const Padding(
           padding: EdgeInsets.only(top: 4),
           child: Center(
-            child: Text("အသုံးစားရိတ် ထည့်သွင်းမည်",
+            child: Text("အသုံးစရိတ် ထည့်သွင်းမည်",
                 textScaleFactor: 1.0,
                 style: TextStyle(fontSize: 15, color: Colors.white)),
           ),
@@ -296,7 +296,7 @@ class NewDonarState extends State<NewExpenseRecordScreen> {
     DateTime? newDateTime = await showRoundedDatePicker(
         context: context,
         initialDate: DateTime.now(),
-         textPositiveButton: "ရွေးချယ်မည်",
+        textPositiveButton: "ရွေးချယ်မည်",
         textNegativeButton: "မရွေးချယ်ပါ",
         firstDate: DateTime(DateTime.now().year - 150),
         lastDate: DateTime(DateTime.now().year + 1),
