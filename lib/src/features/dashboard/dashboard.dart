@@ -11,6 +11,7 @@ import 'package:merchant/src/features/donar/donar_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:merchant/src/features/donation/donation_chart_by_blood.dart';
 import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
+import 'package:merchant/src/features/special_event/event_list.dart';
 import 'package:merchant/src/features/special_event/special_event_list.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/utils.dart';
@@ -92,17 +93,13 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           //get current year
           var date = DateTime.now();
           String donationYear = DateFormat('yyyy').format(date);
-          // donationYear = (int.parse(donationYear) - 1).toString();
-          log("Donation Year - $donationYear");
-          // get donation year from dataList[i].date
+          
           var tempDate = "";
           if (dataList[i].date!.toString().contains("T")) {
             tempDate = dataList[i].date!.toString().split("T")[0];
           } else if (dataList[i].date!.toString().contains(" ")) {
             tempDate = dataList[i].date!.toString().split(" ")[0];
           }
-
-          log("Temp $tempDate");
 
           if (tempDate.split("-")[0] == donationYear) {
             setState(() {
@@ -311,7 +308,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               initial();
             } else if (index == 2) {
               await Navigator.pushNamed(
-                  context, SpecialEventListScreen.routeName);
+                  context, EventListScreen.routeName);
               initial();
             } else if (index == 3) {
               await Navigator.pushNamed(context, DonarList.routeName);

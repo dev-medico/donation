@@ -6,7 +6,7 @@ import 'package:merchant/src/features/donar/donar_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:merchant/src/features/home/home.dart';
 import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
-import 'package:merchant/src/features/special_event/special_event_list.dart';
+import 'package:merchant/src/features/special_event/event_list.dart';
 import 'package:merchant/src/features/splash_screen/splash_screen.dart';
 import 'package:merchant/utils/custom_scroll.dart';
 import 'settings/settings_controller.dart';
@@ -85,8 +85,8 @@ class _MyAppState extends State<MyApp> {
               case BloodDonationListNewStyle.routeName:
                 return const BloodDonationListNewStyle();
 
-              case SpecialEventListScreen.routeName:
-                return const SpecialEventListScreen();
+              case EventListScreen.routeName:
+                return EventListScreen();
 
               case DonarList.routeName:
                 return DonarList();

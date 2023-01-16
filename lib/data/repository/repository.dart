@@ -12,6 +12,18 @@ Map<String, String> headers = {
 class XataRepository {
   XataRepository();
 
+  Future<http.Response> getEventsList(String after) async {
+    final response = await http.post(
+        Uri.parse(
+            'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Records/query'),
+        headers: headers,
+        body: jsonEncode(<String, dynamic>{
+          "page": {"size": 200, if (after != "") "after": after},
+        }));
+
+    return response;
+  }
+
   Future<http.Response> uploadNewEvent(String data) async {
     final response = await http.post(
         Uri.parse(
