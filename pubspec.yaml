@@ -41,6 +41,7 @@ dependencies:
   objectbox_flutter_libs: ^1.7.0
   shared_preferences: ^2.0.15
   shimmer: ^2.0.0
+  syncfusion_flutter_datagrid: ^20.4.43
   tab_container: ^2.0.0
 
 dev_dependencies:

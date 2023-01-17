@@ -2,16 +2,17 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter_expandable_table/flutter_expandable_table.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:logger/logger.dart';
 import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/data/response/xata_member_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/member/member_detail.dart';
+import 'package:merchant/src/features/new_features/member/member_data_source.dart';
 import 'package:merchant/src/features/member/new_member.dart';
 import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MemberListNewStyle extends StatefulWidget {
   static const routeName = "/member_list";
@@ -614,119 +615,220 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
     });
   }
 
-  ExpandableTable buildSimpleTable(List<MemberData> data) {
-    const int COLUMN_COUNT = 7;
-    int ROWCOUNT = data.length;
-    List<String> titles = [
-      "အမည်",
-      "အဖအမည်",
-      "သွေးအုပ်စု",
-      "မှတ်ပုံတင်အမှတ်",
-      "သွေးဘဏ်ကတ်",
-      "သွေးလှူမှုကြိမ်ရေ"
-    ];
-
-    //Creation header
-    ExpandableTableHeader header = ExpandableTableHeader(
-        firstCell: Container(
-            width: Responsive.isMobile(context) ? 80 : 120,
-            color: primaryColor,
-            height: 60,
-            margin: const EdgeInsets.all(1),
-            child: const Center(
-                child: Text(
-              'အမှတ်စဥ်',
-              style: TextStyle(fontSize: 15, color: Colors.white),
-            ))),
-        children: List.generate(
-            COLUMN_COUNT - 1,
-            (index) => Container(
-                color: primaryColor,
-                margin: const EdgeInsets.all(1),
-                child: Center(
-                    child: Text(
-                  titles[index],
-                  style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 13 : 14,
-                      color: Colors.white),
-                )))));
-    //Creation rows
-    List<ExpandableTableRow> rows = List.generate(
-        ROWCOUNT,
-        (rowIndex) => ExpandableTableRow(
-              height: 50,
-              firstCell: Container(
-                  color: const Color(0xffe1e1e1),
-                  margin: const EdgeInsets.all(1),
-                  child: Center(
-                      child: Text(
-                    data[rowIndex].memberId.toString(),
-                    style: const TextStyle(fontSize: 15, color: Colors.black),
+  buildSimpleTable(List<MemberData> data) {
+    MemberDataSource memberDataDataSource = MemberDataSource(memberData: data);
+    return Container(
+      margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 40),
+      child: SfDataGrid(
+        source: memberDataDataSource,
+        onCellTap: (details) async {
+          Logger logger = Logger();
+          logger.i(details.rowColumnIndex.rowIndex);
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MemberDetailScreen(
+                data: data[details.rowColumnIndex.rowIndex - 1],
+              ),
+            ),
+          );
+          callAPI("");
+        },
+        gridLinesVisibility: GridLinesVisibility.both,
+        headerGridLinesVisibility: GridLinesVisibility.both,
+        columnWidthMode: Responsive.isMobile(context)
+            ? ColumnWidthMode.auto
+            : ColumnWidthMode.fill,
+        columns: <GridColumn>[
+          GridColumn(
+              columnName: 'အမှတ်စဥ်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'အမှတ်စဥ်',
+                    style: TextStyle(color: Colors.white),
                   ))),
-              children: List<Widget>.generate(
-                  COLUMN_COUNT - 1,
-                  (columnIndex) => GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MemberDetailScreen(
-                                data: data[rowIndex],
-                              ),
-                            ),
-                          );
-                          callAPI("");
-                        },
-                        child: Container(
-                            decoration: borderDecorationNoRadius(Colors.grey),
-                            margin: const EdgeInsets.all(1),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: columnIndex == 4 ? 32 : 20.0, top: 14),
-                              child: Text(
-                                columnIndex == 0
-                                    ? data[rowIndex].name.toString()
-                                    : columnIndex == 1
-                                        ? data[rowIndex].fatherName.toString()
-                                        : columnIndex == 2
-                                            ? data[rowIndex]
-                                                .bloodType
-                                                .toString()
-                                            : columnIndex == 3
-                                                ? data[rowIndex].nrc.toString()
-                                                : columnIndex == 4
-                                                    ? data[rowIndex]
-                                                        .bloodBankCard
-                                                        .toString()
-                                                    : columnIndex == 5
-                                                        ? data[rowIndex]
-                                                            .donationCounts
-                                                            .toString()
-                                                            .toString()
-                                                        : "",
-                                textAlign: columnIndex == 5 || columnIndex == 2
-                                    ? TextAlign.center
-                                    : TextAlign.start,
-                                style: TextStyle(
-                                    fontSize:
-                                        Responsive.isMobile(context) ? 13 : 14,
-                                    color: Colors.black),
-                              ),
-                            )),
-                      )),
-            ));
-
-    return ExpandableTable(
-      rows: rows,
-      header: header,
-      cellWidth: Responsive.isMobile(context)
-          ? MediaQuery.of(context).size.width * 0.4
-          : MediaQuery.of(context).size.width * 0.14,
-      cellHeight: 48,
-      headerHeight: 52,
-      firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
-      scrollShadowColor: Colors.grey,
+          GridColumn(
+              columnName: 'အမည်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'အမည်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'အဖအမည်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'အဖအမည်',
+                    style: TextStyle(color: Colors.white),
+                    overflow: TextOverflow.ellipsis,
+                  ))),
+          GridColumn(
+              columnName: 'သွေးအုပ်စု',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'သွေးအုပ်စု',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'မှတ်ပုံတင်အမှတ်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'မှတ်ပုံတင်အမှတ်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'သွေးဘဏ်ကတ်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'သွေးဘဏ်ကတ်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'သွေးလှူမှုကြိမ်ရေ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'သွေးလှူမှုကြိမ်ရေ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+        ],
+      ),
     );
   }
+
+  // ExpandableTable buildSimpleTable(List<MemberData> data) {
+  //   const int COLUMN_COUNT = 7;
+  //   int ROWCOUNT = data.length;
+  //   List<String> titles = [
+  //     "အမည်",
+  //     "အဖအမည်",
+  //     "သွေးအုပ်စု",
+  //     "မှတ်ပုံတင်အမှတ်",
+  //     "သွေးဘဏ်ကတ်",
+  //     "သွေးလှူမှုကြိမ်ရေ"
+  //   ];
+
+  //   //Creation header
+  //   ExpandableTableHeader header = ExpandableTableHeader(
+  //       firstCell: Container(
+  //           width: Responsive.isMobile(context) ? 80 : 120,
+  //           color: primaryColor,
+  //           height: 60,
+  //           margin: const EdgeInsets.all(1),
+  //           child: const Center(
+  //               child: Text(
+  //             'အမှတ်စဥ်',
+  //             style: TextStyle(fontSize: 15, color: Colors.white),
+  //           ))),
+  //       children: List.generate(
+  //           COLUMN_COUNT - 1,
+  //           (index) => Container(
+  //               color: primaryColor,
+  //               margin: const EdgeInsets.all(1),
+  //               child: Center(
+  //                   child: Text(
+  //                 titles[index],
+  //                 style: TextStyle(
+  //                     fontSize: Responsive.isMobile(context) ? 13 : 14,
+  //                     color: Colors.white),
+  //               )))));
+  //   //Creation rows
+  //   List<ExpandableTableRow> rows = List.generate(
+  //       ROWCOUNT,
+  //       (rowIndex) => ExpandableTableRow(
+  //             height: 50,
+  //             firstCell: Container(
+  //                 color: const Color(0xffe1e1e1),
+  //                 margin: const EdgeInsets.all(1),
+  //                 child: Center(
+  //                     child: Text(
+  //                   data[rowIndex].memberId.toString(),
+  //                   style: const TextStyle(fontSize: 15, color: Colors.black),
+  //                 ))),
+  //             children: List<Widget>.generate(
+  //                 COLUMN_COUNT - 1,
+  //                 (columnIndex) => GestureDetector(
+  //                       behavior: HitTestBehavior.translucent,
+  //                       onTap: () async {
+  //                         await Navigator.push(
+  //                           context,
+  //                           MaterialPageRoute(
+  //                             builder: (context) => MemberDetailScreen(
+  //                               data: data[rowIndex],
+  //                             ),
+  //                           ),
+  //                         );
+  //                         callAPI("");
+  //                       },
+  //                       child: Container(
+  //                           decoration: borderDecorationNoRadius(Colors.grey),
+  //                           margin: const EdgeInsets.all(1),
+  //                           child: Padding(
+  //                             padding: EdgeInsets.only(
+  //                                 left: columnIndex == 4 ? 32 : 20.0, top: 14),
+  //                             child: Text(
+  //                               columnIndex == 0
+  //                                   ? data[rowIndex].name.toString()
+  //                                   : columnIndex == 1
+  //                                       ? data[rowIndex].fatherName.toString()
+  //                                       : columnIndex == 2
+  //                                           ? data[rowIndex]
+  //                                               .bloodType
+  //                                               .toString()
+  //                                           : columnIndex == 3
+  //                                               ? data[rowIndex].nrc.toString()
+  //                                               : columnIndex == 4
+  //                                                   ? data[rowIndex]
+  //                                                       .bloodBankCard
+  //                                                       .toString()
+  //                                                   : columnIndex == 5
+  //                                                       ? data[rowIndex]
+  //                                                           .donationCounts
+  //                                                           .toString()
+  //                                                           .toString()
+  //                                                       : "",
+  //                               textAlign: columnIndex == 5 || columnIndex == 2
+  //                                   ? TextAlign.center
+  //                                   : TextAlign.start,
+  //                               style: TextStyle(
+  //                                   fontSize:
+  //                                       Responsive.isMobile(context) ? 13 : 14,
+  //                                   color: Colors.black),
+  //                             ),
+  //                           )),
+  //                     )),
+  //           ));
+
+  //   return ExpandableTable(
+  //     rows: rows,
+  //     header: header,
+  //     cellWidth: Responsive.isMobile(context)
+  //         ? MediaQuery.of(context).size.width * 0.4
+  //         : MediaQuery.of(context).size.width * 0.14,
+  //     cellHeight: 48,
+  //     headerHeight: 52,
+  //     firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
+  //     scrollShadowColor: Colors.grey,
+  //   );
+  // }
 }
