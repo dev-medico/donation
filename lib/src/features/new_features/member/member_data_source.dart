@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/data/response/member_response.dart';
+import 'package:merchant/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MemberDataSource extends DataGridSource {
@@ -14,9 +15,11 @@ class MemberDataSource extends DataGridSource {
                   columnName: 'သွေးအုပ်စု', value: e.bloodType),
               DataGridCell<String>(columnName: 'မှတ်ပုံတင်အမှတ်', value: e.nrc),
               DataGridCell<String>(
-                  columnName: 'သွေးဘဏ်ကတ်', value: e.bloodBankCard),
-              DataGridCell<int>(
-                  columnName: 'သွေးလှူမှုကြိမ်ရေ', value: e.totalCount),
+                  columnName: 'သွေးဘဏ်ကတ်',
+                  value: "${"    " + e.bloodBankCard}    "),
+              DataGridCell<String>(
+                  columnName: 'သွေးလှူမှုကြိမ်ရေ',
+                  value: "       ${Utils.strToMM(e.totalCount.toString())} ကြိမ်       "),
             ]))
         .toList();
   }

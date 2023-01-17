@@ -1,17 +1,19 @@
 import 'dart:convert';
+import 'dart:developer';
 
-import 'package:flutter_expandable_table/flutter_expandable_table.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:logger/logger.dart';
 import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/xata_donation_list_response.dart';
 import 'package:merchant/data/response/xata_donation_search_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/donation/blood_donation_report.dart';
+import 'package:merchant/src/features/donation/donation_data_source.dart';
 import 'package:merchant/src/features/donation/donation_detail.dart';
 import 'package:merchant/src/features/donation/new_blood_donation.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 
 class BloodDonationListNewStyle extends StatefulWidget {
@@ -152,6 +154,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
             .page!
             .cursor!);
       } else {
+        log("Data Fully Loaded");
         setState(() {
           dataFullLoaded = true;
         });
@@ -824,162 +827,312 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   }
 
   buildSimpleTable(List<DonationRecord> data) {
-    const int COLUMN_COUNT = 8;
-    int ROWCOUNT = data.length;
-    List<String> titles = [
-      "သွေးအလှူရှင်",
-      "သွေးအုပ်စု",
-      "လှူဒါန်းသည့်နေရာ",
-      "လူနာအမည်",
-      "လိပ်စာ",
-      "အသက်",
-      "ဖြစ်ပွားသည့်ရောဂါ"
-    ];
+    // const int COLUMN_COUNT = 8;
+    // int ROWCOUNT = data.length;
+    // List<String> titles = [
+    //   "သွေးအလှူရှင်",
+    //   "သွေးအုပ်စု",
+    //   "လှူဒါန်းသည့်နေရာ",
+    //   "လူနာအမည်",
+    //   "လိပ်စာ",
+    //   "အသက်",
+    //   "ဖြစ်ပွားသည့်ရောဂါ"
+    // ];
 
-    ExpandableTableHeader header = ExpandableTableHeader(
-        firstCell: Container(
-            width: Responsive.isMobile(context) ? 90 : 120,
-            color: primaryColor,
-            height: 60,
-            margin: const EdgeInsets.all(1),
-            child: const Center(
-                child: Text(
-              'ရက်စွဲ',
-              style: TextStyle(fontSize: 15, color: Colors.white),
-            ))),
-        children: List.generate(
-            COLUMN_COUNT - 1,
-            (index) => Container(
-                color: primaryColor,
-                margin: const EdgeInsets.all(1),
-                child: Center(
-                    child: Text(
-                  titles[index],
-                  style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 13 : 14,
-                      color: Colors.white),
-                )))));
+    // ExpandableTableHeader header = ExpandableTableHeader(
+    //     firstCell: Container(
+    //         width: Responsive.isMobile(context) ? 90 : 120,
+    //         color: primaryColor,
+    //         height: 60,
+    //         margin: const EdgeInsets.all(1),
+    //         child: const Center(
+    //             child: Text(
+    //           'ရက်စွဲ',
+    //           style: TextStyle(fontSize: 15, color: Colors.white),
+    //         ))),
+    //     children: List.generate(
+    //         COLUMN_COUNT - 1,
+    //         (index) => Container(
+    //             color: primaryColor,
+    //             margin: const EdgeInsets.all(1),
+    //             child: Center(
+    //                 child: Text(
+    //               titles[index],
+    //               style: TextStyle(
+    //                   fontSize: Responsive.isMobile(context) ? 13 : 14,
+    //                   color: Colors.white),
+    //             )))));
 
-    List<ExpandableTableRow> rows = List.generate(
-        ROWCOUNT,
-        (rowIndex) => ExpandableTableRow(
-              height: 50,
-              firstCell: Container(
-                  color: const Color(0xffe1e1e1),
-                  margin: const EdgeInsets.all(1),
-                  child: Center(
-                      child: Text(
-                    data[rowIndex].date!.contains("T")
-                        ? data[rowIndex].date.toString().split("T")[0]
-                        : data[rowIndex].date!.contains(" ")
-                            ? data[rowIndex].date.toString().split(" ")[0]
-                            : data[rowIndex].date.toString(),
-                    style: const TextStyle(fontSize: 15, color: Colors.black),
-                  ))),
-              children: List<Widget>.generate(
-                  COLUMN_COUNT - 1,
-                  (columnIndex) => GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () async {
-                          Member member = Member(
-                            address: data[rowIndex].member!.address,
-                            birthDate: data[rowIndex].member!.birthDate,
-                            bloodBankCard: data[rowIndex].member!.bloodBankCard,
-                            bloodType: data[rowIndex].member!.bloodType,
-                            donationCounts:
-                                data[rowIndex].member!.donationCounts,
-                            fatherName: data[rowIndex].member!.fatherName,
-                            id: data[rowIndex].member!.id,
-                            lastDonationDate:
-                                data[rowIndex].member!.lastDonationDate,
-                            memberId: data[rowIndex].member!.memberId,
-                            name: data[rowIndex].member!.name,
-                            note: data[rowIndex].member!.note,
-                            nrc: data[rowIndex].member!.nrc,
-                            phone: data[rowIndex].member!.phone,
-                            registerDate: data[rowIndex].member!.registerDate,
-                            totalCount: data[rowIndex].member!.totalCount,
-                          );
-                          await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DonationDetailScreen(
-                                        data: DonationSearchRecords(
-                                          date: data[rowIndex].date,
-                                          hospital: data[rowIndex].hospital,
-                                          id: data[rowIndex].id,
-                                          member: member,
-                                          patientAddress:
-                                              data[rowIndex].patientAddress,
-                                          patientAge: data[rowIndex].patientAge,
-                                          patientDisease:
-                                              data[rowIndex].patientDisease,
-                                          patientName:
-                                              data[rowIndex].patientName,
-                                        ),
-                                      )));
-                          callAPI("");
-                        },
-                        child: Container(
-                            decoration: borderDecorationNoRadius(Colors.grey),
-                            margin: const EdgeInsets.all(1),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: columnIndex == 4 ? 12 : 20.0,
-                                  top: columnIndex == 4 || columnIndex == 6
-                                      ? 4
-                                      : 14),
-                              child: Text(
-                                columnIndex == 0
-                                    ? data[rowIndex].member!.name.toString()
-                                    : columnIndex == 1
-                                        ? data[rowIndex]
-                                            .member!
-                                            .bloodType
-                                            .toString()
-                                        : columnIndex == 2
-                                            ? data[rowIndex].hospital.toString()
-                                            : columnIndex == 3
-                                                ? data[rowIndex]
-                                                    .patientName
-                                                    .toString()
-                                                : columnIndex == 4
-                                                    ? data[rowIndex]
-                                                        .patientAddress
-                                                        .toString()
-                                                    : columnIndex == 5
-                                                        ? Utils.strToMM(
-                                                            data[rowIndex]
-                                                                .patientAge
-                                                                .toString())
-                                                        : columnIndex == 6
-                                                            ? data[rowIndex]
-                                                                .patientDisease
-                                                                .toString()
-                                                            : "",
-                                textAlign: columnIndex == 5 || columnIndex == 2
-                                    ? TextAlign.center
-                                    : TextAlign.start,
-                                style: TextStyle(
-                                    fontSize:
-                                        Responsive.isMobile(context) ? 13 : 14,
-                                    color: Colors.black),
-                              ),
-                            )),
-                      )),
-            ));
+    // List<ExpandableTableRow> rows = List.generate(
+    //     ROWCOUNT,
+    //     (rowIndex) => ExpandableTableRow(
+    //           height: 50,
+    //           firstCell: Container(
+    //               color: const Color(0xffe1e1e1),
+    //               margin: const EdgeInsets.all(1),
+    //               child: Center(
+    //                   child: Text(
+    //                 data[details.rowColumnIndex.rowIndex - 1].date!.contains("T")
+    //                     ? data[details.rowColumnIndex.rowIndex - 1].date.toString().split("T")[0]
+    //                     : data[details.rowColumnIndex.rowIndex - 1].date!.contains(" ")
+    //                         ? data[details.rowColumnIndex.rowIndex - 1].date.toString().split(" ")[0]
+    //                         : data[details.rowColumnIndex.rowIndex - 1].date.toString(),
+    //                 style: const TextStyle(fontSize: 15, color: Colors.black),
+    //               ))),
+    //           children: List<Widget>.generate(
+    //               COLUMN_COUNT - 1,
+    //               (columnIndex) => GestureDetector(
+    //                     behavior: HitTestBehavior.translucent,
+    //                     onTap: () async {
+    // Member member = Member(
+    //   address: data[details.rowColumnIndex.rowIndex - 1].member!.address,
+    //   birthDate: data[details.rowColumnIndex.rowIndex - 1].member!.birthDate,
+    //   bloodBankCard: data[details.rowColumnIndex.rowIndex - 1].member!.bloodBankCard,
+    //   bloodType: data[details.rowColumnIndex.rowIndex - 1].member!.bloodType,
+    //   donationCounts:
+    //       data[details.rowColumnIndex.rowIndex - 1].member!.donationCounts,
+    //   fatherName: data[details.rowColumnIndex.rowIndex - 1].member!.fatherName,
+    //   id: data[details.rowColumnIndex.rowIndex - 1].member!.id,
+    //   lastDonationDate:
+    //       data[details.rowColumnIndex.rowIndex - 1].member!.lastDonationDate,
+    //   memberId: data[details.rowColumnIndex.rowIndex - 1].member!.memberId,
+    //   name: data[details.rowColumnIndex.rowIndex - 1].member!.name,
+    //   note: data[details.rowColumnIndex.rowIndex - 1].member!.note,
+    //   nrc: data[details.rowColumnIndex.rowIndex - 1].member!.nrc,
+    //   phone: data[details.rowColumnIndex.rowIndex - 1].member!.phone,
+    //   registerDate: data[details.rowColumnIndex.rowIndex - 1].member!.registerDate,
+    //   totalCount: data[details.rowColumnIndex.rowIndex - 1].member!.totalCount,
+    // );
+    // await Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //         builder: (context) => DonationDetailScreen(
+    //               data: DonationSearchRecords(
+    //                 date: data[details.rowColumnIndex.rowIndex - 1].date,
+    //                 hospital: data[details.rowColumnIndex.rowIndex - 1].hospital,
+    //                 id: data[details.rowColumnIndex.rowIndex - 1].id,
+    //                 member: member,
+    //                 patientAddress:
+    //                     data[details.rowColumnIndex.rowIndex - 1].patientAddress,
+    //                 patientAge: data[details.rowColumnIndex.rowIndex - 1].patientAge,
+    //                 patientDisease:
+    //                     data[details.rowColumnIndex.rowIndex - 1].patientDisease,
+    //                 patientName:
+    //                     data[details.rowColumnIndex.rowIndex - 1].patientName,
+    //               ),
+    //             )));
+    // callAPI("");
+    //                     },
+    //                     child: Container(
+    //                         decoration: borderDecorationNoRadius(Colors.grey),
+    //                         margin: const EdgeInsets.all(1),
+    //                         child: Padding(
+    //                           padding: EdgeInsets.only(
+    //                               left: columnIndex == 4 ? 12 : 20.0,
+    //                               top: columnIndex == 4 || columnIndex == 6
+    //                                   ? 4
+    //                                   : 14),
+    //                           child: Text(
+    //                             columnIndex == 0
+    //                                 ? data[details.rowColumnIndex.rowIndex - 1].member!.name.toString()
+    //                                 : columnIndex == 1
+    //                                     ? data[details.rowColumnIndex.rowIndex - 1]
+    //                                         .member!
+    //                                         .bloodType
+    //                                         .toString()
+    //                                     : columnIndex == 2
+    //                                         ? data[details.rowColumnIndex.rowIndex - 1].hospital.toString()
+    //                                         : columnIndex == 3
+    //                                             ? data[details.rowColumnIndex.rowIndex - 1]
+    //                                                 .patientName
+    //                                                 .toString()
+    //                                             : columnIndex == 4
+    //                                                 ? data[details.rowColumnIndex.rowIndex - 1]
+    //                                                     .patientAddress
+    //                                                     .toString()
+    //                                                 : columnIndex == 5
+    //                                                     ? Utils.strToMM(
+    //                                                         data[details.rowColumnIndex.rowIndex - 1]
+    //                                                             .patientAge
+    //                                                             .toString())
+    //                                                     : columnIndex == 6
+    //                                                         ? data[details.rowColumnIndex.rowIndex - 1]
+    //                                                             .patientDisease
+    //                                                             .toString()
+    //                                                         : "",
+    //                             textAlign: columnIndex == 5 || columnIndex == 2
+    //                                 ? TextAlign.center
+    //                                 : TextAlign.start,
+    //                             style: TextStyle(
+    //                                 fontSize:
+    //                                     Responsive.isMobile(context) ? 13 : 14,
+    //                                 color: Colors.black),
+    //                           ),
+    //                         )),
+    //                   )),
+    //         ));
 
     if (dataFullLoaded) {
-      return ExpandableTable(
-        rows: rows,
-        header: header,
-        cellWidth: Responsive.isMobile(context)
-            ? MediaQuery.of(context).size.width * 0.4
-            : MediaQuery.of(context).size.width * 0.115,
-        cellHeight: 52,
-        headerHeight: 52,
-        firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
-        scrollShadowColor: Colors.grey,
+      DonationDataSource memberDataDataSource =
+          DonationDataSource(donationData: data);
+      return Container(
+        margin: EdgeInsets.only(
+            right: Responsive.isMobile(context)
+                ? 20
+                : MediaQuery.of(context).size.width * 0.25),
+        child: SfDataGrid(
+          source: memberDataDataSource,
+          onCellTap: (details) async {
+            Logger logger = Logger();
+            logger.i(details.rowColumnIndex.rowIndex);
+            Member member = Member(
+              address:
+                  data[details.rowColumnIndex.rowIndex - 1].member!.address,
+              birthDate:
+                  data[details.rowColumnIndex.rowIndex - 1].member!.birthDate,
+              bloodBankCard: data[details.rowColumnIndex.rowIndex - 1]
+                  .member!
+                  .bloodBankCard,
+              bloodType:
+                  data[details.rowColumnIndex.rowIndex - 1].member!.bloodType,
+              donationCounts: data[details.rowColumnIndex.rowIndex - 1]
+                  .member!
+                  .donationCounts,
+              fatherName:
+                  data[details.rowColumnIndex.rowIndex - 1].member!.fatherName,
+              id: data[details.rowColumnIndex.rowIndex - 1].member!.id,
+              lastDonationDate: data[details.rowColumnIndex.rowIndex - 1]
+                  .member!
+                  .lastDonationDate,
+              memberId:
+                  data[details.rowColumnIndex.rowIndex - 1].member!.memberId,
+              name: data[details.rowColumnIndex.rowIndex - 1].member!.name,
+              note: data[details.rowColumnIndex.rowIndex - 1].member!.note,
+              nrc: data[details.rowColumnIndex.rowIndex - 1].member!.nrc,
+              phone: data[details.rowColumnIndex.rowIndex - 1].member!.phone,
+              registerDate: data[details.rowColumnIndex.rowIndex - 1]
+                  .member!
+                  .registerDate,
+              totalCount:
+                  data[details.rowColumnIndex.rowIndex - 1].member!.totalCount,
+            );
+            await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DonationDetailScreen(
+                          data: DonationSearchRecords(
+                            date:
+                                data[details.rowColumnIndex.rowIndex - 1].date,
+                            hospital: data[details.rowColumnIndex.rowIndex - 1]
+                                .hospital,
+                            id: data[details.rowColumnIndex.rowIndex - 1].id,
+                            member: member,
+                            patientAddress:
+                                data[details.rowColumnIndex.rowIndex - 1]
+                                    .patientAddress,
+                            patientAge:
+                                data[details.rowColumnIndex.rowIndex - 1]
+                                    .patientAge,
+                            patientDisease:
+                                data[details.rowColumnIndex.rowIndex - 1]
+                                    .patientDisease,
+                            patientName:
+                                data[details.rowColumnIndex.rowIndex - 1]
+                                    .patientName,
+                          ),
+                        )));
+
+            callAPI("");
+          },
+          gridLinesVisibility: GridLinesVisibility.both,
+          headerGridLinesVisibility: GridLinesVisibility.both,
+          columnWidthMode: Responsive.isMobile(context)
+              ? ColumnWidthMode.auto
+              : ColumnWidthMode.fill,
+          columns: <GridColumn>[
+            GridColumn(
+                columnName: 'ရက်စွဲ',
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'ရက်စွဲ',
+                      style: TextStyle(color: Colors.white),
+                    ))),
+            GridColumn(
+                columnName: 'သွေးအလှူရှင်',
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'သွေးအလှူရှင်',
+                      style: TextStyle(color: Colors.white),
+                    ))),
+            GridColumn(
+                columnName: 'သွေးအုပ်စု',
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'သွေးအုပ်စု',
+                      style: TextStyle(color: Colors.white),
+                      overflow: TextOverflow.ellipsis,
+                    ))),
+            GridColumn(
+                columnName: 'လှူဒါန်းသည့်နေရာ',
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'လှူဒါန်းသည့်နေရာ',
+                      style: TextStyle(color: Colors.white),
+                    ))),
+            GridColumn(
+                columnName: 'လူနာအမည်',
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'လူနာအမည်',
+                      style: TextStyle(color: Colors.white),
+                    ))),
+            GridColumn(
+                columnName: 'လိပ်စာ',
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'လိပ်စာ',
+                      style: TextStyle(color: Colors.white),
+                    ))),
+            GridColumn(
+                columnName: 'အသက်',
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'အသက်',
+                      style: TextStyle(color: Colors.white),
+                    ))),
+            GridColumn(
+                columnName: 'ဖြစ်ပွားသည့်ရောဂါ',
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'ဖြစ်ပွားသည့်ရောဂါ',
+                      style: TextStyle(color: Colors.white),
+                    ))),
+          ],
+        ),
       );
     } else {
       return const Center(

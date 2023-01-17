@@ -618,7 +618,10 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
   buildSimpleTable(List<MemberData> data) {
     MemberDataSource memberDataDataSource = MemberDataSource(memberData: data);
     return Container(
-      margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 40),
+      margin: EdgeInsets.only(
+          right: Responsive.isMobile(context)
+              ? 20
+              : MediaQuery.of(context).size.width * 0.25),
       child: SfDataGrid(
         source: memberDataDataSource,
         onCellTap: (details) async {
@@ -638,7 +641,7 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
         headerGridLinesVisibility: GridLinesVisibility.both,
         columnWidthMode: Responsive.isMobile(context)
             ? ColumnWidthMode.auto
-            : ColumnWidthMode.fill,
+            : ColumnWidthMode.fitByCellValue,
         columns: <GridColumn>[
           GridColumn(
               columnName: 'အမှတ်စဥ်',
