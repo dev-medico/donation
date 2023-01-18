@@ -976,10 +976,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
       DonationDataSource memberDataDataSource =
           DonationDataSource(donationData: data);
       return Container(
-        margin: EdgeInsets.only(
-            right: Responsive.isMobile(context)
-                ? 20
-                : MediaQuery.of(context).size.width * 0.25),
+        margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
         child: SfDataGrid(
           source: memberDataDataSource,
           onCellTap: (details) async {
@@ -1048,7 +1045,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
           headerGridLinesVisibility: GridLinesVisibility.both,
           columnWidthMode: Responsive.isMobile(context)
               ? ColumnWidthMode.auto
-              : ColumnWidthMode.fill,
+              : ColumnWidthMode.auto,
           columns: <GridColumn>[
             GridColumn(
                 columnName: 'ရက်စွဲ',

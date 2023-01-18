@@ -14,7 +14,7 @@ class DonationDataSource extends DataGridSource {
   String convertDate(String date) {
     log("Smp = $date");
     if (date != "null") {
-      var dateSplit = date.split(' ');
+      var dateSplit = date.split('-');
       var year = dateSplit[0];
       var month = dateSplit[1];
       var day = dateSplit[2];
