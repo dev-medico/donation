@@ -74,21 +74,35 @@ class DonationDataSource extends DataGridSource {
                           ? e.date.toString().split(" ")[0]
                           : e.date.toString())),
               DataGridCell<String>(
-                  columnName: '"သွေးအလှူရှင်"',
-                  value: e.member!.name.toString()),
+                  columnName: 'သွေးအလှူရှင်',
+                  value: "        ${e.member!.name}        "),
               DataGridCell<String>(
                   columnName: 'သွေးအုပ်စု', value: e.member!.bloodType),
               DataGridCell<String>(
-                  columnName: 'လှူဒါန်းသည့်နေရာ', value: e.hospital),
+                  columnName: 'လှူဒါန်းသည့်နေရာ',
+                  value: e.hospital!.isEmpty
+                      ? "                                "
+                      : "        ${e.hospital}        "),
               DataGridCell<String>(
-                  columnName: 'လူနာအမည်', value: e.patientName),
+                  columnName: 'လူနာအမည်',
+                  value: e.patientName!.isEmpty
+                      ? "                 "
+                      : e.patientName.toString()),
               DataGridCell<String>(
-                  columnName: 'လိပ်စာ', value: e.patientAddress),
+                  columnName: 'လိပ်စာ',
+                  value: e.patientAddress.toString() == "၊"
+                      ? "                                "
+                      : "     ${e.patientAddress}    "),
               DataGridCell<String>(
                   columnName: 'အသက်',
-                  value: Utils.strToMM(e.patientAge.toString())),
+                  value: e.patientAge.toString().isEmpty
+                      ? "                 "
+                      : "  ${Utils.strToMM(e.patientAge.toString())}   "),
               DataGridCell<String>(
-                  columnName: 'ဖြစ်ပွားသည့်ရောဂါ', value: e.patientDisease),
+                  columnName: 'ဖြစ်ပွားသည့်ရောဂါ',
+                  value: e.patientDisease!.isEmpty
+                      ? "                                "
+                      : "     ${e.patientDisease}     "),
             ]))
         .toList();
   }

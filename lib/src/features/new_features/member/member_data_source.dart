@@ -8,18 +8,23 @@ class MemberDataSource extends DataGridSource {
   MemberDataSource({required List<MemberData> memberData}) {
     _memberData = memberData
         .map<DataGridRow>((e) => DataGridRow(cells: [
-              DataGridCell<String>(columnName: 'အမှတ်စဥ်', value: e.memberId),
-              DataGridCell<String>(columnName: 'အမည်', value: e.name),
-              DataGridCell<String>(columnName: 'အဖအမည်', value: e.fatherName),
+              DataGridCell<String>(
+                  columnName: 'အမှတ်စဥ်', value: "   ${e.memberId}   "),
+              DataGridCell<String>(
+                  columnName: 'အမည်', value: "      ${e.name}\t\t\t\t"),
+              DataGridCell<String>(
+                  columnName: 'အဖအမည်',
+                  value: "        ${e.fatherName}        "),
               DataGridCell<String>(
                   columnName: 'သွေးအုပ်စု', value: e.bloodType),
               DataGridCell<String>(columnName: 'မှတ်ပုံတင်အမှတ်', value: e.nrc),
               DataGridCell<String>(
                   columnName: 'သွေးဘဏ်ကတ်',
-                  value: "${"    " + e.bloodBankCard}    "),
+                  value: "      ${e.bloodBankCard}    "),
               DataGridCell<String>(
                   columnName: 'သွေးလှူမှုကြိမ်ရေ',
-                  value: "       ${Utils.strToMM(e.totalCount.toString())} ကြိမ်       "),
+                  value:
+                      "       ${Utils.strToMM(e.totalCount.toString())} ကြိမ်       "),
             ]))
         .toList();
   }

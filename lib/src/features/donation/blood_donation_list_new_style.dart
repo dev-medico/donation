@@ -1045,7 +1045,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
           headerGridLinesVisibility: GridLinesVisibility.both,
           columnWidthMode: Responsive.isMobile(context)
               ? ColumnWidthMode.auto
-              : ColumnWidthMode.auto,
+              : ColumnWidthMode.fitByCellValue,
           columns: <GridColumn>[
             GridColumn(
                 columnName: 'ရက်စွဲ',
