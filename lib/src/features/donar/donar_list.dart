@@ -7,6 +7,7 @@ import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/xata_closing_balance_response.dart';
 import 'package:merchant/data/response/xata_donors_list_response.dart';
 import 'package:merchant/responsive.dart';
+import 'package:merchant/src/features/donar/donar_data_source.dart';
 import 'package:merchant/src/features/donar/donar_yearly_report.dart';
 import 'package:merchant/src/features/donar/edit_donar.dart';
 import 'package:merchant/src/features/donar/new_donar.dart';
@@ -14,6 +15,7 @@ import 'package:merchant/src/features/donar/new_expense_record.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
 import 'package:merchant/utils/utils.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -1545,21 +1547,82 @@ class _DonarListState extends State<DonarList> {
       );
     });
 
+    DonarDataSource donarDataSource = DonarDataSource(donarData: data);
+
     if (Responsive.isMobile(context)) {
       return ListView(
         children: [
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.8,
-            child: ExpandableTable(
-              rows: rows,
-              header: header,
-              cellWidth: Responsive.isMobile(context)
-                  ? MediaQuery.of(context).size.width * 0.3
-                  : MediaQuery.of(context).size.width * 0.12,
-              cellHeight: 58,
-              headerHeight: 60,
-              firstColumnWidth: Responsive.isMobile(context) ? 44 : 50,
-              scrollShadowColor: Colors.grey,
+            child: Container(
+              margin: EdgeInsets.only(
+                  right: Responsive.isMobile(context) ? 20 : 20),
+              child: SfDataGrid(
+                source: donarDataSource,
+                onCellTap: (details) async {
+                  Logger logger = Logger();
+                  logger.i(details.rowColumnIndex.rowIndex);
+
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EditDonarScreen(
+                                donor:
+                                    data[details.rowColumnIndex.rowIndex - 1],
+                              )));
+                  calculateLeftBalance();
+                  callAPI("");
+                },
+                gridLinesVisibility: GridLinesVisibility.both,
+                headerGridLinesVisibility: GridLinesVisibility.both,
+                columnWidthMode: Responsive.isMobile(context)
+                    ? ColumnWidthMode.auto
+                    : ColumnWidthMode.fitByCellValue,
+                columns: <GridColumn>[
+                  GridColumn(
+                      columnName: 'စဥ်',
+                      label: Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'စဥ်',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                  GridColumn(
+                      columnName: 'ရက်စွဲ',
+                      label: Container(
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'ရက်စွဲ',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                  GridColumn(
+                      columnName: 'အမည်',
+                      label: Container(
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'အမည်',
+                            style: TextStyle(color: Colors.white),
+                            overflow: TextOverflow.ellipsis,
+                          ))),
+                  GridColumn(
+                      columnName: 'အလှူငွေ',
+                      label: Container(
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'အလှူငွေ',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                ],
+              ),
             ),
           ),
           SizedBox(
@@ -2195,16 +2258,75 @@ class _DonarListState extends State<DonarList> {
         children: [
           Expanded(
             flex: 1,
-            child: ExpandableTable(
-              rows: rows,
-              header: header,
-              cellWidth: Responsive.isMobile(context)
-                  ? MediaQuery.of(context).size.width * 0.4
-                  : MediaQuery.of(context).size.width * 0.12,
-              cellHeight: 58,
-              headerHeight: 60,
-              firstColumnWidth: Responsive.isMobile(context) ? 44 : 50,
-              scrollShadowColor: Colors.grey,
+            child: Container(
+              margin: EdgeInsets.only(
+                  right: Responsive.isMobile(context) ? 20 : 20),
+              child: SfDataGrid(
+                source: donarDataSource,
+                onCellTap: (details) async {
+                  Logger logger = Logger();
+                  logger.i(details.rowColumnIndex.rowIndex);
+
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EditDonarScreen(
+                                donor:
+                                    data[details.rowColumnIndex.rowIndex - 1],
+                              )));
+                  calculateLeftBalance();
+                  callAPI("");
+                },
+                gridLinesVisibility: GridLinesVisibility.both,
+                headerGridLinesVisibility: GridLinesVisibility.both,
+                columnWidthMode: Responsive.isMobile(context)
+                    ? ColumnWidthMode.auto
+                    : ColumnWidthMode.fitByCellValue,
+                columns: <GridColumn>[
+                  GridColumn(
+                      columnName: 'စဥ်',
+                      label: Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'စဥ်',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                  GridColumn(
+                      columnName: 'ရက်စွဲ',
+                      label: Container(
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'ရက်စွဲ',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                  GridColumn(
+                      columnName: 'အမည်',
+                      label: Container(
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'အမည်',
+                            style: TextStyle(color: Colors.white),
+                            overflow: TextOverflow.ellipsis,
+                          ))),
+                  GridColumn(
+                      columnName: 'အလှူငွေ',
+                      label: Container(
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'အလှူငွေ',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                ],
+              ),
             ),
           ),
           Expanded(

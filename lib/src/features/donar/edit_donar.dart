@@ -243,14 +243,31 @@ class NewDonarState extends State<EditDonarScreen> {
                       width: Responsive.isMobile(context)
                           ? MediaQuery.of(context).size.width
                           : MediaQuery.of(context).size.width * 0.3,
-                      decoration: shadowDecorationWithBorder(
-                          Colors.white, Colors.black),
+                      decoration:
+                          shadowDecorationWithBorder(Colors.white, Colors.red),
                       margin: const EdgeInsets.only(
                           left: 15, bottom: 16, right: 15),
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
-                          Navigator.pop(context);
+                          confirmDeleteDialog(
+                              "ဖျက်မည်မှာ သေချာပါသလား?",
+                              "အသုံးစရိတ်အား ဖျက်မည်မှာ \nသေချာပါသလား?",
+                              context,
+                              "အိုကေ",
+                              Colors.black, () {
+                            XataRepository()
+                                .deleteExpenseByID(widget.donor!.id!.toString())
+                                .then((value) {
+                              if (value.statusCode.toString().startsWith("2")) {
+                                Utils.messageSuccessSinglePopDialog(
+                                    "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                    context,
+                                    "အိုကေ",
+                                    Colors.black);
+                              }
+                            });
+                          });
                         },
                         child: Align(
                             alignment: Alignment.center,
@@ -258,7 +275,7 @@ class NewDonarState extends State<EditDonarScreen> {
                                 padding:
                                     const EdgeInsets.only(top: 8, bottom: 8),
                                 child: Text(
-                                  "မပြင်ဆင်တော့ပါ",
+                                  "ဖျက်သိမ်းမည်",
                                   textScaleFactor: 1.0,
                                   style: TextStyle(
                                       fontSize: 16.0, color: primaryColor),
@@ -271,6 +288,169 @@ class NewDonarState extends State<EditDonarScreen> {
         ),
       ),
     );
+  }
+
+  YYDialog confirmDeleteDialog(String title, String msg, BuildContext context,
+      String buttonMsg, Color color, Function onTap) {
+    return YYDialog().build()
+      ..width = Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width * 0.8
+          : MediaQuery.of(context).size.width * 0.3
+//      ..height = 110
+      ..backgroundColor =
+          Colors.white //Colors.black.withOpacity(0.8)//main_theme_color
+      ..borderRadius = 10.0
+      ..barrierColor = const Color(0xDD000000)
+      ..showCallBack = () {
+        debugPrint("showCallBack invoke");
+      }
+      ..dismissCallBack = () {
+        debugPrint("dismissCallBack invoke");
+      }
+      ..widget(Container(
+        color: Colors.red,
+        padding: const EdgeInsets.only(top: 8),
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4, left: 20, bottom: 12),
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context, rootNavigator: true).pop('dialog');
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                      right: 12,
+                      bottom: 12,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+      ..widget(Padding(
+        padding: EdgeInsets.only(
+            top: Responsive.isMobile(context) ? 26 : 42, bottom: 26),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(
+                left: 8,
+                right: 18,
+              ),
+              child: Image.asset(
+                'assets/images/question_mark.png',
+                height: 56,
+                width: 56,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(
+                left: 12,
+                right: 20,
+              ),
+              child: Text(
+                msg,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: color,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+      ..widget(Align(
+        alignment: Alignment.bottomRight,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context, rootNavigator: true).pop('dialog');
+              },
+              child: Container(
+                decoration:
+                    shadowDecorationWithBorder(Colors.white, Colors.black),
+                height: 50,
+                width: 120,
+                margin: EdgeInsets.only(
+                  left: 20,
+                  bottom: 30,
+                  right: Responsive.isMobile(context) ? 12 : 20,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "မလုပ်တော့ပါ",
+                    textScaleFactor: 1.0,
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontSize: Responsive.isMobile(context) ? 12 : 14),
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () async {
+                onTap.call();
+                Navigator.of(context, rootNavigator: true).pop('dialog');
+              },
+              child: Container(
+                decoration: shadowDecoration(const Color(0xffFF5F17)),
+                height: 50,
+                width: 120,
+                margin: EdgeInsets.only(
+                  bottom: 30,
+                  right: Responsive.isMobile(context) ? 12 : 30,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "ဖျက်မည်",
+                    textScaleFactor: 1.0,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: Responsive.isMobile(context) ? 12 : 14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+      ..animatedFunc = (child, animation) {
+        return ScaleTransition(
+          scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
+        );
+      }
+      ..show();
   }
 
   Widget buildOperator() {
