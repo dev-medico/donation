@@ -16,7 +16,7 @@ class MemberDataSource extends DataGridSource {
                   columnName: 'အဖအမည်',
                   value: "        ${e.fatherName}        "),
               DataGridCell<String>(
-                  columnName: 'သွေးအုပ်စု', value: e.bloodType),
+                  columnName: 'သွေးအုပ်စု', value:"  "+ e.bloodType + "  "),
               DataGridCell<String>(columnName: 'မှတ်ပုံတင်အမှတ်', value: e.nrc),
               DataGridCell<String>(
                   columnName: 'သွေးဘဏ်ကတ်',
@@ -39,7 +39,10 @@ class MemberDataSource extends DataGridSource {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
       return Container(
-        alignment: Alignment.center,
+        alignment: Utils.isNumeric(e.value.toString().replaceAll("-", "")) ||
+                e.value.toString().contains(" ကြိမ်")
+            ? Alignment.centerRight
+            : Alignment.centerLeft,
         padding: const EdgeInsets.all(8.0),
         child: Text(e.value.toString()),
       );

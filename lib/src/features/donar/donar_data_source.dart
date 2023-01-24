@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:merchant/data/response/xata_donors_list_response.dart';
 import 'package:merchant/utils/utils.dart';
@@ -48,8 +50,11 @@ class DonarDataSource extends DataGridSource {
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
+      log(e.value.runtimeType.toString());
       return Container(
-        alignment: Alignment.center,
+        alignment: Utils.isNumeric(e.value.toString())
+            ? Alignment.centerRight
+            : Alignment.centerLeft,
         padding: const EdgeInsets.all(8.0),
         child: Text(e.value.toString()),
       );

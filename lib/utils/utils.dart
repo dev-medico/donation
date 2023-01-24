@@ -29,6 +29,13 @@ class Utils {
     return converted;
   }
 
+  static bool isNumeric(String? s) {
+    if (s == null) {
+      return false;
+    }
+    return double.tryParse(s) != null;
+  }
+
   static YYDialog messageSuccessDialog(
       String msg, BuildContext context, String buttonMsg, Color color) {
     return YYDialog().build()

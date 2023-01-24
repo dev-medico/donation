@@ -117,7 +117,9 @@ class DonationDataSource extends DataGridSource {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
       return Container(
-        alignment: Alignment.center,
+        alignment: Utils.isNumeric(e.value.toString())
+            ? Alignment.centerRight
+            : Alignment.centerLeft,
         padding: const EdgeInsets.all(8.0),
         child: Text(e.value.toString()),
       );

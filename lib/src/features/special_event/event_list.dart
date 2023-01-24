@@ -8,6 +8,7 @@ import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/special_event_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/special_event/edit_special_event.dart';
+import 'package:merchant/src/features/special_event/new_special_event.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
 import 'package:merchant/utils/utils.dart';
@@ -618,6 +619,18 @@ class _EventListScreenState extends State<EventListScreen> {
               textScaleFactor: 1.0,
               style: TextStyle(fontSize: 15, color: Colors.white)),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const NewEventAddScreen(),
+            ),
+          );
+          callAPI("");
+        },
+        child: const Icon(Icons.add),
       ),
       body: dataFullLoaded
           ? tabCreate()
