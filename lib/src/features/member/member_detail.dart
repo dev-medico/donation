@@ -608,7 +608,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                     ),
                     child: ListView(
                       shrinkWrap: true,
-                      // physics: const NeverScrollableScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.all(12),
                       children: [
                         Row(
