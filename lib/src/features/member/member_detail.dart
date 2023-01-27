@@ -599,6 +599,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                   flex: 3,
                   child: Container(
                     width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.9,
                     decoration: shadowDecoration(Colors.white),
                     margin: const EdgeInsets.only(
                       left: 20,
@@ -607,7 +608,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                     ),
                     child: ListView(
                       shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+                      // physics: const NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(12),
                       children: [
                         Row(
