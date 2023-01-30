@@ -348,6 +348,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                 margin: const EdgeInsets.only(
                                     left: 20, top: 16, bottom: 8, right: 20),
                                 child: TypeAheadField(
+                                  hideSuggestionsOnKeyboardHide: false,
                                   textFieldConfiguration:
                                       TextFieldConfiguration(
                                     controller: hospitalController,
@@ -393,6 +394,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                   margin: const EdgeInsets.only(
                                       left: 20, top: 16, bottom: 8, right: 20),
                                   child: TypeAheadField(
+                                    hideSuggestionsOnKeyboardHide: false,
                                     textFieldConfiguration:
                                         TextFieldConfiguration(
                                       controller: diseaseController,
@@ -451,6 +453,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                   margin: const EdgeInsets.only(
                                       left: 20, top: 16, bottom: 8, right: 20),
                                   child: TypeAheadField(
+                                    hideSuggestionsOnKeyboardHide: false,
                                     textFieldConfiguration:
                                         TextFieldConfiguration(
                                       controller: townController,
@@ -727,6 +730,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                           bottom: 8,
                                           right: 20),
                                       child: TypeAheadField(
+                                        hideSuggestionsOnKeyboardHide: false,
                                         textFieldConfiguration:
                                             TextFieldConfiguration(
                                           controller: hospitalController,
@@ -809,6 +813,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                             bottom: 8,
                                             right: 20),
                                         child: TypeAheadField(
+                                          hideSuggestionsOnKeyboardHide: false,
                                           textFieldConfiguration:
                                               TextFieldConfiguration(
                                             controller: diseaseController,
@@ -893,6 +898,8 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
                                                 bottom: 8,
                                                 right: 20),
                                             child: TypeAheadField(
+                                              hideSuggestionsOnKeyboardHide:
+                                                  false,
                                               textFieldConfiguration:
                                                   TextFieldConfiguration(
                                                 controller: townController,
@@ -1050,7 +1057,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
     DateTime? newDateTime = await showRoundedDatePicker(
         context: context,
         initialDate: DateTime.now(),
-         textPositiveButton: "ရွေးချယ်မည်",
+        textPositiveButton: "ရွေးချယ်မည်",
         textNegativeButton: "မရွေးချယ်ပါ",
         firstDate: DateTime(DateTime.now().year - 150),
         lastDate: DateTime(DateTime.now().year + 1),

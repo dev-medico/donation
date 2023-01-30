@@ -337,6 +337,7 @@ class MemberEditState extends State<MemberEditScreen> {
                                   margin: const EdgeInsets.only(
                                       left: 20, top: 16, bottom: 8, right: 20),
                                   child: TypeAheadField(
+                                    hideSuggestionsOnKeyboardHide: false,
                                     textFieldConfiguration:
                                         TextFieldConfiguration(
                                       controller: townController,
@@ -775,6 +776,8 @@ class MemberEditState extends State<MemberEditScreen> {
                                                 bottom: 8,
                                                 right: 20),
                                             child: TypeAheadField(
+                                              hideSuggestionsOnKeyboardHide:
+                                                  false,
                                               textFieldConfiguration:
                                                   TextFieldConfiguration(
                                                 controller: townController,
@@ -984,7 +987,7 @@ class MemberEditState extends State<MemberEditScreen> {
     DateTime? newDateTime = await showRoundedDatePicker(
         context: context,
         initialDate: DateTime.now(),
-         textPositiveButton: "ရွေးချယ်မည်",
+        textPositiveButton: "ရွေးချယ်မည်",
         textNegativeButton: "မရွေးချယ်ပါ",
         firstDate: DateTime(DateTime.now().year - 150),
         lastDate: DateTime(DateTime.now().year + 1),

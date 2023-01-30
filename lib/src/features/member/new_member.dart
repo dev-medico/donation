@@ -1277,6 +1277,8 @@ class NewMemberState extends State<NewMemberScreen> {
                                                 bottom: 8,
                                                 right: 20),
                                             child: TypeAheadField(
+                                              hideSuggestionsOnKeyboardHide:
+                                                  false,
                                               textFieldConfiguration:
                                                   TextFieldConfiguration(
                                                 controller: townController,

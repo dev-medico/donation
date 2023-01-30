@@ -64,7 +64,7 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
       const DropdownMenuItem(value: "သွေးအုပ်စု", child: Text("သွေးအုပ်စု")),
-           const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
+      const DropdownMenuItem(value: "A (Rh +)", child: Text("A (Rh +)")),
       const DropdownMenuItem(value: "B (Rh +)", child: Text("B (Rh +)")),
       const DropdownMenuItem(value: "O (Rh +)", child: Text("O (Rh +)")),
       const DropdownMenuItem(value: "AB (Rh +)", child: Text("AB (Rh +)")),
@@ -334,6 +334,7 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
                                   margin: const EdgeInsets.only(
                                       left: 20, top: 16, bottom: 8, right: 20),
                                   child: TypeAheadField(
+                                    hideSuggestionsOnKeyboardHide: false,
                                     textFieldConfiguration:
                                         TextFieldConfiguration(
                                       controller: townController,
@@ -768,6 +769,8 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
                                                 bottom: 8,
                                                 right: 20),
                                             child: TypeAheadField(
+                                              hideSuggestionsOnKeyboardHide:
+                                                  false,
                                               textFieldConfiguration:
                                                   TextFieldConfiguration(
                                                 controller: townController,
@@ -984,7 +987,7 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
     DateTime? newDateTime = await showRoundedDatePicker(
         context: context,
         initialDate: DateTime.now(),
-         textPositiveButton: "ရွေးချယ်မည်",
+        textPositiveButton: "ရွေးချယ်မည်",
         textNegativeButton: "မရွေးချယ်ပါ",
         firstDate: DateTime(DateTime.now().year - 150),
         lastDate: DateTime(DateTime.now().year + 1),
