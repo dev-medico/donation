@@ -598,10 +598,12 @@ class NewMemberState extends State<NewMemberScreen> {
                                   margin: const EdgeInsets.only(
                                       left: 20, top: 16, bottom: 8, right: 20),
                                   child: TypeAheadField(
+                                    hideSuggestionsOnKeyboardHide: false,
                                     textFieldConfiguration:
                                         TextFieldConfiguration(
                                       controller: townController,
                                       autofocus: false,
+
                                       decoration:
                                           inputBoxDecoration("မြို့နယ်"),
 
@@ -1772,7 +1774,7 @@ class NewMemberState extends State<NewMemberScreen> {
     DateTime? newDateTime = await showRoundedDatePicker(
         context: context,
         initialDate: DateTime.now(),
-         textPositiveButton: "ရွေးချယ်မည်",
+        textPositiveButton: "ရွေးချယ်မည်",
         textNegativeButton: "မရွေးချယ်ပါ",
         firstDate: DateTime(DateTime.now().year - 150),
         lastDate: DateTime(DateTime.now().year + 1),
