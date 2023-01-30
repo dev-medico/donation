@@ -30,7 +30,7 @@ dependencies:
   flutter_rounded_date_picker: ^3.0.2
   flutter_spinkit: ^5.1.0
   flutter_svg: ^1.1.6
-  flutter_typeahead: ^4.1.1
+  flutter_typeahead: ^4.3.2
   flutter_zoom_drawer: ^3.0.3
   # google_fonts: ^2.3.2
   hooks_riverpod: ^2.1.3
