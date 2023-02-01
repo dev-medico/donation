@@ -89,7 +89,7 @@ class XataRepository {
             'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Members/query'),
         headers: headers,
         body: jsonEncode(<String, dynamic>{
-          "page": {"size": 1000, if (after != "") "after": after},
+          "page": {"size": 200, if (after != "") "after": after},
         }));
 
     return response;

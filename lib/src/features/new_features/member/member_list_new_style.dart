@@ -577,19 +577,17 @@ class _MemberListNewStyleState extends State<MemberListNewStyle>
             .records!);
       });
 
-      // if (XataMemberListResponse.fromJson(jsonDecode(response.body))
-      //     .meta!
-      //     .page!
-      //     .more!) {
-      //   callAPI(XataMemberListResponse.fromJson(jsonDecode(response.body))
-      //       .meta!
-      //       .page!
-      //       .cursor!);
-      // } else {
-      //   addData();
-      // }
-
-      addData();
+      if (XataMemberListResponse.fromJson(jsonDecode(response.body))
+          .meta!
+          .page!
+          .more!) {
+        callAPI(XataMemberListResponse.fromJson(jsonDecode(response.body))
+            .meta!
+            .page!
+            .cursor!);
+      } else {
+        addData();
+      }
     });
   }
 
