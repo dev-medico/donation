@@ -17,7 +17,9 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
 class EventListScreen extends StatefulWidget {
-  static const routeName = "/event_list";
+  static const routeName = "/special_events";
+
+  const EventListScreen({Key? key}) : super(key: key);
 
   @override
   _EventListScreenState createState() => _EventListScreenState();

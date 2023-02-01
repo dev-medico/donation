@@ -17,7 +17,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 
 class BloodDonationListNewStyle extends StatefulWidget {
-  static const routeName = "/new_blood_donation_list";
+  static const routeName = "/donations";
 
   const BloodDonationListNewStyle({Key? key}) : super(key: key);
 

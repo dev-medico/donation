@@ -21,7 +21,9 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
 class DonarList extends StatefulWidget {
-  static const routeName = "/donar_list";
+  static const routeName = "/donars";
+
+  const DonarList({Key? key}) : super(key: key);
 
   @override
   _DonarListState createState() => _DonarListState();

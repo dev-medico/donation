@@ -15,7 +15,7 @@ import 'package:merchant/utils/Colors.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MemberListNewStyle extends StatefulWidget {
-  static const routeName = "/member_list";
+  static const routeName = "/members";
 
   const MemberListNewStyle({Key? key}) : super(key: key);
 

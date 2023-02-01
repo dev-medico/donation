@@ -10,7 +10,7 @@ import 'package:merchant/src/features/setttings/settings.dart';
 
 class NavigationHomeScreen extends StatefulWidget {
   const NavigationHomeScreen({Key? key}) : super(key: key);
-  static const routeName = "/home_drawer";
+  static const routeName = "/home";
 
   @override
   _NavigationHomeScreenState createState() => _NavigationHomeScreenState();
