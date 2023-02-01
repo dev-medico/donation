@@ -12,7 +12,6 @@ import 'package:merchant/src/features/donation/blood_donation_list_new_style.dar
 import 'package:merchant/src/features/donation/donation_chart_by_blood.dart';
 import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
 import 'package:merchant/src/features/special_event/event_list.dart';
-import 'package:merchant/src/features/special_event/special_event_list.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/utils.dart';
 import 'package:intl/intl.dart';
