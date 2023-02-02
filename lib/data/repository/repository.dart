@@ -81,6 +81,7 @@ class XataRepository {
         }));
 
     return response;
+    
   }
 
   Future<http.Response> getMemberList(String after) async {
