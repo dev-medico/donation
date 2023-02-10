@@ -67,7 +67,6 @@ class XataRepository {
         body: jsonEncode(<String, dynamic>{
           "filter": {"id": "members_total"}
         }));
-
     return response;
   }
 
@@ -79,7 +78,6 @@ class XataRepository {
         body: jsonEncode(<String, dynamic>{
           "filter": {"id": "donations_total"}
         }));
-
     return response;
     
   }
