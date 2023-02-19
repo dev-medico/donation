@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,11 +6,8 @@ import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/total_data_response.dart';
 import 'package:merchant/data/response/xata_donation_list_response.dart';
 import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/donar/donar_list.dart';
-import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
+import 'package:merchant/src/features/dashboard/ui/dashboard_card.dart';
 import 'package:merchant/src/features/donation/donation_chart_by_blood.dart';
-import 'package:merchant/src/features/new_features/member/member_list_new_style.dart';
-import 'package:merchant/src/features/special_event/event_list.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/utils.dart';
 import 'package:intl/intl.dart';
@@ -92,7 +88,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           //get current year
           var date = DateTime.now();
           String donationYear = DateFormat('yyyy').format(date);
-          
+
           var tempDate = "";
           if (dataList[i].date!.toString().contains("T")) {
             tempDate = dataList[i].date!.toString().split("T")[0];
@@ -122,7 +118,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     String dateFormat = DateFormat('dd MMM yyyy ( EEEE )').format(date);
 
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+        //backgroundColor: const Color.fromARGB(255, 254, 252, 231),
         appBar: AppBar(
           title: const Padding(
             padding: EdgeInsets.only(top: 4.0),
@@ -151,21 +147,28 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                         padding: const EdgeInsets.only(left: 12.0, top: 8),
                         child: Row(
                           children: [
-                            DashBoardCard(
-                                0,
-                                primaryDark,
-                                "အဖွဲ့၀င် စာရင်း",
-                                "စုစုပေါင်း အရေအတွက်",
-                                "${Utils.strToMM(totalMember.toString())} ဦး",
-                                Colors.black),
-                            DashBoardCard(
-                              1,
-                              primaryDark,
-                              "သွေးလှူမှု မှတ်တမ်း",
-                              "စုစုပေါင်း အကြိမ်ရေ",
-                              "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                              Colors.blue,
-                            ),
+                            DashboardCard(
+                                index: 0,
+                                color: primaryDark,
+                                title: "အဖွဲ့၀င် စာရင်း",
+                                subtitle: "စုစုပေါင်း အရေအတွက်",
+                                amount:
+                                    "${Utils.strToMM(totalMember.toString())} ဦး",
+                                amountColor: Colors.black,
+                                onTap: () {
+                                  initial();
+                                }),
+                            DashboardCard(
+                                index: 1,
+                                color: primaryDark,
+                                title: "သွေးလှူမှု မှတ်တမ်း",
+                                subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                                amount:
+                                    "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                                amountColor: Colors.blue,
+                                onTap: () {
+                                  initial();
+                                }),
                           ],
                         ),
                       ),
@@ -174,22 +177,26 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                             left: 12.0, top: 8, bottom: 12),
                         child: Row(
                           children: [
-                            DashBoardCard(
-                              2,
-                              primaryDark,
-                              "ထူးခြားဖြစ်စဉ်",
-                              "",
-                              "",
-                              Colors.black,
-                            ),
-                            DashBoardCard(
-                              3,
-                              primaryDark,
-                              "ရ/သုံး ငွေစာရင်း",
-                              "",
-                              "",
-                              Colors.black,
-                            ),
+                            DashboardCard(
+                                index: 2,
+                                color: primaryDark,
+                                title: "ထူးခြားဖြစ်စဉ်",
+                                subtitle: "",
+                                amount: "",
+                                amountColor: Colors.black,
+                                onTap: () {
+                                  initial();
+                                }),
+                            DashboardCard(
+                                index: 3,
+                                color: primaryDark,
+                                title: "ရ/သုံး ငွေစာရင်း",
+                                subtitle: "",
+                                amount: "",
+                                amountColor: Colors.black,
+                                onTap: () {
+                                  initial();
+                                }),
                           ],
                         ),
                       ),
@@ -215,24 +222,31 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                         padding: const EdgeInsets.only(left: 20.0, top: 24),
                         child: Row(
                           children: [
-                            DashBoardCard(
-                                0,
-                                primaryDark,
-                                "အဖွဲ့၀င် စာရင်း",
-                                "စုစုပေါင်း အရေအတွက်",
-                                "${Utils.strToMM(totalMember.toString())} ဦး",
-                                Colors.black),
+                            DashboardCard(
+                                index: 0,
+                                color: primaryDark,
+                                title: "အဖွဲ့၀င် စာရင်း",
+                                subtitle: "စုစုပေါင်း အရေအတွက်",
+                                amount:
+                                    "${Utils.strToMM(totalMember.toString())} ဦး",
+                                amountColor: Colors.black,
+                                onTap: () {
+                                  initial();
+                                }),
                             const SizedBox(
                               width: 12,
                             ),
-                            DashBoardCard(
-                              1,
-                              primaryDark,
-                              "သွေးလှူမှု မှတ်တမ်း",
-                              "စုစုပေါင်း အကြိမ်ရေ",
-                              "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                              Colors.blue,
-                            ),
+                            DashboardCard(
+                                index: 1,
+                                color: primaryDark,
+                                title: "သွေးလှူမှု မှတ်တမ်း",
+                                subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                                amount:
+                                    "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                                amountColor: Colors.blue,
+                                onTap: () {
+                                  initial();
+                                }),
                           ],
                         ),
                       ),
@@ -248,25 +262,29 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                         padding: const EdgeInsets.only(left: 20.0, bottom: 12),
                         child: Row(
                           children: [
-                            DashBoardCard(
-                              2,
-                              primaryDark,
-                              "ထူးခြားဖြစ်စဉ်",
-                              "အသေးစိတ် ကြည့်မည်",
-                              "",
-                              Colors.black,
-                            ),
+                            DashboardCard(
+                                index: 2,
+                                color: primaryDark,
+                                title: "ထူးခြားဖြစ်စဉ်",
+                                subtitle: "အသေးစိတ် ကြည့်မည်",
+                                amount: "",
+                                amountColor: Colors.black,
+                                onTap: () {
+                                  initial();
+                                }),
                             const SizedBox(
                               width: 12,
                             ),
-                            DashBoardCard(
-                              3,
-                              primaryDark,
-                              "ရ/သုံး ငွေစာရင်း",
-                              "အသေးစိတ် ကြည့်မည်",
-                              "",
-                              Colors.black,
-                            ),
+                            DashboardCard(
+                                index: 3,
+                                color: primaryDark,
+                                title: "ရ/သုံး ငွေစာရင်း",
+                                subtitle: "အသေးစိတ် ကြည့်မည်",
+                                amount: "",
+                                amountColor: Colors.black,
+                                onTap: () {
+                                  initial();
+                                }),
                           ],
                         ),
                       ),
@@ -284,76 +302,5 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       )),
                 ],
               ));
-  }
-
-  Widget DashBoardCard(int index, Color color, String title, String subtitle,
-      String amount, Color amountColor) {
-    return Expanded(
-      child: Container(
-        height: Responsive.isMobile(context)
-            ? MediaQuery.of(context).size.height / 4.75
-            : amount == ""
-                ? MediaQuery.of(context).size.height / 5.2
-                : MediaQuery.of(context).size.height / 4,
-        margin: const EdgeInsets.only(top: 12, right: 12),
-        child: NeumorphicButton(
-          onPressed: () async {
-            if (index == 0) {
-              await Navigator.pushNamed(context, MemberListNewStyle.routeName);
-              initial();
-            } else if (index == 1) {
-              await Navigator.pushNamed(
-                  context, BloodDonationListNewStyle.routeName);
-              initial();
-            } else if (index == 2) {
-              await Navigator.pushNamed(
-                  context, EventListScreen.routeName);
-              initial();
-            } else if (index == 3) {
-              await Navigator.pushNamed(context, DonarList.routeName);
-              initial();
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Spacer(),
-                Text(
-                  title,
-                  style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 16 : 18,
-                      fontWeight: FontWeight.bold,
-                      color:
-                          NeumorphicTheme.of(context)?.current!.variantColor),
-                ),
-                const Spacer(),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 16,
-                      color:
-                          NeumorphicTheme.of(context)?.current!.variantColor),
-                ),
-                const SizedBox(
-                  height: 12,
-                ),
-                Text(
-                  amount,
-                  style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 17 : 20,
-                      fontWeight: FontWeight.bold,
-                      color: NeumorphicTheme.of(context)
-                          ?.current!
-                          .defaultTextColor),
-                ),
-                const Spacer(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
