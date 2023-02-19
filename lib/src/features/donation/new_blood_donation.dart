@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -1188,69 +1187,16 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
   }
 
   showDatePicker() async {
-    DateTime? newDateTime = await showRoundedDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        textPositiveButton: "ရွေးချယ်မည်",
-        textNegativeButton: "မရွေးချယ်ပါ",
-        firstDate: DateTime(DateTime.now().year - 150),
-        lastDate: DateTime(DateTime.now().year + 1),
-        theme: ThemeData(primarySwatch: Colors.red),
-        styleDatePicker: MaterialRoundedDatePickerStyle(
-          textStyleDayButton:
-              const TextStyle(fontSize: 20, color: Colors.white),
-          textStyleYearButton: const TextStyle(
-            fontSize: 22,
-            color: Colors.white,
-          ),
-          textStyleDayHeader: const TextStyle(
-            fontSize: 16,
-            color: Colors.white,
-          ),
-          textStyleCurrentDayOnCalendar: const TextStyle(
-              fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold),
-          textStyleDayOnCalendar:
-              const TextStyle(fontSize: 16, color: Colors.white),
-          textStyleDayOnCalendarSelected: const TextStyle(
-              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-          textStyleDayOnCalendarDisabled:
-              TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.1)),
-          textStyleMonthYearHeader: const TextStyle(
-              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-          paddingMonthHeader: const EdgeInsets.all(16),
-          paddingDateYearHeader: const EdgeInsets.all(20),
-          sizeArrow: 28,
-          colorArrowNext: Colors.white,
-          colorArrowPrevious: Colors.white,
-          marginLeftArrowPrevious: 4,
-          marginTopArrowPrevious: 4,
-          marginTopArrowNext: 4,
-          marginRightArrowNext: 4,
-          textStyleButtonAction:
-              const TextStyle(fontSize: 28, color: Colors.white),
-          textStyleButtonPositive: const TextStyle(
-              fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
-          textStyleButtonNegative:
-              TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.5)),
-          decorationDateSelected:
-              BoxDecoration(color: Colors.orange[600], shape: BoxShape.circle),
-          backgroundPicker: Colors.red[400],
-          backgroundActionBar: Colors.red[300],
-          backgroundHeaderMonth: Colors.red[300],
-        ),
-        styleYearPicker: MaterialRoundedYearPickerStyle(
-          textStyleYear: const TextStyle(fontSize: 20, color: Colors.white),
-          textStyleYearSelected: const TextStyle(
-              fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold),
-          heightYearRow: 60,
-          backgroundPicker: Colors.red[400],
-        ));
-    setState(() {
-      String formattedDate = DateFormat('dd MMM yyyy').format(newDateTime!);
-      donationDateDetail = newDateTime;
-      donationDate = formattedDate;
-      //DateTime.fromMillisecondsSinceEpoch(msIntFromServer)
-    });
+    Utils.showCupertinoDatePicker(
+      context,
+      (DateTime newDateTime) {
+        setState(() {
+          String formattedDate = DateFormat('dd MMM yyyy').format(newDateTime);
+          donationDateDetail = newDateTime;
+          donationDate = formattedDate;
+        });
+      },
+    );
   }
 
   void setRegion(String township) {

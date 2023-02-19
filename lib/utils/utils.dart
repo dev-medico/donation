@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_cupertino_date_picker_fork/flutter_cupertino_date_picker_fork.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -34,6 +35,62 @@ class Utils {
       return false;
     }
     return double.tryParse(s) != null;
+  }
+
+  static showCupertinoDatePicker(
+      BuildContext context, Function onDateTimeChanged) async {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: 0,
+          vertical: MediaQuery.of(context).size.height * 0.2,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 28, bottom: 20),
+            child: TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("အိုကေ",
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 16,
+                  )),
+            ),
+          ),
+        ],
+        titlePadding: const EdgeInsets.only(left: 16.0, top: 16.0),
+        title: const Text("ရက်စွဲအား ရွေးချယ်ပါ",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 19,
+            )),
+        content: SizedBox(
+          width: Responsive.isMobile(context)
+              ? MediaQuery.of(context).size.width * 0.7
+              : MediaQuery.of(context).size.width * 0.3,
+          child: DatePickerWidget(
+            dateFormat: 'dd MMM yyyy',
+            initialDateTime: DateTime.parse("1990-01-01"),
+            pickerTheme: DateTimePickerTheme(
+              backgroundColor: Colors.white,
+              cancel: Container(),
+              confirm: Container(),
+              itemTextStyle: const TextStyle(fontSize: 17, color: Colors.red),
+              pickerHeight: MediaQuery.of(context).size.height * 0.35,
+              titleHeight: 0,
+              itemHeight: 30.0,
+            ),
+            onChange: (newDateTime, selectedIndex) {
+              onDateTimeChanged(newDateTime);
+            },
+          ),
+        ),
+      ),
+    );
   }
 
   static YYDialog messageSuccessDialog(
