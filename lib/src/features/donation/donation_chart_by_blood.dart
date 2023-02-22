@@ -34,6 +34,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
     var date = DateTime.now();
     donationYear = DateFormat('yyyy').format(date);
   }
+  
 
   @override
   Widget build(BuildContext context) {
