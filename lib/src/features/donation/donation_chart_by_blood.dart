@@ -172,16 +172,16 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                 height: 1,
                 color: Colors.white,
               ),
-              Container(
-                  margin: EdgeInsets.only(
-                    top: Responsive.isMobile(context) ? 0 : 20,
-                    left: Responsive.isMobile(context) ? 0 : 20,
-                    right: Responsive.isMobile(context)
-                        ? 0
-                        : MediaQuery.of(context).size.width * 0.05,
-                  ),
-                  height: MediaQuery.of(context).size.height / 2.65,
-                  child: SimpleBarChartBlood.withSampleData(widget.data))
+              // Container(
+              //     margin: EdgeInsets.only(
+              //       top: Responsive.isMobile(context) ? 0 : 20,
+              //       left: Responsive.isMobile(context) ? 0 : 20,
+              //       right: Responsive.isMobile(context)
+              //           ? 0
+              //           : MediaQuery.of(context).size.width * 0.05,
+              //     ),
+              //     height: MediaQuery.of(context).size.height / 2.65,
+              //     child: SimpleBarChartBlood.withSampleData(widget.data))
             ],
           ),
         ),

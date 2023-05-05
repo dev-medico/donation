@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/dashboard/ui/chart.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
 
@@ -38,10 +37,10 @@ class DashBoardChart extends StatelessWidget {
           ),
           Container(
             padding: EdgeInsets.only(
-                left: Responsive.isMobile(context)? 12 : 24,
+                left: Responsive.isMobile(context) ? 12 : 24,
                 right: Responsive.isMobile(context) ? 12 : 24,
                 top: Responsive.isMobile(context) ? 8 : 20,
-                bottom:Responsive.isMobile(context)?  8 : 20),
+                bottom: Responsive.isMobile(context) ? 8 : 20),
             margin: EdgeInsets.only(
               top: Responsive.isMobile(context) ? 20 : 30,
             ),
@@ -120,14 +119,14 @@ class DashBoardChart extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-              margin: EdgeInsets.only(
-                top: Responsive.isMobile(context) ? 0 : 20,
-                left: Responsive.isMobile(context) ? 0 : 20,
-                right: Responsive.isMobile(context) ? 0 : 8,
-              ),
-              height: MediaQuery.of(context).size.height / 2.5,
-              child: StackedBarChart.withSampleData())
+          // Container(
+          //     margin: EdgeInsets.only(
+          //       top: Responsive.isMobile(context) ? 0 : 20,
+          //       left: Responsive.isMobile(context) ? 0 : 20,
+          //       right: Responsive.isMobile(context) ? 0 : 8,
+          //     ),
+          //     height: MediaQuery.of(context).size.height / 2.5,
+          //     child: StackedBarChart.withSampleData())
         ],
       ),
     );
