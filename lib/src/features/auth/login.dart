@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -259,18 +258,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _isLoading = true;
     });
 
-    try {
-      //Signed in with temporary account.
-      final userCredential = await FirebaseAuth.instance.signInAnonymously();
-    } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case "operation-not-allowed":
-          print("Anonymous auth hasn't been enabled for this project.");
-          break;
-        default:
-          print("Unknown error.");
-      }
-    }
+    // try {
+    //   //Signed in with temporary account.
+    //   final userCredential = await FirebaseAuth.instance.signInAnonymously();
+    // } on FirebaseAuthException catch (e) {
+    //   switch (e.code) {
+    //     case "operation-not-allowed":
+    //       print("Anonymous auth hasn't been enabled for this project.");
+    //       break;
+    //     default:
+    //       print("Unknown error.");
+    //   }
+    // }
     CollectionReference admins = FirebaseFirestore.instance.collection('admin');
     bool auth = false;
     admins.get().then((value) {
