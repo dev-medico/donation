@@ -8,6 +8,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:merchant/data/response/login_response/login_response.dart';
+import 'package:merchant/realm/realm_provider.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/src/features/home/home.dart';
 import 'package:merchant/utils/Colors.dart';
@@ -240,81 +241,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              try {
-                                //Signed in with temporary account.
-                                final userCredential = await FirebaseAuth
-                                    .instance
-                                    .signInAnonymously();
-                              } on FirebaseAuthException catch (e) {
-                                switch (e.code) {
-                                  case "operation-not-allowed":
-                                    print(
-                                        "Anonymous auth hasn't been enabled for this project.");
-                                    break;
-                                  default:
-                                    print("Unknown error.");
-                                }
-                              }
-                              CollectionReference admins = FirebaseFirestore
-                                  .instance
-                                  .collection('admin');
-                              bool auth = false;
-                              admins.get().then((value) {
-                                for (var element in value.docs) {
-                                  log(element.data().toString());
-                                  final data =
-                                      element.data() as Map<String, dynamic>;
-                                  log(data["email"]);
-                                  log(data["password"]);
-                                  if (data["email"] == email.text.toString() &&
-                                      data["password"] ==
-                                          password.text.toString()) {
-                                    prefs.setString("name", data["name"]);
-                                    prefs.setString("email", data["email"]);
-                                    prefs.setString("role", data["role"]);
-                                    setState(() {
-                                      auth = true;
-                                    });
-                                  }
-                                }
-
-                                if (auth) {
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  Navigator.pushNamedAndRemoveUntil(
-                                      context,
-                                      NavigationHomeScreen.routeName,
-                                      (Route<dynamic> route) => false);
-                                } else {
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  Utils.messageDialog(
-                                      "အချက်အလက်မှားယွင်းနေပါသည်",
-                                      context,
-                                      "ပြင်ဆင်မည်",
-                                      Colors.black);
-                                }
-                              });
+                              realmLogin();
                             }
-
-                            // if (_formKey.currentState!.validate()) {
-                            //   final repository = ref.watch(repositoryProvider);
-                            //   final cancelToken = CancelToken();
-                            //   final loginResponse = await repository.userLogin(
-                            //     loginRequest: LoginRequest(
-                            //         key: email.text.toString(),
-                            //         password: password.text.toString()),
-                            //     cancelToken: cancelToken,
-                            //   );
-                            //   if (loginResponse != null) {
-                            //     saveLogin(loginResponse);
-                            //   }
-                            // }
                           }),
                     ),
                   ]),
@@ -324,6 +252,78 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       ),
     );
+  }
+
+  firebaseLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      //Signed in with temporary account.
+      final userCredential = await FirebaseAuth.instance.signInAnonymously();
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case "operation-not-allowed":
+          print("Anonymous auth hasn't been enabled for this project.");
+          break;
+        default:
+          print("Unknown error.");
+      }
+    }
+    CollectionReference admins = FirebaseFirestore.instance.collection('admin');
+    bool auth = false;
+    admins.get().then((value) {
+      for (var element in value.docs) {
+        log(element.data().toString());
+        final data = element.data() as Map<String, dynamic>;
+        log(data["email"]);
+        log(data["password"]);
+        if (data["email"] == email.text.toString() &&
+            data["password"] == password.text.toString()) {
+          prefs.setString("name", data["name"]);
+          prefs.setString("email", data["email"]);
+          prefs.setString("role", data["role"]);
+          setState(() {
+            auth = true;
+          });
+        }
+      }
+
+      if (auth) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.pushNamedAndRemoveUntil(context,
+            NavigationHomeScreen.routeName, (Route<dynamic> route) => false);
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        Utils.messageDialog(
+            "အချက်အလက်မှားယွင်းနေပါသည်", context, "ပြင်ဆင်မည်", Colors.black);
+      }
+    });
+  }
+
+  realmLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+    var appServices = ref.read(appServiceProvider);
+    try {
+      await appServices.logInUserEmailPassword(
+          email.text.toString(), password.text.toString());
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context,
+            NavigationHomeScreen.routeName, (Route<dynamic> route) => false);
+      }
+    } catch (err) {
+      Utils.messageDialog(err.toString(), context, "ပြင်ဆင်မည်", Colors.black);
+    }
   }
 
   saveLogin(LoginResponse response) async {
