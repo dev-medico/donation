@@ -626,6 +626,7 @@ class _MemberListNewStyleState extends ConsumerState<MemberListNewStyle>
       dataSegments = data!.sublist(0, 50);
     });
   }
+  
 
   buildSimpleTable(List<MemberData> data) {
     MemberDataSource memberDataDataSource = MemberDataSource(memberData: data);
