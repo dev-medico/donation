@@ -627,7 +627,6 @@ class _MemberListNewStyleState extends ConsumerState<MemberListNewStyle>
     });
   }
   
-
   buildSimpleTable(List<MemberData> data) {
     MemberDataSource memberDataDataSource = MemberDataSource(memberData: data);
     return Container(
