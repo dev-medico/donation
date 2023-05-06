@@ -5,7 +5,7 @@ import 'package:merchant/src/features/auth/login.dart';
 import 'package:merchant/src/features/dashboard/dashboard.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
 import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
-import 'package:merchant/src/features/donation_member/presentation/member_list%20copy.dart';
+import 'package:merchant/src/features/donation_member/presentation/member_list.dart';
 import 'package:merchant/src/features/home/home.dart';
 import 'package:merchant/src/features/special_event/event_list.dart';
 import 'package:merchant/src/features/splash_screen/splash_screen.dart';
