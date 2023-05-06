@@ -2,9 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/firebase_options.dart';
-import 'package:merchant/src/providers/member_provider.dart';
 
 import 'src/app.dart';
 import 'src/settings/settings_controller.dart';
@@ -17,7 +15,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   usePathUrlStrategy();
   runApp(ProviderScope(child: MyApp(settingsController: settingsController)));
 }

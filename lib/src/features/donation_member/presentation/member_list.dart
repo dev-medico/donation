@@ -1,10 +1,13 @@
+// import 'dart:convert';
 // import 'dart:developer';
 
 // import 'package:dropdown_button2/dropdown_button2.dart';
 // import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 // import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:logger/logger.dart';
+// import 'package:merchant/data/repository/repository.dart';
 // import 'package:merchant/data/response/member_response.dart';
+// import 'package:merchant/data/response/xata_member_list_response.dart';
 // import 'package:merchant/responsive.dart';
 // import 'package:merchant/src/features/donation_member/presentation/controller/member_provider.dart';
 // import 'package:merchant/src/features/member/member_detail.dart';
@@ -13,16 +16,16 @@
 // import 'package:merchant/utils/Colors.dart';
 // import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-// class MemberListNewRiverpod extends ConsumerStatefulWidget {
-//   static const routeName = "/members_riverpod";
+// class MemberListScreen extends ConsumerStatefulWidget {
+//   static const routeName = "/members";
 
-//   const MemberListNewRiverpod({Key? key}) : super(key: key);
+//   const MemberListScreen({Key? key}) : super(key: key);
 
 //   @override
-//   _MemberListNewRiverpodState createState() => _MemberListNewRiverpodState();
+//   _MemberListScreenState createState() => _MemberListScreenState();
 // }
 
-// class _MemberListNewRiverpodState extends ConsumerState<MemberListNewRiverpod>
+// class _MemberListScreenState extends ConsumerState<MemberListScreen>
 //     with SingleTickerProviderStateMixin {
 //   List<String> ranges = [];
 //   List<String> bloodTypes = [
@@ -42,10 +45,17 @@
 //   @override
 //   void initState() {
 //     super.initState();
-//     // callAPI("");
+//     if (ref.read(membersProvider).isEmpty) {
+//       callAPI("");
+//     } else {
+//       setState(() {
+//         data = ref.read(membersProvider);
+//         addData();
+//       });
+//     }
 //   }
 
-//   tabCreate(List<MemberData> data) => Scaffold(
+//   tabCreate() => Scaffold(
 //         backgroundColor: const Color.fromARGB(255, 254, 252, 231),
 //         body: Stack(
 //           children: [
@@ -108,11 +118,11 @@
 //                                     if (i != ranges.length - 1) {
 //                                       setState(() {
 //                                         dataSegments =
-//                                             data.sublist(i * 50, (i + 1) * 50);
+//                                             data!.sublist(i * 50, (i + 1) * 50);
 //                                       });
 //                                     } else {
 //                                       setState(() {
-//                                         dataSegments = data.sublist(i * 50);
+//                                         dataSegments = data!.sublist(i * 50);
 //                                       });
 //                                     }
 //                                   }
@@ -178,29 +188,27 @@
 //                                 log(selectedBloodType.toString());
 //                                 log(dataSegments.length.toString());
 //                                 List<MemberData>? filterdata = [];
-//                                 for (int i = 0; i < data.length; i++) {
+//                                 for (int i = 0; i < data!.length; i++) {
 //                                   //get memberdata from data only where bloodtype is equal to value
 //                                   if (searchController.text.isNotEmpty) {
-//                                     if (data[i].name!.toLowerCase().contains(
+//                                     if (data![i].name!.toLowerCase().contains(
 //                                             searchController.text
 //                                                 .toString()
 //                                                 .toLowerCase()) &&
-//                                         data[i].bloodType ==
+//                                         data![i].bloodType ==
 //                                             selectedBloodType) {
-//                                       filterdata.add(data[i]);
+//                                       filterdata.add(data![i]);
 //                                     }
 //                                   } else {
-//                                     if (data[i].bloodType ==
+//                                     if (data![i].bloodType ==
 //                                         selectedBloodType) {
-//                                       filterdata.add(data[i]);
+//                                       filterdata.add(data![i]);
 //                                     }
 //                                   }
 //                                 }
 //                                 setState(() {
 //                                   dataSegments = filterdata.sublist(0);
 //                                 });
-//                                 log(filterdata.length.toString());
-//                                 log(dataSegments.length.toString());
 //                               },
 //                               onSaved: (value) {},
 //                             ),
@@ -220,23 +228,23 @@
 //                               fontSize: 15, color: Colors.black),
 //                           onChanged: (val) {
 //                             List<MemberData>? filterdata = [];
-//                             for (int i = 0; i < data.length; i++) {
+//                             for (int i = 0; i < data!.length; i++) {
 //                               //get memberdata from data only where bloodtype is equal to value
 //                               if (selectedBloodType !=
 //                                   "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
-//                                 if (data[i].name!.toLowerCase().contains(
+//                                 if (data![i].name!.toLowerCase().contains(
 //                                         searchController.text
 //                                             .toString()
 //                                             .toLowerCase()) &&
-//                                     data[i].bloodType == selectedBloodType) {
-//                                   filterdata.add(data[i]);
+//                                     data![i].bloodType == selectedBloodType) {
+//                                   filterdata.add(data![i]);
 //                                 }
 //                               } else {
-//                                 if (data[i]
+//                                 if (data![i]
 //                                     .name!
 //                                     .toLowerCase()
 //                                     .contains(val.toLowerCase())) {
-//                                   filterdata.add(data[i]);
+//                                   filterdata.add(data![i]);
 //                                 }
 //                               }
 //                             }
@@ -336,11 +344,11 @@
 //                                 if (i != ranges.length - 1) {
 //                                   setState(() {
 //                                     dataSegments =
-//                                         data.sublist(i * 50, (i + 1) * 50);
+//                                         data!.sublist(i * 50, (i + 1) * 50);
 //                                   });
 //                                 } else {
 //                                   setState(() {
-//                                     dataSegments = data.sublist(i * 50);
+//                                     dataSegments = data!.sublist(i * 50);
 //                                   });
 //                                 }
 //                               }
@@ -405,18 +413,18 @@
 //                             log(selectedBloodType.toString());
 //                             log(dataSegments.length.toString());
 //                             List<MemberData>? filterdata = [];
-//                             for (int i = 0; i < data.length; i++) {
+//                             for (int i = 0; i < data!.length; i++) {
 //                               if (searchController.text.isNotEmpty) {
-//                                 if (data[i].name!.toLowerCase().contains(
+//                                 if (data![i].name!.toLowerCase().contains(
 //                                         searchController.text
 //                                             .toString()
 //                                             .toLowerCase()) &&
-//                                     data[i].bloodType == selectedBloodType) {
-//                                   filterdata.add(data[i]);
+//                                     data![i].bloodType == selectedBloodType) {
+//                                   filterdata.add(data![i]);
 //                                 }
 //                               } else {
-//                                 if (data[i].bloodType == selectedBloodType) {
-//                                   filterdata.add(data[i]);
+//                                 if (data![i].bloodType == selectedBloodType) {
+//                                   filterdata.add(data![i]);
 //                                 }
 //                               }
 //                             }
@@ -440,23 +448,23 @@
 //                               fontSize: 15, color: Colors.black),
 //                           onChanged: (val) {
 //                             List<MemberData>? filterdata = [];
-//                             for (int i = 0; i < data.length; i++) {
+//                             for (int i = 0; i < data!.length; i++) {
 //                               //get memberdata from data only where bloodtype is equal to value
 //                               if (selectedBloodType !=
 //                                   "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
-//                                 if (data[i].name!.toLowerCase().contains(
+//                                 if (data![i].name!.toLowerCase().contains(
 //                                         searchController.text
 //                                             .toString()
 //                                             .toLowerCase()) &&
-//                                     data[i].bloodType == selectedBloodType) {
-//                                   filterdata.add(data[i]);
+//                                     data![i].bloodType == selectedBloodType) {
+//                                   filterdata.add(data![i]);
 //                                 }
 //                               } else {
-//                                 if (data[i]
+//                                 if (data![i]
 //                                     .name!
 //                                     .toLowerCase()
 //                                     .contains(val.toLowerCase())) {
-//                                   filterdata.add(data[i]);
+//                                   filterdata.add(data![i]);
 //                                 }
 //                               }
 //                             }
@@ -521,12 +529,10 @@
 //   List<String> allMembers = <String>[];
 //   bool inputted = false;
 //   bool dataFullLoad = false;
-//   //List<MemberData>? data;
+//   List<MemberData>? data;
 
 //   @override
 //   Widget build(BuildContext context) {
-//     List<MemberData> data = ref.read(membersProvider);
-//     log("Members " + ref.read(membersProvider).length.toString());
 //     return Scaffold(
 //       backgroundColor: const Color.fromARGB(255, 254, 252, 231),
 //       appBar: AppBar(
@@ -547,14 +553,14 @@
 //                   color: Colors.white)),
 //         ),
 //       ),
-//       body: data.isNotEmpty
-//           ? tabCreate(data)
+//       body: data!.isNotEmpty
+//           ? tabCreate()
 //           : const Center(
 //               child: CircularProgressIndicator(),
 //             ),
 //       floatingActionButton: FloatingActionButton(
 //         onPressed: () async {
-//           await Navigator.push(
+//           Navigator.push(
 //             context,
 //             MaterialPageRoute(
 //               builder: (context) => NewMemberScreen(),
@@ -566,27 +572,59 @@
 //     );
 //   }
 
-//   addData(List<MemberData>? data) {
+//   callAPI(String after) {
+//     if (after.isEmpty) {
+//       setState(() {
+//         data = [];
+//       });
+//     }
+//     XataRepository().getMemberList(after).then((response) {
+//       log(response.body.toString());
+
+//       setState(() {
+//         data!.addAll(XataMemberListResponse.fromJson(jsonDecode(response.body))
+//             .records!);
+//       });
+
+//       if (XataMemberListResponse.fromJson(jsonDecode(response.body))
+//           .meta!
+//           .page!
+//           .more!) {
+//         callAPI(XataMemberListResponse.fromJson(jsonDecode(response.body))
+//             .meta!
+//             .page!
+//             .cursor!);
+//       } else {
+//         log("Data Length - " + data!.length.toString());
+//         data!.forEach((element) {
+//           ref.read(membersProvider.notifier).addMember(element);
+//         });
+//         addData();
+//       }
+//     });
+//   }
+
+//   addData() {
 //     int tabLength = 0;
 //     data!.sort((a, b) => a.memberId!.compareTo(b.memberId!));
 
-//     if (data.length % 50 == 0) {
-//       tabLength = data.length ~/ 50;
+//     if (data!.length % 50 == 0) {
+//       tabLength = data!.length ~/ 50;
 //     } else {
-//       tabLength = data.length ~/ 50 + 1;
+//       tabLength = data!.length ~/ 50 + 1;
 //     }
 
-//     for (int i = 0; i < data.length; i = i + 50) {
-//       if (i + 50 > data.length) {
-//         ranges
-//             .add("${data[i].memberId!} မှ ${data[data.length - 1].memberId!}");
+//     for (int i = 0; i < data!.length; i = i + 50) {
+//       if (i + 50 > data!.length) {
+//         ranges.add(
+//             "${data![i].memberId!} မှ ${data![data!.length - 1].memberId!}");
 //       } else {
-//         ranges.add("${data[i].memberId!} မှ ${data[i + 49].memberId!}");
+//         ranges.add("${data![i].memberId!} မှ ${data![i + 49].memberId!}");
 //       }
 //     }
 //     setState(() {
 //       dataFullLoad = true;
-//       dataSegments = data.sublist(0, 50);
+//       dataSegments = data!.sublist(0, 50);
 //     });
 //   }
 
@@ -599,7 +637,7 @@
 //         onCellTap: (details) async {
 //           Logger logger = Logger();
 //           logger.i(details.rowColumnIndex.rowIndex);
-//           await Navigator.push(
+//           Navigator.push(
 //             context,
 //             MaterialPageRoute(
 //               builder: (context) => MemberDetailScreen(
@@ -607,7 +645,7 @@
 //               ),
 //             ),
 //           );
-//           ref.invalidate(memberListProvider);
+//           // callAPI("");
 //         },
 //         gridLinesVisibility: GridLinesVisibility.both,
 //         headerGridLinesVisibility: GridLinesVisibility.both,

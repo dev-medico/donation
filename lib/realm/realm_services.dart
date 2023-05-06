@@ -64,25 +64,20 @@ class RealmServices with ChangeNotifier {
   }
 
   void createMember(
-      String name,
-      String birthDate,
-      String bloodBankCard,
-      String bloodType,
-      String fatherName,
-      String homeNo,
-      String lastDate,
-      String lastDateDetail,
-      String memberCount,
-      String memberId,
-      String note,
-      String nrc,
-      String phone,
-      String quarter,
-      String region,
-      String registerDate,
-      String street,
-      String totalCount,
-      String town) {
+      {String? name,
+      String? birthDate,
+      String? bloodBankCard,
+      String? bloodType,
+      String? fatherName,
+      String? lastDate,
+      String? memberCount,
+      String? memberId,
+      String? note,
+      String? nrc,
+      String? phone,
+      String? registerDate,
+      String? totalCount,
+      String? address}) {
     final newMember = Member(
       ObjectId(),
       currentUser!.id,
@@ -91,20 +86,15 @@ class RealmServices with ChangeNotifier {
       bloodBankCard: bloodBankCard,
       bloodType: bloodType,
       fatherName: fatherName,
-      homeNo: homeNo,
       lastDate: lastDate,
-      lastDateDetail: lastDateDetail,
       memberCount: memberCount,
       memberId: memberId,
       note: note,
       nrc: nrc,
       phone: phone,
-      quarter: quarter,
-      region: region,
+      address: address,
       registerDate: registerDate,
-      street: street,
       totalCount: totalCount,
-      town: town,
     );
     realm.write<Member>(() => realm.add<Member>(newMember));
     notifyListeners();
@@ -116,20 +106,15 @@ class RealmServices with ChangeNotifier {
       String? bloodBankCard,
       String? bloodType,
       String? fatherName,
-      String? homeNo,
       String? lastDate,
-      String? lastDateDetail,
       String? memberCount,
       String? memberId,
       String? note,
       String? nrc,
       String? phone,
-      String? quarter,
-      String? region,
       String? registerDate,
-      String? street,
       String? totalCount,
-      String? town}) async {
+      String? address}) async {
     realm.write(() {
       if (name != null) {
         member.name = name;
@@ -146,15 +131,11 @@ class RealmServices with ChangeNotifier {
       if (fatherName != null) {
         member.fatherName = fatherName;
       }
-      if (homeNo != null) {
-        member.homeNo = homeNo;
-      }
+
       if (lastDate != null) {
         member.lastDate = lastDate;
       }
-      if (lastDateDetail != null) {
-        member.lastDateDetail = lastDateDetail;
-      }
+
       if (memberCount != null) {
         member.memberCount = memberCount;
       }
@@ -170,23 +151,16 @@ class RealmServices with ChangeNotifier {
       if (phone != null) {
         member.phone = phone;
       }
-      if (quarter != null) {
-        member.quarter = quarter;
-      }
-      if (region != null) {
-        member.region = region;
-      }
+
       if (registerDate != null) {
         member.registerDate = registerDate;
       }
-      if (street != null) {
-        member.street = street;
-      }
+
       if (totalCount != null) {
         member.totalCount = totalCount;
       }
-      if (town != null) {
-        member.town = town;
+      if (address != null) {
+        member.address = address;
       }
     });
     notifyListeners();

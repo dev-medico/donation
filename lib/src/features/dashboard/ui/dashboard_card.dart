@@ -1,9 +1,10 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:merchant/responsive.dart';
+import 'package:merchant/src/features/donation_member/presentation/member_list%20copy.dart';
 
 import '../../donar/donar_list.dart';
 import '../../donation/blood_donation_list_new_style.dart';
-import '../../new_features/member/member_list_new_style.dart';
+import '../../donation_member/presentation/member_list.dart';
 import '../../special_event/event_list.dart';
 
 class DashboardCard extends StatelessWidget {
@@ -48,7 +49,7 @@ class DashboardCard extends StatelessWidget {
           ),
           onPressed: () async {
             if (index == 0) {
-              await Navigator.pushNamed(context, MemberListNewStyle.routeName);
+              await Navigator.pushNamed(context, MemberListScreen.routeName);
               onTap.call();
             } else if (index == 1) {
               await Navigator.pushNamed(

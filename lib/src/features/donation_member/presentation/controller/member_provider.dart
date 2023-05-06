@@ -5,9 +5,26 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:merchant/data/repository/repository.dart';
 import 'package:merchant/data/response/member_response.dart';
 import 'package:merchant/data/response/xata_member_list_response.dart';
+import 'package:merchant/realm/realm_provider.dart';
+import 'package:merchant/realm/schemas.dart';
+import 'package:realm/realm.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'member_provider.g.dart';
+
+final memberStreamProvider = StreamProvider.autoDispose
+    .family<RealmResultsChanges<Member>, String>((ref, search) {
+  var realmService = ref.watch(realmServiceProvider);
+  final stream = search != ""
+      ? realmService!.realm
+          .query<Member>("name CONTAINS[c] '${search.toLowerCase()}'")
+          .changes
+      : realmService!.realm
+          .query<Member>("TRUEPREDICATE SORT(memberId ASC)")
+          .changes;
+
+  return stream;
+});
 
 // create a provider that store list of objects that pass to it
 class Members extends StateNotifier<List<MemberData>> {
@@ -35,14 +52,6 @@ List<MemberData> callAPI(
 
     oldData.addAll(
         XataMemberListResponse.fromJson(jsonDecode(response.body)).records!);
-
-    // if (oldData.isNotEmpty) {
-    //   oldData.forEach((element) {
-    //     ref.read(membersProvider.notifier).addMember(element);
-    //     log("Member Length -" +
-    //         ref.read(membersProvider.notifier).state.length.toString());
-    //   });
-    // }
 
     if (XataMemberListResponse.fromJson(jsonDecode(response.body))
         .meta!

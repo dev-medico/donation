@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:merchant/data/response/member_response.dart';
+import 'package:merchant/realm/schemas.dart';
 import 'package:merchant/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MemberDataSource extends DataGridSource {
   /// Creates the employee data source class with required details.
-  MemberDataSource({required List<MemberData> memberData}) {
+  MemberDataSource({required List<Member> memberData}) {
     _memberData = memberData
         .map<DataGridRow>((e) => DataGridRow(cells: [
               DataGridCell<String>(
@@ -16,7 +16,8 @@ class MemberDataSource extends DataGridSource {
                   columnName: 'အဖအမည်',
                   value: "        ${e.fatherName}        "),
               DataGridCell<String>(
-                  columnName: 'သွေးအုပ်စု', value:"  "+ e.bloodType + "  "),
+                  columnName: 'သွေးအုပ်စု',
+                  value: "  " + e.bloodType.toString() + "  "),
               DataGridCell<String>(columnName: 'မှတ်ပုံတင်အမှတ်', value: e.nrc),
               DataGridCell<String>(
                   columnName: 'သွေးဘဏ်ကတ်',

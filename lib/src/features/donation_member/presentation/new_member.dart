@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
@@ -8,18 +7,19 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:merchant/data/repository/repository.dart';
-import 'package:merchant/data/response/total_data_response.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:merchant/data/response/township_response/datum.dart';
 import 'package:merchant/data/response/township_response/township_response.dart';
 import 'package:merchant/responsive.dart';
+import 'package:merchant/src/features/donation_member/application/service.dart';
+import 'package:merchant/src/features/donation_member/data/respository.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
 import 'package:merchant/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
-class NewMemberScreen extends StatefulWidget {
+class NewMemberScreen extends ConsumerStatefulWidget {
   NewMemberScreen({Key? key}) : super(key: key);
   int selectedIndex = 0;
 
@@ -27,7 +27,7 @@ class NewMemberScreen extends StatefulWidget {
   NewMemberState createState() => NewMemberState();
 }
 
-class NewMemberState extends State<NewMemberScreen> {
+class NewMemberState extends ConsumerState<NewMemberScreen> {
   final memberIDController = TextEditingController();
   final nameController = TextEditingController();
   final fatherNameController = TextEditingController();
@@ -105,83 +105,6 @@ class NewMemberState extends State<NewMemberScreen> {
         getNrcRegionStateOptionDropDownMenuItems(kachin);
     nrc_region_state_options_Value =
         nrc_region_state_options_dropDownMenuItems![0].value;
-  }
-
-  addMember(
-      String memberId,
-      String name,
-      String fatherName,
-      String birthDate,
-      String nrc,
-      String phone,
-      String bloodType,
-      String bloodBankNo,
-      String totalCount,
-      String homeNo,
-      String street,
-      String quarter,
-      String township) {
-    DateTime now = DateTime.now();
-    String date = DateFormat('dd MMM yyyy').format(now);
-
-    XataRepository()
-        .uploadNewMember(jsonEncode(<String, dynamic>{
-      "birth_date": birthDate.toString(),
-      "blood_bank_card": bloodBankNo.toString(),
-      "last_donation_date": "",
-      "donation_counts": 0,
-      "note": noteController.text.toString() != ""
-          ? noteController.text.toString()
-          : "-",
-      "nrc": nrc.toString(),
-      "phone": phone.toString(),
-      "total_count": int.parse(totalCount.toString()),
-      "father_name": fatherName.toString(),
-      "name": name.toString(),
-      "register_date": date,
-      "member_id": memberId.toString(),
-      "blood_type": bloodType.toString(),
-      "address": "$homeNo, $street, $quarter, $township, $region1"
-    }))
-        .then((value) {
-      if (value.statusCode.toString().startsWith("2")) {
-        nameController.clear();
-        memberIDController.clear();
-        fatherNameController.clear();
-        nrcController.clear();
-        phoneController.clear();
-        selectedBloodType = "သွေးအုပ်စု";
-        birthDate = "မွေးသက္ကရာဇ်";
-        bloodBankNoController.clear();
-        totalDonationController.clear();
-        homeNoController.clear();
-        streetController.clear();
-        quarterController.clear();
-        townController.clear();
-        region1 = "";
-        regional = "";
-        noteController.clear();
-
-        XataRepository().getMembersTotal().then((value) {
-          var newMemberCount = int.parse(
-                  TotalDataResponse.fromJson(jsonDecode(value.body))
-                      .records!
-                      .first
-                      .value
-                      .toString()) +
-              1;
-          XataRepository().updateMembersTotal(newMemberCount);
-          setState(() {
-            _isLoading = false;
-          });
-          Utils.messageSuccessDialog("အဖွဲ့၀င် အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-              context, "အိုကေ", Colors.black);
-        });
-      } else {
-        log(value.statusCode.toString());
-        log(value.body);
-      }
-    });
   }
 
   void initial() async {
@@ -1644,7 +1567,7 @@ class NewMemberState extends State<NewMemberScreen> {
     if (editable && memberIDController.text.toString().isNotEmpty) {
       if (memberIDController.text.toString().contains("-") &&
           memberIDController.text.toString().length == 6) {
-        addMember(
+        MemberService(MemberRepository(ref)).addMember(
             memberIDController.text.toString(),
             nameController.text.toString(),
             fatherNameController.text.toString(),
@@ -1659,7 +1582,9 @@ class NewMemberState extends State<NewMemberScreen> {
             homeNoController.text.toString(),
             streetController.text.toString(),
             quarterController.text.toString(),
-            townController.text.toString());
+            townController.text.toString(),
+            noteController.text.toString(),
+            region1);
       } else {
         setState(() {
           _isLoading = false;
@@ -1750,8 +1675,8 @@ class NewMemberState extends State<NewMemberScreen> {
               memberId = "Z-${formatter.format((id - 25000))}";
             }
 
-            addMember(
-                memberId,
+            MemberService(MemberRepository(ref)).addMember(
+                memberIDController.text.toString(),
                 nameController.text.toString(),
                 fatherNameController.text.toString(),
                 birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
@@ -1765,9 +1690,10 @@ class NewMemberState extends State<NewMemberScreen> {
                 homeNoController.text.toString(),
                 streetController.text.toString(),
                 quarterController.text.toString(),
-                townController.text.toString());
+                townController.text.toString(),
+                noteController.text.toString(),
+                region1);
 
-            // Return the new count
             return newCount;
           })
           .then((value) => print("Follower count updated to $value"))

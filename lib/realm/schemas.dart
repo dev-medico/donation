@@ -11,21 +11,16 @@ class _Member {
   String? bloodBankCard;
   String? bloodType;
   String? fatherName;
-  String? homeNo;
   String? lastDate;
-  String? lastDateDetail;
   String? memberCount;
   String? memberId;
   String? name;
   String? note;
   String? nrc;
   String? phone;
-  String? quarter;
-  String? region;
+  String? address;
   String? registerDate;
-  String? street;
   String? totalCount;
-  String? town;
   @MapTo('owner_id')
   late String ownerId;
 }
