@@ -1,5 +1,4 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:merchant/realm/realm_provider.dart';
 
 class MemberRepository {
@@ -23,7 +22,6 @@ class MemberRepository {
       String note,
       String region) {
     DateTime now = DateTime.now();
-    String date = DateFormat('dd MMM yyyy').format(now);
 
     ref.watch(realmServiceProvider)!.createMember(
         name: name,
@@ -31,13 +29,13 @@ class MemberRepository {
         bloodBankCard: bloodBankNo,
         bloodType: bloodType,
         fatherName: fatherName,
-        lastDate: date,
+        lastDate: now,
         totalCount: totalCount.toString(),
         memberId: memberId,
         note: note,
         nrc: nrc,
         phone: phone,
-        registerDate: date,
+        registerDate: now,
         address: "$homeNo, $street, $quarter, $township, $region");
 
     // XataRepository()

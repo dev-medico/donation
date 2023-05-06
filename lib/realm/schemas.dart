@@ -11,7 +11,7 @@ class _Member {
   String? bloodBankCard;
   String? bloodType;
   String? fatherName;
-  String? lastDate;
+  DateTime? lastDate;
   String? memberCount;
   String? memberId;
   String? name;
@@ -19,7 +19,7 @@ class _Member {
   String? nrc;
   String? phone;
   String? address;
-  String? registerDate;
+  DateTime? registerDate;
   String? totalCount;
   @MapTo('owner_id')
   late String ownerId;

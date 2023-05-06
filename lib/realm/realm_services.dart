@@ -69,13 +69,13 @@ class RealmServices with ChangeNotifier {
       String? bloodBankCard,
       String? bloodType,
       String? fatherName,
-      String? lastDate,
+      DateTime? lastDate,
       String? memberCount,
       String? memberId,
       String? note,
       String? nrc,
       String? phone,
-      String? registerDate,
+      DateTime? registerDate,
       String? totalCount,
       String? address}) {
     final newMember = Member(
@@ -106,13 +106,13 @@ class RealmServices with ChangeNotifier {
       String? bloodBankCard,
       String? bloodType,
       String? fatherName,
-      String? lastDate,
+      DateTime? lastDate,
       String? memberCount,
       String? memberId,
       String? note,
       String? nrc,
       String? phone,
-      String? registerDate,
+      DateTime? registerDate,
       String? totalCount,
       String? address}) async {
     realm.write(() {

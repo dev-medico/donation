@@ -14,7 +14,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
     String? bloodBankCard,
     String? bloodType,
     String? fatherName,
-    String? lastDate,
+    DateTime? lastDate,
     String? memberCount,
     String? memberId,
     String? name,
@@ -22,7 +22,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
     String? nrc,
     String? phone,
     String? address,
-    String? registerDate,
+    DateTime? registerDate,
     String? totalCount,
   }) {
     RealmObjectBase.set(this, '_id', id);
@@ -77,10 +77,10 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
       RealmObjectBase.set(this, 'fatherName', value);
 
   @override
-  String? get lastDate =>
-      RealmObjectBase.get<String>(this, 'lastDate') as String?;
+  DateTime? get lastDate =>
+      RealmObjectBase.get<DateTime>(this, 'lastDate') as DateTime?;
   @override
-  set lastDate(String? value) => RealmObjectBase.set(this, 'lastDate', value);
+  set lastDate(DateTime? value) => RealmObjectBase.set(this, 'lastDate', value);
 
   @override
   String? get memberCount =>
@@ -122,10 +122,10 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
   set address(String? value) => RealmObjectBase.set(this, 'address', value);
 
   @override
-  String? get registerDate =>
-      RealmObjectBase.get<String>(this, 'registerDate') as String?;
+  DateTime? get registerDate =>
+      RealmObjectBase.get<DateTime>(this, 'registerDate') as DateTime?;
   @override
-  set registerDate(String? value) =>
+  set registerDate(DateTime? value) =>
       RealmObjectBase.set(this, 'registerDate', value);
 
   @override
@@ -158,7 +158,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
       SchemaProperty('bloodBankCard', RealmPropertyType.string, optional: true),
       SchemaProperty('bloodType', RealmPropertyType.string, optional: true),
       SchemaProperty('fatherName', RealmPropertyType.string, optional: true),
-      SchemaProperty('lastDate', RealmPropertyType.string, optional: true),
+      SchemaProperty('lastDate', RealmPropertyType.timestamp, optional: true),
       SchemaProperty('memberCount', RealmPropertyType.string, optional: true),
       SchemaProperty('memberId', RealmPropertyType.string, optional: true),
       SchemaProperty('name', RealmPropertyType.string, optional: true),
@@ -166,7 +166,8 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
       SchemaProperty('nrc', RealmPropertyType.string, optional: true),
       SchemaProperty('phone', RealmPropertyType.string, optional: true),
       SchemaProperty('address', RealmPropertyType.string, optional: true),
-      SchemaProperty('registerDate', RealmPropertyType.string, optional: true),
+      SchemaProperty('registerDate', RealmPropertyType.timestamp,
+          optional: true),
       SchemaProperty('totalCount', RealmPropertyType.string, optional: true),
       SchemaProperty('ownerId', RealmPropertyType.string, mapTo: 'owner_id'),
     ]);
