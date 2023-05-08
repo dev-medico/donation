@@ -503,7 +503,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                   left: 20.0,
                   top: Responsive.isMobile(context) ? 160 : 100,
                   bottom: 12),
-              child: buildSimpleTable(dataSegments),
+              child: buildSimpleTable(),
             ),
           ],
         ),
@@ -542,6 +542,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
       body: streamAsyncValue.when(
         data: (savedData) {
           final results = savedData.results;
+          log("Data " + results.length.toString());
 
           List<Member> members = [];
           for (int i = 0; i < results.length; i++) {
@@ -552,7 +553,11 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
           });
           addData();
 
-          return tabCreate();
+          if (data.isNotEmpty) {
+            return tabCreate();
+          } else
+            Container();
+          return null;
         },
         error: (Object error, StackTrace stackTrace) {
           return Text(error.toString());
@@ -592,12 +597,14 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
         ranges.add("${data[i].memberId!} မှ ${data[i + 49].memberId!}");
       }
     }
-    setState(() {
-      dataSegments = data.sublist(0, 50);
-    });
+    if (data.isNotEmpty) {
+      setState(() {
+        dataSegments = data.sublist(0, 50);
+      });
+    }
   }
 
-  buildSimpleTable(List<Member> data) {
+  buildSimpleTable() {
     MemberDataSource memberDataDataSource = MemberDataSource(memberData: data);
     return Container(
       margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),

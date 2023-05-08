@@ -4,28 +4,27 @@
 // import 'package:dropdown_button2/dropdown_button2.dart';
 // import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 // import 'package:hooks_riverpod/hooks_riverpod.dart';
-// import 'package:logger/logger.dart';
 // import 'package:merchant/data/repository/repository.dart';
 // import 'package:merchant/data/response/member_response.dart';
 // import 'package:merchant/data/response/xata_member_list_response.dart';
+// import 'package:merchant/realm/realm_provider.dart';
 // import 'package:merchant/responsive.dart';
+// import 'package:merchant/src/features/donation_member/application/service.dart';
+// import 'package:merchant/src/features/donation_member/data/respository.dart';
 // import 'package:merchant/src/features/donation_member/presentation/controller/member_provider.dart';
-// import 'package:merchant/src/features/member/member_detail.dart';
 // import 'package:merchant/src/features/donation_member/presentation/new_member.dart';
-// import 'package:merchant/src/features/new_features/member/member_data_source.dart';
 // import 'package:merchant/utils/Colors.dart';
-// import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-// class MemberListScreen extends ConsumerStatefulWidget {
+// class MemberListBackupScreen extends ConsumerStatefulWidget {
 //   static const routeName = "/members";
 
-//   const MemberListScreen({Key? key}) : super(key: key);
+//   const MemberListBackupScreen({Key? key}) : super(key: key);
 
 //   @override
-//   _MemberListScreenState createState() => _MemberListScreenState();
+//   _MemberListBackupScreenState createState() => _MemberListBackupScreenState();
 // }
 
-// class _MemberListScreenState extends ConsumerState<MemberListScreen>
+// class _MemberListBackupScreenState extends ConsumerState<MemberListBackupScreen>
 //     with SingleTickerProviderStateMixin {
 //   List<String> ranges = [];
 //   List<String> bloodTypes = [
@@ -598,6 +597,19 @@
 //         log("Data Length - " + data!.length.toString());
 //         data!.forEach((element) {
 //           ref.read(membersProvider.notifier).addMember(element);
+//           MemberService(MemberRepository(ref)).addMember(
+//               element.memberId,
+//               element.name,
+//               element.fatherName,
+//               element.birthDate,
+//               element.nrc,
+//               element.phone,
+//               element.bloodType,
+//               element.bloodBankCard,
+//               element.totalCount,
+//               element.donationCounts.toString(),
+//               element.address,
+//               element.note);
 //         });
 //         addData();
 //       }
@@ -629,104 +641,105 @@
 //   }
 
 //   buildSimpleTable(List<MemberData> data) {
-//     MemberDataSource memberDataDataSource = MemberDataSource(memberData: data);
-//     return Container(
-//       margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
-//       child: SfDataGrid(
-//         source: memberDataDataSource,
-//         onCellTap: (details) async {
-//           Logger logger = Logger();
-//           logger.i(details.rowColumnIndex.rowIndex);
-//           Navigator.push(
-//             context,
-//             MaterialPageRoute(
-//               builder: (context) => MemberDetailScreen(
-//                 data: data[details.rowColumnIndex.rowIndex - 1],
-//               ),
-//             ),
-//           );
-//           // callAPI("");
-//         },
-//         gridLinesVisibility: GridLinesVisibility.both,
-//         headerGridLinesVisibility: GridLinesVisibility.both,
-//         columnWidthMode: Responsive.isMobile(context)
-//             ? ColumnWidthMode.auto
-//             : ColumnWidthMode.fitByCellValue,
-//         columns: <GridColumn>[
-//           GridColumn(
-//               columnName: 'အမှတ်စဥ်',
-//               label: Container(
-//                   width: MediaQuery.of(context).size.width * 0.3,
-//                   color: primaryColor,
-//                   padding: const EdgeInsets.all(8.0),
-//                   alignment: Alignment.center,
-//                   child: const Text(
-//                     'အမှတ်စဥ်',
-//                     style: TextStyle(color: Colors.white),
-//                   ))),
-//           GridColumn(
-//               columnName: 'အမည်',
-//               label: Container(
-//                   color: primaryColor,
-//                   padding: const EdgeInsets.all(8.0),
-//                   alignment: Alignment.center,
-//                   child: const Text(
-//                     'အမည်',
-//                     style: TextStyle(color: Colors.white),
-//                   ))),
-//           GridColumn(
-//               columnName: 'အဖအမည်',
-//               label: Container(
-//                   color: primaryColor,
-//                   padding: const EdgeInsets.all(8.0),
-//                   alignment: Alignment.center,
-//                   child: const Text(
-//                     'အဖအမည်',
-//                     style: TextStyle(color: Colors.white),
-//                     overflow: TextOverflow.ellipsis,
-//                   ))),
-//           GridColumn(
-//               columnName: 'သွေးအုပ်စု',
-//               label: Container(
-//                   color: primaryColor,
-//                   padding: const EdgeInsets.all(8.0),
-//                   alignment: Alignment.center,
-//                   child: const Text(
-//                     'သွေးအုပ်စု',
-//                     style: TextStyle(color: Colors.white),
-//                   ))),
-//           GridColumn(
-//               columnName: 'မှတ်ပုံတင်အမှတ်',
-//               label: Container(
-//                   color: primaryColor,
-//                   padding: const EdgeInsets.all(8.0),
-//                   alignment: Alignment.center,
-//                   child: const Text(
-//                     'မှတ်ပုံတင်အမှတ်',
-//                     style: TextStyle(color: Colors.white),
-//                   ))),
-//           GridColumn(
-//               columnName: 'သွေးဘဏ်ကတ်',
-//               label: Container(
-//                   color: primaryColor,
-//                   padding: const EdgeInsets.all(8.0),
-//                   alignment: Alignment.center,
-//                   child: const Text(
-//                     'သွေးဘဏ်ကတ်',
-//                     style: TextStyle(color: Colors.white),
-//                   ))),
-//           GridColumn(
-//               columnName: 'သွေးလှူမှုကြိမ်ရေ',
-//               label: Container(
-//                   color: primaryColor,
-//                   padding: const EdgeInsets.all(8.0),
-//                   alignment: Alignment.center,
-//                   child: const Text(
-//                     'သွေးလှူမှုကြိမ်ရေ',
-//                     style: TextStyle(color: Colors.white),
-//                   ))),
-//         ],
-//       ),
-//     );
+//     return Container();
+//     // MemberDataSource memberDataDataSource = MemberDataSource(memberData: data);
+//     // return Container(
+//     //   margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
+//     //   child: SfDataGrid(
+//     //     source: memberDataDataSource,
+//     //     onCellTap: (details) async {
+//     //       Logger logger = Logger();
+//     //       logger.i(details.rowColumnIndex.rowIndex);
+//     //       Navigator.push(
+//     //         context,
+//     //         MaterialPageRoute(
+//     //           builder: (context) => MemberDetailScreen(
+//     //             data: data[details.rowColumnIndex.rowIndex - 1],
+//     //           ),
+//     //         ),
+//     //       );
+//     //       // callAPI("");
+//     //     },
+//     //     gridLinesVisibility: GridLinesVisibility.both,
+//     //     headerGridLinesVisibility: GridLinesVisibility.both,
+//     //     columnWidthMode: Responsive.isMobile(context)
+//     //         ? ColumnWidthMode.auto
+//     //         : ColumnWidthMode.fitByCellValue,
+//     //     columns: <GridColumn>[
+//     //       GridColumn(
+//     //           columnName: 'အမှတ်စဥ်',
+//     //           label: Container(
+//     //               width: MediaQuery.of(context).size.width * 0.3,
+//     //               color: primaryColor,
+//     //               padding: const EdgeInsets.all(8.0),
+//     //               alignment: Alignment.center,
+//     //               child: const Text(
+//     //                 'အမှတ်စဥ်',
+//     //                 style: TextStyle(color: Colors.white),
+//     //               ))),
+//     //       GridColumn(
+//     //           columnName: 'အမည်',
+//     //           label: Container(
+//     //               color: primaryColor,
+//     //               padding: const EdgeInsets.all(8.0),
+//     //               alignment: Alignment.center,
+//     //               child: const Text(
+//     //                 'အမည်',
+//     //                 style: TextStyle(color: Colors.white),
+//     //               ))),
+//     //       GridColumn(
+//     //           columnName: 'အဖအမည်',
+//     //           label: Container(
+//     //               color: primaryColor,
+//     //               padding: const EdgeInsets.all(8.0),
+//     //               alignment: Alignment.center,
+//     //               child: const Text(
+//     //                 'အဖအမည်',
+//     //                 style: TextStyle(color: Colors.white),
+//     //                 overflow: TextOverflow.ellipsis,
+//     //               ))),
+//     //       GridColumn(
+//     //           columnName: 'သွေးအုပ်စု',
+//     //           label: Container(
+//     //               color: primaryColor,
+//     //               padding: const EdgeInsets.all(8.0),
+//     //               alignment: Alignment.center,
+//     //               child: const Text(
+//     //                 'သွေးအုပ်စု',
+//     //                 style: TextStyle(color: Colors.white),
+//     //               ))),
+//     //       GridColumn(
+//     //           columnName: 'မှတ်ပုံတင်အမှတ်',
+//     //           label: Container(
+//     //               color: primaryColor,
+//     //               padding: const EdgeInsets.all(8.0),
+//     //               alignment: Alignment.center,
+//     //               child: const Text(
+//     //                 'မှတ်ပုံတင်အမှတ်',
+//     //                 style: TextStyle(color: Colors.white),
+//     //               ))),
+//     //       GridColumn(
+//     //           columnName: 'သွေးဘဏ်ကတ်',
+//     //           label: Container(
+//     //               color: primaryColor,
+//     //               padding: const EdgeInsets.all(8.0),
+//     //               alignment: Alignment.center,
+//     //               child: const Text(
+//     //                 'သွေးဘဏ်ကတ်',
+//     //                 style: TextStyle(color: Colors.white),
+//     //               ))),
+//     //       GridColumn(
+//     //           columnName: 'သွေးလှူမှုကြိမ်ရေ',
+//     //           label: Container(
+//     //               color: primaryColor,
+//     //               padding: const EdgeInsets.all(8.0),
+//     //               alignment: Alignment.center,
+//     //               child: const Text(
+//     //                 'သွေးလှူမှုကြိမ်ရေ',
+//     //                 style: TextStyle(color: Colors.white),
+//     //               ))),
+//     //     ],
+//     //   ),
+//     // );
 //   }
 // }

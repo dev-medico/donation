@@ -171,6 +171,11 @@ class RealmServices with ChangeNotifier {
     notifyListeners();
   }
 
+  void deleteAllMember() {
+    realm.write(() => realm.deleteAll());
+    notifyListeners();
+  }
+
   void createDonation(
     String date,
     String hospital,

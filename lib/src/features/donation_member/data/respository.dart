@@ -6,21 +6,19 @@ class MemberRepository {
 
   MemberRepository(this.ref);
   addMember(
-      String memberId,
-      String name,
-      String fatherName,
-      String birthDate,
-      String nrc,
-      String phone,
-      String bloodType,
-      String bloodBankNo,
-      String totalCount,
-      String homeNo,
-      String street,
-      String quarter,
-      String township,
-      String note,
-      String region) {
+    String memberId,
+    String name,
+    String fatherName,
+    String birthDate,
+    String nrc,
+    String phone,
+    String bloodType,
+    String bloodBankNo,
+    String totalCount,
+    String memberCount,
+    String address,
+    String note,
+  ) {
     DateTime now = DateTime.now();
 
     ref.watch(realmServiceProvider)!.createMember(
@@ -30,13 +28,14 @@ class MemberRepository {
         bloodType: bloodType,
         fatherName: fatherName,
         lastDate: now,
+        memberCount: memberCount.toString(),
         totalCount: totalCount.toString(),
         memberId: memberId,
         note: note,
         nrc: nrc,
         phone: phone,
         registerDate: now,
-        address: "$homeNo, $street, $quarter, $township, $region");
+        address: address);
 
     // XataRepository()
     //     .uploadNewMember(jsonEncode(<String, dynamic>{

@@ -3,7 +3,7 @@ import 'package:merchant/realm/app_services.dart';
 import 'package:merchant/realm/realm_services.dart';
 
 final appServiceProvider = ChangeNotifierProvider<AppServices>((ref) {
-  String appId = "donation-nbctj";
+  String appId = "donation-vtcpe";
   Uri baseUrl = Uri.parse("https://realm.mongodb.com");
   return AppServices(appId, baseUrl);
 });

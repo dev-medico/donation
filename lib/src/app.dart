@@ -1,6 +1,7 @@
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:merchant/realm/realm_provider.dart';
 import 'package:merchant/src/features/auth/login.dart';
 import 'package:merchant/src/features/dashboard/dashboard.dart';
 import 'package:merchant/src/features/donar/donar_list.dart';
@@ -14,7 +15,6 @@ import 'package:merchant/utils/custom_scroll.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
-/// The Widget that configures your application.
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({
     Key? key,
@@ -30,46 +30,27 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
-    final container = ProviderContainer(overrides: []);
-    // container.read(memberListProvider.future).then((oldData) {
+    var currentUser = ref.watch(realmServiceProvider);
 
-    // });
     return MaterialApp(
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
-
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en', ''), // English, no country code
+        Locale('en', ''),
       ],
-      themeMode: ThemeMode.light, //or dark / system
+      themeMode: ThemeMode.light,
       darkTheme: ThemeData(
-        //fontFamily: 'MS',
-        // baseColor: Color(0xff555555),
         accentColor: const Color(0xff333333),
-        // variantColor: Colors.white,
-        // defaultTextColor: Colors.white,
-        // lightSource: LightSource.topLeft,
-        // depth: 4,
-        // intensity: 0.3,
       ),
       theme: ThemeData(
-        //fontFamily: 'MS',
-        // baseColor: Color(0xffDDDDDD),
         accentColor: Colors.white,
-        // variantColor: Color(0xffA70507),
-        // defaultTextColor: Colors.black,
-        // lightSource: LightSource.topLeft,
-        // depth: 6,
-        // intensity: 0.5,
       ),
-
-      // Define a function to handle named routes in order to support
-      // Flutter web url navigation and deep linking.
+      home: currentUser == null ? const LoginScreen() : NavigationHomeScreen(),
       onGenerateRoute: (RouteSettings routeSettings) {
         return MaterialPageRoute<void>(
           settings: routeSettings,

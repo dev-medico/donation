@@ -15,6 +15,7 @@ part 'member_provider.g.dart';
 final memberStreamProvider = StreamProvider.autoDispose
     .family<RealmResultsChanges<Member>, String>((ref, search) {
   var realmService = ref.watch(realmServiceProvider);
+  log("Search " + search);
   final stream = search != ""
       ? realmService!.realm
           .query<Member>("name CONTAINS[c] '${search.toLowerCase()}'")
@@ -22,6 +23,7 @@ final memberStreamProvider = StreamProvider.autoDispose
       : realmService!.realm
           .query<Member>("TRUEPREDICATE SORT(memberId ASC)")
           .changes;
+  stream.length.then((value) => log("Stream " + value.toString()));
 
   return stream;
 });

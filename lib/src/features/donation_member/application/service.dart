@@ -1,42 +1,39 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:merchant/src/features/donation_member/data/respository.dart';
 
 class MemberService {
   MemberRepository _memberRepository;
 
-  MemberService(this._memberRepository,);
+  MemberService(
+    this._memberRepository,
+  );
 
   addMember(
-      String memberId,
-      String name,
-      String fatherName,
-      String birthDate,
-      String nrc,
-      String phone,
-      String bloodType,
-      String bloodBankNo,
-      String totalCount,
-      String homeNo,
-      String street,
-      String quarter,
-      String township,
-      String note,
-      String region) {
+    String memberId,
+    String name,
+    String fatherName,
+    String birthDate,
+    String nrc,
+    String phone,
+    String bloodType,
+    String bloodBankNo,
+    String totalCount,
+    String memberCount,
+    String address,
+    String note,
+  ) {
     _memberRepository.addMember(
-        memberId,
-        name,
-        fatherName,
-        birthDate,
-        nrc,
-        phone,
-        bloodType,
-        bloodBankNo,
-        totalCount,
-        homeNo,
-        street,
-        quarter,
-        township,
-        note,
-        region);
+      memberId,
+      name,
+      fatherName,
+      birthDate,
+      nrc,
+      phone,
+      bloodType,
+      bloodBankNo,
+      totalCount,
+      memberCount,
+      address,
+      note
+    );
   }
 }

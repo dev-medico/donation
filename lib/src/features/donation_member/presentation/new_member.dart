@@ -1568,23 +1568,27 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
       if (memberIDController.text.toString().contains("-") &&
           memberIDController.text.toString().length == 6) {
         MemberService(MemberRepository(ref)).addMember(
-            memberIDController.text.toString(),
-            nameController.text.toString(),
-            fatherNameController.text.toString(),
-            birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
-            _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
-            phoneController.text.toString(),
-            selectedBloodType,
-            bloodBankNoController.text.toString() != ""
-                ? bloodBankNoController.text.toString()
-                : "-",
-            totalDonationController.text.toString(),
-            homeNoController.text.toString(),
-            streetController.text.toString(),
-            quarterController.text.toString(),
-            townController.text.toString(),
-            noteController.text.toString(),
-            region1);
+          memberIDController.text.toString(),
+          nameController.text.toString(),
+          fatherNameController.text.toString(),
+          birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
+          _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
+          phoneController.text.toString(),
+          selectedBloodType,
+          bloodBankNoController.text.toString() != ""
+              ? bloodBankNoController.text.toString()
+              : "-",
+          totalDonationController.text.toString(),
+          "0",
+          homeNoController.text.toString() +
+              " ၊ " +
+              streetController.text.toString() +
+              " ၊ " +
+              quarterController.text.toString() +
+              " ၊ " +
+              townController.text.toString(),
+          noteController.text.toString(),
+        );
       } else {
         setState(() {
           _isLoading = false;
@@ -1676,23 +1680,29 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
             }
 
             MemberService(MemberRepository(ref)).addMember(
-                memberIDController.text.toString(),
-                nameController.text.toString(),
-                fatherNameController.text.toString(),
-                birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
-                _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
-                phoneController.text.toString(),
-                selectedBloodType,
-                bloodBankNoController.text.toString() != ""
-                    ? bloodBankNoController.text.toString()
-                    : "-",
-                totalDonationController.text.toString(),
-                homeNoController.text.toString(),
-                streetController.text.toString(),
-                quarterController.text.toString(),
-                townController.text.toString(),
-                noteController.text.toString(),
-                region1);
+              memberIDController.text.toString(),
+              nameController.text.toString(),
+              fatherNameController.text.toString(),
+              birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
+              _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
+              phoneController.text.toString(),
+              selectedBloodType,
+              bloodBankNoController.text.toString() != ""
+                  ? bloodBankNoController.text.toString()
+                  : "-",
+              totalDonationController.text.toString(),
+              "0",
+              homeNoController.text.toString() +
+                  " ၊ " +
+                  streetController.text.toString() +
+                  " ၊ " +
+                  quarterController.text.toString() +
+                  " ၊ " +
+                  townController.text.toString() +
+                  " ၊ " +
+                  region1,
+              noteController.text.toString(),
+            );
 
             return newCount;
           })
