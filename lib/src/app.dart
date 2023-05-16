@@ -44,12 +44,6 @@ class _MyAppState extends ConsumerState<MyApp> {
         Locale('en', ''),
       ],
       themeMode: ThemeMode.light,
-      darkTheme: ThemeData(
-        accentColor: const Color(0xff333333),
-      ),
-      theme: ThemeData(
-        accentColor: Colors.white,
-      ),
       home: currentUser == null ? const LoginScreen() : NavigationHomeScreen(),
       onGenerateRoute: (RouteSettings routeSettings) {
         return MaterialPageRoute<void>(
