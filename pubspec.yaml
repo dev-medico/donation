@@ -18,6 +18,7 @@ dependencies:
   dropdown_button2: ^1.9.2
   firebase_core: ^2.4.0
   fl_chart: ^0.55.2
+  fluent_ui: ^4.6.1
   flutter:
     sdk: flutter
   flutter_cupertino_date_picker_fork: ^1.0.7
