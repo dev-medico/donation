@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -148,7 +147,7 @@ class MenuItemWidget extends StatelessWidget {
       child: TextButton(
         onPressed: () => callback!(item!.index),
         style: TextButton.styleFrom(
-          primary: selected! ? const Color(0x44000000) : null,
+          foregroundColor: selected! ? const Color(0x44000000) : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.max,

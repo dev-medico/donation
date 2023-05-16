@@ -3,14 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:http/http.dart';
 import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/member/member_detail.dart';
-import 'package:merchant/src/features/donation_member/presentation/new_member.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
-import 'package:merchant/utils/utils.dart';
 
 class SearchMemberScreen extends StatefulWidget {
   static const routeName = "/member_search";

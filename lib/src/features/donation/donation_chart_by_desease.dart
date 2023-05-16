@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/data/response/xata_donation_list_response.dart';
-import 'package:merchant/donation_list_response.dart';
 import 'package:merchant/responsive.dart';
 import 'package:merchant/utils/Colors.dart';
 import 'package:merchant/utils/tool_widgets.dart';
