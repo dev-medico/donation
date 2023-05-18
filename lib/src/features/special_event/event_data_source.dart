@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:merchant/data/response/special_event_list_response.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/data/response/special_event_list_response.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class EventDataSource extends DataGridSource {

@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:merchant/data/repository/repository.dart';
-import 'package:merchant/data/response/total_data_response.dart';
-import 'package:merchant/data/response/xata_donation_list_response.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_card.dart';
-import 'package:merchant/src/features/donation/donation_chart_by_blood.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/data/repository/repository.dart';
+import 'package:donation/data/response/total_data_response.dart';
+import 'package:donation/data/response/xata_donation_list_response.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
+import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:intl/intl.dart';
 
 class DashBoardScreen extends StatefulWidget {
@@ -118,7 +118,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     String dateFormat = DateFormat('dd MMM yyyy ( EEEE )').format(date);
 
     return Scaffold(
-        //backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+        //backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Padding(
             padding: EdgeInsets.only(top: 4.0),

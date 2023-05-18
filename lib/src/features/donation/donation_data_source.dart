@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:merchant/data/response/xata_donation_list_response.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/data/response/xata_donation_list_response.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class DonationDataSource extends DataGridSource {

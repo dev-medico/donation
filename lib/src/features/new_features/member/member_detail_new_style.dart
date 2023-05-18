@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:merchant/data/response/member_response.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/new_features/member/member_edit_new_style.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/data/response/member_response.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/new_features/member/member_edit_new_style.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:intl/intl.dart';
 
 class MemberDetailNewStyleScreen extends StatefulWidget {

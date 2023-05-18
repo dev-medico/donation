@@ -6,15 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:intl/intl.dart';
 
 class NewExpense extends StatefulWidget {
-
   NewExpense({Key? key}) : super(key: key);
   int selectedIndex = 0;
 
@@ -118,11 +117,9 @@ class NewDonarState extends State<NewExpense> {
                               children: [
                                 TextFormField(
                                   keyboardType: TextInputType.number,
-                                  inputFormatters: <
-                                                    TextInputFormatter>[
-                                                  FilteringTextInputFormatter
-                                                      .digitsOnly
-                                                ],
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
                                   controller: amountController,
                                   decoration: inputBoxDecoration("ငွေပမာဏ"),
                                 ),

@@ -92,10 +92,10 @@ BEGIN
             VALUE "CompanyName", "com.fcs" "\0"
             VALUE "FileDescription", "A new Flutter project." "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "merchant" "\0"
+            VALUE "InternalName", "donation" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2021 com.fcs. All rights reserved." "\0"
-            VALUE "OriginalFilename", "merchant.exe" "\0"
-            VALUE "ProductName", "merchant" "\0"
+            VALUE "OriginalFilename", "donation.exe" "\0"
+            VALUE "ProductName", "donation" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

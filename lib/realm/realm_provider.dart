@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:merchant/realm/app_services.dart';
-import 'package:merchant/realm/realm_services.dart';
+import 'package:donation/realm/app_services.dart';
+import 'package:donation/realm/realm_services.dart';
 
 final appServiceProvider = ChangeNotifierProvider<AppServices>((ref) {
   String appId = "donation-vtcpe";

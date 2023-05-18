@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:merchant/data/repository/repository.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/data/repository/repository.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:intl/intl.dart';
 

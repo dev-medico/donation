@@ -1,4 +1,4 @@
-import 'package:merchant/src/features/donation_member/data/respository.dart';
+import 'package:donation/src/features/donation_member/data/respository.dart';
 
 class MemberService {
   MemberRepository _memberRepository;
@@ -21,19 +21,7 @@ class MemberService {
     String address,
     String note,
   ) {
-    _memberRepository.addMember(
-      memberId,
-      name,
-      fatherName,
-      birthDate,
-      nrc,
-      phone,
-      bloodType,
-      bloodBankNo,
-      totalCount,
-      memberCount,
-      address,
-      note
-    );
+    _memberRepository.addMember(memberId, name, fatherName, birthDate, nrc,
+        phone, bloodType, bloodBankNo, totalCount, memberCount, address, note);
   }
 }

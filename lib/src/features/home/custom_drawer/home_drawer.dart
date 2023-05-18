@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/auth/login.dart';
-import 'package:merchant/utils/Colors.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/auth/login.dart';
+import 'package:donation/utils/Colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeDrawer extends StatefulWidget {
@@ -85,14 +85,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          const Color.fromARGB(255, 254, 252, 231).withOpacity(0.5),
+      backgroundColor: Colors.white.withOpacity(0.5),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Container(
-            color: const Color.fromARGB(255, 254, 252, 231),
+            color: Colors.white,
             padding: const EdgeInsets.fromLTRB(0, 46, 0, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

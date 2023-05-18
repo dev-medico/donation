@@ -3,16 +3,16 @@ import 'dart:developer';
 
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:logger/logger.dart';
-import 'package:merchant/data/repository/repository.dart';
-import 'package:merchant/data/response/xata_donation_list_response.dart';
-import 'package:merchant/data/response/xata_donation_search_list_response.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/donation/blood_donation_report.dart';
-import 'package:merchant/src/features/donation/donation_data_source.dart';
-import 'package:merchant/src/features/donation/donation_detail.dart';
-import 'package:merchant/src/features/donation/new_blood_donation.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
+import 'package:donation/data/repository/repository.dart';
+import 'package:donation/data/response/xata_donation_list_response.dart';
+import 'package:donation/data/response/xata_donation_search_list_response.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation/blood_donation_report.dart';
+import 'package:donation/src/features/donation/donation_data_source.dart';
+import 'package:donation/src/features/donation/donation_detail.dart';
+import 'package:donation/src/features/donation/new_blood_donation.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 
@@ -164,7 +164,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   }
 
   tabCreate() => Scaffold(
-        backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+        backgroundColor: Colors.white,
         body: Stack(
           children: [
             ListView(
@@ -577,7 +577,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         flexibleSpace: Container(
             decoration: BoxDecoration(

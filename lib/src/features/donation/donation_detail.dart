@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:merchant/data/repository/repository.dart';
-import 'package:merchant/data/response/member_response.dart';
-import 'package:merchant/data/response/total_data_response.dart';
-import 'package:merchant/data/response/xata_donation_search_list_response.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/donation/blood_donation_edit.dart';
-import 'package:merchant/src/features/member/member_detail.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/data/repository/repository.dart';
+import 'package:donation/data/response/member_response.dart';
+import 'package:donation/data/response/total_data_response.dart';
+import 'package:donation/data/response/xata_donation_search_list_response.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation/blood_donation_edit.dart';
+import 'package:donation/src/features/member/member_detail.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class DonationDetailScreen extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
 import 'package:shimmer/shimmer.dart';
 
 class DashBoardCardShimmer extends StatelessWidget {

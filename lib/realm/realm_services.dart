@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:merchant/realm/schemas.dart';
+import 'package:donation/realm/schemas.dart';
 import 'package:realm/realm.dart';
 import 'package:flutter/material.dart';
 

@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:merchant/data/response/xata_donors_list_response.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/data/response/xata_donors_list_response.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:intl/intl.dart';
 

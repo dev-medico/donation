@@ -1,7 +1,7 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:merchant/data/response/xata_donation_list_response.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/utils/Colors.dart';
+import 'package:donation/data/response/xata_donation_list_response.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
 import 'package:intl/intl.dart';
 
 class DonationChartByBlood extends StatefulWidget {
@@ -33,7 +33,6 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
     var date = DateTime.now();
     donationYear = DateFormat('yyyy').format(date);
   }
-  
 
   @override
   Widget build(BuildContext context) {

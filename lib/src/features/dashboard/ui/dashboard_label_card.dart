@@ -1,7 +1,7 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/utils/Colors.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
 
 class DashBoardLabelCard extends StatelessWidget {
   final String status;
@@ -23,8 +23,12 @@ class DashBoardLabelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: Responsive.isMobile(context) ? MediaQuery.of(context).size.width / 2.5 : MediaQuery.of(context).size.width / 4.5,
-      height:  Responsive.isMobile(context) ? 118 : MediaQuery.of(context).size.height / 5.7,
+      width: Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width / 2.5
+          : MediaQuery.of(context).size.width / 4.5,
+      height: Responsive.isMobile(context)
+          ? 118
+          : MediaQuery.of(context).size.height / 5.7,
       margin: const EdgeInsets.only(top: 8.0, bottom: 8, right: 8.0),
       child: Material(
         shadowColor: Colors.grey[50],
@@ -48,12 +52,14 @@ class DashBoardLabelCard extends StatelessWidget {
                 //     arguments: ScreenArguments(title, status));
               },
               child: Container(
-                padding:  EdgeInsets.all(Responsive.isMobile(context) ? 16.0 : 30),
+                padding:
+                    EdgeInsets.all(Responsive.isMobile(context) ? 16.0 : 30),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding:  EdgeInsets.only(bottom: Responsive.isMobile(context)? 0 : 12),
+                      padding: EdgeInsets.only(
+                          bottom: Responsive.isMobile(context) ? 0 : 12),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -65,7 +71,7 @@ class DashBoardLabelCard extends StatelessWidget {
                           Text(
                             count,
                             style: TextStyle(
-                              fontSize: Responsive.isMobile(context)  ? 14 : 16,
+                              fontSize: Responsive.isMobile(context) ? 14 : 16,
                               color: countColor,
                             ),
                           ),

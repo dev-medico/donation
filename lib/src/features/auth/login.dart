@@ -6,13 +6,14 @@ import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:merchant/data/response/login_response/login_response.dart';
-import 'package:merchant/realm/realm_provider.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/home/home.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/data/response/login_response/login_response.dart';
+import 'package:donation/realm/realm_provider.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/home/home.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -56,7 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       child: Form(
         key: _formKey,
         child: Scaffold(
-          backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+          backgroundColor: Colors.white,
           body: Stack(
             children: [
               ListView(
@@ -293,8 +294,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         setState(() {
           _isLoading = false;
         });
-        Navigator.pushNamedAndRemoveUntil(context,
-            NavigationHomeScreen.routeName, (Route<dynamic> route) => false);
+        Navigator.pushNamedAndRemoveUntil(context, MobileHomeScreen.routeName,
+            (Route<dynamic> route) => false);
       } else {
         setState(() {
           _isLoading = false;
@@ -317,8 +318,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _isLoading = false;
       });
       if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context,
-            NavigationHomeScreen.routeName, (Route<dynamic> route) => false);
+        Navigator.pushNamedAndRemoveUntil(context, MobileHomeScreen.routeName,
+            (Route<dynamic> route) => false);
       }
     } catch (err) {
       Utils.messageDialog(err.toString(), context, "ပြင်ဆင်မည်", Colors.black);
@@ -330,7 +331,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     prefs.setString("token", response.token.toString());
     prefs.setString("userName", response.user!.name!.toString());
     prefs.setString("userPhone", response.user!.phones![0].toString());
-    Navigator.pushNamedAndRemoveUntil(context, NavigationHomeScreen.routeName,
-        (Route<dynamic> route) => false);
+    Navigator.pushNamedAndRemoveUntil(
+        context, MobileHomeScreen.routeName, (Route<dynamic> route) => false);
   }
 }

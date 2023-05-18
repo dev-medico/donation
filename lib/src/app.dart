@@ -1,16 +1,18 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:merchant/realm/realm_provider.dart';
-import 'package:merchant/src/features/auth/login.dart';
-import 'package:merchant/src/features/dashboard/dashboard.dart';
-import 'package:merchant/src/features/donar/donar_list.dart';
-import 'package:merchant/src/features/donation/blood_donation_list_new_style.dart';
-import 'package:merchant/src/features/donation_member/presentation/member_list.dart';
-import 'package:merchant/src/features/home/home.dart';
-import 'package:merchant/src/features/special_event/event_list.dart';
-import 'package:merchant/src/features/splash_screen/splash_screen.dart';
-import 'package:merchant/utils/custom_scroll.dart';
+import 'package:donation/realm/realm_provider.dart';
+import 'package:donation/src/features/auth/login.dart';
+import 'package:donation/src/features/dashboard/dashboard.dart';
+import 'package:donation/src/features/donar/donar_list.dart';
+import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
+import 'package:donation/src/features/donation_member/presentation/member_list.dart';
+import 'package:donation/src/features/home/home.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
+import 'package:donation/src/features/special_event/event_list.dart';
+import 'package:donation/src/features/splash_screen/splash_screen.dart';
+import 'package:donation/utils/custom_scroll.dart';
 
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
@@ -32,7 +34,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     var currentUser = ref.watch(realmServiceProvider);
 
-    return MaterialApp(
+    return FluentApp(
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
@@ -44,7 +46,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         Locale('en', ''),
       ],
       themeMode: ThemeMode.light,
-      home: currentUser == null ? const LoginScreen() : NavigationHomeScreen(),
+      home: currentUser == null ? const LoginScreen() : MobileHomeScreen(),
       onGenerateRoute: (RouteSettings routeSettings) {
         return MaterialPageRoute<void>(
           settings: routeSettings,
@@ -60,6 +62,8 @@ class _MyAppState extends ConsumerState<MyApp> {
 
               case NavigationHomeScreen.routeName:
                 return const NavigationHomeScreen();
+              case MobileHomeScreen.routeName:
+                return const MobileHomeScreen();
               case MemberListScreen.routeName:
                 return const MemberListScreen();
 

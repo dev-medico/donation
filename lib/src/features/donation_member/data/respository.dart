@@ -1,5 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:merchant/realm/realm_provider.dart';
+import 'package:donation/realm/realm_provider.dart';
 
 class MemberRepository {
   WidgetRef ref;

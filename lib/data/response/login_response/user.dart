@@ -33,8 +33,8 @@ class User {
   String? serviceType;
   @JsonKey(name: 'company_name')
   String? companyName;
-  @JsonKey(name: 'merchant_id')
-  String? merchantId;
+  @JsonKey(name: 'donation_id')
+  String? donationId;
   @JsonKey(name: 'license_type')
   String? licenseType;
   @JsonKey(name: 'license_no')
@@ -97,7 +97,7 @@ class User {
     this.companyType,
     this.serviceType,
     this.companyName,
-    this.merchantId,
+    this.donationId,
     this.licenseType,
     this.licenseNo,
     this.licenseExpireDate,

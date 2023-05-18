@@ -1,5 +1,5 @@
 // import 'package:flutter/material.dart';
-// import 'package:merchant/utils/Colors.dart';
+// import 'package:donation/utils/Colors.dart';
 // import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 // /// The home page of the application which hosts the datagrid.

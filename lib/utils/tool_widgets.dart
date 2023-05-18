@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:merchant/utils/Colors.dart';
+import 'package:donation/utils/Colors.dart';
 
 BoxDecoration shadowDecoration(Color color) {
   return BoxDecoration(
@@ -158,4 +158,11 @@ BoxDecoration shadowDecorationGradient() {
     ],
     color: Colors.white,
   );
+}
+
+smallTextStyle(BuildContext context, {bool bold = false}) {
+  return TextStyle(
+      color: Colors.black,
+      fontSize: 14,
+      fontWeight: bold ? FontWeight.bold : FontWeight.normal);
 }

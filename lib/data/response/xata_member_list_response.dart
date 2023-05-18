@@ -1,4 +1,4 @@
-import 'package:merchant/data/response/member_response.dart';
+import 'package:donation/data/response/member_response.dart';
 
 class XataMemberListResponse {
   Meta? meta;

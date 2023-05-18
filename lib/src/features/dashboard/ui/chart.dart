@@ -1,6 +1,6 @@
 // import 'package:flutter/material.dart';
 // import 'package:charts_flutter/flutter.dart' as charts;
-// import 'package:merchant/utils/Colors.dart';
+// import 'package:donation/utils/Colors.dart';
 
 // class StackedBarChart extends StatelessWidget {
 //   final List<charts.Series<dynamic, String>> seriesList;

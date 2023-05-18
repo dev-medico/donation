@@ -1,7 +1,7 @@
 // import 'package:charts_flutter/flutter.dart' as charts;
 // import 'package:flutter/material.dart';
-// import 'package:merchant/data/response/xata_donation_list_response.dart';
-// import 'package:merchant/donation_list_response.dart';
+// import 'package:donation/data/response/xata_donation_list_response.dart';
+// import 'package:donation/donation_list_response.dart';
 
 // class SimpleBarChartBlood extends StatelessWidget {
 //   final List<charts.Series<dynamic, String>> seriesList;

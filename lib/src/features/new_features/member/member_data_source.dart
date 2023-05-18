@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:merchant/realm/schemas.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/realm/schemas.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MemberDataSource extends DataGridSource {

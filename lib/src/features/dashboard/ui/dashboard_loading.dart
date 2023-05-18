@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_card_shimmer.dart';
-import 'package:merchant/src/features/dashboard/ui/dashboard_label_shimmer.dart';
-import 'package:merchant/utils/Colors.dart';
+import 'package:donation/src/features/dashboard/ui/dashboard_card_shimmer.dart';
+import 'package:donation/src/features/dashboard/ui/dashboard_label_shimmer.dart';
+import 'package:donation/utils/Colors.dart';
 
 class DashboardLoading extends StatelessWidget {
   const DashboardLoading({Key? key}) : super(key: key);

@@ -3,8 +3,8 @@ import 'package:flutter_cupertino_date_picker_fork/flutter_cupertino_date_picker
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/utils/Colors.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
 
 final formatter = NumberFormat("#,###", "en_US");
 

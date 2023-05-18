@@ -1,10 +1,10 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:merchant/data/response/xata_donation_list_response.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/donation/donation_chart_by_blood.dart';
-import 'package:merchant/src/features/donation/donation_chart_by_desease.dart';
-import 'package:merchant/src/features/donation/donation_chart_by_hospital.dart';
-import 'package:merchant/utils/Colors.dart';
+import 'package:donation/data/response/xata_donation_list_response.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
+import 'package:donation/src/features/donation/donation_chart_by_desease.dart';
+import 'package:donation/src/features/donation/donation_chart_by_hospital.dart';
+import 'package:donation/utils/Colors.dart';
 
 class BloodDonationReportScreen extends StatefulWidget {
   final List<DonationRecord> data;
@@ -44,7 +44,7 @@ class _BloodDonationReportScreenState extends State<BloodDonationReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+        backgroundColor: Colors.white,
         appBar: AppBar(
           flexibleSpace: Container(
               decoration: BoxDecoration(

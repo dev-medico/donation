@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
-project(merchant LANGUAGES CXX)
+project(donation LANGUAGES CXX)
 
-set(BINARY_NAME "merchant")
+set(BINARY_NAME "donation")
 
 cmake_policy(SET CMP0063 NEW)
 

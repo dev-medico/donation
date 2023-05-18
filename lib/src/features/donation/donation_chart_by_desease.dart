@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:merchant/data/response/xata_donation_list_response.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
+import 'package:donation/data/response/xata_donation_list_response.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
 
 class DonationChartByDisease extends StatefulWidget {
   final List<DonationRecord> data;

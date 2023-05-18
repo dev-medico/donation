@@ -3,14 +3,14 @@ import 'dart:developer';
 
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:merchant/data/repository/repository.dart';
-import 'package:merchant/data/response/special_event_list_response.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/special_event/edit_special_event.dart';
-import 'package:merchant/src/features/special_event/event_data_source.dart';
-import 'package:merchant/src/features/special_event/new_special_event.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
+import 'package:donation/data/repository/repository.dart';
+import 'package:donation/data/response/special_event_list_response.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/special_event/edit_special_event.dart';
+import 'package:donation/src/features/special_event/event_data_source.dart';
+import 'package:donation/src/features/special_event/new_special_event.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 import 'package:intl/intl.dart';
@@ -67,7 +67,7 @@ class _EventListScreenState extends State<EventListScreen> {
   List<SpecialEventData> data = [];
 
   tabCreate() => Scaffold(
-        backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+        backgroundColor: Colors.white,
         body: Stack(
           children: [
             ListView(
@@ -286,7 +286,7 @@ class _EventListScreenState extends State<EventListScreen> {
   Widget build(BuildContext context) {
     YYDialog.init(context);
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         flexibleSpace: Container(
             decoration: BoxDecoration(

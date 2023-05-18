@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
 
 class SearchMemberScreen extends StatefulWidget {
   static const routeName = "/member_search";
@@ -51,7 +51,7 @@ class _SearchMemberScreenState extends State<SearchMemberScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         flexibleSpace: Container(
             decoration: BoxDecoration(

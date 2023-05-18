@@ -1,15 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:merchant/data/repository/repository.dart';
-import 'package:merchant/data/response/member_response.dart';
-import 'package:merchant/data/response/xata_donation_search_list_response.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/donation/donation_detail.dart';
-import 'package:merchant/src/features/member/member_edit.dart';
-import 'package:merchant/utils/Colors.dart';
-import 'package:merchant/utils/tool_widgets.dart';
-import 'package:merchant/utils/utils.dart';
+import 'package:donation/data/repository/repository.dart';
+import 'package:donation/data/response/member_response.dart';
+import 'package:donation/data/response/xata_donation_search_list_response.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation/donation_detail.dart';
+import 'package:donation/src/features/member/member_edit.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
+import 'package:donation/utils/utils.dart';
 
 class MemberDetailScreen extends StatefulWidget {
   static const routeName = '/member-detail';

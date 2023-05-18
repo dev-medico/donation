@@ -1,5 +1,5 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:merchant/utils/Colors.dart';
+import 'package:donation/utils/Colors.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 254, 252, 231),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "Settings",

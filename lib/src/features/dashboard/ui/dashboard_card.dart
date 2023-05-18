@@ -1,6 +1,6 @@
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:merchant/responsive.dart';
-import 'package:merchant/src/features/donation_member/presentation/member_list.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 
 import '../../donar/donar_list.dart';
 import '../../donation/blood_donation_list_new_style.dart';
