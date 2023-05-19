@@ -1,11 +1,12 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:donation/responsive.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:donation/realm/schemas.dart';
-import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/new_member.dart';
 import 'package:donation/src/features/new_features/member/member_data_source.dart';
@@ -40,7 +41,46 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
   List<Member> data = [];
   TextStyle tabStyle = const TextStyle(fontSize: 16);
 
-  tabCreate() => Scaffold(
+  final searchController = TextEditingController();
+  final memberController = TextEditingController();
+  List<String> membersSelected = <String>[];
+  List<String> allMembers = <String>[];
+  bool inputted = false;
+  String searchKey = "";
+  Timer? _debounceTimer;
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final streamAsyncValue = ref.watch(memberStreamProvider(
+        (search: searchKey, bloodType: selectedBloodType)));
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        flexibleSpace: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [primaryColor, primaryDark],
+        ))),
+        centerTitle: true,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text("အဖွဲ့၀င်များ",
+              textScaleFactor: 1.0,
+              style: TextStyle(
+                  fontSize: Responsive.isMobile(context) ? 15 : 17,
+                  color: Colors.white)),
+        ),
+      ),
+      body: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
           children: [
@@ -220,29 +260,15 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                           style: const TextStyle(
                               fontSize: 15, color: Colors.black),
                           onChanged: (val) {
-                            List<Member>? filterdata = [];
-                            for (int i = 0; i < data.length; i++) {
-                              //get memberdata from data only where bloodtype is equal to value
-                              if (selectedBloodType !=
-                                  "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
-                                if (data[i].name!.toLowerCase().contains(
-                                        searchController.text
-                                            .toString()
-                                            .toLowerCase()) &&
-                                    data[i].bloodType == selectedBloodType) {
-                                  filterdata.add(data[i]);
-                                }
-                              } else {
-                                if (data[i]
-                                    .name!
-                                    .toLowerCase()
-                                    .contains(val.toLowerCase())) {
-                                  filterdata.add(data[i]);
-                                }
-                              }
+                            if (_debounceTimer?.isActive ?? false) {
+                              _debounceTimer?.cancel();
                             }
-                            setState(() {
-                              dataSegments = filterdata.sublist(0);
+
+                            _debounceTimer =
+                                Timer(const Duration(milliseconds: 500), () {
+                              setState(() {
+                                searchKey = val;
+                              });
                             });
                           },
                           decoration: InputDecoration(
@@ -450,29 +476,15 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                           style: const TextStyle(
                               fontSize: 15, color: Colors.black),
                           onChanged: (val) {
-                            List<Member>? filterdata = [];
-                            for (int i = 0; i < data.length; i++) {
-                              //get memberdata from data only where bloodtype is equal to value
-                              if (selectedBloodType !=
-                                  "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
-                                if (data[i].name!.toLowerCase().contains(
-                                        searchController.text
-                                            .toString()
-                                            .toLowerCase()) &&
-                                    data[i].bloodType == selectedBloodType) {
-                                  filterdata.add(data[i]);
-                                }
-                              } else {
-                                if (data[i]
-                                    .name!
-                                    .toLowerCase()
-                                    .contains(val.toLowerCase())) {
-                                  filterdata.add(data[i]);
-                                }
-                              }
+                            if (_debounceTimer?.isActive ?? false) {
+                              _debounceTimer?.cancel();
                             }
-                            setState(() {
-                              dataSegments = filterdata.sublist(0);
+
+                            _debounceTimer =
+                                Timer(const Duration(milliseconds: 700), () {
+                              setState(() {
+                                searchKey = val;
+                              });
                             });
                           },
                           decoration: InputDecoration(
@@ -512,73 +524,43 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                       ),
                     ],
                   ),
-            Container(
-              padding: EdgeInsets.only(
-                  left: 20.0,
-                  top: Responsive.isMobile(context) ? 160 : 100,
-                  bottom: 12),
-              child: buildSimpleTable(),
+            streamAsyncValue.when(
+              data: (savedData) {
+                final results = savedData.results;
+                log("Data " + results.length.toString());
+
+                List<Member> members = [];
+                for (int i = 0; i < results.length; i++) {
+                  members.add(results[i]);
+                }
+                setState(() {
+                  data = members;
+                });
+                if (searchController.text.isEmpty) {
+                  getRanges();
+                }
+
+                if (data.isNotEmpty) {
+                  return Container(
+                    margin: EdgeInsets.only(
+                        left: 20.0,
+                        top: Responsive.isMobile(context) ? 160 : 100,
+                        bottom: 12),
+                    child: buildSimpleTable(data),
+                  );
+                } else {
+                  return Container();
+                }
+              },
+              error: (Object error, StackTrace stackTrace) {
+                return Text(error.toString());
+              },
+              loading: () {
+                return Container();
+              },
             ),
           ],
         ),
-      );
-  final searchController = TextEditingController();
-  final memberController = TextEditingController();
-  List<String> membersSelected = <String>[];
-  List<String> allMembers = <String>[];
-  bool inputted = false;
-  String searchKey = "";
-
-  @override
-  Widget build(BuildContext context) {
-    final streamAsyncValue = ref.watch(memberStreamProvider(searchKey));
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [primaryColor, primaryDark],
-        ))),
-        centerTitle: true,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Text("အဖွဲ့၀င်များ",
-              textScaleFactor: 1.0,
-              style: TextStyle(
-                  fontSize: Responsive.isMobile(context) ? 15 : 17,
-                  color: Colors.white)),
-        ),
-      ),
-      body: streamAsyncValue.when(
-        data: (savedData) {
-          final results = savedData.results;
-          log("Data " + results.length.toString());
-
-          List<Member> members = [];
-          for (int i = 0; i < results.length; i++) {
-            members.add(results[i]);
-          }
-          setState(() {
-            data = members;
-          });
-          addData();
-
-          if (data.isNotEmpty) {
-            return tabCreate();
-          } else
-            Container();
-          return null;
-        },
-        error: (Object error, StackTrace stackTrace) {
-          return Text(error.toString());
-        },
-        loading: () {
-          return Container();
-        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -594,15 +576,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
     );
   }
 
-  addData() {
-    int tabLength = 0;
-
-    if (data.length % 50 == 0) {
-      tabLength = data.length ~/ 50;
-    } else {
-      tabLength = data.length ~/ 50 + 1;
-    }
-
+  getRanges() {
     for (int i = 0; i < data.length; i = i + 50) {
       if (i + 50 > data.length) {
         ranges
@@ -611,14 +585,14 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
         ranges.add("${data[i].memberId!} မှ ${data[i + 49].memberId!}");
       }
     }
-    if (data.isNotEmpty) {
+    if (data.isNotEmpty && data.length > 50) {
       setState(() {
         dataSegments = data.sublist(0, 50);
       });
     }
   }
 
-  buildSimpleTable() {
+  buildSimpleTable(List<Member> data) {
     MemberDataSource memberDataDataSource = MemberDataSource(memberData: data);
     return Container(
       margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),

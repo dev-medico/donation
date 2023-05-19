@@ -1,8 +1,8 @@
+import 'package:donation/realm/realm_services.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:donation/realm/realm_provider.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/dashboard/dashboard.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
@@ -32,7 +32,7 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
-    var currentUser = ref.watch(realmServiceProvider);
+    var currentUser = ref.watch(realmProvider);
 
     return FluentApp(
       scrollBehavior: MyCustomScrollBehavior(),

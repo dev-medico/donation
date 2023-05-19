@@ -1,11 +1,21 @@
 import 'dart:developer';
 
+import 'package:donation/realm/app_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:realm/realm.dart';
 import 'package:flutter/material.dart';
 
+final realmProvider = ChangeNotifierProvider<RealmServices?>((ref) {
+  final appServices = ref.watch(appServiceProvider);
+  return appServices.app.currentUser != null
+      ? RealmServices(appServices.app)
+      : null;
+});
+
 class RealmServices with ChangeNotifier {
   static const String queryAllName = "getAllSubscription";
+  static const String queryAllDonationName = "getAllDonation";
 
   bool offlineModeOn = false;
   bool isWaiting = false;
@@ -17,7 +27,7 @@ class RealmServices with ChangeNotifier {
     if (app.currentUser != null || currentUser != app.currentUser) {
       currentUser ??= app.currentUser;
       realm = Realm(Configuration.flexibleSync(
-          currentUser!, [Member.schema, Donation.schema]));
+          currentUser!, [Donation.schema, Member.schema]));
       if (realm.subscriptions.isEmpty) {
         updateSubscriptions();
       }
@@ -29,6 +39,8 @@ class RealmServices with ChangeNotifier {
     realm.subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.clear();
       mutableSubscriptions.add(realm.all<Member>(), name: queryAllName);
+      mutableSubscriptions.add(realm.all<Donation>(),
+          name: queryAllDonationName);
     });
     await realm.subscriptions.waitForSynchronization();
   }
@@ -47,6 +59,7 @@ class RealmServices with ChangeNotifier {
         isWaiting = false;
       }
     }
+    log("Switch Called");
     notifyListeners();
   }
 

@@ -1,5 +1,6 @@
-import 'package:donation/realm/realm_provider.dart';
+import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
+import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/utils/tool_widgets.dart';
@@ -39,10 +40,16 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     setDrawerListArray(titles);
   }
 
+  switchUI() async {
+    var realmServices = ref.watch(realmProvider);
+    await realmServices!.sessionSwitch();
+  }
+
   @override
   Widget build(BuildContext context) {
     return NavigationView(
       onOpenSearch: () {
+        switchUI();
         ref.read(openDrawerProvider.notifier).update((state) => true);
       },
       pane: NavigationPane(
@@ -55,7 +62,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         footerItems: [
           PaneItem(
             onTap: () {
-              ref.watch(realmServiceProvider)!.close();
+              ref.watch(realmProvider)!.close();
             },
             icon: CustomIcon(
               icon: icons[5],

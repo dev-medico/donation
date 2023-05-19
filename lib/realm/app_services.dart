@@ -1,5 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:realm/realm.dart';
+
+final appServiceProvider = ChangeNotifierProvider<AppServices>((ref) {
+  String appId = "application-0-vnwzx";
+  Uri baseUrl = Uri.parse("https://realm.mongodb.com");
+  return AppServices(appId, baseUrl);
+});
 
 class AppServices with ChangeNotifier {
   String id;
@@ -13,11 +22,15 @@ class AppServices with ChangeNotifier {
     User loggedInUser =
         await app.logIn(Credentials.emailPassword(email, password));
     currentUser = loggedInUser;
+    log("Custom User Data - ${currentUser!.customData}");
     notifyListeners();
+    final customUserData = await currentUser!.refreshCustomData();
+    log("Custom User Data -  $customUserData");
     return loggedInUser;
   }
 
-  Future<User> registerUserEmailPassword(String email, String password) async {
+  Future<User> registerUserEmailPassword(
+      String email, String password, String name) async {
     EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
     await authProvider.registerUser(email, password);
     User loggedInUser =

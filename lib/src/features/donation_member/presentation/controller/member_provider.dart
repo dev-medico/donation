@@ -1,34 +1,50 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:donation/realm/realm_services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/member_response.dart';
 import 'package:donation/data/response/xata_member_list_response.dart';
-import 'package:donation/realm/realm_provider.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:realm/realm.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'member_provider.g.dart';
 
-final memberStreamProvider = StreamProvider.autoDispose
-    .family<RealmResultsChanges<Member>, String>((ref, search) {
-  var realmService = ref.watch(realmServiceProvider);
-  log("Search " + search);
-  // final stream = search != ""
-  //     ? realmService!.realm
-  //         .query<Member>("name CONTAINS[c] '${search.toLowerCase()}'")
-  //         .changes
-  //     : realmService!.realm
-  //         .query<Member>("TRUEPREDICATE SORT(memberId ASC)")
-  //         .changes;
-  final stream = realmService!.realm
-      .query<Member>("TRUEPREDICATE SORT(memberId ASC)")
-      .changes;
-  // stream.length.then((value) => log("Stream " + value.toString()));
+typedef SearchParams = ({String? search, String? bloodType});
 
-  return stream;
+final memberStreamProvider = StreamProvider.autoDispose
+    .family<RealmResultsChanges<Member>, SearchParams>((ref, searchParam) {
+  var realmService = ref.watch(realmProvider);
+  log("Search " + searchParam.search.toString());
+  if (searchParam.search != "" &&
+      searchParam.bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
+    final stream = realmService!.realm
+        .query<Member>(
+            "name CONTAINS[c] '${searchParam.search.toString().toLowerCase()}' AND bloodType =='${searchParam.bloodType.toString()}'")
+        .changes;
+
+    return stream;
+  } else if (searchParam.search != "") {
+    final stream = realmService!.realm
+        .query<Member>(
+            "name CONTAINS[c] '${searchParam.search.toString().toLowerCase()}'")
+        .changes;
+
+    return stream;
+  } else if (searchParam.bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
+    final stream = realmService!.realm
+        .query<Member>("bloodType =='${searchParam.bloodType.toString()}'")
+        .changes;
+
+    return stream;
+  } else {
+    final stream = realmService!.realm
+        .query<Member>("TRUEPREDICATE SORT(memberId ASC)")
+        .changes;
+    return stream;
+  }
 });
 
 // create a provider that store list of objects that pass to it

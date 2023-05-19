@@ -7,7 +7,6 @@
 // import 'package:donation/data/repository/repository.dart';
 // import 'package:donation/data/response/member_response.dart';
 // import 'package:donation/data/response/xata_member_list_response.dart';
-// import 'package:donation/realm/realm_provider.dart';
 // import 'package:donation/responsive.dart';
 // import 'package:donation/src/features/donation_member/application/service.dart';
 // import 'package:donation/src/features/donation_member/data/respository.dart';
@@ -80,16 +79,20 @@
 //                                 "အမှတ်စဥ် အလိုက်ကြည့်မည်",
 //                                 style: TextStyle(fontSize: 13),
 //                               ),
-//                               icon: const Icon(
-//                                 Icons.arrow_drop_down,
-//                                 color: Colors.black45,
+//                               iconStyleData: IconStyleData(
+//                                 icon: const Icon(
+//                                   Icons.arrow_drop_down,
+//                                   color: Colors.black45,
+//                                 ),
+//                                 iconSize: 30,
 //                               ),
-//                               iconSize: 30,
-//                               buttonHeight: 60,
-//                               buttonPadding:
-//                                   const EdgeInsets.only(left: 20, right: 10),
-//                               dropdownDecoration: BoxDecoration(
-//                                 borderRadius: BorderRadius.circular(12),
+//                               buttonStyleData: ButtonStyleData(
+//                                 height: 60,
+//                                 padding:
+//                                     const EdgeInsets.only(left: 20, right: 10),
+//                                 decoration: BoxDecoration(
+//                                   borderRadius: BorderRadius.circular(12),
+//                                 ),
 //                               ),
 //                               items: ranges
 //                                   .map((item) => DropdownMenuItem<String>(
@@ -152,16 +155,20 @@
 //                                 selectedBloodType!,
 //                                 style: const TextStyle(fontSize: 13),
 //                               ),
-//                               icon: const Icon(
-//                                 Icons.arrow_drop_down,
-//                                 color: Colors.black45,
+//                               iconStyleData: IconStyleData(
+//                                 icon: const Icon(
+//                                   Icons.arrow_drop_down,
+//                                   color: Colors.black45,
+//                                 ),
+//                                 iconSize: 30,
 //                               ),
-//                               iconSize: 30,
-//                               buttonHeight: 60,
-//                               buttonPadding:
-//                                   const EdgeInsets.only(left: 20, right: 10),
-//                               dropdownDecoration: BoxDecoration(
-//                                 borderRadius: BorderRadius.circular(12),
+//                               buttonStyleData: ButtonStyleData(
+//                                 height: 60,
+//                                 padding:
+//                                     const EdgeInsets.only(left: 20, right: 10),
+//                                 decoration: BoxDecoration(
+//                                   borderRadius: BorderRadius.circular(12),
+//                                 ),
 //                               ),
 //                               items: bloodTypes
 //                                   .map((item) => DropdownMenuItem<String>(
@@ -306,16 +313,19 @@
 //                             "အမှတ်စဥ် အလိုက်ကြည့်မည်",
 //                             style: TextStyle(fontSize: 14),
 //                           ),
-//                           icon: const Icon(
-//                             Icons.arrow_drop_down,
-//                             color: Colors.black45,
+//                           iconStyleData: IconStyleData(
+//                             icon: const Icon(
+//                               Icons.arrow_drop_down,
+//                               color: Colors.black45,
+//                             ),
+//                             iconSize: 30,
 //                           ),
-//                           iconSize: 30,
-//                           buttonHeight: 60,
-//                           buttonPadding:
-//                               const EdgeInsets.only(left: 20, right: 10),
-//                           dropdownDecoration: BoxDecoration(
-//                             borderRadius: BorderRadius.circular(12),
+//                           buttonStyleData: ButtonStyleData(
+//                             height: 60,
+//                             padding: const EdgeInsets.only(left: 20, right: 10),
+//                             decoration: BoxDecoration(
+//                               borderRadius: BorderRadius.circular(12),
+//                             ),
 //                           ),
 //                           items: ranges
 //                               .map((item) => DropdownMenuItem<String>(
@@ -377,16 +387,19 @@
 //                             selectedBloodType!,
 //                             style: const TextStyle(fontSize: 14),
 //                           ),
-//                           icon: const Icon(
-//                             Icons.arrow_drop_down,
-//                             color: Colors.black45,
+//                           iconStyleData: IconStyleData(
+//                             icon: const Icon(
+//                               Icons.arrow_drop_down,
+//                               color: Colors.black45,
+//                             ),
+//                             iconSize: 30,
 //                           ),
-//                           iconSize: 30,
-//                           buttonHeight: 60,
-//                           buttonPadding:
-//                               const EdgeInsets.only(left: 20, right: 10),
-//                           dropdownDecoration: BoxDecoration(
-//                             borderRadius: BorderRadius.circular(12),
+//                           buttonStyleData: ButtonStyleData(
+//                             height: 60,
+//                             padding: const EdgeInsets.only(left: 20, right: 10),
+//                             decoration: BoxDecoration(
+//                               borderRadius: BorderRadius.circular(12),
+//                             ),
 //                           ),
 //                           items: bloodTypes
 //                               .map((item) => DropdownMenuItem<String>(
@@ -606,7 +619,7 @@
 //               element.phone,
 //               element.bloodType,
 //               element.bloodBankCard,
-//               element.totalCount,
+//               element.totalCount.toString(),
 //               element.donationCounts.toString(),
 //               element.address,
 //               element.note);

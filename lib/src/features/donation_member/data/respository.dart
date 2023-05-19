@@ -1,5 +1,5 @@
+import 'package:donation/realm/realm_services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:donation/realm/realm_provider.dart';
 
 class MemberRepository {
   WidgetRef ref;
@@ -21,7 +21,7 @@ class MemberRepository {
   ) {
     DateTime now = DateTime.now();
 
-    ref.watch(realmServiceProvider)!.createMember(
+    ref.watch(realmProvider)!.createMember(
         name: name,
         birthDate: birthDate,
         bloodBankCard: bloodBankNo,
