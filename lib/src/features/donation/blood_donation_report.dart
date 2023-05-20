@@ -60,7 +60,7 @@ class _BloodDonationReportScreenState extends State<BloodDonationReportScreen> {
                 "${widget.year} ${months[widget.month]} သွေးလှူဒါန်းမှုမှတ်တမ်း",
                 textScaleFactor: 1.0,
                 style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15 : 17,
+                    fontSize: Responsive.isMobile(context) ? 15 : 16,
                     color: Colors.white)),
           ),
         ),

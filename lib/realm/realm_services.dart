@@ -267,6 +267,11 @@ class RealmServices with ChangeNotifier {
     notifyListeners();
   }
 
+  void deleteAllDonation() {
+    realm.write(() => realm.deleteAll());
+    notifyListeners();
+  }
+
   Future<void> close() async {
     if (currentUser != null) {
       await currentUser?.logOut();

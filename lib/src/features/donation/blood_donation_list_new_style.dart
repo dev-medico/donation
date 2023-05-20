@@ -1,18 +1,12 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/donation/controller/donation_provider.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/logger.dart';
-import 'package:donation/data/repository/repository.dart';
-import 'package:donation/data/response/xata_donation_list_response.dart';
-import 'package:donation/data/response/xata_donation_search_list_response.dart';
 import 'package:donation/responsive.dart';
-import 'package:donation/src/features/donation/blood_donation_report.dart';
 import 'package:donation/src/features/donation/donation_data_source.dart';
-import 'package:donation/src/features/donation/donation_detail.dart';
 import 'package:donation/src/features/donation/new_blood_donation.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
@@ -23,6 +17,11 @@ import 'package:tab_container/tab_container.dart';
 final membersProvider = StateProvider<RealmResults<Member>>((ref) {
   var realmService = ref.watch(realmProvider);
   return realmService!.realm.query<Member>("TRUEPREDICATE SORT(_id ASC)");
+});
+
+final donationsProvider = StateProvider<RealmResults<Donation>>((ref) {
+  var realmService = ref.watch(realmProvider);
+  return realmService!.realm.query<Donation>("TRUEPREDICATE SORT(_id ASC)");
 });
 
 class BloodDonationListNewStyle extends ConsumerStatefulWidget {
@@ -107,18 +106,18 @@ class _BloodDonationListNewStyleState
     "O (Rh -)",
     "AB (Rh -)"
   ];
-  List<DonationRecord> dataSegments1 = [];
-  List<DonationRecord> dataSegments2 = [];
-  List<DonationRecord> dataSegments3 = [];
-  List<DonationRecord> dataSegments4 = [];
-  List<DonationRecord> dataSegments5 = [];
-  List<DonationRecord> dataSegments6 = [];
-  List<DonationRecord> dataSegments7 = [];
-  List<DonationRecord> dataSegments8 = [];
-  List<DonationRecord> dataSegments9 = [];
-  List<DonationRecord> dataSegments10 = [];
-  List<DonationRecord> dataSegments11 = [];
-  List<DonationRecord> dataSegments12 = [];
+  List<Donation> dataSegments1 = [];
+  List<Donation> dataSegments2 = [];
+  List<Donation> dataSegments3 = [];
+  List<Donation> dataSegments4 = [];
+  List<Donation> dataSegments5 = [];
+  List<Donation> dataSegments6 = [];
+  List<Donation> dataSegments7 = [];
+  List<Donation> dataSegments8 = [];
+  List<Donation> dataSegments9 = [];
+  List<Donation> dataSegments10 = [];
+  List<Donation> dataSegments11 = [];
+  List<Donation> dataSegments12 = [];
   TextStyle tabStyle = const TextStyle(fontSize: 16);
   bool dataFullLoaded = false;
   TabContainerController controller = TabContainerController(length: 12);
@@ -138,59 +137,101 @@ class _BloodDonationListNewStyleState
   @override
   void initState() {
     super.initState();
-    callAPI("");
+
+    // callAPI("");
   }
 
-  callAPI(String after) {
-    if (after.isEmpty) {
-      setState(() {
-        data = [];
-      });
-    }
-    XataRepository().getDonationsList(after).then((response) {
-      setState(() {
-        data!.addAll(
-            XataDonationListResponse.fromJson(jsonDecode(response.body))
-                .records!);
-      });
+  // callAPI(String after) {
+  //   if (after.isEmpty) {
+  //     setState(() {
+  //       data = [];
+  //     });
+  //   }
+  //   XataRepository().getDonationsList(after).then((response) {
+  //     setState(() {
+  //       data!.addAll(
+  //           XataDonationListResponse.fromJson(jsonDecode(response.body))
+  //               .records!);
+  //     });
 
-      if (XataDonationListResponse.fromJson(jsonDecode(response.body))
-              .meta!
-              .page!
-              .more ??
-          false) {
-        callAPI(XataDonationListResponse.fromJson(jsonDecode(response.body))
-            .meta!
-            .page!
-            .cursor!);
-      } else {
-        log("Data Fully Loaded");
-        setState(() {
-          dataFullLoaded = true;
-        });
-        data!.forEach((element) {
-          ref.watch(realmProvider)!.createDonation(
-                member: ref
-                    .read(membersProvider)
-                    .where((data) =>
-                        data.memberId.toString() ==
-                        element.member!.memberId.toString())
-                    .first
-                    .id,
-                date: element.date,
-                hospital: element.hospital,
-                memberId: element.member!.memberId.toString(),
-                patientAddress: element.patientAddress,
-                patientAge: element.patientAge,
-                patientDisease: element.patientDisease,
-                patientName: element.patientName,
-              );
-        });
+  //     if (XataDonationListResponse.fromJson(jsonDecode(response.body))
+  //             .meta!
+  //             .page!
+  //             .more ??
+  //         false) {
+  //       callAPI(XataDonationListResponse.fromJson(jsonDecode(response.body))
+  //           .meta!
+  //           .page!
+  //           .cursor!);
+  //     } else {
+  //       log("Data Fully Loaded");
+  //       setState(() {
+  //         dataFullLoaded = true;
+  //       });
+  //       // ref.watch(donationsProvider).forEach((element) {
+  //       //   ref.watch(realmProvider)!.deleteDonation(element);
+  //       // });
 
-        sortBySegments();
-      }
-    });
-  }
+  //       log("Data Length: ${data!.length}");
+
+  //       // var count = 0;
+  //       // var existCount = 0;
+  //       // data!.forEach((element) {
+  //       //   existCount++;
+  //       //   var donationDate = element.date.toString() != "null"
+  //       //       ? DateTime.parse(element.date!.replaceAll("Z", ""))
+  //       //       : DateTime.now();
+  //       //   bool noMember = ref
+  //       //       .read(membersProvider)
+  //       //       .where((data) =>
+  //       //           data.memberId.toString() ==
+  //       //           element.member!.memberId.toString())
+  //       //       .isEmpty;
+  //       //   var member = !noMember
+  //       //       ? ref
+  //       //           .read(membersProvider)
+  //       //           .where((data) =>
+  //       //               data.memberId.toString() ==
+  //       //               element.member!.memberId.toString())
+  //       //           .first
+  //       //       : null;
+  //       //   ref.watch(realmProvider)!.createDonation(
+  //       //         member: !noMember ? member!.id : null,
+  //       //         date: DateFormat('MM/dd/yyyy').format(donationDate),
+  //       //         donationDate: donationDate,
+  //       //         hospital: element.hospital,
+  //       //         memberId: noMember ? "" : member!.memberId.toString(),
+  //       //         patientAddress: element.patientAddress.toString(),
+  //       //         patientAge: element.patientAge.toString(),
+  //       //         patientDisease: element.patientDisease.toString(),
+  //       //         patientName: element.patientName.toString(),
+  //       //       );
+
+  //       //   //edit Member
+  //       //   if (!noMember) {
+  //       //     log(DateFormat('MM/dd/yyyy').format(member!.lastDate!).toString());
+
+  //       //     if (DateFormat('MM/dd/yyyy').format(member.lastDate!).toString() ==
+  //       //         "5/18/2023") {
+  //       //       ref
+  //       //           .watch(realmProvider)!
+  //       //           .updateMember(member, lastDate: donationDate);
+  //       //       count++;
+  //       //     } else if (donationDate.compareTo(member.lastDate!) > 0) {
+  //       //       ref
+  //       //           .watch(realmProvider)!
+  //       //           .updateMember(member, lastDate: donationDate);
+  //       //       count++;
+  //       //     }
+  //       //   }
+  //       // });
+  //       // log("Editted Count - $count");
+  //       // log("Added Count - $existCount");
+
+  //       sortBySegments();
+  //     }
+  //   });
+  // }
 
   tabCreate() => Scaffold(
         backgroundColor: Colors.white,
@@ -214,40 +255,40 @@ class _BloodDonationListNewStyleState
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
                           int selectedMonth = controller.index;
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder:
-                                      (context) => BloodDonationReportScreen(
-                                            month: selectedMonth,
-                                            year: selectedYear,
-                                            data: selectedMonth == 0
-                                                ? dataSegments1
-                                                : selectedMonth == 1
-                                                    ? dataSegments2
-                                                    : selectedMonth == 2
-                                                        ? dataSegments3
-                                                        : selectedMonth == 3
-                                                            ? dataSegments4
-                                                            : selectedMonth == 4
-                                                                ? dataSegments5
-                                                                : selectedMonth ==
-                                                                        5
-                                                                    ? dataSegments6
-                                                                    : selectedMonth ==
-                                                                            6
-                                                                        ? dataSegments7
-                                                                        : selectedMonth ==
-                                                                                7
-                                                                            ? dataSegments8
-                                                                            : selectedMonth == 8
-                                                                                ? dataSegments9
-                                                                                : selectedMonth == 9
-                                                                                    ? dataSegments10
-                                                                                    : selectedMonth == 10
-                                                                                        ? dataSegments11
-                                                                                        : dataSegments12,
-                                          )));
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder:
+                          //             (context) => BloodDonationReportScreen(
+                          //                   month: selectedMonth,
+                          //                   year: selectedYear,
+                          //                   data: selectedMonth == 0
+                          //                       ? dataSegments1
+                          //                       : selectedMonth == 1
+                          //                           ? dataSegments2
+                          //                           : selectedMonth == 2
+                          //                               ? dataSegments3
+                          //                               : selectedMonth == 3
+                          //                                   ? dataSegments4
+                          //                                   : selectedMonth == 4
+                          //                                       ? dataSegments5
+                          //                                       : selectedMonth ==
+                          //                                               5
+                          //                                           ? dataSegments6
+                          //                                           : selectedMonth ==
+                          //                                                   6
+                          //                                               ? dataSegments7
+                          //                                               : selectedMonth ==
+                          //                                                       7
+                          //                                                   ? dataSegments8
+                          //                                                   : selectedMonth == 8
+                          //                                                       ? dataSegments9
+                          //                                                       : selectedMonth == 9
+                          //                                                           ? dataSegments10
+                          //                                                           : selectedMonth == 10
+                          //                                                               ? dataSegments11
+                          //                                                               : dataSegments12,
+                          //                 )));
                         },
                         child: Align(
                             alignment: Alignment.center,
@@ -313,7 +354,7 @@ class _BloodDonationListNewStyleState
                             child: Container(
                               width: Responsive.isMobile(context)
                                   ? MediaQuery.of(context).size.width / 5
-                                  : MediaQuery.of(context).size.width / 14,
+                                  : MediaQuery.of(context).size.width / 15,
                               height: 50,
                               decoration: shadowDecorationOnlyTop(
                                   rangesSelect[index]
@@ -323,7 +364,7 @@ class _BloodDonationListNewStyleState
                                   child: Text(
                                 ranges[index],
                                 style: TextStyle(
-                                    fontSize: 17,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     color: rangesSelect[index]
                                         ? Colors.white
@@ -350,40 +391,40 @@ class _BloodDonationListNewStyleState
                             behavior: HitTestBehavior.translucent,
                             onTap: () {
                               int selectedMonth = controller.index;
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          BloodDonationReportScreen(
-                                            month: selectedMonth,
-                                            year: selectedYear,
-                                            data: selectedMonth == 0
-                                                ? dataSegments1
-                                                : selectedMonth == 1
-                                                    ? dataSegments2
-                                                    : selectedMonth == 2
-                                                        ? dataSegments3
-                                                        : selectedMonth == 3
-                                                            ? dataSegments4
-                                                            : selectedMonth == 4
-                                                                ? dataSegments5
-                                                                : selectedMonth ==
-                                                                        5
-                                                                    ? dataSegments6
-                                                                    : selectedMonth ==
-                                                                            6
-                                                                        ? dataSegments7
-                                                                        : selectedMonth ==
-                                                                                7
-                                                                            ? dataSegments8
-                                                                            : selectedMonth == 8
-                                                                                ? dataSegments9
-                                                                                : selectedMonth == 9
-                                                                                    ? dataSegments10
-                                                                                    : selectedMonth == 10
-                                                                                        ? dataSegments11
-                                                                                        : dataSegments12,
-                                          )));
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) =>
+                              //             BloodDonationReportScreen(
+                              //               month: selectedMonth,
+                              //               year: selectedYear,
+                              //               data: selectedMonth == 0
+                              //                   ? dataSegments1
+                              //                   : selectedMonth == 1
+                              //                       ? dataSegments2
+                              //                       : selectedMonth == 2
+                              //                           ? dataSegments3
+                              //                           : selectedMonth == 3
+                              //                               ? dataSegments4
+                              //                               : selectedMonth == 4
+                              //                                   ? dataSegments5
+                              //                                   : selectedMonth ==
+                              //                                           5
+                              //                                       ? dataSegments6
+                              //                                       : selectedMonth ==
+                              //                                               6
+                              //                                           ? dataSegments7
+                              //                                           : selectedMonth ==
+                              //                                                   7
+                              //                                               ? dataSegments8
+                              //                                               : selectedMonth == 8
+                              //                                                   ? dataSegments9
+                              //                                                   : selectedMonth == 9
+                              //                                                       ? dataSegments10
+                              //                                                       : selectedMonth == 10
+                              //                                                           ? dataSegments11
+                              //                                                           : dataSegments12,
+                              //             )));
                             },
                             child: Align(
                                 alignment: Alignment.center,
@@ -415,7 +456,7 @@ class _BloodDonationListNewStyleState
                 Container(
                   padding: const EdgeInsets.only(left: 20, right: 20, top: 2),
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.81,
+                  height: MediaQuery.of(context).size.height * 0.91,
                   child: TabContainer(
                     controller: controller,
                     color: const Color(0xffe3e3e3),
@@ -601,10 +642,12 @@ class _BloodDonationListNewStyleState
   List<String> membersSelected = <String>[];
   List<String> allMembers = <String>[];
   bool inputted = false;
-  List<DonationRecord>? data;
+  List<Donation>? data;
 
   @override
   Widget build(BuildContext context) {
+    final streamAsyncValue = ref.watch(donationStreamProvider);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -621,16 +664,43 @@ class _BloodDonationListNewStyleState
           child: Text("သွေးလှူဒါန်းမှုစာရင်း",
               textScaleFactor: 1.0,
               style: TextStyle(
-                  fontSize: Responsive.isMobile(context) ? 15 : 17,
+                  fontSize: Responsive.isMobile(context) ? 15 : 16,
                   color: Colors.white)),
         ),
       ),
-      body: data != null && data!.isNotEmpty
-          ? tabCreate()
-          : const Center(
-              child: CircularProgressIndicator(),
-            ),
+      body: streamAsyncValue.when(
+        data: (savedData) {
+          final results = savedData.results;
+          log("Data " + results.length.toString());
+
+          List<Donation> donations = [];
+          for (int i = 0; i < results.length; i++) {
+            donations.add(results[i]);
+          }
+          setState(() {
+            data = donations;
+          });
+
+          if (data!.isNotEmpty) {
+            return tabCreate();
+          } else {
+            return Container();
+          }
+        },
+        error: (Object error, StackTrace stackTrace) {
+          return Text(error.toString());
+        },
+        loading: () {
+          return Container();
+        },
+      ),
+      // body: data != null && data!.isNotEmpty
+      //     ? tabCreate()
+      //     : const Center(
+      //         child: CircularProgressIndicator(),
+      //       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.red,
         onPressed: () async {
           await Navigator.push(
             context,
@@ -645,29 +715,29 @@ class _BloodDonationListNewStyleState
   }
 
   sortBySegments() {
-    List<DonationRecord> filterData1 = [];
-    List<DonationRecord> filterData2 = [];
-    List<DonationRecord> filterData3 = [];
-    List<DonationRecord> filterData4 = [];
-    List<DonationRecord> filterData5 = [];
-    List<DonationRecord> filterData6 = [];
-    List<DonationRecord> filterData7 = [];
-    List<DonationRecord> filterData8 = [];
-    List<DonationRecord> filterData9 = [];
-    List<DonationRecord> filterData10 = [];
-    List<DonationRecord> filterData11 = [];
-    List<DonationRecord> filterData12 = [];
+    List<Donation> filterData1 = [];
+    List<Donation> filterData2 = [];
+    List<Donation> filterData3 = [];
+    List<Donation> filterData4 = [];
+    List<Donation> filterData5 = [];
+    List<Donation> filterData6 = [];
+    List<Donation> filterData7 = [];
+    List<Donation> filterData8 = [];
+    List<Donation> filterData9 = [];
+    List<Donation> filterData10 = [];
+    List<Donation> filterData11 = [];
+    List<Donation> filterData12 = [];
     for (int i = 0; i < data!.length; i++) {
       if (data![i].date.toString() != "null" && data![i].date != null) {
-        DateTime? dateTime;
-        if (data![i].date!.contains("T")) {
-          dateTime = DateTime.parse(data![i].date!.split("T")[0].toString());
-        } else if (data![i].date!.contains(" ")) {
-          dateTime = DateTime.parse(data![i].date!.split(" ")[0].toString());
-        }
-        if (dateTime!.year == int.parse(selectedYear) && dateTime.month == 1) {
-          filterData1.add(data![i]);
-        }
+        DateTime dateTime = data![i].donationDate!;
+        // if (data![i].date!.contains("T")) {
+        //   dateTime = DateTime.parse(data![i].date!.split("T")[0].toString());
+        // } else if (data![i].date!.contains(" ")) {
+        //   dateTime = DateTime.parse(data![i].date!.split(" ")[0].toString());
+        // }
+        // if (dateTime!.year == int.parse(selectedYear) && dateTime.month == 1) {
+        //   filterData1.add(data![i]);
+        // }
 
         if (dateTime.year == int.parse(selectedYear) && dateTime.month == 2) {
           filterData2.add(data![i]);
@@ -855,7 +925,7 @@ class _BloodDonationListNewStyleState
     });
   }
 
-  buildSimpleTable(List<DonationRecord> data) {
+  buildSimpleTable(List<Donation> data) {
     // const int COLUMN_COUNT = 8;
     // int ROWCOUNT = data.length;
     // List<String> titles = [
@@ -1001,169 +1071,163 @@ class _BloodDonationListNewStyleState
     //                   )),
     //         ));
 
-    if (dataFullLoaded) {
-      DonationDataSource memberDataDataSource =
-          DonationDataSource(donationData: data);
-      return Container(
-        margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
-        child: SfDataGrid(
-          source: memberDataDataSource,
-          onCellTap: (details) async {
-            Logger logger = Logger();
-            logger.i(details.rowColumnIndex.rowIndex);
-            MemberOldData member = MemberOldData(
-              address:
-                  data[details.rowColumnIndex.rowIndex - 1].member!.address,
-              birthDate:
-                  data[details.rowColumnIndex.rowIndex - 1].member!.birthDate,
-              bloodBankCard: data[details.rowColumnIndex.rowIndex - 1]
-                  .member!
-                  .bloodBankCard,
-              bloodType:
-                  data[details.rowColumnIndex.rowIndex - 1].member!.bloodType,
-              donationCounts: data[details.rowColumnIndex.rowIndex - 1]
-                  .member!
-                  .donationCounts,
-              fatherName:
-                  data[details.rowColumnIndex.rowIndex - 1].member!.fatherName,
-              id: data[details.rowColumnIndex.rowIndex - 1].member!.id,
-              lastDonationDate: data[details.rowColumnIndex.rowIndex - 1]
-                  .member!
-                  .lastDonationDate,
-              memberId:
-                  data[details.rowColumnIndex.rowIndex - 1].member!.memberId,
-              name: data[details.rowColumnIndex.rowIndex - 1].member!.name,
-              note: data[details.rowColumnIndex.rowIndex - 1].member!.note,
-              nrc: data[details.rowColumnIndex.rowIndex - 1].member!.nrc,
-              phone: data[details.rowColumnIndex.rowIndex - 1].member!.phone,
-              registerDate: data[details.rowColumnIndex.rowIndex - 1]
-                  .member!
-                  .registerDate,
-              totalCount:
-                  data[details.rowColumnIndex.rowIndex - 1].member!.totalCount,
-            );
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => DonationDetailScreen(
-                          data: DonationSearchRecords(
-                            date:
-                                data[details.rowColumnIndex.rowIndex - 1].date,
-                            hospital: data[details.rowColumnIndex.rowIndex - 1]
-                                .hospital,
-                            id: data[details.rowColumnIndex.rowIndex - 1].id,
-                            member: member,
-                            patientAddress:
-                                data[details.rowColumnIndex.rowIndex - 1]
-                                    .patientAddress,
-                            patientAge:
-                                data[details.rowColumnIndex.rowIndex - 1]
-                                    .patientAge,
-                            patientDisease:
-                                data[details.rowColumnIndex.rowIndex - 1]
-                                    .patientDisease,
-                            patientName:
-                                data[details.rowColumnIndex.rowIndex - 1]
-                                    .patientName,
-                          ),
-                        )));
+    DonationDataSource memberDataDataSource =
+        DonationDataSource(donationData: data, ref: ref);
+    return Container(
+      margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
+      child: SfDataGrid(
+        source: memberDataDataSource,
+        onCellTap: (details) async {
+          // Logger logger = Logger();
+          // logger.i(details.rowColumnIndex.rowIndex);
+          // MemberOldData member = MemberOldData(
+          //   address:
+          //       data[details.rowColumnIndex.rowIndex - 1].member!.address,
+          //   birthDate:
+          //       data[details.rowColumnIndex.rowIndex - 1].member!.birthDate,
+          //   bloodBankCard: data[details.rowColumnIndex.rowIndex - 1]
+          //       .member!
+          //       .bloodBankCard,
+          //   bloodType:
+          //       data[details.rowColumnIndex.rowIndex - 1].member!.bloodType,
+          //   donationCounts: data[details.rowColumnIndex.rowIndex - 1]
+          //       .member!
+          //       .donationCounts,
+          //   fatherName:
+          //       data[details.rowColumnIndex.rowIndex - 1].member!.fatherName,
+          //   id: data[details.rowColumnIndex.rowIndex - 1].member!.id,
+          //   lastDonationDate: data[details.rowColumnIndex.rowIndex - 1]
+          //       .member!
+          //       .lastDonationDate,
+          //   memberId:
+          //       data[details.rowColumnIndex.rowIndex - 1].member!.memberId,
+          //   name: data[details.rowColumnIndex.rowIndex - 1].member!.name,
+          //   note: data[details.rowColumnIndex.rowIndex - 1].member!.note,
+          //   nrc: data[details.rowColumnIndex.rowIndex - 1].member!.nrc,
+          //   phone: data[details.rowColumnIndex.rowIndex - 1].member!.phone,
+          //   registerDate: data[details.rowColumnIndex.rowIndex - 1]
+          //       .member!
+          //       .registerDate,
+          //   totalCount:
+          //       data[details.rowColumnIndex.rowIndex - 1].member!.totalCount,
+          // );
+          // await Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //         builder: (context) => DonationDetailScreen(
+          //               data: DonationSearchRecords(
+          //                 date:
+          //                     data[details.rowColumnIndex.rowIndex - 1].date,
+          //                 hospital: data[details.rowColumnIndex.rowIndex - 1]
+          //                     .hospital,
+          //                 id: data[details.rowColumnIndex.rowIndex - 1].id,
+          //                 member: member,
+          //                 patientAddress:
+          //                     data[details.rowColumnIndex.rowIndex - 1]
+          //                         .patientAddress,
+          //                 patientAge:
+          //                     data[details.rowColumnIndex.rowIndex - 1]
+          //                         .patientAge,
+          //                 patientDisease:
+          //                     data[details.rowColumnIndex.rowIndex - 1]
+          //                         .patientDisease,
+          //                 patientName:
+          //                     data[details.rowColumnIndex.rowIndex - 1]
+          //                         .patientName,
+          //               ),
+          //             )));
 
-            callAPI("");
-          },
-          gridLinesVisibility: GridLinesVisibility.both,
-          headerGridLinesVisibility: GridLinesVisibility.both,
-          columnWidthMode: Responsive.isMobile(context)
-              ? ColumnWidthMode.auto
-              : ColumnWidthMode.fitByCellValue,
-          columns: <GridColumn>[
-            GridColumn(
-                columnName: 'ရက်စွဲ',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'ရက်စွဲ',
-                      style: TextStyle(color: Colors.white),
-                    ))),
-            GridColumn(
-                columnName: 'သွေးအလှူရှင်',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'သွေးအလှူရှင်',
-                      style: TextStyle(color: Colors.white),
-                    ))),
-            GridColumn(
-                columnName: 'သွေးအုပ်စု',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'သွေးအုပ်စု',
-                      style: TextStyle(color: Colors.white),
-                      overflow: TextOverflow.ellipsis,
-                    ))),
-            GridColumn(
-                columnName: 'လှူဒါန်းသည့်နေရာ',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'လှူဒါန်းသည့်နေရာ',
-                      style: TextStyle(color: Colors.white),
-                    ))),
-            GridColumn(
-                columnName: 'လူနာအမည်',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'လူနာအမည်',
-                      style: TextStyle(color: Colors.white),
-                    ))),
-            GridColumn(
-                columnName: 'လိပ်စာ',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'လိပ်စာ',
-                      style: TextStyle(color: Colors.white),
-                    ))),
-            GridColumn(
-                columnName: 'အသက်',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'အသက်',
-                      style: TextStyle(color: Colors.white),
-                    ))),
-            GridColumn(
-                columnName: 'ဖြစ်ပွားသည့်ရောဂါ',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'ဖြစ်ပွားသည့်ရောဂါ',
-                      style: TextStyle(color: Colors.white),
-                    ))),
-          ],
-        ),
-      );
-    } else {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
+          // callAPI("");
+        },
+        gridLinesVisibility: GridLinesVisibility.both,
+        headerGridLinesVisibility: GridLinesVisibility.both,
+        columnWidthMode: Responsive.isMobile(context)
+            ? ColumnWidthMode.auto
+            : ColumnWidthMode.fitByCellValue,
+        columns: <GridColumn>[
+          GridColumn(
+              columnName: 'ရက်စွဲ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'ရက်စွဲ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'သွေးအလှူရှင်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'သွေးအလှူရှင်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'သွေးအုပ်စု',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'သွေးအုပ်စု',
+                    style: TextStyle(color: Colors.white),
+                    overflow: TextOverflow.ellipsis,
+                  ))),
+          GridColumn(
+              columnName: 'လှူဒါန်းသည့်နေရာ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'လှူဒါန်းသည့်နေရာ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'လူနာအမည်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'လူနာအမည်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'လိပ်စာ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'လိပ်စာ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'အသက်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'အသက်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'ဖြစ်ပွားသည့်ရောဂါ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'ဖြစ်ပွားသည့်ရောဂါ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+        ],
+      ),
+    );
   }
 }

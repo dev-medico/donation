@@ -49,7 +49,7 @@ class _SpecialEventListScreenState extends State<SpecialEventListScreen> {
           child: Text("ထူးခြားဖြစ်စဥ်များ",
               textScaleFactor: 1.0,
               style: TextStyle(
-                  fontSize: Responsive.isMobile(context) ? 15 : 17,
+                  fontSize: Responsive.isMobile(context) ? 15 : 16,
                   color: Colors.white)),
         ),
       ),

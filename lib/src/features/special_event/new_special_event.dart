@@ -55,7 +55,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
             child: Text("ထူးခြားဖြစ်စဥ်အသစ် ထည့်သွင်းမည်",
                 textScaleFactor: 1.0,
                 style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15 : 17,
+                    fontSize: Responsive.isMobile(context) ? 15 : 16,
                     color: Colors.white)),
           ),
         ),

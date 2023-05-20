@@ -200,7 +200,7 @@ class BloodDonationEditState extends State<BloodDonationEditScreen> {
             child: Text("သွေးလှူဒါန်းမှုအချက်အလက် ပြင်ဆင်မည်",
                 textScaleFactor: 1.0,
                 style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15 : 17,
+                    fontSize: Responsive.isMobile(context) ? 15 : 16,
                     color: Colors.white)),
           ),
         ),

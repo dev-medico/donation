@@ -1142,7 +1142,7 @@ class _MemberDetailNewStyleScreenState
                 child: Text(
                   "ရက်စွဲ",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 15 : 16,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1157,7 +1157,7 @@ class _MemberDetailNewStyleScreenState
                 child: Text(
                   "လှူဒါန်းသည့်နေရာ",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 15 : 16,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1172,7 +1172,7 @@ class _MemberDetailNewStyleScreenState
                 child: Text(
                   "လူနာအမည်",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 15 : 16,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1188,7 +1188,7 @@ class _MemberDetailNewStyleScreenState
                   "လိပ်စာ",
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15 : 17,
+                    fontSize: Responsive.isMobile(context) ? 15 : 16,
                     color: primaryColor,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1204,7 +1204,7 @@ class _MemberDetailNewStyleScreenState
                 child: Text(
                   "အသက်",
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 15 : 16,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1220,7 +1220,7 @@ class _MemberDetailNewStyleScreenState
                   "ဖြစ်ပွားသည့်ရောဂါ",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 15 : 16,
                       color: primaryColor,
                       fontWeight: FontWeight.w600),
                 ),
@@ -1352,7 +1352,7 @@ class _MemberDetailNewStyleScreenState
                         : data['patient_age'],
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 15 : 17,
+                        fontSize: Responsive.isMobile(context) ? 15 : 16,
                         color: Colors.black),
                   ),
                 ),
