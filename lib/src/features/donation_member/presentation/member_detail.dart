@@ -1,19 +1,14 @@
-import 'dart:convert';
-
+import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/donation_member/presentation/member_edit.dart';
 import 'package:flutter/material.dart';
-import 'package:donation/data/repository/repository.dart';
-import 'package:donation/data/response/member_response.dart';
-import 'package:donation/data/response/xata_donation_search_list_response.dart';
 import 'package:donation/responsive.dart';
-import 'package:donation/src/features/donation/donation_detail.dart';
-import 'package:donation/src/features/member/member_edit.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 
 class MemberDetailScreen extends StatefulWidget {
   static const routeName = '/member-detail';
-  MemberData data;
+  Member data;
   MemberDetailScreen({Key? key, required this.data}) : super(key: key);
 
   @override
@@ -21,46 +16,45 @@ class MemberDetailScreen extends StatefulWidget {
 }
 
 class _MemberDetailScreenState extends State<MemberDetailScreen> {
-  MemberData data;
+  Member data;
   _MemberDetailScreenState(this.data);
-  List<DonationSearchRecords> donationDatas = [];
+  //List<DonationSearchRecords> donationDatas = [];
 
   @override
   void initState() {
     super.initState();
-    fetchCount();
+    //fetchCount();
   }
 
-  fetchCount() {
-    print("Fetch Count called");
+  // fetchCount() {
 
-    XataRepository()
-        .getDonationsListByMemberId(data.memberId.toString())
-        .then((value) {
-      print("Donation List Response - ${value.body}");
-      setState(() {
-        donationDatas =
-            DonationSearchListResponse.fromJson(jsonDecode(value.body))
-                .records!;
-        donationDatas.sort((a, b) {
-          return DateTime.parse(b.date == null
-                  ? "2020-01-01"
-                  : b.date.toString().contains("T")
-                      ? b.date.toString().split("T")[0]
-                      : b.date.toString().contains(" ")
-                          ? b.date.toString().split(" ")[0]
-                          : "2020-01-01")
-              .compareTo(DateTime.parse(a.date == null
-                  ? "2020-01-01"
-                  : b.date.toString().contains("T")
-                      ? b.date.toString().split("T")[0]
-                      : b.date.toString().contains(" ")
-                          ? b.date.toString().split(" ")[0]
-                          : "2020-01-01"));
-        });
-      });
-    });
-  }
+  //   XataRepository()
+  //       .getDonationsListByMemberId(data.memberId.toString())
+  //       .then((value) {
+  //     print("Donation List Response - ${value.body}");
+  //     setState(() {
+  //       donationDatas =
+  //           DonationSearchListResponse.fromJson(jsonDecode(value.body))
+  //               .records!;
+  //       donationDatas.sort((a, b) {
+  //         return DateTime.parse(b.date == null
+  //                 ? "2020-01-01"
+  //                 : b.date.toString().contains("T")
+  //                     ? b.date.toString().split("T")[0]
+  //                     : b.date.toString().contains(" ")
+  //                         ? b.date.toString().split(" ")[0]
+  //                         : "2020-01-01")
+  //             .compareTo(DateTime.parse(a.date == null
+  //                 ? "2020-01-01"
+  //                 : b.date.toString().contains("T")
+  //                     ? b.date.toString().split("T")[0]
+  //                     : b.date.toString().contains(" ")
+  //                         ? b.date.toString().split(" ")[0]
+  //                         : "2020-01-01"));
+  //       });
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +149,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                         height: 12,
                                       ),
                                 Text(
-                                  data.registerDate!,
+                                  data.registerDate.toString(),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.black,
@@ -388,7 +382,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              "${Utils.strToMM(data.donationCounts.toString())} ကြိမ်",
+                              "${Utils.strToMM(data.memberCount.toString())} ကြိမ်",
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -554,40 +548,41 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                     const SizedBox(
                       height: 12,
                     ),
-                    ListView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      children: [
-                        SizedBox(
-                          height: donationDatas.length > 8
-                              ? MediaQuery.of(context).size.height *
-                                  (donationDatas.length / 8)
-                              : MediaQuery.of(context).size.height,
-                          width: MediaQuery.of(context).size.width * 2.5,
-                          child: ListView(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  header(),
-                                  Column(
-                                    // shrinkWrap: true,
-                                    // scrollDirection: Axis.vertical,
-                                    children: donationDatas
-                                        .map((DonationSearchRecords document) {
-                                      return blood_donationRow(document);
-                                    }).toList(),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
+                    //TODO Donation Data
+                    // ListView(
+                    //   shrinkWrap: true,
+                    //   physics: const NeverScrollableScrollPhysics(),
+                    //   scrollDirection: Axis.vertical,
+                    //   children: [
+                    //     SizedBox(
+                    //       height: donationDatas.length > 8
+                    //           ? MediaQuery.of(context).size.height *
+                    //               (donationDatas.length / 8)
+                    //           : MediaQuery.of(context).size.height,
+                    //       width: MediaQuery.of(context).size.width * 2.5,
+                    //       child: ListView(
+                    //         shrinkWrap: true,
+                    //         scrollDirection: Axis.horizontal,
+                    //         children: [
+                    //           Column(
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               header(),
+                    //               Column(
+                    //                 // shrinkWrap: true,
+                    //                 // scrollDirection: Axis.vertical,
+                    //                 children: donationDatas
+                    //                     .map((DonationSearchRecords document) {
+                    //                   return blood_donationRow(document);
+                    //                 }).toList(),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ],
+                    // )
                   ],
                 )
               ],
@@ -668,7 +663,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                           height: 12,
                                         ),
                                   Text(
-                                    data.registerDate!,
+                                    data.registerDate.toString(),
                                     style: const TextStyle(
                                       fontSize: 14,
                                       color: Colors.black,
@@ -907,7 +902,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                             Expanded(
                               flex: 4,
                               child: Text(
-                                "${Utils.strToMM(data.donationCounts.toString())} ကြိမ်",
+                                "${Utils.strToMM(data.memberCount.toString())} ကြိမ်",
                                 style: const TextStyle(
                                     fontSize: 14, color: Colors.black),
                               ),
@@ -1058,54 +1053,54 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 5,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 20, left: 8, bottom: 12),
-                    height: MediaQuery.of(context).size.height * 0.9,
-                    child: ListView(
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                        ListView(
-                          shrinkWrap: true,
-                          physics: const BouncingScrollPhysics(),
-                          scrollDirection: Axis.vertical,
-                          children: [
-                            SizedBox(
-                              height: donationDatas.length > 8
-                                  ? MediaQuery.of(context).size.height *
-                                      (donationDatas.length / 8)
-                                  : MediaQuery.of(context).size.height,
-                              width: MediaQuery.of(context).size.width * 0.575,
-                              child: ListView(
-                                shrinkWrap: true,
-                                scrollDirection: Axis.horizontal,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      header(),
-                                      Column(
-                                        // shrinkWrap: true,
-                                        // scrollDirection: Axis.vertical,
-                                        children: donationDatas.map(
-                                            (DonationSearchRecords document) {
-                                          return blood_donationRow(document);
-                                        }).toList(),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                )
+                Expanded(flex: 5, child: Container()
+                    //TODO Donation Data
+                    // child: Container(
+                    //   margin: const EdgeInsets.only(top: 20, left: 8, bottom: 12),
+                    //   height: MediaQuery.of(context).size.height * 0.9,
+                    //   child: ListView(
+                    //     shrinkWrap: true,
+                    //     physics: const BouncingScrollPhysics(),
+                    //     children: [
+                    //       ListView(
+                    //         shrinkWrap: true,
+                    //         physics: const BouncingScrollPhysics(),
+                    //         scrollDirection: Axis.vertical,
+                    //         children: [
+                    //           SizedBox(
+                    //             height: donationDatas.length > 8
+                    //                 ? MediaQuery.of(context).size.height *
+                    //                     (donationDatas.length / 8)
+                    //                 : MediaQuery.of(context).size.height,
+                    //             width: MediaQuery.of(context).size.width * 0.575,
+                    //             child: ListView(
+                    //               shrinkWrap: true,
+                    //               scrollDirection: Axis.horizontal,
+                    //               children: [
+                    //                 Column(
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.start,
+                    //                   children: [
+                    //                     header(),
+                    //                     Column(
+                    //                       // shrinkWrap: true,
+                    //                       // scrollDirection: Axis.vertical,
+                    //                       children: donationDatas.map(
+                    //                           (DonationSearchRecords document) {
+                    //                         return blood_donationRow(document);
+                    //                       }).toList(),
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ],
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
+                    )
               ],
             ),
     );
@@ -1236,145 +1231,145 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
     );
   }
 
-  Widget blood_donationRow(DonationSearchRecords data) {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: () async {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DonationDetailScreen(
-              data: data,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        height: Responsive.isMobile(context) ? 60 : 60,
-        decoration: shadowDecoration(Colors.white),
-        width: Responsive.isMobile(context)
-            ? MediaQuery.of(context).size.width * 2
-            : MediaQuery.of(context).size.width * 0.575,
-        margin: EdgeInsets.only(
-            top: 4,
-            left: Responsive.isMobile(context) ? 4 : 32,
-            right: Responsive.isMobile(context) ? 20 : 32),
-        padding: const EdgeInsets.only(left: 18, right: 20),
-        child: ListView(
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: Responsive.isMobile(context)
-                      ? MediaQuery.of(context).size.width / 4.1
-                      : MediaQuery.of(context).size.width / 13,
-                  child: Text(
-                    //data['date'].toString(),
-                    data.date!.contains("T")
-                        ? data.date!.split("T")[0].toString()
-                        : data.date!.contains(" ")
-                            ? data.date!.split(" ")[0]
-                            : "-",
-                    style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 13 : 14,
-                        color: Colors.black),
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                SizedBox(
-                  width: Responsive.isMobile(context)
-                      ? MediaQuery.of(context).size.width / 3.2
-                      : MediaQuery.of(context).size.width / 10,
-                  child: Text(
-                    data.hospital ?? "-",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 14 : 16,
-                        color: Colors.black),
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                SizedBox(
-                  width: Responsive.isMobile(context)
-                      ? MediaQuery.of(context).size.width / 3
-                      : MediaQuery.of(context).size.width / 10,
-                  child: Text(
-                    data.patientName == null || data.patientName == ""
-                        ? "-"
-                        : data.patientName!,
-                    style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 14 : 16,
-                        color: Colors.black),
-                  ),
-                ),
-                SizedBox(
-                  width: Responsive.isMobile(context) ? 12 : 4,
-                ),
-                SizedBox(
-                  width: Responsive.isMobile(context)
-                      ? MediaQuery.of(context).size.width / 2.8
-                      : MediaQuery.of(context).size.width / 12,
-                  child: Text(
-                    data.patientAddress == null ||
-                            data.patientAddress == "၊" ||
-                            data.patientAddress == ""
-                        ? "-"
-                        : data.patientAddress!,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        height: 1.5,
-                        fontSize: Responsive.isMobile(context) ? 14 : 16,
-                        color: Colors.black),
-                  ),
-                ),
-                const SizedBox(
-                  width: 12,
-                ),
-                SizedBox(
-                  width: Responsive.isMobile(context)
-                      ? MediaQuery.of(context).size.width / 7.4
-                      : MediaQuery.of(context).size.width / 22,
-                  child: Text(
-                    data.patientAge == null || data.patientAge == ""
-                        ? "-"
-                        : data.patientAge!,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 13 : 14,
-                        color: Colors.black),
-                  ),
-                ),
-                const SizedBox(
-                  width: 4,
-                ),
-                SizedBox(
-                  width: Responsive.isMobile(context)
-                      ? MediaQuery.of(context).size.width / 3.2
-                      : MediaQuery.of(context).size.width / 9,
-                  child: Text(
-                    data.patientDisease == null || data.patientDisease == ""
-                        ? "-"
-                        : data.patientDisease!,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 14 : 16,
-                        color: Colors.black),
-                  ),
-                ),
-                const SizedBox(
-                  width: 6,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget blood_donationRow(DonationSearchRecords data) {
+  //   return GestureDetector(
+  //     behavior: HitTestBehavior.translucent,
+  //     onTap: () async {
+  //       await Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => DonationDetailScreen(
+  //             data: data,
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //     child: Container(
+  //       height: Responsive.isMobile(context) ? 60 : 60,
+  //       decoration: shadowDecoration(Colors.white),
+  //       width: Responsive.isMobile(context)
+  //           ? MediaQuery.of(context).size.width * 2
+  //           : MediaQuery.of(context).size.width * 0.575,
+  //       margin: EdgeInsets.only(
+  //           top: 4,
+  //           left: Responsive.isMobile(context) ? 4 : 32,
+  //           right: Responsive.isMobile(context) ? 20 : 32),
+  //       padding: const EdgeInsets.only(left: 18, right: 20),
+  //       child: ListView(
+  //         shrinkWrap: true,
+  //         scrollDirection: Axis.horizontal,
+  //         children: [
+  //           Row(
+  //             children: [
+  //               SizedBox(
+  //                 width: Responsive.isMobile(context)
+  //                     ? MediaQuery.of(context).size.width / 4.1
+  //                     : MediaQuery.of(context).size.width / 13,
+  //                 child: Text(
+  //                   //data['date'].toString(),
+  //                   data.date!.contains("T")
+  //                       ? data.date!.split("T")[0].toString()
+  //                       : data.date!.contains(" ")
+  //                           ? data.date!.split(" ")[0]
+  //                           : "-",
+  //                   style: TextStyle(
+  //                       fontSize: Responsive.isMobile(context) ? 13 : 14,
+  //                       color: Colors.black),
+  //                 ),
+  //               ),
+  //               const SizedBox(
+  //                 width: 8,
+  //               ),
+  //               SizedBox(
+  //                 width: Responsive.isMobile(context)
+  //                     ? MediaQuery.of(context).size.width / 3.2
+  //                     : MediaQuery.of(context).size.width / 10,
+  //                 child: Text(
+  //                   data.hospital ?? "-",
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       fontSize: Responsive.isMobile(context) ? 14 : 16,
+  //                       color: Colors.black),
+  //                 ),
+  //               ),
+  //               const SizedBox(
+  //                 width: 8,
+  //               ),
+  //               SizedBox(
+  //                 width: Responsive.isMobile(context)
+  //                     ? MediaQuery.of(context).size.width / 3
+  //                     : MediaQuery.of(context).size.width / 10,
+  //                 child: Text(
+  //                   data.patientName == null || data.patientName == ""
+  //                       ? "-"
+  //                       : data.patientName!,
+  //                   style: TextStyle(
+  //                       fontSize: Responsive.isMobile(context) ? 14 : 16,
+  //                       color: Colors.black),
+  //                 ),
+  //               ),
+  //               SizedBox(
+  //                 width: Responsive.isMobile(context) ? 12 : 4,
+  //               ),
+  //               SizedBox(
+  //                 width: Responsive.isMobile(context)
+  //                     ? MediaQuery.of(context).size.width / 2.8
+  //                     : MediaQuery.of(context).size.width / 12,
+  //                 child: Text(
+  //                   data.patientAddress == null ||
+  //                           data.patientAddress == "၊" ||
+  //                           data.patientAddress == ""
+  //                       ? "-"
+  //                       : data.patientAddress!,
+  //                   textAlign: TextAlign.left,
+  //                   style: TextStyle(
+  //                       height: 1.5,
+  //                       fontSize: Responsive.isMobile(context) ? 14 : 16,
+  //                       color: Colors.black),
+  //                 ),
+  //               ),
+  //               const SizedBox(
+  //                 width: 12,
+  //               ),
+  //               SizedBox(
+  //                 width: Responsive.isMobile(context)
+  //                     ? MediaQuery.of(context).size.width / 7.4
+  //                     : MediaQuery.of(context).size.width / 22,
+  //                 child: Text(
+  //                   data.patientAge == null || data.patientAge == ""
+  //                       ? "-"
+  //                       : data.patientAge!,
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       fontSize: Responsive.isMobile(context) ? 13 : 14,
+  //                       color: Colors.black),
+  //                 ),
+  //               ),
+  //               const SizedBox(
+  //                 width: 4,
+  //               ),
+  //               SizedBox(
+  //                 width: Responsive.isMobile(context)
+  //                     ? MediaQuery.of(context).size.width / 3.2
+  //                     : MediaQuery.of(context).size.width / 9,
+  //                 child: Text(
+  //                   data.patientDisease == null || data.patientDisease == ""
+  //                       ? "-"
+  //                       : data.patientDisease!,
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       fontSize: Responsive.isMobile(context) ? 14 : 16,
+  //                       color: Colors.black),
+  //                 ),
+  //               ),
+  //               const SizedBox(
+  //                 width: 6,
+  //               ),
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

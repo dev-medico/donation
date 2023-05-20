@@ -6,12 +6,10 @@ import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:donation/data/repository/repository.dart';
-import 'package:donation/data/response/member_response.dart';
 import 'package:donation/data/response/total_data_response.dart';
 import 'package:donation/data/response/xata_donation_search_list_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation/blood_donation_edit.dart';
-import 'package:donation/src/features/member/member_detail.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
@@ -1230,29 +1228,29 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
   }
 
   goToDetail() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MemberDetailScreen(
-          data: MemberData(
-            address: data.member!.address,
-            birthDate: data.member!.birthDate,
-            bloodBankCard: data.member!.bloodBankCard,
-            bloodType: data.member!.bloodType,
-            donationCounts: data.member!.donationCounts,
-            fatherName: data.member!.fatherName,
-            id: data.member!.id,
-            lastDonationDate: data.member!.lastDonationDate,
-            memberId: data.member!.memberId,
-            name: data.member!.name,
-            note: data.member!.note,
-            nrc: data.member!.nrc,
-            phone: data.member!.phone,
-            registerDate: data.member!.registerDate,
-            totalCount: data.member!.totalCount,
-          ),
-        ),
-      ),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => MemberDetailScreen(
+    //       data: MemberData(
+    //         address: data.member!.address,
+    //         birthDate: data.member!.birthDate,
+    //         bloodBankCard: data.member!.bloodBankCard,
+    //         bloodType: data.member!.bloodType,
+    //         donationCounts: data.member!.donationCounts,
+    //         fatherName: data.member!.fatherName,
+    //         id: data.member!.id,
+    //         lastDonationDate: data.member!.lastDonationDate,
+    //         memberId: data.member!.memberId,
+    //         name: data.member!.name,
+    //         note: data.member!.note,
+    //         nrc: data.member!.nrc,
+    //         phone: data.member!.phone,
+    //         registerDate: data.member!.registerDate,
+    //         totalCount: data.member!.totalCount,
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }

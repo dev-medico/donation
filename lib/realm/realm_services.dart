@@ -26,8 +26,12 @@ class RealmServices with ChangeNotifier {
   RealmServices(this.app) {
     if (app.currentUser != null || currentUser != app.currentUser) {
       currentUser ??= app.currentUser;
-      realm = Realm(Configuration.flexibleSync(
-          currentUser!, [Donation.schema, Member.schema]));
+      realm = Realm(
+        Configuration.flexibleSync(
+          currentUser!,
+          [Donation.schema, Member.schema],
+        ),
+      );
       if (realm.subscriptions.isEmpty) {
         updateSubscriptions();
       }
@@ -198,7 +202,7 @@ class RealmServices with ChangeNotifier {
     String patientDisease,
     String patientName,
     String ownerId,
-    Member mebmer,
+    ObjectId member,
   ) {
     final newDonation = Donation(
       ObjectId(),
@@ -210,7 +214,7 @@ class RealmServices with ChangeNotifier {
       patientAge: patientAge,
       patientDisease: patientDisease,
       patientName: patientName,
-      member: mebmer,
+      member: member,
     );
     realm.write<Donation>(() => realm.add<Donation>(newDonation));
     notifyListeners();
@@ -225,6 +229,7 @@ class RealmServices with ChangeNotifier {
     String? patientAge,
     String? patientDisease,
     String? patientName,
+    ObjectId? member,
   }) async {
     realm.write(() {
       if (date != null) {
@@ -247,6 +252,9 @@ class RealmServices with ChangeNotifier {
       }
       if (patientName != null) {
         donation.patientName = patientName;
+      }
+      if (member != null) {
+        donation.member = member;
       }
     });
     notifyListeners();

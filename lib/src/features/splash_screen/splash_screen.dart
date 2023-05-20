@@ -3,7 +3,7 @@ import 'package:animated_widgets/animated_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
-import 'package:donation/src/features/home/mobile_home.dart';
+import 'package:donation/src/features/home/home.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

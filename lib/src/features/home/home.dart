@@ -1,87 +1,257 @@
-import 'package:flutter/material.dart';
-import 'package:donation/responsive.dart';
-import 'package:donation/src/features/dashboard/dashboard.dart';
-import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
+import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
-import 'package:donation/src/features/home/custom_drawer/drawer_user_controller.dart';
-import 'package:donation/src/features/home/custom_drawer/home_drawer.dart';
-import 'package:donation/src/features/member/search_member.dart';
-import 'package:donation/src/features/setttings/settings.dart';
+import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:donation/utils/tool_widgets.dart';
 
-class NavigationHomeScreen extends StatefulWidget {
-  const NavigationHomeScreen({Key? key}) : super(key: key);
-  static const routeName = "/home";
+final openDrawerProvider = StateProvider<bool>((ref) => false);
+
+class MobileHomeScreen extends ConsumerStatefulWidget {
+  const MobileHomeScreen({super.key});
+  static const routeName = "/mobile_home";
 
   @override
-  _NavigationHomeScreenState createState() => _NavigationHomeScreenState();
+  ConsumerState<MobileHomeScreen> createState() => _MobileHomeScreenState();
 }
 
-class _NavigationHomeScreenState extends State<NavigationHomeScreen>
-    with TickerProviderStateMixin {
-  AnimationController? animationController;
-  Widget? screenView;
-  DrawerIndex? drawerIndex;
-
+class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
+  int topIndex = 0;
+  List<String> titles = [
+    'သွေးလှူရှင် ရှာမည်',
+    'အဖွဲ့ဝင် စာရင်း',
+    'သွေးလှူမှု မှတ်တမ်း',
+    'ထူးခြားဖြစ်စဥ်',
+    'ရ/သုံး ငွေစာရင်း',
+    'အပြင်အဆင်'
+  ];
+  List<NavigationPaneItem> items = [];
+  List<String> icons = [
+    'assets/images/search_list.png',
+    'assets/images/donations.png',
+    'assets/images/members.png',
+    'assets/images/special_case.png',
+    'assets/images/finance.png',
+    'assets/images/settings.png',
+  ];
   @override
   void initState() {
-    drawerIndex = DrawerIndex.DASHBOARD;
-    screenView = const DashBoardScreen();
     super.initState();
+    setDrawerListArray(titles);
+  }
+
+  switchUI() async {
+    var realmServices = ref.watch(realmProvider);
+    await realmServices!.sessionSwitch();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: SafeArea(
-        top: false,
-        bottom: false,
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: DrawerUserController(
-            screenIndex: drawerIndex,
-            drawerWidth: Responsive.isMobile(context)
-                ? MediaQuery.of(context).size.width * 0.68
-                : MediaQuery.of(context).size.width * 0.25,
-            onDrawerCall: (DrawerIndex drawerIndexdata) {
-              changeIndex(drawerIndexdata);
-              //callback from drawer for replace screen as user need with passing DrawerIndex(Enum index)
+    return NavigationView(
+      onOpenSearch: () {
+        switchUI();
+        ref.read(openDrawerProvider.notifier).update((state) => true);
+      },
+      pane: NavigationPane(
+        selected: topIndex,
+        onChanged: (index) => setState(() {
+          topIndex = index;
+        }),
+        displayMode: PaneDisplayMode.compact,
+        items: items,
+        footerItems: [
+          PaneItem(
+            onTap: () {
+              ref.watch(realmProvider)!.close();
             },
-            screenView: screenView,
-            //we replace screen view as we need on navigate starting screens like MyHomePage, HelpScreen, FeedbackScreen, etc...
+            icon: CustomIcon(
+              icon: icons[5],
+            ),
+            title: Text(
+              titles[5],
+              style: smallTextStyle(context),
+            ),
+            body: const Text(
+              'အပြင်အဆင်',
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  void changeIndex(DrawerIndex drawerIndexdata) {
-    if (drawerIndex != drawerIndexdata) {
-      drawerIndex = drawerIndexdata;
-      if (drawerIndex == DrawerIndex.DASHBOARD) {
-        setState(() {
-          screenView = const DashBoardScreen();
-        });
-      } else if (drawerIndex == DrawerIndex.NEWMEMBER) {
-        setState(() {
-          screenView = const MemberListScreen();
-        });
-      } else if (drawerIndex == DrawerIndex.RECORDS) {
-        setState(() {
-          animationController = AnimationController(
-              duration: const Duration(milliseconds: 600), vsync: this);
-          screenView = const BloodDonationListNewStyle();
-        });
-      } else if (drawerIndex == DrawerIndex.SEARCH) {
-        setState(() {
-          screenView = SearchMemberScreen();
-        });
-      } else {
-        setState(() {
-          screenView = const SettingsScreen();
-        });
-        //do in your way......
-      }
-    }
+  setDrawerListArray(List<String> titles) {
+    items = [
+      PaneItem(
+        selectedTileColor: ButtonState.resolveWith((state) {
+          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
+          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
+
+          return null;
+        }),
+        icon: CustomIcon(
+          icon: icons[0],
+        ),
+        title: Text(
+          titles[0],
+          style: smallTextStyle(context),
+        ),
+        body: Center(
+          child: Text("Search Blood"),
+        ),
+      ),
+      PaneItemSeparator(),
+      PaneItem(
+        selectedTileColor: ButtonState.resolveWith((state) {
+          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
+          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
+
+          return null;
+        }),
+        icon: CustomIcon(
+          icon: icons[1],
+        ),
+        infoBadge: const InfoBadge(source: Text('8')),
+        title: Text(
+          titles[1],
+          style: smallTextStyle(context),
+        ),
+        body: MemberListScreen(),
+      ),
+      PaneItemSeparator(),
+      PaneItem(
+        selectedTileColor: ButtonState.resolveWith((state) {
+          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
+          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
+
+          return null;
+        }),
+        icon: CustomIcon(
+          icon: icons[2],
+        ),
+        title: Text(
+          titles[2],
+          style: smallTextStyle(context),
+        ),
+        body: const Text(
+          'အပ်ကုန်',
+        ),
+      ),
+      PaneItemSeparator(),
+      PaneItemExpander(
+        selectedTileColor: ButtonState.resolveWith((state) {
+          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
+          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
+
+          return null;
+        }),
+        icon: CustomIcon(
+          icon: icons[3],
+        ),
+        title: Text(
+          titles[3],
+          style: smallTextStyle(context),
+        ),
+        body: const Text(
+          'ကုန်ပစ္စည်း',
+        ),
+        items: [
+          PaneItem(
+            selectedTileColor: ButtonState.resolveWith((state) {
+              if (state.isPressing)
+                return const Color.fromARGB(39, 52, 46, 226);
+              if (state.isHovering)
+                return const Color.fromARGB(39, 52, 46, 226);
+
+              return null;
+            }),
+            icon: CustomIcon(
+              icon: icons[3],
+            ),
+            title: Text(
+              "ကုန်ပစ္စည်းမျိုးကွဲ",
+              style: smallTextStyle(context),
+            ),
+            body: const Text(
+              'ကုန်ပစ္စည်း',
+            ),
+          ),
+          PaneItem(
+            selectedTileColor: ButtonState.resolveWith((state) {
+              if (state.isPressing)
+                return const Color.fromARGB(39, 52, 46, 226);
+              if (state.isHovering)
+                return const Color.fromARGB(39, 52, 46, 226);
+
+              return null;
+            }),
+            icon: CustomIcon(
+              icon: icons[3],
+            ),
+            title: Text(
+              "ကုန်ပစ္စည်း စုစည်းမှု",
+              style: smallTextStyle(context),
+            ),
+            body: const Text(
+              'ကုန်ပစ္စည်း စုစည်းမှု"',
+            ),
+          ),
+          PaneItem(
+            selectedTileColor: ButtonState.resolveWith((state) {
+              if (state.isPressing)
+                return const Color.fromARGB(39, 52, 46, 226);
+              if (state.isHovering)
+                return const Color.fromARGB(39, 52, 46, 226);
+
+              return null;
+            }),
+            icon: CustomIcon(
+              icon: icons[3],
+            ),
+            title: Text(
+              "လျှော့စျေး",
+              style: smallTextStyle(context),
+            ),
+            body: const Text(
+              'လျှော့စျေး',
+            ),
+          ),
+        ],
+      ),
+      PaneItemSeparator(),
+      PaneItem(
+        selectedTileColor: ButtonState.resolveWith((state) {
+          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
+          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
+
+          return null;
+        }),
+        icon: CustomIcon(
+          icon: icons[4],
+        ),
+        title: Text(
+          titles.isEmpty ? "ရောင်းရငွေစာရင်း" : titles[4],
+          style: smallTextStyle(context),
+        ),
+        body: const Text(
+          'ရောင်းရငွေစာရင်း',
+        ),
+      ),
+    ];
+  }
+
+// Return the NavigationView from `Widegt Build` function
+}
+
+class CustomIcon extends StatelessWidget {
+  final String icon;
+  const CustomIcon({super.key, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      icon,
+      width: 24,
+    );
   }
 }

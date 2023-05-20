@@ -1,26 +1,26 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:donation/realm/realm_services.dart';
+import 'package:donation/realm/schemas.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:donation/data/repository/repository.dart';
-import 'package:donation/data/response/member_response.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
-class MemberEditScreen extends StatefulWidget {
-  MemberData data;
+class MemberEditScreen extends ConsumerStatefulWidget {
+  Member data;
   MemberEditScreen({Key? key, required this.data}) : super(key: key);
   int selectedIndex = 0;
 
@@ -28,8 +28,8 @@ class MemberEditScreen extends StatefulWidget {
   MemberEditState createState() => MemberEditState(data);
 }
 
-class MemberEditState extends State<MemberEditScreen> {
-  MemberData data;
+class MemberEditState extends ConsumerState<MemberEditScreen> {
+  Member data;
   MemberEditState(this.data);
   final nameController = TextEditingController();
   final fatherNameController = TextEditingController();
@@ -429,49 +429,81 @@ class MemberEditState extends State<MemberEditScreen> {
                             ),
                           )),
                       Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(12.0))),
-                            margin: const EdgeInsets.only(
-                                left: 15, bottom: 16, right: 15),
-                            width: double.infinity,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {
-                                if (nameController.text.isNotEmpty &&
-                                    fatherNameController.text.isNotEmpty &&
-                                    nrcController.text.isNotEmpty &&
-                                    phoneController.text.isNotEmpty &&
-                                    selectedBloodType != "သွေးအုပ်စု") {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  updateMember(data.id.toString());
-                                } else {
-                                  Utils.messageDialog(
-                                      "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
-                                      context,
-                                      "ပြင်ဆင်မည်",
-                                      Colors.black);
-                                }
-                              },
-                              child: const Align(
-                                  alignment: Alignment.center,
-                                  child: Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 8, bottom: 8),
-                                      child: Text(
-                                        "ပြင်ဆင်မည်",
-                                        textScaleFactor: 1.0,
-                                        style: TextStyle(
-                                            fontSize: 16.0,
-                                            color: Colors.white),
-                                      ))),
+                        alignment: Alignment.bottomLeft,
+                        child: Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: primaryColor,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(12.0))),
+                              margin: const EdgeInsets.only(
+                                  left: 15, bottom: 16, right: 15),
+                              width: 120,
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTap: () {
+                                  ref.watch(realmProvider)!.deleteMember(data);
+                                },
+                                child: const Align(
+                                    alignment: Alignment.center,
+                                    child: Padding(
+                                        padding:
+                                            EdgeInsets.only(top: 8, bottom: 8),
+                                        child: Text(
+                                          "ဖျက်မည်",
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(
+                                              fontSize: 16.0,
+                                              color: Colors.white),
+                                        ))),
+                              ),
                             ),
-                          ))
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: primaryColor,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(12.0))),
+                              margin: const EdgeInsets.only(
+                                  left: 15, bottom: 16, right: 15),
+                              width: 180,
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTap: () {
+                                  if (nameController.text.isNotEmpty &&
+                                      fatherNameController.text.isNotEmpty &&
+                                      nrcController.text.isNotEmpty &&
+                                      phoneController.text.isNotEmpty &&
+                                      selectedBloodType != "သွေးအုပ်စု") {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    updateMember(data.id.toString());
+                                  } else {
+                                    Utils.messageDialog(
+                                        "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
+                                        context,
+                                        "ပြင်ဆင်မည်",
+                                        Colors.black);
+                                  }
+                                },
+                                child: const Align(
+                                    alignment: Alignment.center,
+                                    child: Padding(
+                                        padding:
+                                            EdgeInsets.only(top: 8, bottom: 8),
+                                        child: Text(
+                                          "ပြင်ဆင်မည်",
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(
+                                              fontSize: 16.0,
+                                              color: Colors.white),
+                                        ))),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 )
@@ -927,59 +959,48 @@ class MemberEditState extends State<MemberEditScreen> {
   }
 
   updateMember(String memberId) {
-    setState(() {
-      _isLoading = true;
-    });
-    XataRepository()
-        .updateMemberData(
-            memberId,
-            jsonEncode(<String, dynamic>{
-              'name': nameController.text.toString(),
-              'father_name': fatherNameController.text.toString(),
-              'birth_date': birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
-              'nrc': nrcController.text.toString() != ""
-                  ? nrcController.text.toString()
-                  : "-",
-              'phone': phoneController.text.toString(),
-              'blood_type': selectedBloodType,
-              'blood_bank_card': bloodBankNoController.text.toString() != ""
-                  ? bloodBankNoController.text.toString()
-                  : "-",
-              'total_count': totalDonationController.text.toString() != ""
-                  ? int.parse(totalDonationController.text.toString())
-                  : 0,
-              'note': noteController.text.toString() != ""
-                  ? noteController.text.toString()
-                  : "-",
-              'address':
-                  "${homeNoController.text}, ${streetController.text}, ${quarterController.text}, ${townController.text}, $region1",
-            }))
-        .then((value) {
-      if (value.statusCode.toString().startsWith("2")) {
-        setState(() {
-          _isLoading = false;
-        });
-        Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
-            context, "အိုကေ", Colors.black);
-        nameController.clear();
-        fatherNameController.clear();
-        nrcController.clear();
-        phoneController.clear();
-        selectedBloodType = "သွေးအုပ်စု";
-        bloodBankNoController.clear();
-        totalDonationController.clear();
-        homeNoController.clear();
-        streetController.clear();
-        quarterController.clear();
-        townController.clear();
-        region1 = "";
-        regional = "";
-        noteController.clear();
-      } else {
-        log(value.statusCode.toString());
-        log(value.body);
-      }
-    });
+    ref.watch(realmProvider)!.updateMember(
+          widget.data,
+          name: nameController.text.toString(),
+          birthDate: birthDate,
+          bloodBankCard: bloodBankNoController.text.toString() != ""
+              ? bloodBankNoController.text.toString()
+              : "-",
+          bloodType: selectedBloodType,
+          fatherName: fatherNameController.text.toString(),
+          //lastDate: now,
+          //memberCount: memberCount.toString(),
+          totalCount: totalDonationController.text.toString() != ""
+              ? totalDonationController.text.toString()
+              : "0",
+          memberId: memberId,
+          note: noteController.text.toString() != ""
+              ? noteController.text.toString()
+              : "-",
+          nrc: nrcController.text.toString() != ""
+              ? nrcController.text.toString()
+              : "-",
+          phone: phoneController.text.toString(),
+          //registerDate: now,
+          address:
+              "${homeNoController.text}, ${streetController.text}, ${quarterController.text}, ${townController.text}, $region1",
+        );
+    Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
+        context, "အိုကေ", Colors.black);
+    nameController.clear();
+    fatherNameController.clear();
+    nrcController.clear();
+    phoneController.clear();
+    selectedBloodType = "သွေးအုပ်စု";
+    bloodBankNoController.clear();
+    totalDonationController.clear();
+    homeNoController.clear();
+    streetController.clear();
+    quarterController.clear();
+    townController.clear();
+    region1 = "";
+    regional = "";
+    noteController.clear();
   }
 
   showDatePicker() async {

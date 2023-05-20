@@ -33,7 +33,7 @@ class _Donation {
   String? date;
   String? hospital;
   String? memberId;
-  _Member? member;
+  ObjectId? member;
   String? patientAddress;
   String? patientAge;
   String? patientDisease;

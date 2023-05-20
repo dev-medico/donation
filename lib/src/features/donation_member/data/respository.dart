@@ -19,24 +19,7 @@ class MemberRepository {
     String address,
     String note,
   ) {
-    DateTime now = DateTime.now();
-
-    ref.watch(realmProvider)!.createMember(
-        name: name,
-        birthDate: birthDate,
-        bloodBankCard: bloodBankNo,
-        bloodType: bloodType,
-        fatherName: fatherName,
-        lastDate: now,
-        memberCount: memberCount.toString(),
-        totalCount: totalCount.toString(),
-        memberId: memberId,
-        note: note,
-        nrc: nrc,
-        phone: phone,
-        registerDate: now,
-        address: address);
-
+    
     // XataRepository()
     //     .uploadNewMember(jsonEncode(<String, dynamic>{
     //   "birth_date": birthDate.toString(),

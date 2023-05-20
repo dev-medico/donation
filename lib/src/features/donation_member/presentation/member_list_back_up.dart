@@ -10,12 +10,11 @@
 // import 'package:donation/responsive.dart';
 // import 'package:donation/src/features/donation_member/application/service.dart';
 // import 'package:donation/src/features/donation_member/data/respository.dart';
-// import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 // import 'package:donation/src/features/donation_member/presentation/new_member.dart';
 // import 'package:donation/utils/Colors.dart';
 
 // class MemberListBackupScreen extends ConsumerStatefulWidget {
-//   static const routeName = "/members";
+//   static const routeName = "/members_backup";
 
 //   const MemberListBackupScreen({Key? key}) : super(key: key);
 
@@ -43,14 +42,7 @@
 //   @override
 //   void initState() {
 //     super.initState();
-//     if (ref.read(membersProvider).isEmpty) {
-//       callAPI("");
-//     } else {
-//       setState(() {
-//         data = ref.read(membersProvider);
-//         addData();
-//       });
-//     }
+//     callAPI("");
 //   }
 
 //   tabCreate() => Scaffold(
@@ -609,7 +601,6 @@
 //       } else {
 //         log("Data Length - " + data!.length.toString());
 //         data!.forEach((element) {
-//           ref.read(membersProvider.notifier).addMember(element);
 //           MemberService(MemberRepository(ref)).addMember(
 //               element.memberId,
 //               element.name,

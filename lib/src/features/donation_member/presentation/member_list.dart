@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,7 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/new_member.dart';
-import 'package:donation/src/features/new_features/member/member_data_source.dart';
+import 'package:donation/src/features/donation_member/domain/member_data_source.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -601,14 +602,14 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
         onCellTap: (details) async {
           Logger logger = Logger();
           logger.i(details.rowColumnIndex.rowIndex);
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => MemberDetailScreen(
-          //       data: data[details.rowColumnIndex.rowIndex - 1],
-          //     ),
-          //   ),
-          // );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MemberDetailScreen(
+                data: data[details.rowColumnIndex.rowIndex - 1],
+              ),
+            ),
+          );
         },
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,
