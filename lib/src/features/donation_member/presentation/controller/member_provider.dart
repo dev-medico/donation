@@ -38,12 +38,6 @@ final memberStreamProvider =
         .query<Member>("TRUEPREDICATE SORT(memberId ASC)")
         .changes;
 
-    log("realm Data" +
-        realmService.realm
-            .query<Member>("TRUEPREDICATE SORT(_id ASC)")
-            .length
-            .toString());
-
     return stream;
   }
 });

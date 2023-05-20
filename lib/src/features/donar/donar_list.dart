@@ -1477,11 +1477,13 @@ class _DonarListState extends State<DonarList> {
                                 ),
                                 onPressed: () async {
                                   await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => EditDonarScreen(
-                                                donor: data[rowIndex],
-                                              )));
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditDonarScreen(
+                                        donor: data[rowIndex],
+                                      ),
+                                    ),
+                                  );
                                   calculateLeftBalance();
                                   callAPI("");
                                 }),

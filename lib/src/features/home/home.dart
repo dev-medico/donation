@@ -1,7 +1,9 @@
 import 'package:donation/realm/realm_services.dart';
+import 'package:donation/src/features/auth/login.dart';
+import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
-import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/utils/tool_widgets.dart';
 
@@ -28,8 +30,8 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   List<NavigationPaneItem> items = [];
   List<String> icons = [
     'assets/images/search_list.png',
-    'assets/images/donations.png',
     'assets/images/members.png',
+    'assets/images/donations.png',
     'assets/images/special_case.png',
     'assets/images/finance.png',
     'assets/images/settings.png',
@@ -63,6 +65,10 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
           PaneItem(
             onTap: () {
               ref.watch(realmProvider)!.close();
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (route) => false);
             },
             icon: CustomIcon(
               icon: icons[5],
@@ -111,7 +117,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         icon: CustomIcon(
           icon: icons[1],
         ),
-        infoBadge: const InfoBadge(source: Text('8')),
+        //infoBadge: const InfoBadge(source: Text('8')),
         title: Text(
           titles[1],
           style: smallTextStyle(context),
@@ -133,9 +139,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
           titles[2],
           style: smallTextStyle(context),
         ),
-        body: const Text(
-          'အပ်ကုန်',
-        ),
+        body: BloodDonationListNewStyle(),
       ),
       PaneItemSeparator(),
       PaneItemExpander(

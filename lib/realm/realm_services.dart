@@ -193,21 +193,23 @@ class RealmServices with ChangeNotifier {
     notifyListeners();
   }
 
-  void createDonation(
-    String date,
-    String hospital,
-    String memberId,
-    String patientAddress,
-    String patientAge,
-    String patientDisease,
-    String patientName,
-    String ownerId,
-    ObjectId member,
-  ) {
+  void createDonation({
+    String? date,
+    DateTime? donationDate,
+    String? hospital,
+    String? memberId,
+    String? patientAddress,
+    String? patientAge,
+    String? patientDisease,
+    String? patientName,
+    String? ownerId,
+    ObjectId? member,
+  }) {
     final newDonation = Donation(
       ObjectId(),
       currentUser!.id,
       date: date,
+      donationDate: donationDate,
       hospital: hospital,
       memberId: memberId,
       patientAddress: patientAddress,

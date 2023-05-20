@@ -180,6 +180,7 @@ class Donation extends _Donation
     ObjectId id,
     String ownerId, {
     String? date,
+    DateTime? donationDate,
     String? hospital,
     String? memberId,
     ObjectId? member,
@@ -190,6 +191,7 @@ class Donation extends _Donation
   }) {
     RealmObjectBase.set(this, '_id', id);
     RealmObjectBase.set(this, 'date', date);
+    RealmObjectBase.set(this, 'donationDate', donationDate);
     RealmObjectBase.set(this, 'hospital', hospital);
     RealmObjectBase.set(this, 'memberId', memberId);
     RealmObjectBase.set(this, 'member', member);
@@ -211,6 +213,13 @@ class Donation extends _Donation
   String? get date => RealmObjectBase.get<String>(this, 'date') as String?;
   @override
   set date(String? value) => RealmObjectBase.set(this, 'date', value);
+
+  @override
+  DateTime? get donationDate =>
+      RealmObjectBase.get<DateTime>(this, 'donationDate') as DateTime?;
+  @override
+  set donationDate(DateTime? value) =>
+      RealmObjectBase.set(this, 'donationDate', value);
 
   @override
   String? get hospital =>
@@ -278,6 +287,8 @@ class Donation extends _Donation
       SchemaProperty('id', RealmPropertyType.objectid,
           mapTo: '_id', primaryKey: true),
       SchemaProperty('date', RealmPropertyType.string, optional: true),
+      SchemaProperty('donationDate', RealmPropertyType.timestamp,
+          optional: true),
       SchemaProperty('hospital', RealmPropertyType.string, optional: true),
       SchemaProperty('memberId', RealmPropertyType.string, optional: true),
       SchemaProperty('member', RealmPropertyType.objectid, optional: true),

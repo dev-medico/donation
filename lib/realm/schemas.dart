@@ -31,6 +31,7 @@ class _Donation {
   @PrimaryKey()
   late ObjectId id;
   String? date;
+  DateTime? donationDate;
   String? hospital;
   String? memberId;
   ObjectId? member;

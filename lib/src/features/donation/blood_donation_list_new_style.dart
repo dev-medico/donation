@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:donation/realm/realm_services.dart';
+import 'package:donation/realm/schemas.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/xata_donation_list_response.dart';
@@ -13,10 +16,16 @@ import 'package:donation/src/features/donation/donation_detail.dart';
 import 'package:donation/src/features/donation/new_blood_donation.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
+import 'package:realm/realm.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 
-class BloodDonationListNewStyle extends StatefulWidget {
+final membersProvider = StateProvider<RealmResults<Member>>((ref) {
+  var realmService = ref.watch(realmProvider);
+  return realmService!.realm.query<Member>("TRUEPREDICATE SORT(_id ASC)");
+});
+
+class BloodDonationListNewStyle extends ConsumerStatefulWidget {
   static const routeName = "/donations";
 
   const BloodDonationListNewStyle({Key? key}) : super(key: key);
@@ -26,7 +35,8 @@ class BloodDonationListNewStyle extends StatefulWidget {
       _BloodDonationListNewStyleState();
 }
 
-class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
+class _BloodDonationListNewStyleState
+    extends ConsumerState<BloodDonationListNewStyle>
     with SingleTickerProviderStateMixin {
   late TextTheme textTheme;
   List<String> ranges = [
@@ -158,6 +168,25 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
         setState(() {
           dataFullLoaded = true;
         });
+        data!.forEach((element) {
+          ref.watch(realmProvider)!.createDonation(
+                member: ref
+                    .read(membersProvider)
+                    .where((data) =>
+                        data.memberId.toString() ==
+                        element.member!.memberId.toString())
+                    .first
+                    .id,
+                date: element.date,
+                hospital: element.hospital,
+                memberId: element.member!.memberId.toString(),
+                patientAddress: element.patientAddress,
+                patientAge: element.patientAge,
+                patientDisease: element.patientDisease,
+                patientName: element.patientName,
+              );
+        });
+
         sortBySegments();
       }
     });
@@ -982,7 +1011,7 @@ class _BloodDonationListNewStyleState extends State<BloodDonationListNewStyle>
           onCellTap: (details) async {
             Logger logger = Logger();
             logger.i(details.rowColumnIndex.rowIndex);
-            Member member = Member(
+            MemberOldData member = MemberOldData(
               address:
                   data[details.rowColumnIndex.rowIndex - 1].member!.address,
               birthDate:

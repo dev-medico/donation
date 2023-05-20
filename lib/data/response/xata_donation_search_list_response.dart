@@ -67,7 +67,7 @@ class DonationSearchRecords {
   String? date;
   String? hospital;
   String? id;
-  Member? member;
+  MemberOldData? member;
   String? patientAddress;
   String? patientAge;
   String? patientDisease;
@@ -89,7 +89,7 @@ class DonationSearchRecords {
     date = json['date'];
     hospital = json['hospital'];
     id = json['id'];
-    member = json['member'] != null ? Member.fromJson(json['member']) : null;
+    member = json['member'] != null ? MemberOldData.fromJson(json['member']) : null;
     patientAddress = json['patient_address'];
     patientAge = json['patient_age'];
     patientDisease = json['patient_disease'];
@@ -116,7 +116,7 @@ class DonationSearchRecords {
   }
 }
 
-class Member {
+class MemberOldData {
   String? address;
   String? birthDate;
   String? bloodBankCard;
@@ -134,7 +134,7 @@ class Member {
   int? totalCount;
   Xata? xata;
 
-  Member(
+  MemberOldData(
       {this.address,
       this.birthDate,
       this.bloodBankCard,
@@ -152,7 +152,7 @@ class Member {
       this.totalCount,
       this.xata});
 
-  Member.fromJson(Map<String, dynamic> json) {
+  MemberOldData.fromJson(Map<String, dynamic> json) {
     address = json['address'];
     birthDate = json['birth_date'];
     bloodBankCard = json['blood_bank_card'];
