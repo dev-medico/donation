@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -94,10 +93,14 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                           Container(
                             width: MediaQuery.of(context).size.width / 2.22,
                             margin: const EdgeInsets.only(top: 20, left: 20),
-                            child: DropdownButtonFormField2(
+                            child: DropdownButtonFormField(
+                              dropdownColor: Colors.white,
+                              focusColor: Colors.white,
                               decoration: InputDecoration(
                                 isDense: true,
-                                contentPadding: EdgeInsets.zero,
+                                fillColor: Colors.white,
+                                contentPadding: EdgeInsets.only(
+                                    top: 16, left: 20, bottom: 16, right: 12),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -107,21 +110,11 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                                 "အမှတ်စဥ် အလိုက်ကြည့်မည်",
                                 style: TextStyle(fontSize: 13),
                               ),
-                              iconStyleData: IconStyleData(
-                                icon: const Icon(
-                                  Icons.arrow_drop_down,
-                                  color: Colors.black45,
-                                ),
-                                iconSize: 30,
+                              icon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.black45,
                               ),
-                              buttonStyleData: ButtonStyleData(
-                                height: 60,
-                                padding:
-                                    const EdgeInsets.only(left: 20, right: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
+                              iconSize: 30,
                               items: ranges
                                   .map((item) => DropdownMenuItem<String>(
                                         value: item,
@@ -170,10 +163,13 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                           Container(
                             width: MediaQuery.of(context).size.width / 2.22,
                             margin: const EdgeInsets.only(top: 20, left: 12),
-                            child: DropdownButtonFormField2(
+                            child: DropdownButtonFormField(
+                              dropdownColor: Colors.white,
+                              focusColor: Colors.white,
                               decoration: InputDecoration(
                                 isDense: true,
-                                contentPadding: EdgeInsets.zero,
+                                contentPadding: EdgeInsets.only(
+                                    top: 16, left: 20, bottom: 16, right: 12),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -183,21 +179,11 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                                 selectedBloodType!,
                                 style: const TextStyle(fontSize: 13),
                               ),
-                              iconStyleData: IconStyleData(
-                                icon: const Icon(
-                                  Icons.arrow_drop_down,
-                                  color: Colors.black45,
-                                ),
-                                iconSize: 30,
+                              icon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.black45,
                               ),
-                              buttonStyleData: ButtonStyleData(
-                                height: 60,
-                                padding:
-                                    const EdgeInsets.only(left: 20, right: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
+                              iconSize: 30,
                               items: bloodTypes
                                   .map((item) => DropdownMenuItem<String>(
                                         value: item,
@@ -313,11 +299,15 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                     children: [
                       Container(
                         width: MediaQuery.of(context).size.width / 5,
+                        height: 50,
                         margin: const EdgeInsets.only(top: 28, left: 24),
-                        child: DropdownButtonFormField2(
+                        child: DropdownButtonFormField(
+                          dropdownColor: Colors.white,
+                          focusColor: Colors.white,
                           decoration: InputDecoration(
                             isDense: true,
-                            contentPadding: EdgeInsets.zero,
+                            contentPadding: EdgeInsets.only(
+                                top: 16, left: 20, bottom: 16, right: 12),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -327,20 +317,11 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                             "အမှတ်စဥ် အလိုက်ကြည့်မည်",
                             style: TextStyle(fontSize: 14),
                           ),
-                          iconStyleData: IconStyleData(
-                            icon: const Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.black45,
-                            ),
-                            iconSize: 30,
+                          icon: const Icon(
+                            Icons.arrow_drop_down,
+                            color: Colors.black45,
                           ),
-                          buttonStyleData: ButtonStyleData(
-                            height: 60,
-                            padding: const EdgeInsets.only(left: 20, right: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                          iconSize: 30,
                           items: ranges
                               .toSet()
                               .toList()
@@ -392,10 +373,13 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                       Container(
                         width: MediaQuery.of(context).size.width / 5,
                         margin: const EdgeInsets.only(top: 28, left: 20),
-                        child: DropdownButtonFormField2(
+                        child: DropdownButtonFormField(
+                          dropdownColor: Colors.white,
+                          focusColor: Colors.white,
                           decoration: InputDecoration(
                             isDense: true,
-                            contentPadding: EdgeInsets.zero,
+                            contentPadding: EdgeInsets.only(
+                                top: 16, left: 20, bottom: 16, right: 12),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -405,20 +389,11 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                             selectedBloodType!,
                             style: const TextStyle(fontSize: 14),
                           ),
-                          iconStyleData: IconStyleData(
-                            icon: const Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.black45,
-                            ),
-                            iconSize: 30,
+                          icon: const Icon(
+                            Icons.arrow_drop_down,
+                            color: Colors.black45,
                           ),
-                          buttonStyleData: ButtonStyleData(
-                            height: 60,
-                            padding: const EdgeInsets.only(left: 20, right: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                          iconSize: 30,
                           items: bloodTypes
                               .map((item) => DropdownMenuItem<String>(
                                     value: item,

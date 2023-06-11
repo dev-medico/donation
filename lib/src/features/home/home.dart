@@ -1,4 +1,5 @@
 import 'package:donation/realm/realm_services.dart';
+import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
@@ -55,6 +56,11 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         ref.read(openDrawerProvider.notifier).update((state) => true);
       },
       pane: NavigationPane(
+        size: NavigationPaneSize(
+            compactWidth: Responsive.isMobile(context) ? 46 : 56,
+            openWidth: Responsive.isMobile(context)
+                ? MediaQuery.of(context).size.width * 0.7
+                : 240),
         selected: topIndex,
         onChanged: (index) => setState(() {
           topIndex = index;
