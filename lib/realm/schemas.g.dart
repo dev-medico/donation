@@ -192,6 +192,7 @@ class Donation extends _Donation
     String? hospital,
     String? memberId,
     ObjectId? member,
+    Member? memberObj,
     String? patientAddress,
     String? patientAge,
     String? patientDisease,
@@ -203,6 +204,7 @@ class Donation extends _Donation
     RealmObjectBase.set(this, 'hospital', hospital);
     RealmObjectBase.set(this, 'memberId', memberId);
     RealmObjectBase.set(this, 'member', member);
+    RealmObjectBase.set(this, 'memberObj', memberObj);
     RealmObjectBase.set(this, 'patientAddress', patientAddress);
     RealmObjectBase.set(this, 'patientAge', patientAge);
     RealmObjectBase.set(this, 'patientDisease', patientDisease);
@@ -246,6 +248,13 @@ class Donation extends _Donation
       RealmObjectBase.get<ObjectId>(this, 'member') as ObjectId?;
   @override
   set member(ObjectId? value) => RealmObjectBase.set(this, 'member', value);
+
+  @override
+  Member? get memberObj =>
+      RealmObjectBase.get<Member>(this, 'memberObj') as Member?;
+  @override
+  set memberObj(covariant Member? value) =>
+      RealmObjectBase.set(this, 'memberObj', value);
 
   @override
   String? get patientAddress =>
@@ -300,6 +309,8 @@ class Donation extends _Donation
       SchemaProperty('hospital', RealmPropertyType.string, optional: true),
       SchemaProperty('memberId', RealmPropertyType.string, optional: true),
       SchemaProperty('member', RealmPropertyType.objectid, optional: true),
+      SchemaProperty('memberObj', RealmPropertyType.object,
+          optional: true, linkTarget: 'Member'),
       SchemaProperty('patientAddress', RealmPropertyType.string,
           optional: true),
       SchemaProperty('patientAge', RealmPropertyType.string, optional: true),

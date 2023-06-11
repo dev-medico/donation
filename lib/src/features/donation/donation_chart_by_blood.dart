@@ -1,11 +1,12 @@
+import 'package:donation/realm/schemas.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:donation/data/response/xata_donation_list_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:intl/intl.dart';
+import 'package:realm/realm.dart';
 
 class DonationChartByBlood extends StatefulWidget {
-  final List<DonationRecord> data;
+  final RealmResults<Donation> data;
   bool? fromDashboard;
   DonationChartByBlood({Key? key, required this.data, this.fromDashboard})
       : super(key: key);
@@ -102,7 +103,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                   return Visibility(
                     visible: widget.data
                         .where((element) =>
-                            element.member!.id == bloodTypes[index])
+                            element.member == bloodTypes[index])
                         .isNotEmpty,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -116,18 +117,18 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                               color: Colors.black,
                             ),
                           ),
-                          Text(
-                            widget.data
-                                .where((element) =>
-                                    element.member!.bloodType.toString() ==
-                                    bloodTypes[index])
-                                .length
-                                .toString(),
-                            style: TextStyle(
-                              fontSize: Responsive.isMobile(context) ? 15 : 16,
-                              color: primaryColor,
-                            ),
-                          ),
+                          // Text(
+                          //   widget.data
+                          //       .where((element) =>
+                          //           element.member!.bloodType.toString() ==
+                          //           bloodTypes[index])
+                          //       .length
+                          //       .toString(),
+                          //   style: TextStyle(
+                          //     fontSize: Responsive.isMobile(context) ? 15 : 16,
+                          //     color: primaryColor,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

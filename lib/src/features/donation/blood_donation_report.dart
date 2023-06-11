@@ -70,11 +70,11 @@ class _BloodDonationReportScreenState extends State<BloodDonationReportScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                  flex: 1,
-                  child: DonationChartByBlood(
-                    data: widget.data,
-                  )),
+              // Expanded(
+              //     flex: 1,
+              //     child: DonationChartByBlood(
+              //       data: widget.data,
+              //     )),
               const SizedBox(
                 width: 20,
               ),

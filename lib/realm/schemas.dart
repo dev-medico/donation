@@ -36,6 +36,7 @@ class _Donation {
   String? hospital;
   String? memberId;
   ObjectId? member;
+  _Member? memberObj;
   String? patientAddress;
   String? patientAge;
   String? patientDisease;

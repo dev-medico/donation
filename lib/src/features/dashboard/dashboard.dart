@@ -202,13 +202,13 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: DonationChartByBlood(
-                    data: data,
-                    fromDashboard: true,
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.all(12),
+                //   child: DonationChartByBlood(
+                //     data: data,
+                //     fromDashboard: true,
+                //   ),
+                // ),
               ],
             )
           : Row(
@@ -290,16 +290,16 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     ),
                   ],
                 ),
-                Expanded(
-                    flex: 1,
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 12),
-                      padding: const EdgeInsets.all(20.0),
-                      child: DonationChartByBlood(
-                        data: data,
-                        fromDashboard: true,
-                      ),
-                    )),
+                // Expanded(
+                //     flex: 1,
+                //     child: Container(
+                //       margin: const EdgeInsets.only(top: 12),
+                //       padding: const EdgeInsets.all(20.0),
+                //       child: DonationChartByBlood(
+                //         data: data,
+                //         fromDashboard: true,
+                //       ),
+                //     )),
               ],
             ),
     );

@@ -1,8 +1,7 @@
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
 import 'package:donation/src/providers/providers.dart';
-import 'package:donation/utils/tool_widgets.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class DonationByDiseaseScreen extends ConsumerStatefulWidget {
@@ -45,16 +44,27 @@ class _DonationByDiseaseScreenState
     donations = donations!.length > 8 ? donations!.sublist(0, 8) : donations;
 
     return Container(
-      decoration: shadowDecoration(Colors.white),
-      child: Row(
-        children: [
-          Expanded(child: BloodDonationPieChart(donations: donations!)),
-          Container(
-            width: Responsive.isMobile(context)
-                ? 20
-                : MediaQuery.of(context).size.width * 0.3,
-          )
-        ],
+      margin: EdgeInsets.only(
+          left: 20, top: 20, right: MediaQuery.of(context).size.width * 0.34),
+      child: NeumorphicButton(
+        style: NeumorphicStyle(
+          color: Colors.white,
+          boxShape: NeumorphicBoxShape.roundRect(
+              BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
+          depth: 4,
+          intensity: 0.8,
+          shadowDarkColor: Colors.black,
+          shadowLightColor: Colors.white,
+        ),
+        onPressed: () async {},
+        child: Row(
+          children: [
+            Expanded(child: BloodDonationPieChart(donations: donations!)),
+            Container(
+              width: 20,
+            )
+          ],
+        ),
       ),
     );
   }

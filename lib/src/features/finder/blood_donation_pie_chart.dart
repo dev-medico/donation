@@ -65,7 +65,7 @@ class _BloodDonationPieChartState extends State<BloodDonationPieChart> {
         Row(
           children: [
             Container(
-              width: MediaQuery.of(context).size.width * 0.01,
+              width: 40,
             ),
             Expanded(child: _buildSmartLabelPieChart()),
           ],
@@ -96,7 +96,7 @@ class _BloodDonationPieChartState extends State<BloodDonationPieChart> {
         DoughnutSeries<ChartData, String>(
           dataSource: dataList,
           enableTooltip: true,
-          radius: '90%',
+          radius: '80%',
           dataLabelSettings: DataLabelSettings(
               isVisible: true,
               labelIntersectAction: LabelIntersectAction.none,
