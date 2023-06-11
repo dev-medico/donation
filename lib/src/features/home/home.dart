@@ -4,6 +4,7 @@ import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
+import 'package:donation/src/features/finder/finder_and_report.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
@@ -110,9 +111,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
           titles[0],
           style: smallTextStyle(context),
         ),
-        body: Center(
-          child: Text("Search Blood"),
-        ),
+        body: FinderAndReportScreen(),
       ),
       PaneItemSeparator(),
       PaneItem(

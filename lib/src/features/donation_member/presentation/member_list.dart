@@ -88,152 +88,173 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width / 2.22,
-                            margin: const EdgeInsets.only(top: 20, left: 20),
-                            child: DropdownButtonFormField(
-                              dropdownColor: Colors.white,
-                              focusColor: Colors.white,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                fillColor: Colors.white,
-                                contentPadding: EdgeInsets.only(
-                                    top: 16, left: 20, bottom: 16, right: 12),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              isExpanded: true,
-                              hint: const Text(
-                                "အမှတ်စဥ် အလိုက်ကြည့်မည်",
-                                style: TextStyle(fontSize: 13),
-                              ),
-                              icon: const Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.black45,
-                              ),
-                              iconSize: 30,
-                              items: ranges
-                                  .map((item) => DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(
-                                          item,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                              validator: (value) {
-                                if (value == null) {
-                                  return "အမှတ်စဥ် အလိုက်ကြည့်မည်";
-                                }
-                                return null;
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedRange = value.toString();
-                                });
-                                for (int i = 0; i < ranges.length; i++) {
-                                  if (value == ranges[i]) {
-                                    if (i != ranges.length - 1) {
-                                      setState(() {
-                                        dataSegments =
-                                            data.sublist(i * 50, (i + 1) * 50);
-                                      });
-                                    } else {
-                                      setState(() {
-                                        dataSegments = data.sublist(i * 50);
-                                      });
+                      Container(
+                        margin: EdgeInsets.only(left: 20, right: 20),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width / 2.3,
+                                margin:
+                                    const EdgeInsets.only(top: 20, right: 6),
+                                child: DropdownButtonFormField(
+                                  dropdownColor: Colors.white,
+                                  focusColor: Colors.white,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    fillColor: Colors.white,
+                                    contentPadding: EdgeInsets.only(
+                                        top: 16,
+                                        left: 20,
+                                        bottom: 16,
+                                        right: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  isExpanded: true,
+                                  hint: const Text(
+                                    "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Colors.black45,
+                                  ),
+                                  iconSize: 30,
+                                  items: ranges
+                                      .map((item) => DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(
+                                              item,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return "အမှတ်စဥ် အလိုက်ကြည့်မည်";
                                     }
-                                  }
-                                }
-                                setState(() {
-                                  searchController.text = "";
-                                  selectedBloodType =
-                                      "သွေးအုပ်စု အလိုက်ကြည့်မည်";
-                                });
-                                log(selectedBloodType.toString());
-                              },
-                              onSaved: (value) {},
-                            ),
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width / 2.22,
-                            margin: const EdgeInsets.only(top: 20, left: 12),
-                            child: DropdownButtonFormField(
-                              dropdownColor: Colors.white,
-                              focusColor: Colors.white,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                contentPadding: EdgeInsets.only(
-                                    top: 16, left: 20, bottom: 16, right: 12),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedRange = value.toString();
+                                    });
+                                    for (int i = 0; i < ranges.length; i++) {
+                                      if (value == ranges[i]) {
+                                        if (i != ranges.length - 1) {
+                                          setState(() {
+                                            dataSegments = data.sublist(
+                                                i * 50, (i + 1) * 50);
+                                          });
+                                        } else {
+                                          setState(() {
+                                            dataSegments = data.sublist(i * 50);
+                                          });
+                                        }
+                                      }
+                                    }
+                                    setState(() {
+                                      searchController.text = "";
+                                      selectedBloodType =
+                                          "သွေးအုပ်စု အလိုက်ကြည့်မည်";
+                                    });
+                                    log(selectedBloodType.toString());
+                                  },
+                                  onSaved: (value) {},
                                 ),
                               ),
-                              isExpanded: true,
-                              hint: Text(
-                                selectedBloodType!,
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                              icon: const Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.black45,
-                              ),
-                              iconSize: 30,
-                              items: bloodTypes
-                                  .map((item) => DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(
-                                          item,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                              validator: (value) {
-                                if (value == null) {
-                                  return "သွေးအုပ်စု အလိုက်ကြည့်မည်";
-                                }
-                                return null;
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedBloodType = value.toString();
-                                });
-                                log(selectedBloodType.toString());
-                                log(dataSegments.length.toString());
-                                List<Member>? filterdata = [];
-                                for (int i = 0; i < data.length; i++) {
-                                  //get memberdata from data only where bloodtype is equal to value
-                                  if (searchController.text.isNotEmpty) {
-                                    if (data[i].name!.toLowerCase().contains(
-                                            searchController.text
-                                                .toString()
-                                                .toLowerCase()) &&
-                                        data[i].bloodType ==
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width / 2.3,
+                                margin: const EdgeInsets.only(
+                                  top: 20,
+                                  left: 6,
+                                ),
+                                child: DropdownButtonFormField(
+                                  dropdownColor: Colors.white,
+                                  focusColor: Colors.white,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.only(
+                                        top: 16,
+                                        left: 20,
+                                        bottom: 16,
+                                        right: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  isExpanded: true,
+                                  hint: Text(
+                                    selectedBloodType!,
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Colors.black45,
+                                  ),
+                                  iconSize: 30,
+                                  items: bloodTypes
+                                      .map((item) => DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(
+                                              item,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return "သွေးအုပ်စု အလိုက်ကြည့်မည်";
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedBloodType = value.toString();
+                                    });
+                                    log(selectedBloodType.toString());
+                                    log(dataSegments.length.toString());
+                                    List<Member>? filterdata = [];
+                                    for (int i = 0; i < data.length; i++) {
+                                      //get memberdata from data only where bloodtype is equal to value
+                                      if (searchController.text.isNotEmpty) {
+                                        if (data[i]
+                                                .name!
+                                                .toLowerCase()
+                                                .contains(searchController.text
+                                                    .toString()
+                                                    .toLowerCase()) &&
+                                            data[i].bloodType ==
+                                                selectedBloodType) {
+                                          filterdata.add(data[i]);
+                                        }
+                                      } else {
+                                        if (data[i].bloodType ==
                                             selectedBloodType) {
-                                      filterdata.add(data[i]);
+                                          filterdata.add(data[i]);
+                                        }
+                                      }
                                     }
-                                  } else {
-                                    if (data[i].bloodType ==
-                                        selectedBloodType) {
-                                      filterdata.add(data[i]);
-                                    }
-                                  }
-                                }
-                                setState(() {
-                                  dataSegments = filterdata.sublist(0);
-                                });
-                              },
-                              onSaved: (value) {},
+                                    setState(() {
+                                      dataSegments = filterdata.sublist(0);
+                                    });
+                                  },
+                                  onSaved: (value) {},
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       Container(
                         width: MediaQuery.of(context).size.width - 40,

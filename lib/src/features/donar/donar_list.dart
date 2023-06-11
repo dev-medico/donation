@@ -225,7 +225,7 @@ class _DonarListState extends State<DonarList> {
                             child: Container(
                               width: Responsive.isMobile(context)
                                   ? MediaQuery.of(context).size.width / 5
-                                  : MediaQuery.of(context).size.width / 15,
+                                  : MediaQuery.of(context).size.width / 17,
                               height: 44,
                               decoration: shadowDecorationOnlyTop(
                                   rangesSelect[index]
