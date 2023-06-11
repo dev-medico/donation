@@ -1,5 +1,4 @@
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
-import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:donation/responsive.dart';
 
@@ -34,8 +33,8 @@ class DashboardCard extends StatelessWidget {
         height: Responsive.isMobile(context)
             ? MediaQuery.of(context).size.height / 4.75
             : amount == ""
-                ? MediaQuery.of(context).size.height / 5.2
-                : MediaQuery.of(context).size.height / 4,
+                ? MediaQuery.of(context).size.height * 0.13
+                : MediaQuery.of(context).size.height * 0.18,
         margin: const EdgeInsets.only(top: 12, right: 12),
         child: NeumorphicButton(
           style: NeumorphicStyle(
@@ -49,8 +48,7 @@ class DashboardCard extends StatelessWidget {
           ),
           onPressed: () async {
             if (index == 0) {
-              await Navigator.pushNamed(
-                  context, MemberListScreen.routeName);
+              await Navigator.pushNamed(context, MemberListScreen.routeName);
               onTap.call();
             } else if (index == 1) {
               await Navigator.pushNamed(
@@ -89,15 +87,17 @@ class DashboardCard extends StatelessWidget {
                 const SizedBox(
                   height: 12,
                 ),
-                Text(
-                  amount,
-                  style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 17 : 20,
-                      fontWeight: FontWeight.bold,
-                      color: NeumorphicTheme.of(context)
-                          ?.current!
-                          .defaultTextColor),
-                ),
+                amount != ""
+                    ? Text(
+                        amount,
+                        style: TextStyle(
+                            fontSize: Responsive.isMobile(context) ? 17 : 20,
+                            fontWeight: FontWeight.bold,
+                            color: NeumorphicTheme.of(context)
+                                ?.current!
+                                .defaultTextColor),
+                      )
+                    : Container(),
                 const Spacer(),
               ],
             ),

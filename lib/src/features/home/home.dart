@@ -4,7 +4,8 @@ import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
-import 'package:donation/src/features/finder/finder_and_report.dart';
+import 'package:donation/src/features/donation_member/presentation/search_member.dart';
+import 'package:donation/src/features/finder/report.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
@@ -105,13 +106,30 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
           return null;
         }),
         icon: CustomIcon(
+          icon: "assets/images/dashboard.png",
+        ),
+        title: Text(
+          "ပင်မစာမျက်နှာ",
+          style: smallTextStyle(context),
+        ),
+        body: ReportScreen(),
+      ),
+      PaneItemSeparator(),
+      PaneItem(
+        selectedTileColor: ButtonState.resolveWith((state) {
+          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
+          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
+
+          return null;
+        }),
+        icon: CustomIcon(
           icon: icons[0],
         ),
         title: Text(
           titles[0],
           style: smallTextStyle(context),
         ),
-        body: FinderAndReportScreen(),
+        body: SearchMemberListScreen(),
       ),
       PaneItemSeparator(),
       PaneItem(

@@ -118,189 +118,190 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     String dateFormat = DateFormat('dd MMM yyyy ( EEEE )').format(date);
 
     return Scaffold(
-        //backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Padding(
-            padding: EdgeInsets.only(top: 4.0),
-            child: Text("Red Juniors Admin",
-                style: TextStyle(fontSize: 17, color: Colors.white)),
-          ),
-          centerTitle: true,
-          backgroundColor: primaryColor,
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(
-                  right: Responsive.isMobile(context) ? 16.0 : 30),
-              child: SvgPicture.asset(
-                "assets/images/noti.svg",
-                width: 26,
-              ),
-            ),
-          ],
+      //backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Padding(
+          padding: EdgeInsets.only(top: 4.0),
+          child: Text("Red Juniors Admin",
+              style: TextStyle(fontSize: 17, color: Colors.white)),
         ),
-        body: Responsive.isMobile(context)
-            ? ListView(
-                children: [
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0, top: 8),
-                        child: Row(
-                          children: [
-                            DashboardCard(
-                                index: 0,
-                                color: primaryDark,
-                                title: "အဖွဲ့၀င် စာရင်း",
-                                subtitle: "စုစုပေါင်း အရေအတွက်",
-                                amount:
-                                    "${Utils.strToMM(totalMember.toString())} ဦး",
-                                amountColor: Colors.black,
-                                onTap: () {
-                                  initial();
-                                }),
-                            DashboardCard(
-                                index: 1,
-                                color: primaryDark,
-                                title: "သွေးလှူမှု မှတ်တမ်း",
-                                subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                                amount:
-                                    "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                                amountColor: Colors.blue,
-                                onTap: () {
-                                  initial();
-                                }),
-                          ],
-                        ),
+        centerTitle: true,
+        backgroundColor: primaryColor,
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(
+                right: Responsive.isMobile(context) ? 16.0 : 30),
+            child: SvgPicture.asset(
+              "assets/images/noti.svg",
+              width: 26,
+            ),
+          ),
+        ],
+      ),
+      body: Responsive.isMobile(context)
+          ? ListView(
+              children: [
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12.0, top: 8),
+                      child: Row(
+                        children: [
+                          DashboardCard(
+                              index: 0,
+                              color: primaryDark,
+                              title: "အဖွဲ့၀င် စာရင်း",
+                              subtitle: "စုစုပေါင်း အရေအတွက်",
+                              amount:
+                                  "${Utils.strToMM(totalMember.toString())} ဦး",
+                              amountColor: Colors.black,
+                              onTap: () {
+                                initial();
+                              }),
+                          DashboardCard(
+                              index: 1,
+                              color: primaryDark,
+                              title: "သွေးလှူမှု မှတ်တမ်း",
+                              subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                              amount:
+                                  "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                              amountColor: Colors.blue,
+                              onTap: () {
+                                initial();
+                              }),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 12.0, top: 8, bottom: 12),
-                        child: Row(
-                          children: [
-                            DashboardCard(
-                                index: 2,
-                                color: primaryDark,
-                                title: "ထူးခြားဖြစ်စဉ်",
-                                subtitle: "",
-                                amount: "",
-                                amountColor: Colors.black,
-                                onTap: () {
-                                  initial();
-                                }),
-                            DashboardCard(
-                                index: 3,
-                                color: primaryDark,
-                                title: "ရ/သုံး ငွေစာရင်း",
-                                subtitle: "",
-                                amount: "",
-                                amountColor: Colors.black,
-                                onTap: () {
-                                  initial();
-                                }),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: DonationChartByBlood(
-                      data: data,
-                      fromDashboard: true,
                     ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 12.0, top: 8, bottom: 12),
+                      child: Row(
+                        children: [
+                          DashboardCard(
+                              index: 2,
+                              color: primaryDark,
+                              title: "ထူးခြားဖြစ်စဉ်",
+                              subtitle: "",
+                              amount: "",
+                              amountColor: Colors.black,
+                              onTap: () {
+                                initial();
+                              }),
+                          DashboardCard(
+                              index: 3,
+                              color: primaryDark,
+                              title: "ရ/သုံး ငွေစာရင်း",
+                              subtitle: "",
+                              amount: "",
+                              amountColor: Colors.black,
+                              onTap: () {
+                                initial();
+                              }),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: DonationChartByBlood(
+                    data: data,
+                    fromDashboard: true,
                   ),
-                ],
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width / 2,
-                        padding: const EdgeInsets.only(left: 20.0, top: 24),
-                        child: Row(
-                          children: [
-                            DashboardCard(
-                                index: 0,
-                                color: primaryDark,
-                                title: "အဖွဲ့၀င် စာရင်း",
-                                subtitle: "စုစုပေါင်း အရေအတွက်",
-                                amount:
-                                    "${Utils.strToMM(totalMember.toString())} ဦး",
-                                amountColor: Colors.black,
-                                onTap: () {
-                                  initial();
-                                }),
-                            const SizedBox(
-                              width: 12,
-                            ),
-                            DashboardCard(
-                                index: 1,
-                                color: primaryDark,
-                                title: "သွေးလှူမှု မှတ်တမ်း",
-                                subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                                amount:
-                                    "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                                amountColor: Colors.blue,
-                                onTap: () {
-                                  initial();
-                                }),
-                          ],
-                        ),
+                ),
+              ],
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width / 2,
+                      padding: const EdgeInsets.only(left: 20.0, top: 24),
+                      child: Row(
+                        children: [
+                          DashboardCard(
+                              index: 0,
+                              color: primaryDark,
+                              title: "အဖွဲ့၀င် စာရင်း",
+                              subtitle: "စုစုပေါင်း အရေအတွက်",
+                              amount:
+                                  "${Utils.strToMM(totalMember.toString())} ဦး",
+                              amountColor: Colors.black,
+                              onTap: () {
+                                initial();
+                              }),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          DashboardCard(
+                              index: 1,
+                              color: primaryDark,
+                              title: "သွေးလှူမှု မှတ်တမ်း",
+                              subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                              amount:
+                                  "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                              amountColor: Colors.blue,
+                              onTap: () {
+                                initial();
+                              }),
+                        ],
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(
-                            left: 12, right: 12, top: 20, bottom: 8),
-                        width: MediaQuery.of(context).size.width / 2.15,
-                        height: 1,
-                        color: Colors.grey,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, right: 12, top: 20, bottom: 8),
+                      width: MediaQuery.of(context).size.width / 2.15,
+                      height: 1,
+                      color: Colors.grey,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width / 2,
+                      padding: const EdgeInsets.only(left: 20.0, bottom: 12),
+                      child: Row(
+                        children: [
+                          DashboardCard(
+                              index: 2,
+                              color: primaryDark,
+                              title: "ထူးခြားဖြစ်စဉ်",
+                              subtitle: "အသေးစိတ် ကြည့်မည်",
+                              amount: "",
+                              amountColor: Colors.black,
+                              onTap: () {
+                                initial();
+                              }),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          DashboardCard(
+                              index: 3,
+                              color: primaryDark,
+                              title: "ရ/သုံး ငွေစာရင်း",
+                              subtitle: "အသေးစိတ် ကြည့်မည်",
+                              amount: "",
+                              amountColor: Colors.black,
+                              onTap: () {
+                                initial();
+                              }),
+                        ],
                       ),
-                      Container(
-                        width: MediaQuery.of(context).size.width / 2,
-                        padding: const EdgeInsets.only(left: 20.0, bottom: 12),
-                        child: Row(
-                          children: [
-                            DashboardCard(
-                                index: 2,
-                                color: primaryDark,
-                                title: "ထူးခြားဖြစ်စဉ်",
-                                subtitle: "အသေးစိတ် ကြည့်မည်",
-                                amount: "",
-                                amountColor: Colors.black,
-                                onTap: () {
-                                  initial();
-                                }),
-                            const SizedBox(
-                              width: 12,
-                            ),
-                            DashboardCard(
-                                index: 3,
-                                color: primaryDark,
-                                title: "ရ/သုံး ငွေစာရင်း",
-                                subtitle: "အသေးစိတ် ကြည့်မည်",
-                                amount: "",
-                                amountColor: Colors.black,
-                                onTap: () {
-                                  initial();
-                                }),
-                          ],
-                        ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                    flex: 1,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.all(20.0),
+                      child: DonationChartByBlood(
+                        data: data,
+                        fromDashboard: true,
                       ),
-                    ],
-                  ),
-                  Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: const EdgeInsets.only(top: 12),
-                        padding: const EdgeInsets.all(20.0),
-                        child: DonationChartByBlood(
-                          data: data,
-                          fromDashboard: true,
-                        ),
-                      )),
-                ],
-              ));
+                    )),
+              ],
+            ),
+    );
   }
 }

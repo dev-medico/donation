@@ -21,6 +21,7 @@ class _Member {
   String? address;
   DateTime? registerDate;
   String? totalCount;
+  String? status;
   @MapTo('owner_id')
   late String ownerId;
 }

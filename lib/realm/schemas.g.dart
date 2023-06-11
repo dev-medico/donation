@@ -24,6 +24,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
     String? address,
     DateTime? registerDate,
     String? totalCount,
+    String? status,
   }) {
     RealmObjectBase.set(this, '_id', id);
     RealmObjectBase.set(this, 'birthDate', birthDate);
@@ -40,6 +41,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
     RealmObjectBase.set(this, 'address', address);
     RealmObjectBase.set(this, 'registerDate', registerDate);
     RealmObjectBase.set(this, 'totalCount', totalCount);
+    RealmObjectBase.set(this, 'status', status);
     RealmObjectBase.set(this, 'owner_id', ownerId);
   }
 
@@ -136,6 +138,11 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
       RealmObjectBase.set(this, 'totalCount', value);
 
   @override
+  String? get status => RealmObjectBase.get<String>(this, 'status') as String?;
+  @override
+  set status(String? value) => RealmObjectBase.set(this, 'status', value);
+
+  @override
   String get ownerId => RealmObjectBase.get<String>(this, 'owner_id') as String;
   @override
   set ownerId(String value) => RealmObjectBase.set(this, 'owner_id', value);
@@ -169,6 +176,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
       SchemaProperty('registerDate', RealmPropertyType.timestamp,
           optional: true),
       SchemaProperty('totalCount', RealmPropertyType.string, optional: true),
+      SchemaProperty('status', RealmPropertyType.string, optional: true),
       SchemaProperty('ownerId', RealmPropertyType.string, mapTo: 'owner_id'),
     ]);
   }

@@ -14,15 +14,7 @@ import 'package:realm/realm.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 
-final membersProvider = StateProvider<RealmResults<Member>>((ref) {
-  var realmService = ref.watch(realmProvider);
-  return realmService!.realm.query<Member>("TRUEPREDICATE SORT(_id ASC)");
-});
 
-final donationsProvider = StateProvider<RealmResults<Donation>>((ref) {
-  var realmService = ref.watch(realmProvider);
-  return realmService!.realm.query<Donation>("TRUEPREDICATE SORT(_id ASC)");
-});
 
 class BloodDonationListNewStyle extends ConsumerStatefulWidget {
   static const routeName = "/donations";
