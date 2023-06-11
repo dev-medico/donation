@@ -1,8 +1,10 @@
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
+import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
+import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -148,7 +150,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         body: BloodDonationListNewStyle(),
       ),
       PaneItemSeparator(),
-      PaneItemExpander(
+      PaneItem(
         selectedTileColor: ButtonState.resolveWith((state) {
           if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
           if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
@@ -162,71 +164,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
           titles[3],
           style: smallTextStyle(context),
         ),
-        body: const Text(
-          'ကုန်ပစ္စည်း',
-        ),
-        items: [
-          PaneItem(
-            selectedTileColor: ButtonState.resolveWith((state) {
-              if (state.isPressing)
-                return const Color.fromARGB(39, 52, 46, 226);
-              if (state.isHovering)
-                return const Color.fromARGB(39, 52, 46, 226);
-
-              return null;
-            }),
-            icon: CustomIcon(
-              icon: icons[3],
-            ),
-            title: Text(
-              "ကုန်ပစ္စည်းမျိုးကွဲ",
-              style: smallTextStyle(context),
-            ),
-            body: const Text(
-              'ကုန်ပစ္စည်း',
-            ),
-          ),
-          PaneItem(
-            selectedTileColor: ButtonState.resolveWith((state) {
-              if (state.isPressing)
-                return const Color.fromARGB(39, 52, 46, 226);
-              if (state.isHovering)
-                return const Color.fromARGB(39, 52, 46, 226);
-
-              return null;
-            }),
-            icon: CustomIcon(
-              icon: icons[3],
-            ),
-            title: Text(
-              "ကုန်ပစ္စည်း စုစည်းမှု",
-              style: smallTextStyle(context),
-            ),
-            body: const Text(
-              'ကုန်ပစ္စည်း စုစည်းမှု"',
-            ),
-          ),
-          PaneItem(
-            selectedTileColor: ButtonState.resolveWith((state) {
-              if (state.isPressing)
-                return const Color.fromARGB(39, 52, 46, 226);
-              if (state.isHovering)
-                return const Color.fromARGB(39, 52, 46, 226);
-
-              return null;
-            }),
-            icon: CustomIcon(
-              icon: icons[3],
-            ),
-            title: Text(
-              "လျှော့စျေး",
-              style: smallTextStyle(context),
-            ),
-            body: const Text(
-              'လျှော့စျေး',
-            ),
-          ),
-        ],
+        body: SpecialEventListScreen(),
       ),
       PaneItemSeparator(),
       PaneItem(
@@ -240,12 +178,10 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
           icon: icons[4],
         ),
         title: Text(
-          titles.isEmpty ? "ရောင်းရငွေစာရင်း" : titles[4],
+          titles[4],
           style: smallTextStyle(context),
         ),
-        body: const Text(
-          'ရောင်းရငွေစာရင်း',
-        ),
+        body: DonarList(),
       ),
     ];
   }

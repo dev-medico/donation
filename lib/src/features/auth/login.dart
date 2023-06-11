@@ -321,6 +321,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             (Route<dynamic> route) => false);
       }
     } catch (err) {
+      setState(() {
+        _isLoading = false;
+      });
       Utils.messageDialog(err.toString(), context, "ပြင်ဆင်မည်", Colors.black);
     }
   }
