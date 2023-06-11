@@ -276,27 +276,29 @@ class _SpecialEventListScreenState
             ));
 
     return ExpandableTable(
-      rows: rows,
-      firstHeaderCell: ExpandableTableCell(
-        child: Container(
-            width: Responsive.isMobile(context) ? 80 : 120,
-            color: primaryColor,
-            height: 74,
-            margin: const EdgeInsets.all(1),
-            child: const Center(
-                child: Text(
-              'ရက်စွဲ',
-              style: TextStyle(fontSize: 15, color: Colors.white),
-            ))),
+      controller: ExpandableTableController(
+        rows: rows,
+        firstHeaderCell: ExpandableTableCell(
+          child: Container(
+              width: Responsive.isMobile(context) ? 80 : 120,
+              color: primaryColor,
+              height: 74,
+              margin: const EdgeInsets.all(1),
+              child: const Center(
+                  child: Text(
+                'ရက်စွဲ',
+                style: TextStyle(fontSize: 15, color: Colors.white),
+              ))),
+        ),
+        headers: header,
+        defaultsColumnWidth: Responsive.isMobile(context)
+            ? MediaQuery.of(context).size.width * 0.23
+            : MediaQuery.of(context).size.width * 0.135,
+        defaultsRowHeight: 48,
+        headerHeight: 74,
+        firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
+        scrollShadowColor: Colors.grey,
       ),
-      headers: header,
-      defaultsColumnWidth: Responsive.isMobile(context)
-          ? MediaQuery.of(context).size.width * 0.23
-          : MediaQuery.of(context).size.width * 0.135,
-      defaultsRowHeight: 48,
-      headerHeight: 74,
-      firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
-      scrollShadowColor: Colors.grey,
     );
   }
 

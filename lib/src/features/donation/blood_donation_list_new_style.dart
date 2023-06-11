@@ -354,8 +354,8 @@ class _BloodDonationListNewStyleState
                             child: Container(
                               width: Responsive.isMobile(context)
                                   ? MediaQuery.of(context).size.width / 5
-                                  : MediaQuery.of(context).size.width / 15,
-                              height: 50,
+                                  : MediaQuery.of(context).size.width / 17,
+                              height: 42,
                               decoration: shadowDecorationOnlyTop(
                                   rangesSelect[index]
                                       ? Colors.red.withOpacity(0.6)
@@ -364,7 +364,7 @@ class _BloodDonationListNewStyleState
                                   child: Text(
                                 ranges[index],
                                 style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: rangesSelect[index]
                                         ? Colors.white
@@ -478,11 +478,11 @@ class _BloodDonationListNewStyleState
                       );
                     },
                     selectedTextStyle: TextStyle(
-                        fontSize: 15,
+                        fontSize: 14,
                         color: primaryColor,
                         fontWeight: FontWeight.bold),
                     unselectedTextStyle:
-                        const TextStyle(fontSize: 14, color: Colors.black),
+                        const TextStyle(fontSize: 13, color: Colors.black),
                     tabs: Responsive.isMobile(context) ? monthsMobile : months,
                     children: [
                       Container(

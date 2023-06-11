@@ -225,8 +225,8 @@ class _DonarListState extends State<DonarList> {
                             child: Container(
                               width: Responsive.isMobile(context)
                                   ? MediaQuery.of(context).size.width / 5
-                                  : MediaQuery.of(context).size.width / 14,
-                              height: 50,
+                                  : MediaQuery.of(context).size.width / 15,
+                              height: 44,
                               decoration: shadowDecorationOnlyTop(
                                   rangesSelect[index]
                                       ? Colors.red.withOpacity(0.6)
@@ -235,7 +235,7 @@ class _DonarListState extends State<DonarList> {
                                   child: Text(
                                 ranges[index],
                                 style: TextStyle(
-                                    fontSize: 17,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                     color: rangesSelect[index]
                                         ? Colors.white
@@ -277,7 +277,7 @@ class _DonarListState extends State<DonarList> {
                                         "နှစ်ချုပ်စာရင်း",
                                         textScaleFactor: 1.0,
                                         style: TextStyle(
-                                            fontSize: 15.0,
+                                            fontSize: 14.0,
                                             color: Colors.white),
                                       )),
                                 ],
@@ -314,7 +314,7 @@ class _DonarListState extends State<DonarList> {
                       );
                     },
                     selectedTextStyle: TextStyle(
-                        fontSize: 15,
+                        fontSize: 14,
                         color: primaryColor,
                         fontWeight: FontWeight.bold),
                     unselectedTextStyle:
