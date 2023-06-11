@@ -1,6 +1,4 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation/realm/app_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
@@ -270,39 +268,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     //       print("Unknown error.");
     //   }
     // }
-    CollectionReference admins = FirebaseFirestore.instance.collection('admin');
-    bool auth = false;
-    admins.get().then((value) {
-      for (var element in value.docs) {
-        log(element.data().toString());
-        final data = element.data() as Map<String, dynamic>;
-        log(data["email"]);
-        log(data["password"]);
-        if (data["email"] == email.text.toString() &&
-            data["password"] == password.text.toString()) {
-          prefs.setString("name", data["name"]);
-          prefs.setString("email", data["email"]);
-          prefs.setString("role", data["role"]);
-          setState(() {
-            auth = true;
-          });
-        }
-      }
+    // CollectionReference admins = FirebaseFirestore.instance.collection('admin');
+    // bool auth = false;
+    // admins.get().then((value) {
+    //   for (var element in value.docs) {
+    //     log(element.data().toString());
+    //     final data = element.data() as Map<String, dynamic>;
+    //     log(data["email"]);
+    //     log(data["password"]);
+    //     if (data["email"] == email.text.toString() &&
+    //         data["password"] == password.text.toString()) {
+    //       prefs.setString("name", data["name"]);
+    //       prefs.setString("email", data["email"]);
+    //       prefs.setString("role", data["role"]);
+    //       setState(() {
+    //         auth = true;
+    //       });
+    //     }
+    //   }
 
-      if (auth) {
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.pushNamedAndRemoveUntil(context, MobileHomeScreen.routeName,
-            (Route<dynamic> route) => false);
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-        Utils.messageDialog(
-            "အချက်အလက်မှားယွင်းနေပါသည်", context, "ပြင်ဆင်မည်", Colors.black);
-      }
-    });
+    //   if (auth) {
+    //     setState(() {
+    //       _isLoading = false;
+    //     });
+    //     Navigator.pushNamedAndRemoveUntil(context, MobileHomeScreen.routeName,
+    //         (Route<dynamic> route) => false);
+    //   } else {
+    //     setState(() {
+    //       _isLoading = false;
+    //     });
+    //     Utils.messageDialog(
+    //         "အချက်အလက်မှားယွင်းနေပါသည်", context, "ပြင်ဆင်မည်", Colors.black);
+    //   }
+    // });
   }
 
   realmLogin() async {

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -53,7 +52,6 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
   String regional = " ";
   String post_code = " ";
   bool _isLoading = false;
-  late FirebaseFirestore firestore;
   late TownshipResponse townshipResponse;
   List<String> townships = <String>[];
   List<String> townshipsSelected = <String>[];
@@ -80,12 +78,7 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
     initial();
   }
 
-  CollectionReference members =
-      FirebaseFirestore.instance.collection('members');
-
   void initial() async {
-    firestore = FirebaseFirestore.instance;
-
     nameController.text = data.name!;
     fatherNameController.text = data.fatherName!;
     nrcController.text = data.nrc!;
@@ -921,66 +914,66 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
   }
 
   getAutoIncrementKey(String memberId) {
-    setState(() {
-      _isLoading = true;
-    });
-    DocumentReference documentReference =
-        FirebaseFirestore.instance.collection('members').doc(memberId);
+    // setState(() {
+    //   _isLoading = true;
+    // });
+    // DocumentReference documentReference =
+    //     FirebaseFirestore.instance.collection('members').doc(memberId);
 
-    return FirebaseFirestore.instance.runTransaction((transaction) async {
-      // Get the document
-      DocumentSnapshot snapshot = await transaction.get(documentReference);
-      // Perform an update on the document
-      transaction.update(documentReference, {
-        'member_id': memberId,
-        'name': nameController.text.toString(),
-        'father_name': fatherNameController.text.toString(),
-        'birth_date': birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
-        'nrc': nrcController.text.toString() != ""
-            ? nrcController.text.toString()
-            : "-",
-        'phone': phoneController.text.toString(),
-        'blood_type': selectedBloodType,
-        'blood_bank_card': bloodBankNoController.text.toString() != ""
-            ? bloodBankNoController.text.toString()
-            : "-",
-        'total_count': totalDonationController.text.toString() != ""
-            ? totalDonationController.text.toString()
-            : "0",
-        'note': noteController.text.toString() != ""
-            ? noteController.text.toString()
-            : "-",
-        'home_no': homeNoController.text.toString(),
-        'street': streetController.text.toString(),
-        'quarter': quarterController.text.toString(),
-        'town': townController.text.toString(),
-        'region': region1,
-      });
+    // return FirebaseFirestore.instance.runTransaction((transaction) async {
+    //   // Get the document
+    //   DocumentSnapshot snapshot = await transaction.get(documentReference);
+    //   // Perform an update on the document
+    //   transaction.update(documentReference, {
+    //     'member_id': memberId,
+    //     'name': nameController.text.toString(),
+    //     'father_name': fatherNameController.text.toString(),
+    //     'birth_date': birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
+    //     'nrc': nrcController.text.toString() != ""
+    //         ? nrcController.text.toString()
+    //         : "-",
+    //     'phone': phoneController.text.toString(),
+    //     'blood_type': selectedBloodType,
+    //     'blood_bank_card': bloodBankNoController.text.toString() != ""
+    //         ? bloodBankNoController.text.toString()
+    //         : "-",
+    //     'total_count': totalDonationController.text.toString() != ""
+    //         ? totalDonationController.text.toString()
+    //         : "0",
+    //     'note': noteController.text.toString() != ""
+    //         ? noteController.text.toString()
+    //         : "-",
+    //     'home_no': homeNoController.text.toString(),
+    //     'street': streetController.text.toString(),
+    //     'quarter': quarterController.text.toString(),
+    //     'town': townController.text.toString(),
+    //     'region': region1,
+    //   });
 
-      // Return the new count
-      return true;
-    }).then((value) {
-      print("Member updated to $value");
-      setState(() {
-        _isLoading = false;
-      });
-      Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
-          context, "အိုကေ", Colors.black);
-      nameController.clear();
-      fatherNameController.clear();
-      nrcController.clear();
-      phoneController.clear();
-      selectedBloodType = "သွေးအုပ်စု";
-      bloodBankNoController.clear();
-      totalDonationController.clear();
-      homeNoController.clear();
-      streetController.clear();
-      quarterController.clear();
-      townController.clear();
-      region1 = "";
-      regional = "";
-      noteController.clear();
-    }).catchError((error) => print("Failed to update Member: $error"));
+    //   // Return the new count
+    //   return true;
+    // }).then((value) {
+    //   print("Member updated to $value");
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    //   Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
+    //       context, "အိုကေ", Colors.black);
+    //   nameController.clear();
+    //   fatherNameController.clear();
+    //   nrcController.clear();
+    //   phoneController.clear();
+    //   selectedBloodType = "သွေးအုပ်စု";
+    //   bloodBankNoController.clear();
+    //   totalDonationController.clear();
+    //   homeNoController.clear();
+    //   streetController.clear();
+    //   quarterController.clear();
+    //   townController.clear();
+    //   region1 = "";
+    //   regional = "";
+    //   noteController.clear();
+    // }).catchError((error) => print("Failed to update Member: $error"));
   }
 
   showDatePicker() async {

@@ -1,10 +1,10 @@
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
+import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:donation/responsive.dart';
 
 import '../../donar/donar_list.dart';
 import '../../donation/blood_donation_list_new_style.dart';
-import '../../special_event/event_list.dart';
 
 class DashboardCard extends StatelessWidget {
   int index;
@@ -55,7 +55,8 @@ class DashboardCard extends StatelessWidget {
                   context, BloodDonationListNewStyle.routeName);
               onTap.call();
             } else if (index == 2) {
-              await Navigator.pushNamed(context, EventListScreen.routeName);
+              await Navigator.pushNamed(
+                  context, SpecialEventListScreen.routeName);
               onTap.call();
             } else if (index == 3) {
               await Navigator.pushNamed(context, DonarList.routeName);

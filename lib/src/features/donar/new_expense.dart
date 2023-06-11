@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
@@ -27,7 +27,7 @@ class NewDonarState extends State<NewExpense> {
   String operatorImg = "";
 
   bool _isLoading = false;
-  late FirebaseFirestore firestore;
+  //late FirebaseFirestore firestore;
 
   @override
   void initState() {
@@ -35,28 +35,28 @@ class NewDonarState extends State<NewExpense> {
     initial();
   }
 
-  CollectionReference members =
-      FirebaseFirestore.instance.collection('expenses');
+  // CollectionReference members =
+  //     FirebaseFirestore.instance.collection('expenses');
 
-  Future<void> addExpense(String amount, String date) {
-    return members.add({
-      'amount': amount,
-      'date': date,
-    }).then((value) {
-      setState(() {
-        _isLoading = true;
-      });
-      Utils.messageSuccessDialog(
-          "ယခုလအတွက် အသုံးစာရင်း အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-          context,
-          "အိုကေ",
-          Colors.black);
-      amountController.clear();
-    }).catchError((error) {});
-  }
+  // Future<void> addExpense(String amount, String date) {
+  //   return members.add({
+  //     'amount': amount,
+  //     'date': date,
+  //   }).then((value) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     Utils.messageSuccessDialog(
+  //         "ယခုလအတွက် အသုံးစာရင်း အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+  //         context,
+  //         "အိုကေ",
+  //         Colors.black);
+  //     amountController.clear();
+  //   }).catchError((error) {});
+  // }
 
   void initial() async {
-    firestore = FirebaseFirestore.instance;
+    // firestore = FirebaseFirestore.instance;
   }
 
   @override
@@ -149,21 +149,21 @@ class NewDonarState extends State<NewExpense> {
                             String expenseMonth =
                                 DateFormat('MMM yyyy').format(date);
                             log(expenseMonth);
-                            FirebaseFirestore.instance
-                                .collection('expenses')
-                                .where('date',
-                                    isEqualTo: expenseMonth.toString())
-                                .get()
-                                .then((value) {
-                              if (value.docs.isEmpty) {
-                                addExpense(
-                                  amountController.text.toString(),
-                                  expenseMonth.toString(),
-                                );
-                              } else {
-                                expenseExistDialog(context);
-                              }
-                            });
+                            // FirebaseFirestore.instance
+                            //     .collection('expenses')
+                            //     .where('date',
+                            //         isEqualTo: expenseMonth.toString())
+                            //     .get()
+                            //     .then((value) {
+                            //   if (value.docs.isEmpty) {
+                            //     addExpense(
+                            //       amountController.text.toString(),
+                            //       expenseMonth.toString(),
+                            //     );
+                            //   } else {
+                            //     expenseExistDialog(context);
+                            //   }
+                            // });
                           } else {
                             Utils.messageDialog(
                                 "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",

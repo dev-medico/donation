@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -58,7 +58,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   String regional = " ";
   String post_code = " ";
   bool _isLoading = false;
-  late FirebaseFirestore firestore;
+  //late FirebaseFirestore firestore;
   late TownshipResponse townshipResponse;
   List<String> townships = <String>[];
   List<String> townshipsSelected = <String>[];
@@ -108,14 +108,6 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   }
 
   void initial() async {
-    firestore = FirebaseFirestore.instance;
-    firestore.collection('member_count').doc("manual").get().then((value) {
-      setState(() {
-        editable = value['editable'];
-      });
-      print(editable);
-    });
-
     final String response =
         await rootBundle.loadString('assets/json/township.json');
     townshipResponse = TownshipResponse.fromJson(json.decode(response));
@@ -250,28 +242,28 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                               behavior:
                                                   HitTestBehavior.translucent,
                                               onTap: () {
-                                                FirebaseFirestore.instance
-                                                    .collection('members')
-                                                    .where('name',
-                                                        isEqualTo:
-                                                            nameController.text
-                                                                .toString())
-                                                    .get()
-                                                    .then((value) {
-                                                  if (value.docs.isEmpty) {
-                                                    setState(() {
-                                                      nameChecked = true;
-                                                    });
-                                                  } else {
-                                                    Map<String, dynamic> data =
-                                                        value.docs.first.data();
-                                                    memberExistDialog(
-                                                        context,
-                                                        nameController.text
-                                                            .toString(),
-                                                        data);
-                                                  }
-                                                });
+                                                // FirebaseFirestore.instance
+                                                //     .collection('members')
+                                                //     .where('name',
+                                                //         isEqualTo:
+                                                //             nameController.text
+                                                //                 .toString())
+                                                //     .get()
+                                                //     .then((value) {
+                                                //   if (value.docs.isEmpty) {
+                                                //     setState(() {
+                                                //       nameChecked = true;
+                                                //     });
+                                                //   } else {
+                                                //     Map<String, dynamic> data =
+                                                //         value.docs.first.data();
+                                                //     memberExistDialog(
+                                                //         context,
+                                                //         nameController.text
+                                                //             .toString(),
+                                                //         data);
+                                                //   }
+                                                // });
                                               },
                                               child: Padding(
                                                 padding: const EdgeInsets.only(
@@ -638,27 +630,27 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  FirebaseFirestore.instance
-                                      .collection('members')
-                                      .where('name',
-                                          isEqualTo:
-                                              nameController.text.toString())
-                                      .where('father_name',
-                                          isEqualTo: fatherNameController.text
-                                              .toString())
-                                      .where('blood_type',
-                                          isEqualTo: selectedBloodType)
-                                      .get()
-                                      .then((value) {
-                                    if (value.docs.isEmpty) {
-                                      getAutoIncrementKey();
-                                    } else {
-                                      Map<String, dynamic> data =
-                                          value.docs.first.data();
-                                      memberExistDialog(context,
-                                          nameController.text.toString(), data);
-                                    }
-                                  });
+                                  // FirebaseFirestore.instance
+                                  //     .collection('members')
+                                  //     .where('name',
+                                  //         isEqualTo:
+                                  //             nameController.text.toString())
+                                  //     .where('father_name',
+                                  //         isEqualTo: fatherNameController.text
+                                  //             .toString())
+                                  //     .where('blood_type',
+                                  //         isEqualTo: selectedBloodType)
+                                  //     .get()
+                                  //     .then((value) {
+                                  //   if (value.docs.isEmpty) {
+                                  //     getAutoIncrementKey();
+                                  //   } else {
+                                  //     Map<String, dynamic> data =
+                                  //         value.docs.first.data();
+                                  //     memberExistDialog(context,
+                                  //         nameController.text.toString(), data);
+                                  //   }
+                                  // });
                                 } else {
                                   Utils.messageDialog(
                                       "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
@@ -780,33 +772,33 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                     behavior: HitTestBehavior
                                                         .translucent,
                                                     onTap: () {
-                                                      FirebaseFirestore.instance
-                                                          .collection('members')
-                                                          .where('name',
-                                                              isEqualTo:
-                                                                  nameController
-                                                                      .text
-                                                                      .toString())
-                                                          .get()
-                                                          .then((value) {
-                                                        if (value
-                                                            .docs.isEmpty) {
-                                                          setState(() {
-                                                            nameChecked = true;
-                                                          });
-                                                        } else {
-                                                          Map<String, dynamic>
-                                                              data = value
-                                                                  .docs.first
-                                                                  .data();
-                                                          memberExistDialog(
-                                                              context,
-                                                              nameController
-                                                                  .text
-                                                                  .toString(),
-                                                              data);
-                                                        }
-                                                      });
+                                                      // FirebaseFirestore.instance
+                                                      //     .collection('members')
+                                                      //     .where('name',
+                                                      //         isEqualTo:
+                                                      //             nameController
+                                                      //                 .text
+                                                      //                 .toString())
+                                                      //     .get()
+                                                      //     .then((value) {
+                                                      //   if (value
+                                                      //       .docs.isEmpty) {
+                                                      //     setState(() {
+                                                      //       nameChecked = true;
+                                                      //     });
+                                                      //   } else {
+                                                      //     Map<String, dynamic>
+                                                      //         data = value
+                                                      //             .docs.first
+                                                      //             .data();
+                                                      //     memberExistDialog(
+                                                      //         context,
+                                                      //         nameController
+                                                      //             .text
+                                                      //             .toString(),
+                                                      //         data);
+                                                      //   }
+                                                      // });
                                                     },
                                                     child: Padding(
                                                       padding:
@@ -1323,27 +1315,27 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                 setState(() {
                                   _isLoading = true;
                                 });
-                                FirebaseFirestore.instance
-                                    .collection('members')
-                                    .where('name',
-                                        isEqualTo:
-                                            nameController.text.toString())
-                                    .where('father_name',
-                                        isEqualTo: fatherNameController.text
-                                            .toString())
-                                    .where('blood_type',
-                                        isEqualTo: selectedBloodType)
-                                    .get()
-                                    .then((value) {
-                                  if (value.docs.isEmpty) {
-                                    getAutoIncrementKey();
-                                  } else {
-                                    Map<String, dynamic> data =
-                                        value.docs.first.data();
-                                    memberExistDialog(context,
-                                        nameController.text.toString(), data);
-                                  }
-                                });
+                                // FirebaseFirestore.instance
+                                //     .collection('members')
+                                //     .where('name',
+                                //         isEqualTo:
+                                //             nameController.text.toString())
+                                //     .where('father_name',
+                                //         isEqualTo: fatherNameController.text
+                                //             .toString())
+                                //     .where('blood_type',
+                                //         isEqualTo: selectedBloodType)
+                                //     .get()
+                                //     .then((value) {
+                                //   if (value.docs.isEmpty) {
+                                //     getAutoIncrementKey();
+                                //   } else {
+                                //     Map<String, dynamic> data =
+                                //         value.docs.first.data();
+                                //     memberExistDialog(context,
+                                //         nameController.text.toString(), data);
+                                //   }
+                                // });
                               } else {
                                 Utils.messageDialog(
                                     "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
@@ -1597,118 +1589,118 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
             "ပြင်ဆင်မည်", Colors.black);
       }
     } else {
-      DocumentReference documentReference = FirebaseFirestore.instance
-          .collection('member_count')
-          .doc("increment");
+      // DocumentReference documentReference = FirebaseFirestore.instance
+      //     .collection('member_count')
+      //     .doc("increment");
 
-      return FirebaseFirestore.instance
-          .runTransaction((transaction) async {
-            // Get the document
-            DocumentSnapshot snapshot =
-                await transaction.get(documentReference);
+      // return FirebaseFirestore.instance
+      //     .runTransaction((transaction) async {
+      //       // Get the document
+      //       DocumentSnapshot snapshot =
+      //           await transaction.get(documentReference);
 
-            int newCount = 0;
-            if (!snapshot.exists) {
-              newCount = 1;
-            } else {
-              print(snapshot.data());
-              Map<String, dynamic> data =
-                  snapshot.data()! as Map<String, dynamic>;
-              print(data);
-              newCount = int.parse(data['count'].toString()) + 1;
-            }
-            // Perform an update on the document
-            transaction.update(documentReference, {'count': newCount});
-            setState(() {
-              id = newCount;
-            });
+      //       int newCount = 0;
+      //       if (!snapshot.exists) {
+      //         newCount = 1;
+      //       } else {
+      //         print(snapshot.data());
+      //         Map<String, dynamic> data =
+      //             snapshot.data()! as Map<String, dynamic>;
+      //         print(data);
+      //         newCount = int.parse(data['count'].toString()) + 1;
+      //       }
+      //       // Perform an update on the document
+      //       transaction.update(documentReference, {'count': newCount});
+      //       setState(() {
+      //         id = newCount;
+      //       });
 
-            NumberFormat formatter = NumberFormat("0000");
-            String memberId = "";
-            if (id <= 1000) {
-              memberId = "A-${formatter.format(id)}";
-            } else if (id <= 2000) {
-              memberId = "B-${formatter.format((id - 1000))}";
-            } else if (id <= 3000) {
-              memberId = "C-${formatter.format((id - 2000))}";
-            } else if (id <= 4000) {
-              memberId = "D-${formatter.format((id - 3000))}";
-            } else if (id <= 5000) {
-              memberId = "E-${formatter.format((id - 4000))}";
-            } else if (id <= 6000) {
-              memberId = "F-${formatter.format((id - 5000))}";
-            } else if (id <= 7000) {
-              memberId = "G-${formatter.format((id - 6000))}";
-            } else if (id <= 8000) {
-              memberId = "H-${formatter.format((id - 7000))}";
-            } else if (id <= 9000) {
-              memberId = "I-${formatter.format((id - 8000))}";
-            } else if (id <= 10000) {
-              memberId = "J-${formatter.format((id - 9000))}";
-            } else if (id <= 11000) {
-              memberId = "K-${formatter.format((id - 10000))}";
-            } else if (id <= 12000) {
-              memberId = "L-${formatter.format((id - 11000))}";
-            } else if (id <= 13000) {
-              memberId = "M-${formatter.format((id - 12000))}";
-            } else if (id <= 14000) {
-              memberId = "N-${formatter.format((id - 13000))}";
-            } else if (id <= 15000) {
-              memberId = "O-${formatter.format((id - 14000))}";
-            } else if (id <= 16000) {
-              memberId = "P-${formatter.format((id - 15000))}";
-            } else if (id <= 17000) {
-              memberId = "Q-${formatter.format((id - 16000))}";
-            } else if (id <= 18000) {
-              memberId = "R-${formatter.format((id - 17000))}";
-            } else if (id <= 19000) {
-              memberId = "S-${formatter.format((id - 18000))}";
-            } else if (id <= 20000) {
-              memberId = "T-${formatter.format((id - 19000))}";
-            } else if (id <= 21000) {
-              memberId = "U-${formatter.format((id - 20000))}";
-            } else if (id <= 22000) {
-              memberId = "V-${formatter.format((id - 21000))}";
-            } else if (id <= 23000) {
-              memberId = "W-${formatter.format((id - 22000))}";
-            } else if (id <= 24000) {
-              memberId = "X-${formatter.format((id - 23000))}";
-            } else if (id <= 25000) {
-              memberId = "Y-${formatter.format((id - 24000))}";
-            } else if (id <= 26000) {
-              memberId = "Z-${formatter.format((id - 25000))}";
-            }
+      //       NumberFormat formatter = NumberFormat("0000");
+      //       String memberId = "";
+      //       if (id <= 1000) {
+      //         memberId = "A-${formatter.format(id)}";
+      //       } else if (id <= 2000) {
+      //         memberId = "B-${formatter.format((id - 1000))}";
+      //       } else if (id <= 3000) {
+      //         memberId = "C-${formatter.format((id - 2000))}";
+      //       } else if (id <= 4000) {
+      //         memberId = "D-${formatter.format((id - 3000))}";
+      //       } else if (id <= 5000) {
+      //         memberId = "E-${formatter.format((id - 4000))}";
+      //       } else if (id <= 6000) {
+      //         memberId = "F-${formatter.format((id - 5000))}";
+      //       } else if (id <= 7000) {
+      //         memberId = "G-${formatter.format((id - 6000))}";
+      //       } else if (id <= 8000) {
+      //         memberId = "H-${formatter.format((id - 7000))}";
+      //       } else if (id <= 9000) {
+      //         memberId = "I-${formatter.format((id - 8000))}";
+      //       } else if (id <= 10000) {
+      //         memberId = "J-${formatter.format((id - 9000))}";
+      //       } else if (id <= 11000) {
+      //         memberId = "K-${formatter.format((id - 10000))}";
+      //       } else if (id <= 12000) {
+      //         memberId = "L-${formatter.format((id - 11000))}";
+      //       } else if (id <= 13000) {
+      //         memberId = "M-${formatter.format((id - 12000))}";
+      //       } else if (id <= 14000) {
+      //         memberId = "N-${formatter.format((id - 13000))}";
+      //       } else if (id <= 15000) {
+      //         memberId = "O-${formatter.format((id - 14000))}";
+      //       } else if (id <= 16000) {
+      //         memberId = "P-${formatter.format((id - 15000))}";
+      //       } else if (id <= 17000) {
+      //         memberId = "Q-${formatter.format((id - 16000))}";
+      //       } else if (id <= 18000) {
+      //         memberId = "R-${formatter.format((id - 17000))}";
+      //       } else if (id <= 19000) {
+      //         memberId = "S-${formatter.format((id - 18000))}";
+      //       } else if (id <= 20000) {
+      //         memberId = "T-${formatter.format((id - 19000))}";
+      //       } else if (id <= 21000) {
+      //         memberId = "U-${formatter.format((id - 20000))}";
+      //       } else if (id <= 22000) {
+      //         memberId = "V-${formatter.format((id - 21000))}";
+      //       } else if (id <= 23000) {
+      //         memberId = "W-${formatter.format((id - 22000))}";
+      //       } else if (id <= 24000) {
+      //         memberId = "X-${formatter.format((id - 23000))}";
+      //       } else if (id <= 25000) {
+      //         memberId = "Y-${formatter.format((id - 24000))}";
+      //       } else if (id <= 26000) {
+      //         memberId = "Z-${formatter.format((id - 25000))}";
+      //       }
 
-            MemberService(MemberRepository(ref)).addMember(
-              memberIDController.text.toString(),
-              nameController.text.toString(),
-              fatherNameController.text.toString(),
-              birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
-              _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
-              phoneController.text.toString(),
-              selectedBloodType,
-              bloodBankNoController.text.toString() != ""
-                  ? bloodBankNoController.text.toString()
-                  : "-",
-              totalDonationController.text.toString(),
-              "0",
-              homeNoController.text.toString() +
-                  " ၊ " +
-                  streetController.text.toString() +
-                  " ၊ " +
-                  quarterController.text.toString() +
-                  " ၊ " +
-                  townController.text.toString() +
-                  " ၊ " +
-                  region1,
-              noteController.text.toString(),
-            );
+      //       MemberService(MemberRepository(ref)).addMember(
+      //         memberIDController.text.toString(),
+      //         nameController.text.toString(),
+      //         fatherNameController.text.toString(),
+      //         birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
+      //         _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
+      //         phoneController.text.toString(),
+      //         selectedBloodType,
+      //         bloodBankNoController.text.toString() != ""
+      //             ? bloodBankNoController.text.toString()
+      //             : "-",
+      //         totalDonationController.text.toString(),
+      //         "0",
+      //         homeNoController.text.toString() +
+      //             " ၊ " +
+      //             streetController.text.toString() +
+      //             " ၊ " +
+      //             quarterController.text.toString() +
+      //             " ၊ " +
+      //             townController.text.toString() +
+      //             " ၊ " +
+      //             region1,
+      //         noteController.text.toString(),
+      //       );
 
-            return newCount;
-          })
-          .then((value) => print("Follower count updated to $value"))
-          .catchError(
-              (error) => print("Failed to update user followers: $error"));
+      //       return newCount;
+      //     })
+      //     .then((value) => print("Follower count updated to $value"))
+      //     .catchError(
+      //         (error) => print("Failed to update user followers: $error"));
     }
   }
 

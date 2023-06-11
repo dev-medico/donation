@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:flutter/services.dart';
@@ -55,7 +55,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
   String regional = " ";
   String post_code = " ";
   bool _isLoading = false;
-  late FirebaseFirestore firestore;
+  //late FirebaseFirestore firestore;
   late TownshipResponse townshipResponse;
   List<String> townships = <String>[];
   List<String> townshipsSelected = <String>[];

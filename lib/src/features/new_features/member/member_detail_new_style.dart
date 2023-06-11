@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:donation/data/response/member_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/new_features/member/member_edit_new_style.dart';
@@ -23,35 +21,7 @@ class _MemberDetailNewStyleScreenState
     extends State<MemberDetailNewStyleScreen> {
   MemberData data;
   _MemberDetailNewStyleScreenState(this.data);
-  late Stream<QuerySnapshot> _usersStream;
   int groupTotalCount = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchCount();
-    _usersStream = FirebaseFirestore.instance
-        .collection('blood_donations')
-        .where("member_id", isEqualTo: data.memberId)
-        .orderBy("date_detail")
-        .snapshots();
-  }
-
-  fetchCount() {
-    print("Fetch Count called");
-    //get count of snapshots doc from firestore
-    FirebaseFirestore.instance
-        .collection('blood_donations')
-        .where("member_id", isEqualTo: data.memberId)
-        .orderBy("date_detail")
-        .get()
-        .then((value) {
-      print("Count: ${value.docs.length}");
-      setState(() {
-        groupTotalCount = value.docs.length;
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1047,62 +1017,62 @@ class _MemberDetailNewStyleScreenState
               const SizedBox(
                 height: 12,
               ),
-              StreamBuilder<QuerySnapshot>(
-                stream: _usersStream,
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return const Text('Something went wrong');
-                  }
+              // StreamBuilder<QuerySnapshot>(
+              //   stream: _usersStream,
+              //   builder: (BuildContext context,
+              //       AsyncSnapshot<QuerySnapshot> snapshot) {
+              //     if (snapshot.hasError) {
+              //       return const Text('Something went wrong');
+              //     }
 
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: SpinKitCircle(
-                        color: Colors.white,
-                        size: 60.0,
-                      ),
-                    );
-                  }
+              //     if (snapshot.connectionState == ConnectionState.waiting) {
+              //       return const Center(
+              //         child: SpinKitCircle(
+              //           color: Colors.white,
+              //           size: 60.0,
+              //         ),
+              //       );
+              //     }
 
-                  return ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    children: [
-                      SizedBox(
-                        height: snapshot.data!.docs.length > 8
-                            ? MediaQuery.of(context).size.height *
-                                (snapshot.data!.docs.length / 8)
-                            : MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width * 2.5,
-                        child: ListView(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                header(),
-                                Column(
-                                  // shrinkWrap: true,
-                                  // scrollDirection: Axis.vertical,
-                                  children: snapshot.data!.docs
-                                      .map((DocumentSnapshot document) {
-                                    Map<String, dynamic> data = document.data()!
-                                        as Map<String, dynamic>;
+              //     return ListView(
+              //       shrinkWrap: true,
+              //       physics: const NeverScrollableScrollPhysics(),
+              //       scrollDirection: Axis.vertical,
+              //       children: [
+              //         SizedBox(
+              //           height: snapshot.data!.docs.length > 8
+              //               ? MediaQuery.of(context).size.height *
+              //                   (snapshot.data!.docs.length / 8)
+              //               : MediaQuery.of(context).size.height,
+              //           width: MediaQuery.of(context).size.width * 2.5,
+              //           child: ListView(
+              //             shrinkWrap: true,
+              //             scrollDirection: Axis.horizontal,
+              //             children: [
+              //               Column(
+              //                 crossAxisAlignment: CrossAxisAlignment.start,
+              //                 children: [
+              //                   header(),
+              //                   Column(
+              //                     // shrinkWrap: true,
+              //                     // scrollDirection: Axis.vertical,
+              //                     children: snapshot.data!.docs
+              //                         .map((DocumentSnapshot document) {
+              //                       Map<String, dynamic> data = document.data()!
+              //                           as Map<String, dynamic>;
 
-                                    return blood_donationRow(data, document.id);
-                                  }).toList(),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              )
+              //                       return blood_donationRow(data, document.id);
+              //                     }).toList(),
+              //                   ),
+              //                 ],
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       ],
+              //     );
+              //   },
+              // )
             ],
           )
         ],
@@ -1248,11 +1218,6 @@ class _MemberDetailNewStyleScreenState
         //     ),
         //   ),
         // );
-        _usersStream = FirebaseFirestore.instance
-            .collection('blood_donations')
-            .where("member_id", isEqualTo: data['member_id'])
-            .orderBy("date_detail")
-            .snapshots();
       },
       child: Container(
         height: Responsive.isMobile(context) ? 60 : 60,
