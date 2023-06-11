@@ -79,10 +79,10 @@ flutter:
 
 msix_config:
   display_name: Safe Blood
-  publisher: CN=7CE8207B-1F21-4956-8CDC-1A8029A0BC59
+  #publisher: CN=7CE8207B-1F21-4956-8CDC-1A8029A0BC59
   publisher_display_name: Za Information Technology Co.,Ltd.
   identity_name: ZaInformationTechnologyCo.POSGlobalMarketplace
   msix_version: 1.0.0.0
-  logo_path: C:\Users\Administrator\Desktop\Projects\blood_donation\ic_launcher.png
-  certificate_path: C:\Users\Administrator\Desktop\MyCert.pfx
-  certificate_password: zatest
+  logo_path: C:\Users\Administrator\Desktop\ic_launcher.png
+  #certificate_path: C:\Users\Administrator\Desktop\MyCert.pfx
+  #certificate_password: zatest
