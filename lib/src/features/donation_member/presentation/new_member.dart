@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 // import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:donation/realm/realm_services.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -11,8 +12,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
 import 'package:donation/responsive.dart';
-import 'package:donation/src/features/donation_member/application/service.dart';
-import 'package:donation/src/features/donation_member/data/respository.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
@@ -1559,28 +1558,28 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
     if (editable && memberIDController.text.toString().isNotEmpty) {
       if (memberIDController.text.toString().contains("-") &&
           memberIDController.text.toString().length == 6) {
-        MemberService(MemberRepository(ref)).addMember(
-          memberIDController.text.toString(),
-          nameController.text.toString(),
-          fatherNameController.text.toString(),
-          birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
-          _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
-          phoneController.text.toString(),
-          selectedBloodType,
-          bloodBankNoController.text.toString() != ""
-              ? bloodBankNoController.text.toString()
-              : "-",
-          totalDonationController.text.toString(),
-          "0",
-          homeNoController.text.toString() +
-              " ၊ " +
-              streetController.text.toString() +
-              " ၊ " +
-              quarterController.text.toString() +
-              " ၊ " +
-              townController.text.toString(),
-          noteController.text.toString(),
-        );
+        ref.watch(realmProvider)!.createMember(
+              memberId: memberIDController.text.toString(),
+              name: nameController.text.toString(),
+              fatherName: fatherNameController.text.toString(),
+              birthDate: birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
+              nrc: _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
+              phone: phoneController.text.toString(),
+              bloodType: selectedBloodType,
+              bloodBankCard: bloodBankNoController.text.toString() != ""
+                  ? bloodBankNoController.text.toString()
+                  : "-",
+              totalCount: totalDonationController.text.toString(),
+              memberCount: "0",
+              address: homeNoController.text.toString() +
+                  " ၊ " +
+                  streetController.text.toString() +
+                  " ၊ " +
+                  quarterController.text.toString() +
+                  " ၊ " +
+                  townController.text.toString(),
+              note: noteController.text.toString(),
+            );
       } else {
         setState(() {
           _isLoading = false;

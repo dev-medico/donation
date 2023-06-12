@@ -1,12 +1,13 @@
+import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:donation/responsive.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../donar/donar_list.dart';
-import '../../donation/blood_donation_list_new_style.dart';
 
-class DashboardCard extends StatelessWidget {
+class DashboardCard extends ConsumerWidget {
   int index;
   Color color;
   String title;
@@ -27,7 +28,7 @@ class DashboardCard extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Expanded(
       child: Container(
         height: Responsive.isMobile(context)
@@ -48,9 +49,17 @@ class DashboardCard extends StatelessWidget {
           ),
           onPressed: () async {
             if (index == 0) {
+              // ref.watch(membersProvider).forEach((element) {
+              //   ref.watch(realmProvider)!.deleteMember(element);
+              // });
+              // await Navigator.pushNamed(
+              //     context, MemberListBackupScreen.routeName);
               await Navigator.pushNamed(context, MemberListScreen.routeName);
               onTap.call();
             } else if (index == 1) {
+              // ref.watch(donationsProvider).forEach((element) {
+              //   ref.watch(realmProvider)!.deleteDonation(element);
+              // });
               await Navigator.pushNamed(
                   context, BloodDonationListNewStyle.routeName);
               onTap.call();

@@ -1,4 +1,5 @@
 import 'package:donation/realm/realm_services.dart';
+import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -66,6 +67,9 @@ class _MyAppState extends ConsumerState<MyApp> {
                 return const MobileHomeScreen();
               case MemberListScreen.routeName:
                 return const MemberListScreen();
+
+              case MemberListBackupScreen.routeName:
+                return const MemberListBackupScreen();
 
               case BloodDonationListNewStyle.routeName:
                 return const BloodDonationListNewStyle();

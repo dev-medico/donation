@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:realm/realm.dart';
 
 final appServiceProvider = ChangeNotifierProvider<AppServices>((ref) {
-  String appId = "application-0-gxdza";
+  String appId = "application-0-yjtha";
   Uri baseUrl = Uri.parse("https://realm.mongodb.com");
   return AppServices(appId, baseUrl);
 });

@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'dart:developer';
 
+import 'package:donation/data/repository/repository.dart';
+import 'package:donation/data/response/xata_donation_list_response.dart';
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donation/controller/donation_provider.dart';
+import 'package:donation/src/providers/providers.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/responsive.dart';
@@ -10,11 +14,9 @@ import 'package:donation/src/features/donation/donation_data_source.dart';
 import 'package:donation/src/features/donation/new_blood_donation.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
-import 'package:realm/realm.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
-
-
+import 'package:intl/intl.dart';
 
 class BloodDonationListNewStyle extends ConsumerStatefulWidget {
   static const routeName = "/donations";
@@ -133,97 +135,101 @@ class _BloodDonationListNewStyleState
     // callAPI("");
   }
 
-  // callAPI(String after) {
-  //   if (after.isEmpty) {
-  //     setState(() {
-  //       data = [];
-  //     });
-  //   }
-  //   XataRepository().getDonationsList(after).then((response) {
-  //     setState(() {
-  //       data!.addAll(
-  //           XataDonationListResponse.fromJson(jsonDecode(response.body))
-  //               .records!);
-  //     });
+  callAPI(String after) {
+    if (after.isEmpty) {
+      setState(() {
+        data = [];
+      });
+    }
+    XataRepository().getDonationsList(after).then((response) {
+      setState(() {
+        oldData.addAll(
+            XataDonationListResponse.fromJson(jsonDecode(response.body))
+                .records!);
+      });
 
-  //     if (XataDonationListResponse.fromJson(jsonDecode(response.body))
-  //             .meta!
-  //             .page!
-  //             .more ??
-  //         false) {
-  //       callAPI(XataDonationListResponse.fromJson(jsonDecode(response.body))
-  //           .meta!
-  //           .page!
-  //           .cursor!);
-  //     } else {
-  //       log("Data Fully Loaded");
-  //       setState(() {
-  //         dataFullLoaded = true;
-  //       });
-  //       // ref.watch(donationsProvider).forEach((element) {
-  //       //   ref.watch(realmProvider)!.deleteDonation(element);
-  //       // });
+      if (XataDonationListResponse.fromJson(jsonDecode(response.body))
+              .meta!
+              .page!
+              .more ??
+          false) {
+        callAPI(XataDonationListResponse.fromJson(jsonDecode(response.body))
+            .meta!
+            .page!
+            .cursor!);
+      } else {
+        log("Data Fully Loaded");
+        setState(() {
+          dataFullLoaded = true;
+        });
+        // ref.watch(donationsProvider).forEach((element) {
+        //   ref.watch(realmProvider)!.deleteDonation(element);
+        // });
 
-  //       log("Data Length: ${data!.length}");
+        //Old Data Loaded
 
-  //       // var count = 0;
-  //       // var existCount = 0;
-  //       // data!.forEach((element) {
-  //       //   existCount++;
-  //       //   var donationDate = element.date.toString() != "null"
-  //       //       ? DateTime.parse(element.date!.replaceAll("Z", ""))
-  //       //       : DateTime.now();
-  //       //   bool noMember = ref
-  //       //       .read(membersProvider)
-  //       //       .where((data) =>
-  //       //           data.memberId.toString() ==
-  //       //           element.member!.memberId.toString())
-  //       //       .isEmpty;
-  //       //   var member = !noMember
-  //       //       ? ref
-  //       //           .read(membersProvider)
-  //       //           .where((data) =>
-  //       //               data.memberId.toString() ==
-  //       //               element.member!.memberId.toString())
-  //       //           .first
-  //       //       : null;
-  //       //   ref.watch(realmProvider)!.createDonation(
-  //       //         member: !noMember ? member!.id : null,
-  //       //         date: DateFormat('MM/dd/yyyy').format(donationDate),
-  //       //         donationDate: donationDate,
-  //       //         hospital: element.hospital,
-  //       //         memberId: noMember ? "" : member!.memberId.toString(),
-  //       //         patientAddress: element.patientAddress.toString(),
-  //       //         patientAge: element.patientAge.toString(),
-  //       //         patientDisease: element.patientDisease.toString(),
-  //       //         patientName: element.patientName.toString(),
-  //       //       );
+        log("Data Length: ${oldData.length}");
 
-  //       //   //edit Member
-  //       //   if (!noMember) {
-  //       //     log(DateFormat('MM/dd/yyyy').format(member!.lastDate!).toString());
+        var count = 0;
+        var existCount = 0;
+        oldData.forEach((element) {
+          existCount++;
+          var donationDate = element.date.toString() != "null"
+              ? DateTime.parse(element.date!.replaceAll("Z", ""))
+              : DateTime.now();
+          bool noMember = ref
+              .read(membersProvider)
+              .where((data) =>
+                  data.memberId.toString() ==
+                  element.member!.memberId.toString())
+              .isEmpty;
+          var member = !noMember
+              ? ref
+                  .read(membersProvider)
+                  .where((data) =>
+                      data.memberId.toString() ==
+                      element.member!.memberId.toString())
+                  .first
+              : null;
+          ref.watch(realmProvider)!.createDonation(
+                member: !noMember ? member!.id : null,
+                date: DateFormat('MM/dd/yyyy').format(donationDate),
+                donationDate: donationDate,
+                hospital: element.hospital,
+                memberObj: member,
+                memberId: noMember ? "" : member!.memberId.toString(),
+                patientAddress: element.patientAddress.toString(),
+                patientAge: element.patientAge.toString(),
+                patientDisease: element.patientDisease.toString(),
+                patientName: element.patientName.toString(),
+              );
 
-  //       //     if (DateFormat('MM/dd/yyyy').format(member.lastDate!).toString() ==
-  //       //         "5/18/2023") {
-  //       //       ref
-  //       //           .watch(realmProvider)!
-  //       //           .updateMember(member, lastDate: donationDate);
-  //       //       count++;
-  //       //     } else if (donationDate.compareTo(member.lastDate!) > 0) {
-  //       //       ref
-  //       //           .watch(realmProvider)!
-  //       //           .updateMember(member, lastDate: donationDate);
-  //       //       count++;
-  //       //     }
-  //       //   }
-  //       // });
-  //       // log("Editted Count - $count");
-  //       // log("Added Count - $existCount");
+          //edit Member
+          if (!noMember) {
+            log(DateFormat('MM/dd/yyyy').format(member!.lastDate!).toString());
 
-  //       sortBySegments();
-  //     }
-  //   });
-  // }
+            if (DateFormat('MM/dd/yyyy').format(member.lastDate!).toString() ==
+                "5/18/2023") {
+              ref
+                  .watch(realmProvider)!
+                  .updateMember(member, lastDate: donationDate);
+              count++;
+            } else if (member.lastDate == null ||
+                donationDate.compareTo(member.lastDate!) > 0) {
+              ref
+                  .watch(realmProvider)!
+                  .updateMember(member, lastDate: donationDate);
+              count++;
+            }
+          }
+        });
+        log("Editted Count - $count");
+        log("Added Count - $existCount");
+
+        sortBySegments();
+      }
+    });
+  }
 
   tabCreate() => Scaffold(
         backgroundColor: Colors.white,
@@ -635,6 +641,7 @@ class _BloodDonationListNewStyleState
   List<String> allMembers = <String>[];
   bool inputted = false;
   List<Donation>? data;
+  List<DonationRecord> oldData = [];
 
   @override
   Widget build(BuildContext context) {
