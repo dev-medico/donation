@@ -52,16 +52,17 @@ final searchMemberStreamProvider =
   if (searchParam.search != "" &&
       searchParam.bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
     final stream = realmService!.realm.query<Member>(
-        r"name CONTAINS[c] $1 AND bloodType ==$2 AND lastDate > $0", [
-      fourMonthBefore,
-      searchParam.search.toString().toLowerCase(),
-      searchParam.bloodType.toString()
-    ]).changes;
+        r"name CONTAINS[c] $1 AND bloodType ==$2 AND lastDate < $0 SORT(memberId ASC)",
+        [
+          fourMonthBefore,
+          searchParam.search.toString().toLowerCase(),
+          searchParam.bloodType.toString()
+        ]).changes;
 
     return stream;
   } else if (searchParam.search != "") {
-    final stream = realmService!.realm
-        .query<Member>(r"name CONTAINS[c] $1 AND lastDate > $0", [
+    final stream = realmService!.realm.query<Member>(
+        r"name CONTAINS[c] $1 AND lastDate < $0 SORT(memberId ASC)", [
       fourMonthBefore,
       searchParam.search.toString().toLowerCase(),
     ]).changes;
@@ -69,13 +70,13 @@ final searchMemberStreamProvider =
     return stream;
   } else if (searchParam.bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
     final stream = realmService!.realm.query<Member>(
-        r"bloodType ==$1 AND lastDate > $0",
+        r"bloodType ==$1 AND lastDate < $0 SORT(memberId ASC)",
         [fourMonthBefore, searchParam.bloodType.toString()]).changes;
 
     return stream;
   } else {
     final stream = realmService!.realm.query<Member>(
-        r"lastDate > $0 TRUEPREDICATE SORT(memberId ASC)",
+        r"lastDate < $0 TRUEPREDICATE SORT(memberId ASC)",
         [fourMonthBefore]).changes;
 
     return stream;

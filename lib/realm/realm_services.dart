@@ -131,6 +131,7 @@ class RealmServices with ChangeNotifier {
       String? note,
       String? nrc,
       String? phone,
+      String? status,
       DateTime? registerDate,
       String? totalCount,
       String? address}) async {
@@ -180,6 +181,9 @@ class RealmServices with ChangeNotifier {
       }
       if (address != null) {
         member.address = address;
+      }
+      if (status != null) {
+        member.status = status;
       }
     });
     notifyListeners();

@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/domain/search_member_data_source.dart';
-import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
+import 'package:donation/src/features/donation_member/presentation/widget/call_or_remark_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -85,89 +85,88 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
             Responsive.isMobile(context)
                 ? Container(
                     margin: EdgeInsets.only(left: 20, right: 20),
-                    child: Row(
+                    child: Column(
                       children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            width: MediaQuery.of(context).size.width / 2.3,
-                            margin: const EdgeInsets.only(
-                              top: 20,
-                              left: 6,
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          margin: const EdgeInsets.only(
+                            top: 20,
+                            left: 6,
+                          ),
+                          child: DropdownButtonFormField(
+                            dropdownColor: Colors.white,
+                            focusColor: Colors.white,
+                            decoration: InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.only(
+                                  top: 16, left: 20, bottom: 16, right: 12),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
-                            child: DropdownButtonFormField(
-                              dropdownColor: Colors.white,
-                              focusColor: Colors.white,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                contentPadding: EdgeInsets.only(
-                                    top: 16, left: 20, bottom: 16, right: 12),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              isExpanded: true,
-                              hint: Text(
-                                selectedBloodType!,
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                              icon: const Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.black45,
-                              ),
-                              iconSize: 30,
-                              items: bloodTypes
-                                  .map((item) => DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(
-                                          item,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                          ),
+                            isExpanded: true,
+                            hint: Text(
+                              selectedBloodType!,
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                            icon: const Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.black45,
+                            ),
+                            iconSize: 30,
+                            items: bloodTypes
+                                .map((item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(
+                                          fontSize: 14,
                                         ),
-                                      ))
-                                  .toList(),
-                              validator: (value) {
-                                if (value == null) {
-                                  return "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
-                                }
-                                return null;
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedBloodType = value.toString();
-                                });
-                                log(selectedBloodType.toString());
-                                log(dataSegments.length.toString());
-                                List<Member>? filterdata = [];
-                                for (int i = 0; i < data.length; i++) {
-                                  //get memberdata from data only where bloodtype is equal to value
-                                  if (searchController.text.isNotEmpty) {
-                                    if (data[i].name!.toLowerCase().contains(
-                                            searchController.text
-                                                .toString()
-                                                .toLowerCase()) &&
-                                        data[i].bloodType ==
-                                            selectedBloodType) {
-                                      filterdata.add(data[i]);
-                                    }
-                                  } else {
-                                    if (data[i].bloodType ==
-                                        selectedBloodType) {
-                                      filterdata.add(data[i]);
-                                    }
+                                      ),
+                                    ))
+                                .toList(),
+                            validator: (value) {
+                              if (value == null) {
+                                return "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              setState(() {
+                                selectedBloodType = value.toString();
+                              });
+                              log(selectedBloodType.toString());
+                              log(dataSegments.length.toString());
+                              List<Member>? filterdata = [];
+                              for (int i = 0; i < data.length; i++) {
+                                //get memberdata from data only where bloodtype is equal to value
+                                if (searchController.text.isNotEmpty) {
+                                  if (data[i].name!.toLowerCase().contains(
+                                          searchController.text
+                                              .toString()
+                                              .toLowerCase()) &&
+                                      data[i].bloodType == selectedBloodType) {
+                                    filterdata.add(data[i]);
+                                  }
+                                } else {
+                                  if (data[i].bloodType == selectedBloodType) {
+                                    filterdata.add(data[i]);
                                   }
                                 }
-                                setState(() {
-                                  dataSegments = filterdata.sublist(0);
-                                });
-                              },
-                              onSaved: (value) {},
-                            ),
+                              }
+                              setState(() {
+                                dataSegments = filterdata.sublist(0);
+                              });
+                            },
+                            onSaved: (value) {},
                           ),
                         ),
-                        Expanded(
-                          flex: 1,
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          margin: const EdgeInsets.only(
+                            top: 20,
+                            left: 6,
+                          ),
                           child: TextFormField(
                             autofocus: false,
                             controller: searchController,
@@ -415,14 +414,20 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
         onCellTap: (details) async {
           Logger logger = Logger();
           logger.i(details.rowColumnIndex.rowIndex);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MemberDetailScreen(
-                data: data[details.rowColumnIndex.rowIndex - 1],
-              ),
-            ),
-          );
+          showDialog(
+              context: context,
+              builder: (context) => CallOrRemarkDialog(
+                    title: "လုပ်ဆောင်ရန်",
+                    member: data[details.rowColumnIndex.rowIndex - 1],
+                  ));
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => MemberDetailScreen(
+          //       data: data[details.rowColumnIndex.rowIndex - 1],
+          //     ),
+          //   ),
+          // );
         },
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,
@@ -500,6 +505,16 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                   alignment: Alignment.center,
                   child: const Text(
                     'အခြေအနေ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'မှတ်ချက်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'မှတ်ချက်',
                     style: TextStyle(color: Colors.white),
                   ))),
         ],

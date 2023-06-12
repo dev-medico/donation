@@ -1,4 +1,5 @@
 import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 
 class CommonDialog extends StatelessWidget {
@@ -74,8 +75,8 @@ class DialogGradientTitleWidget extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.topRight,
           colors: <Color>[
-            Colors.red,
-            Colors.red,
+            primaryDark,
+            primaryDark,
           ], // red to yellow
           // tileMode: TileMode.repeated, // repeats the gradient over the canvas
         ),
@@ -88,7 +89,7 @@ class DialogGradientTitleWidget extends StatelessWidget {
               title,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: Responsive.isMobile(context) ? 16 : 18,
+                fontSize: Responsive.isMobile(context) ? 15 : 16,
                 fontWeight: FontWeight.w600,
               ),
             ),

@@ -2,10 +2,12 @@ import 'dart:convert';
 
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation/realm/realm_services.dart';
+import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/providers/providers.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,7 +18,6 @@ import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:intl/intl.dart';
-import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class NewMemberScreen extends ConsumerStatefulWidget {
   NewMemberScreen({Key? key}) : super(key: key);
@@ -56,7 +57,6 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   String township1ID = " ";
   String regional = " ";
   String post_code = " ";
-  bool _isLoading = false;
   //late FirebaseFirestore firestore;
   late TownshipResponse townshipResponse;
   List<String> townships = <String>[];
@@ -86,7 +86,8 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   List<DropdownMenuItem<String>>? nrc_type_options_dropDownMenuItems;
   String? nrc_type_options_Value;
   bool nameChecked = false;
-  bool editable = false;
+  bool editable = true;
+  DateTime? selected;
 
   @override
   void initState() {
@@ -147,1163 +148,463 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   @override
   Widget build(BuildContext context) {
     YYDialog.init(context);
-    return ModalProgressHUD(
-      inAsyncCall: _isLoading,
-      color: Colors.black,
-      progressIndicator: const SpinKitCircle(
-        color: Colors.white,
-        size: 60.0,
-      ),
-      dismissible: false,
-      child: Scaffold(
-        backgroundColor: const Color(0xfff2f2f2),
-        appBar: AppBar(
-          flexibleSpace: Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [primaryColor, primaryDark],
-          ))),
-          centerTitle: true,
-          title: Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Center(
-              child: Text("အဖွဲ့၀င်အသစ် ထည့်သွင်းမည်",
-                  textScaleFactor: 1.0,
-                  style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 16,
-                      color: Colors.white)),
-            ),
+    return Scaffold(
+      backgroundColor: const Color(0xfff2f2f2),
+      appBar: AppBar(
+        flexibleSpace: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [primaryColor, primaryDark],
+        ))),
+        centerTitle: true,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Center(
+            child: Text("အဖွဲ့၀င်အသစ် ထည့်သွင်းမည်",
+                textScaleFactor: 1.0,
+                style: TextStyle(
+                    fontSize: Responsive.isMobile(context) ? 15 : 16,
+                    color: Colors.white)),
           ),
         ),
-        body: SafeArea(
-          child: Responsive.isMobile(context)
-              ? SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                          margin: const EdgeInsets.only(
-                              left: 12, top: 12, bottom: 15, right: 12),
-                          child: Container(
-                            padding: const EdgeInsets.only(
-                                bottom: 20, left: 4, right: 4, top: 8),
-                            decoration: shadowDecoration(Colors.white),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Visibility(
-                                  visible: editable,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 20, top: 16, right: 20),
-                                    child: TextFormField(
-                                      controller: memberIDController,
-                                      decoration:
-                                          inputBoxDecoration("အဖွဲ့ဝင်အမှတ်"),
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 5,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                          left: 20,
-                                          top: 24,
-                                          bottom: 8,
-                                        ),
-                                        child: TextFormField(
-                                          controller: nameController,
-                                          decoration:
-                                              inputBoxDecoration("အမည်"),
-                                        ),
-                                      ),
-                                    ),
-                                    nameChecked
-                                        ? Expanded(
-                                            flex: 1,
-                                            child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 16, right: 4),
-                                                child: Image.asset(
-                                                  "assets/images/checked.png",
-                                                  height: 24,
-                                                  width: 20,
-                                                )))
-                                        : Expanded(
-                                            flex: 1,
-                                            child: GestureDetector(
-                                              behavior:
-                                                  HitTestBehavior.translucent,
-                                              onTap: () {
-                                                // FirebaseFirestore.instance
-                                                //     .collection('members')
-                                                //     .where('name',
-                                                //         isEqualTo:
-                                                //             nameController.text
-                                                //                 .toString())
-                                                //     .get()
-                                                //     .then((value) {
-                                                //   if (value.docs.isEmpty) {
-                                                //     setState(() {
-                                                //       nameChecked = true;
-                                                //     });
-                                                //   } else {
-                                                //     Map<String, dynamic> data =
-                                                //         value.docs.first.data();
-                                                //     memberExistDialog(
-                                                //         context,
-                                                //         nameController.text
-                                                //             .toString(),
-                                                //         data);
-                                                //   }
-                                                // });
-                                              },
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 16, right: 4),
-                                                child: Image.asset(
-                                                  "assets/images/magnifier.png",
-                                                  height: 24,
-                                                  width: 20,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                  ],
-                                ),
-                                Container(
+      ),
+      body: SafeArea(
+        child: Responsive.isMobile(context)
+            ? SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                        margin: const EdgeInsets.only(
+                            left: 12, top: 12, bottom: 15, right: 12),
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                              bottom: 20, left: 4, right: 4, top: 8),
+                          decoration: shadowDecoration(Colors.white),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Visibility(
+                                visible: editable,
+                                child: Container(
                                   margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
+                                      left: 20, top: 16, right: 20),
                                   child: TextFormField(
-                                    controller: fatherNameController,
-                                    decoration: inputBoxDecoration("အဖအမည်"),
-                                  ),
-                                ),
-                                Container(
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  child: DropdownButtonFormField(
-                                      value: selectedBloodType,
-                                      style: const TextStyle(
-                                          fontSize: 13.5, color: Colors.black),
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide: const BorderSide(
-                                              color: Colors.grey, width: 1),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        contentPadding: const EdgeInsets.only(
-                                            left: 20, right: 12, bottom: 4),
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                      ),
-                                      onChanged: (val) {
-                                        setState(() {
-                                          selectedBloodType = val.toString();
-                                        });
-                                      },
-                                      items: dropdownItems),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 12, left: 22),
-                                      child: const Text(
-                                        "မှတ်ပုံတင်အမှတ်",
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                          left: 20, right: 20, top: 8),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: <Widget>[
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            decoration:
-                                                shadowDecoration(Colors.white),
-                                            child: DropdownButton(
-                                              value: nrc_initial_options_Value,
-                                              items:
-                                                  nrc_initial_options_dropDownMenuItems,
-                                              icon: const Icon(
-                                                  Icons.keyboard_arrow_down),
-                                              iconSize: 0,
-                                              elevation: 16,
-                                              underline: const SizedBox(),
-                                              onChanged:
-                                                  nrcInitialOptionschangedDropDownItem,
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                left: 8, right: 8),
-                                            child: const Text(
-                                              "/",
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            decoration:
-                                                shadowDecoration(Colors.white),
-                                            child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 8, right: 8),
-                                                child: DropdownButton(
-                                                  value:
-                                                      nrc_region_state_options_Value,
-                                                  icon: const Icon(Icons
-                                                      .keyboard_arrow_down),
-                                                  iconSize: 0,
-                                                  elevation: 16,
-                                                  underline: const SizedBox(),
-                                                  items:
-                                                      nrc_region_state_options_dropDownMenuItems,
-                                                  onChanged:
-                                                      nrcInitialRegionStateOptionschangedDropDownItem,
-                                                )),
-                                          ),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            margin:
-                                                const EdgeInsets.only(left: 8),
-                                            decoration:
-                                                shadowDecoration(Colors.white),
-                                            child: DropdownButton(
-                                              value: nrc_type_options_Value,
-                                              items:
-                                                  nrc_type_options_dropDownMenuItems,
-                                              icon: const Icon(
-                                                  Icons.keyboard_arrow_down),
-                                              iconSize: 0,
-                                              elevation: 16,
-                                              underline: const SizedBox(),
-                                              onChanged:
-                                                  nrcTypeOptionschangedDropDownItem,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Container(
-                                              height: 48,
-                                              margin: const EdgeInsets.only(
-                                                  left: 12),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: const Color(0xffecf0f1),
-                                              ),
-                                              child: TextField(
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                controller: nrcController,
-                                                decoration:
-                                                    const InputDecoration(
-                                                  border: InputBorder.none,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  width: double.infinity,
-                                  height: 50,
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 4, right: 20),
-                                  child: NeumorphicButton(
-                                    child: Text(
-                                      birthDate,
-                                      style: const TextStyle(
-                                          fontSize: 14, color: Colors.black),
-                                    ),
-                                    onPressed: () {
-                                      showDatePicker();
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  child: Stack(
-                                    children: [
-                                      TextFormField(
-                                        keyboardType: TextInputType.number,
-                                        controller: phoneController,
-                                        decoration:
-                                            inputBoxDecoration("ဖုန်းနံပါတ်"),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 8, right: 20),
-                                        child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: buildOperator()),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  child: TextFormField(
-                                    controller: bloodBankNoController,
+                                    controller: memberIDController,
                                     decoration:
-                                        inputBoxDecoration("သွေးဘဏ်ကတ်နံပါတ်"),
+                                        inputBoxDecoration("အဖွဲ့ဝင်အမှတ်"),
                                   ),
                                 ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  child: TextFormField(
-                                    controller: totalDonationController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                    decoration: inputBoxDecoration(
-                                        "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  child: TextFormField(
-                                    controller: homeNoController,
-                                    decoration: inputBoxDecoration(
-                                        "အိမ်အမှတ်/တိုက်ခန်းအမှတ်"),
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  child: TextFormField(
-                                    controller: streetController,
-                                    decoration: inputBoxDecoration("လမ်းအမည်"),
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  child: TextFormField(
-                                    controller: quarterController,
-                                    decoration:
-                                        inputBoxDecoration("ရပ်ကွက်အမည်"),
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  child: TypeAheadField(
-                                    hideSuggestionsOnKeyboardHide: false,
-                                    textFieldConfiguration:
-                                        TextFieldConfiguration(
-                                      controller: townController,
-                                      autofocus: false,
-
-                                      decoration:
-                                          inputBoxDecoration("မြို့နယ်"),
-
-                                      // decoration:  InputDecoration(
-                                      //   hintText: "မြို့",
-                                      //   border: InputBorder.none,
-                                      //   focusedBorder: InputBorder.none,
-                                      //   enabledBorder: InputBorder.none,
-                                      //   errorBorder: InputBorder.none,
-                                      //   disabledBorder: InputBorder.none,
-                                      //   contentPadding:  EdgeInsets.only(
-                                      //       left: 15, bottom: 8, top: 8, right: 15),
-                                      //   hintStyle:  TextStyle(
-                                      //       fontSize: 15.0, color: Colors.grey),
-                                      // ),
-                                    ),
-                                    suggestionsCallback: (pattern) {
-                                      townshipsSelected.clear();
-                                      townshipsSelected.addAll(townships);
-                                      townshipsSelected.retainWhere((s) => s
-                                          .toLowerCase()
-                                          .contains(pattern.toLowerCase()));
-                                      return townshipsSelected;
-                                    },
-                                    transitionBuilder:
-                                        (context, suggestionsBox, controller) {
-                                      return suggestionsBox;
-                                    },
-                                    itemBuilder: (context, suggestion) {
-                                      return ListTile(
-                                        title: Text(
-                                          suggestion.toString(),
-                                          textScaleFactor: 1.0,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder:
-                                        (BuildContext context, Object? error) =>
-                                            Text('$error',
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .errorColor)),
-                                    onSuggestionSelected: (suggestion) {
-                                      townController.text =
-                                          suggestion.toString();
-                                      setRegion(suggestion.toString());
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 30, bottom: 4, right: 20),
-                                  child: Text(regional,
-                                      textScaleFactor: 1.0,
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          fontSize: 15, color: primaryColor)),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  decoration: const BoxDecoration(
-                                      color: Color(0xFFefefef),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(12.0))),
-                                  child: TextFormField(
-                                      controller: noteController,
-                                      maxLines: 4,
-                                      decoration: const InputDecoration(
-                                        hintText: "မှတ်ချက်ရေးမည်",
-                                        border: InputBorder.none,
-                                        focusedBorder: InputBorder.none,
-                                        enabledBorder: InputBorder.none,
-                                        errorBorder: InputBorder.none,
-                                        disabledBorder: InputBorder.none,
-                                        contentPadding: EdgeInsets.only(
-                                            left: 15,
-                                            bottom: 8,
-                                            top: 8,
-                                            right: 15),
-                                        hintStyle: TextStyle(
-                                            fontSize: 15.0, color: Colors.grey),
-                                      )),
-                                ),
-                              ],
-                            ),
-                          )),
-                      Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(12.0))),
-                            margin: const EdgeInsets.only(
-                                left: 15, bottom: 16, right: 15),
-                            width: double.infinity,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {
-                                if (nameController.text.isNotEmpty &&
-                                    fatherNameController.text.isNotEmpty &&
-                                    phoneController.text.isNotEmpty &&
-                                    selectedBloodType != "သွေးအုပ်စု") {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  // FirebaseFirestore.instance
-                                  //     .collection('members')
-                                  //     .where('name',
-                                  //         isEqualTo:
-                                  //             nameController.text.toString())
-                                  //     .where('father_name',
-                                  //         isEqualTo: fatherNameController.text
-                                  //             .toString())
-                                  //     .where('blood_type',
-                                  //         isEqualTo: selectedBloodType)
-                                  //     .get()
-                                  //     .then((value) {
-                                  //   if (value.docs.isEmpty) {
-                                  //     getAutoIncrementKey();
-                                  //   } else {
-                                  //     Map<String, dynamic> data =
-                                  //         value.docs.first.data();
-                                  //     memberExistDialog(context,
-                                  //         nameController.text.toString(), data);
-                                  //   }
-                                  // });
-                                } else {
-                                  Utils.messageDialog(
-                                      "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
-                                      context,
-                                      "ပြင်ဆင်မည်",
-                                      Colors.black);
-                                }
-                                // if (operatorImg == "") {
-
-                                // } else if (homeNo.text.toString() == "" ||
-                                //     street.text.toString() == "" ||
-                                //     quarter.text.toString() == "" ||
-                                //     town1.toString() == " ") {
-                                //   Util.messageDialog(
-                                //       "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
-                                //       context,
-                                //       "ဖြည့်သွင်းမည်",
-                                //       Colors.black);
-                                // } else {
-
-                                // }
-                              },
-                              child: const Align(
-                                  alignment: Alignment.center,
-                                  child: Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 8, bottom: 8),
-                                      child: Text(
-                                        "ထည့်သွင်းမည်",
-                                        textScaleFactor: 1.0,
-                                        style: TextStyle(
-                                            fontSize: 16.0,
-                                            color: Colors.white),
-                                      ))),
-                            ),
-                          ))
-                    ],
-                  ),
-                )
-              : SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                          margin: EdgeInsets.only(
-                              left: 54,
-                              top: 20,
-                              bottom: 20,
-                              right: MediaQuery.of(context).size.width * 0.1),
-                          child: Container(
-                            padding: const EdgeInsets.only(
-                                bottom: 20, left: 4, right: 4, top: 8),
-                            decoration: shadowDecoration(Colors.white),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Visibility(
-                                        visible: editable,
-                                        child: Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 20, top: 16, right: 20),
-                                          child: TextFormField(
-                                            controller: memberIDController,
-                                            decoration: inputBoxDecoration(
-                                                "အဖွဲ့ဝင်အမှတ်"),
-                                          ),
-                                        ),
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 5,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                        left: 20,
+                                        top: 24,
+                                        bottom: 8,
+                                      ),
+                                      child: TextFormField(
+                                        controller: nameController,
+                                        decoration: inputBoxDecoration("အမည်"),
                                       ),
                                     ),
-                                    Expanded(
-                                      flex: 5,
-                                      child: Container(),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 5,
-                                            child: Container(
-                                              margin: const EdgeInsets.only(
-                                                left: 20,
-                                                top: 24,
-                                                bottom: 8,
-                                              ),
-                                              child: TextFormField(
-                                                controller: nameController,
-                                                decoration:
-                                                    inputBoxDecoration("အမည်"),
-                                              ),
-                                            ),
-                                          ),
-                                          nameChecked
-                                              ? Expanded(
-                                                  flex: 1,
-                                                  child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 16,
-                                                              right: 4),
-                                                      child: Image.asset(
-                                                        "assets/images/checked.png",
-                                                        height: 24,
-                                                        width: 20,
-                                                      )))
-                                              : Expanded(
-                                                  flex: 1,
-                                                  child: GestureDetector(
-                                                    behavior: HitTestBehavior
-                                                        .translucent,
-                                                    onTap: () {
-                                                      // FirebaseFirestore.instance
-                                                      //     .collection('members')
-                                                      //     .where('name',
-                                                      //         isEqualTo:
-                                                      //             nameController
-                                                      //                 .text
-                                                      //                 .toString())
-                                                      //     .get()
-                                                      //     .then((value) {
-                                                      //   if (value
-                                                      //       .docs.isEmpty) {
-                                                      //     setState(() {
-                                                      //       nameChecked = true;
-                                                      //     });
-                                                      //   } else {
-                                                      //     Map<String, dynamic>
-                                                      //         data = value
-                                                      //             .docs.first
-                                                      //             .data();
-                                                      //     memberExistDialog(
-                                                      //         context,
-                                                      //         nameController
-                                                      //             .text
-                                                      //             .toString(),
-                                                      //         data);
-                                                      //   }
-                                                      // });
-                                                    },
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 16,
-                                                              right: 4),
-                                                      child: Image.asset(
-                                                        "assets/images/magnifier.png",
-                                                        height: 24,
-                                                        width: 20,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 5,
-                                      child: Container(),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: TextFormField(
-                                          controller: fatherNameController,
-                                          decoration:
-                                              inputBoxDecoration("အဖအမည်"),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        width: double.infinity,
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: DropdownButtonFormField(
-                                            value: selectedBloodType,
-                                            style: const TextStyle(
-                                                fontSize: 13.5,
-                                                color: Colors.black),
-                                            decoration: InputDecoration(
-                                              enabledBorder: OutlineInputBorder(
-                                                borderSide: const BorderSide(
-                                                    color: Colors.grey,
-                                                    width: 1),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              contentPadding:
-                                                  const EdgeInsets.only(
-                                                      left: 20,
-                                                      right: 12,
-                                                      bottom: 4),
-                                              filled: true,
-                                              fillColor: Colors.white,
-                                            ),
-                                            onChanged: (val) {
-                                              setState(() {
-                                                selectedBloodType =
-                                                    val.toString();
-                                              });
+                                  ),
+                                  nameChecked
+                                      ? Expanded(
+                                          flex: 1,
+                                          child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 16, right: 4),
+                                              child: Image.asset(
+                                                "assets/images/checked.png",
+                                                height: 24,
+                                                width: 20,
+                                              )))
+                                      : Expanded(
+                                          flex: 1,
+                                          child: GestureDetector(
+                                            behavior:
+                                                HitTestBehavior.translucent,
+                                            onTap: () {
+                                              // FirebaseFirestore.instance
+                                              //     .collection('members')
+                                              //     .where('name',
+                                              //         isEqualTo:
+                                              //             nameController.text
+                                              //                 .toString())
+                                              //     .get()
+                                              //     .then((value) {
+                                              //   if (value.docs.isEmpty) {
+                                              //     setState(() {
+                                              //       nameChecked = true;
+                                              //     });
+                                              //   } else {
+                                              //     Map<String, dynamic> data =
+                                              //         value.docs.first.data();
+                                              //     memberExistDialog(
+                                              //         context,
+                                              //         nameController.text
+                                              //             .toString(),
+                                              //         data);
+                                              //   }
+                                              // });
                                             },
-                                            items: dropdownItems),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                top: 12, left: 22),
-                                            child: const Text(
-                                              "မှတ်ပုံတင်အမှတ်",
-                                              style: TextStyle(fontSize: 15),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 16, right: 4),
+                                              child: Image.asset(
+                                                "assets/images/magnifier.png",
+                                                height: 24,
+                                                width: 20,
+                                              ),
                                             ),
                                           ),
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                left: 20, right: 20, top: 8),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: <Widget>[
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 10),
-                                                  decoration: shadowDecoration(
-                                                      Colors.white),
-                                                  child: DropdownButton(
-                                                    value:
-                                                        nrc_initial_options_Value,
-                                                    items:
-                                                        nrc_initial_options_dropDownMenuItems,
-                                                    icon: const Icon(Icons
-                                                        .keyboard_arrow_down),
-                                                    iconSize: 0,
-                                                    elevation: 16,
-                                                    underline: const SizedBox(),
-                                                    onChanged:
-                                                        nrcInitialOptionschangedDropDownItem,
-                                                  ),
-                                                ),
-                                                Container(
-                                                  margin: const EdgeInsets.only(
-                                                      left: 8, right: 8),
-                                                  child: const Text(
-                                                    "/",
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 10),
-                                                  decoration: shadowDecoration(
-                                                      Colors.white),
-                                                  child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 8,
-                                                              right: 8),
-                                                      child: DropdownButton(
-                                                        value:
-                                                            nrc_region_state_options_Value,
-                                                        icon: const Icon(Icons
-                                                            .keyboard_arrow_down),
-                                                        iconSize: 0,
-                                                        elevation: 16,
-                                                        underline:
-                                                            const SizedBox(),
-                                                        items:
-                                                            nrc_region_state_options_dropDownMenuItems,
-                                                        onChanged:
-                                                            nrcInitialRegionStateOptionschangedDropDownItem,
-                                                      )),
-                                                ),
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 10),
-                                                  margin: const EdgeInsets.only(
-                                                      left: 8),
-                                                  decoration: shadowDecoration(
-                                                      Colors.white),
-                                                  child: DropdownButton(
-                                                    value:
-                                                        nrc_type_options_Value,
-                                                    items:
-                                                        nrc_type_options_dropDownMenuItems,
-                                                    icon: const Icon(Icons
-                                                        .keyboard_arrow_down),
-                                                    iconSize: 0,
-                                                    elevation: 16,
-                                                    underline: const SizedBox(),
-                                                    onChanged:
-                                                        nrcTypeOptionschangedDropDownItem,
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    height: 48,
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                            left: 12),
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 12),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: const Color(
-                                                          0xffecf0f1),
-                                                    ),
-                                                    child: TextField(
-                                                      keyboardType:
-                                                          TextInputType.number,
-                                                      controller: nrcController,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        border:
-                                                            InputBorder.none,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 5,
-                                      child: Container(),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        width: double.infinity,
-                                        height: 50,
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 4,
-                                            right: 20),
-                                        child: NeumorphicButton(
-                                          child: Text(
-                                            birthDate,
-                                            style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.black),
-                                          ),
-                                          onPressed: () {
-                                            showDatePicker();
-                                          },
                                         ),
+                                ],
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: fatherNameController,
+                                  decoration: inputBoxDecoration("အဖအမည်"),
+                                ),
+                              ),
+                              Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: DropdownButtonFormField(
+                                    value: selectedBloodType,
+                                    style: const TextStyle(
+                                        fontSize: 13.5, color: Colors.black),
+                                    decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                            color: Colors.grey, width: 1),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
+                                      contentPadding: const EdgeInsets.only(
+                                          left: 20, right: 12, bottom: 4),
+                                      filled: true,
+                                      fillColor: Colors.white,
                                     ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: Stack(
-                                          children: [
-                                            TextFormField(
+                                    onChanged: (val) {
+                                      setState(() {
+                                        selectedBloodType = val.toString();
+                                      });
+                                    },
+                                    items: dropdownItems),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 12, left: 22),
+                                    child: const Text(
+                                      "မှတ်ပုံတင်အမှတ်",
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                        left: 20, right: 20, top: 8),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          decoration:
+                                              shadowDecoration(Colors.white),
+                                          child: DropdownButton(
+                                            value: nrc_initial_options_Value,
+                                            items:
+                                                nrc_initial_options_dropDownMenuItems,
+                                            icon: const Icon(
+                                                Icons.keyboard_arrow_down),
+                                            iconSize: 0,
+                                            elevation: 16,
+                                            underline: const SizedBox(),
+                                            onChanged:
+                                                nrcInitialOptionschangedDropDownItem,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              left: 8, right: 8),
+                                          child: const Text(
+                                            "/",
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          decoration:
+                                              shadowDecoration(Colors.white),
+                                          child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8, right: 8),
+                                              child: DropdownButton(
+                                                value:
+                                                    nrc_region_state_options_Value,
+                                                icon: const Icon(
+                                                    Icons.keyboard_arrow_down),
+                                                iconSize: 0,
+                                                elevation: 16,
+                                                underline: const SizedBox(),
+                                                items:
+                                                    nrc_region_state_options_dropDownMenuItems,
+                                                onChanged:
+                                                    nrcInitialRegionStateOptionschangedDropDownItem,
+                                              )),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          margin:
+                                              const EdgeInsets.only(left: 8),
+                                          decoration:
+                                              shadowDecoration(Colors.white),
+                                          child: DropdownButton(
+                                            value: nrc_type_options_Value,
+                                            items:
+                                                nrc_type_options_dropDownMenuItems,
+                                            icon: const Icon(
+                                                Icons.keyboard_arrow_down),
+                                            iconSize: 0,
+                                            elevation: 16,
+                                            underline: const SizedBox(),
+                                            onChanged:
+                                                nrcTypeOptionschangedDropDownItem,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            height: 48,
+                                            margin:
+                                                const EdgeInsets.only(left: 12),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: const Color(0xffecf0f1),
+                                            ),
+                                            child: TextField(
                                               keyboardType:
                                                   TextInputType.number,
-                                              controller: phoneController,
-                                              decoration: inputBoxDecoration(
-                                                  "ဖုန်းနံပါတ်"),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 8, right: 20),
-                                              child: Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: buildOperator()),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: TextFormField(
-                                          controller: bloodBankNoController,
-                                          decoration: inputBoxDecoration(
-                                              "သွေးဘဏ်ကတ်နံပါတ်"),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: TextFormField(
-                                          controller: totalDonationController,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter
-                                                .digitsOnly
-                                          ],
-                                          decoration: inputBoxDecoration(
-                                              "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: TextFormField(
-                                          controller: homeNoController,
-                                          decoration: inputBoxDecoration(
-                                              "အိမ်အမှတ်/တိုက်ခန်းအမှတ်"),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: TextFormField(
-                                          controller: streetController,
-                                          decoration:
-                                              inputBoxDecoration("လမ်းအမည်"),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: TextFormField(
-                                          controller: quarterController,
-                                          decoration:
-                                              inputBoxDecoration("ရပ်ကွက်အမည်"),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                left: 20,
-                                                top: 16,
-                                                bottom: 8,
-                                                right: 20),
-                                            child: TypeAheadField(
-                                              hideSuggestionsOnKeyboardHide:
-                                                  false,
-                                              textFieldConfiguration:
-                                                  TextFieldConfiguration(
-                                                controller: townController,
-                                                autofocus: false,
-                                                decoration: inputBoxDecoration(
-                                                    "မြို့နယ်"),
+                                              controller: nrcController,
+                                              decoration: const InputDecoration(
+                                                border: InputBorder.none,
                                               ),
-                                              suggestionsCallback: (pattern) {
-                                                townshipsSelected.clear();
-                                                townshipsSelected
-                                                    .addAll(townships);
-                                                townshipsSelected.retainWhere(
-                                                    (s) => s
-                                                        .toLowerCase()
-                                                        .contains(pattern
-                                                            .toLowerCase()));
-                                                return townshipsSelected;
-                                              },
-                                              transitionBuilder: (context,
-                                                  suggestionsBox, controller) {
-                                                return suggestionsBox;
-                                              },
-                                              itemBuilder:
-                                                  (context, suggestion) {
-                                                return ListTile(
-                                                  title: Text(
-                                                    suggestion.toString(),
-                                                    textScaleFactor: 1.0,
-                                                  ),
-                                                );
-                                              },
-                                              errorBuilder: (BuildContext
-                                                          context,
-                                                      Object? error) =>
-                                                  Text('$error',
-                                                      style: TextStyle(
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .errorColor)),
-                                              onSuggestionSelected:
-                                                  (suggestion) {
-                                                townController.text =
-                                                    suggestion.toString();
-                                                setRegion(
-                                                    suggestion.toString());
-                                              },
                                             ),
                                           ),
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                left: 30, bottom: 4, right: 20),
-                                            child: Text(regional,
-                                                textScaleFactor: 1.0,
-                                                textAlign: TextAlign.left,
-                                                style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: primaryColor)),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                width: double.infinity,
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 4, right: 20),
+                                child: NeumorphicButton(
+                                  child: Text(
+                                    birthDate,
+                                    style: const TextStyle(
+                                        fontSize: 14, color: Colors.black),
+                                  ),
+                                  onPressed: () {
+                                    showDatePicker();
+                                  },
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: Stack(
+                                  children: [
+                                    TextFormField(
+                                      keyboardType: TextInputType.number,
+                                      controller: phoneController,
+                                      decoration:
+                                          inputBoxDecoration("ဖုန်းနံပါတ်"),
                                     ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 8, right: 20),
+                                      child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: buildOperator()),
+                                    )
                                   ],
                                 ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width / 3,
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 4, bottom: 8, right: 20),
-                                  decoration: const BoxDecoration(
-                                      color: Color(0xFFefefef),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(12.0))),
-                                  child: TextFormField(
-                                      controller: noteController,
-                                      maxLines: 2,
-                                      decoration: const InputDecoration(
-                                        hintText: "မှတ်ချက်ရေးမည်",
-                                        border: InputBorder.none,
-                                        focusedBorder: InputBorder.none,
-                                        enabledBorder: InputBorder.none,
-                                        errorBorder: InputBorder.none,
-                                        disabledBorder: InputBorder.none,
-                                        contentPadding: EdgeInsets.only(
-                                            left: 24,
-                                            bottom: 8,
-                                            top: 20,
-                                            right: 15),
-                                        hintStyle: TextStyle(
-                                            fontSize: 16.0, color: Colors.grey),
-                                      )),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: bloodBankNoController,
+                                  decoration:
+                                      inputBoxDecoration("သွေးဘဏ်ကတ်နံပါတ်"),
                                 ),
-                              ],
-                            ),
-                          )),
-                      Align(
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: totalDonationController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  decoration: inputBoxDecoration(
+                                      "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: homeNoController,
+                                  decoration: inputBoxDecoration(
+                                      "အိမ်အမှတ်/တိုက်ခန်းအမှတ်"),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: streetController,
+                                  decoration: inputBoxDecoration("လမ်းအမည်"),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: quarterController,
+                                  decoration: inputBoxDecoration("ရပ်ကွက်အမည်"),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TypeAheadField(
+                                  hideSuggestionsOnKeyboardHide: false,
+                                  textFieldConfiguration:
+                                      TextFieldConfiguration(
+                                    controller: townController,
+                                    autofocus: false,
+
+                                    decoration: inputBoxDecoration("မြို့နယ်"),
+
+                                    // decoration:  InputDecoration(
+                                    //   hintText: "မြို့",
+                                    //   border: InputBorder.none,
+                                    //   focusedBorder: InputBorder.none,
+                                    //   enabledBorder: InputBorder.none,
+                                    //   errorBorder: InputBorder.none,
+                                    //   disabledBorder: InputBorder.none,
+                                    //   contentPadding:  EdgeInsets.only(
+                                    //       left: 15, bottom: 8, top: 8, right: 15),
+                                    //   hintStyle:  TextStyle(
+                                    //       fontSize: 15.0, color: Colors.grey),
+                                    // ),
+                                  ),
+                                  suggestionsCallback: (pattern) {
+                                    townshipsSelected.clear();
+                                    townshipsSelected.addAll(townships);
+                                    townshipsSelected.retainWhere((s) => s
+                                        .toLowerCase()
+                                        .contains(pattern.toLowerCase()));
+                                    return townshipsSelected;
+                                  },
+                                  transitionBuilder:
+                                      (context, suggestionsBox, controller) {
+                                    return suggestionsBox;
+                                  },
+                                  itemBuilder: (context, suggestion) {
+                                    return ListTile(
+                                      title: Text(
+                                        suggestion.toString(),
+                                        textScaleFactor: 1.0,
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (BuildContext context,
+                                          Object? error) =>
+                                      Text('$error',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .errorColor)),
+                                  onSuggestionSelected: (suggestion) {
+                                    townController.text = suggestion.toString();
+                                    setRegion(suggestion.toString());
+                                  },
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 30, bottom: 4, right: 20),
+                                child: Text(regional,
+                                    textScaleFactor: 1.0,
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 15, color: primaryColor)),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                decoration: const BoxDecoration(
+                                    color: Color(0xFFefefef),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(12.0))),
+                                child: TextFormField(
+                                    controller: noteController,
+                                    maxLines: 4,
+                                    decoration: const InputDecoration(
+                                      hintText: "မှတ်ချက်ရေးမည်",
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding: EdgeInsets.only(
+                                          left: 15,
+                                          bottom: 8,
+                                          top: 8,
+                                          right: 15),
+                                      hintStyle: TextStyle(
+                                          fontSize: 15.0, color: Colors.grey),
+                                    )),
+                              ),
+                            ],
+                          ),
+                        )),
+                    Align(
                         alignment: Alignment.bottomLeft,
                         child: Container(
                           decoration: BoxDecoration(
                               color: primaryColor,
                               borderRadius: const BorderRadius.all(
                                   Radius.circular(12.0))),
-                          width: MediaQuery.of(context).size.width / 2.8,
                           margin: const EdgeInsets.only(
-                              left: 54, bottom: 16, right: 8),
+                              left: 15, bottom: 16, right: 15),
+                          width: double.infinity,
                           child: GestureDetector(
                             behavior: HitTestBehavior.translucent,
                             onTap: () {
@@ -1311,30 +612,35 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   fatherNameController.text.isNotEmpty &&
                                   phoneController.text.isNotEmpty &&
                                   selectedBloodType != "သွေးအုပ်စု") {
-                                setState(() {
-                                  _isLoading = true;
-                                });
-                                // FirebaseFirestore.instance
-                                //     .collection('members')
-                                //     .where('name',
-                                //         isEqualTo:
-                                //             nameController.text.toString())
-                                //     .where('father_name',
-                                //         isEqualTo: fatherNameController.text
-                                //             .toString())
-                                //     .where('blood_type',
-                                //         isEqualTo: selectedBloodType)
-                                //     .get()
-                                //     .then((value) {
-                                //   if (value.docs.isEmpty) {
-                                //     getAutoIncrementKey();
-                                //   } else {
-                                //     Map<String, dynamic> data =
-                                //         value.docs.first.data();
-                                //     memberExistDialog(context,
-                                //         nameController.text.toString(), data);
-                                //   }
-                                // });
+                                var members = ref.watch(membersProvider);
+                                //check member exist by name, father name and nrc
+                                var exist = members
+                                    .where((element) =>
+                                        element.name ==
+                                            nameController.text.toString() &&
+                                        element.fatherName ==
+                                            fatherNameController.text
+                                                .toString() &&
+                                        element.bloodType == selectedBloodType)
+                                    .toList()
+                                    .isNotEmpty;
+
+                                if (!exist) {
+                                  getAutoIncrementKey();
+                                } else {
+                                  var data = members
+                                      .where((element) =>
+                                          element.name ==
+                                              nameController.text.toString() &&
+                                          element.fatherName ==
+                                              fatherNameController.text
+                                                  .toString() &&
+                                          element.bloodType ==
+                                              selectedBloodType)
+                                      .toList()
+                                      .first;
+                                  memberExistDialog(context, data);
+                                }
                               } else {
                                 Utils.messageDialog(
                                     "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
@@ -1346,27 +652,674 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                             child: const Align(
                                 alignment: Alignment.center,
                                 child: Padding(
-                                    padding:
-                                        EdgeInsets.only(top: 16, bottom: 16),
+                                    padding: EdgeInsets.only(top: 8, bottom: 8),
                                     child: Text(
                                       "ထည့်သွင်းမည်",
                                       textScaleFactor: 1.0,
                                       style: TextStyle(
-                                          fontSize: 18.0, color: Colors.white),
+                                          fontSize: 16.0, color: Colors.white),
                                     ))),
                           ),
-                        ),
-                      )
-                    ],
-                  ),
+                        ))
+                  ],
                 ),
-        ),
+              )
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                        margin: EdgeInsets.only(
+                            left: 54,
+                            top: 20,
+                            bottom: 20,
+                            right: MediaQuery.of(context).size.width * 0.1),
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                              bottom: 20, left: 4, right: 4, top: 8),
+                          decoration: shadowDecoration(Colors.white),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Visibility(
+                                      visible: editable,
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 20, top: 16, right: 20),
+                                        child: TextFormField(
+                                          controller: memberIDController,
+                                          decoration: inputBoxDecoration(
+                                              "အဖွဲ့ဝင်အမှတ်"),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 5,
+                                    child: Container(),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 5,
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                              left: 20,
+                                              top: 24,
+                                              bottom: 8,
+                                            ),
+                                            child: TextFormField(
+                                              controller: nameController,
+                                              decoration:
+                                                  inputBoxDecoration("အမည်"),
+                                            ),
+                                          ),
+                                        ),
+                                        nameChecked
+                                            ? Expanded(
+                                                flex: 1,
+                                                child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 16, right: 4),
+                                                    child: Image.asset(
+                                                      "assets/images/checked.png",
+                                                      height: 24,
+                                                      width: 20,
+                                                    )))
+                                            : Expanded(
+                                                flex: 1,
+                                                child: GestureDetector(
+                                                  behavior: HitTestBehavior
+                                                      .translucent,
+                                                  onTap: () {
+                                                    // FirebaseFirestore.instance
+                                                    //     .collection('members')
+                                                    //     .where('name',
+                                                    //         isEqualTo:
+                                                    //             nameController
+                                                    //                 .text
+                                                    //                 .toString())
+                                                    //     .get()
+                                                    //     .then((value) {
+                                                    //   if (value
+                                                    //       .docs.isEmpty) {
+                                                    //     setState(() {
+                                                    //       nameChecked = true;
+                                                    //     });
+                                                    //   } else {
+                                                    //     Map<String, dynamic>
+                                                    //         data = value
+                                                    //             .docs.first
+                                                    //             .data();
+                                                    //     memberExistDialog(
+                                                    //         context,
+                                                    //         nameController
+                                                    //             .text
+                                                    //             .toString(),
+                                                    //         data);
+                                                    //   }
+                                                    // });
+                                                  },
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 16, right: 4),
+                                                    child: Image.asset(
+                                                      "assets/images/magnifier.png",
+                                                      height: 24,
+                                                      width: 20,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 5,
+                                    child: Container(),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: fatherNameController,
+                                        decoration:
+                                            inputBoxDecoration("အဖအမည်"),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      width: double.infinity,
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: DropdownButtonFormField(
+                                          value: selectedBloodType,
+                                          style: const TextStyle(
+                                              fontSize: 13.5,
+                                              color: Colors.black),
+                                          decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.grey, width: 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            contentPadding:
+                                                const EdgeInsets.only(
+                                                    left: 20,
+                                                    right: 12,
+                                                    bottom: 4),
+                                            filled: true,
+                                            fillColor: Colors.white,
+                                          ),
+                                          onChanged: (val) {
+                                            setState(() {
+                                              selectedBloodType =
+                                                  val.toString();
+                                            });
+                                          },
+                                          items: dropdownItems),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 12, left: 22),
+                                          child: const Text(
+                                            "မှတ်ပုံတင်အမှတ်",
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              left: 20, right: 20, top: 8),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: <Widget>[
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                decoration: shadowDecoration(
+                                                    Colors.white),
+                                                child: DropdownButton(
+                                                  value:
+                                                      nrc_initial_options_Value,
+                                                  items:
+                                                      nrc_initial_options_dropDownMenuItems,
+                                                  icon: const Icon(Icons
+                                                      .keyboard_arrow_down),
+                                                  iconSize: 0,
+                                                  elevation: 16,
+                                                  underline: const SizedBox(),
+                                                  onChanged:
+                                                      nrcInitialOptionschangedDropDownItem,
+                                                ),
+                                              ),
+                                              Container(
+                                                margin: const EdgeInsets.only(
+                                                    left: 8, right: 8),
+                                                child: const Text(
+                                                  "/",
+                                                ),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                decoration: shadowDecoration(
+                                                    Colors.white),
+                                                child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 8, right: 8),
+                                                    child: DropdownButton(
+                                                      value:
+                                                          nrc_region_state_options_Value,
+                                                      icon: const Icon(Icons
+                                                          .keyboard_arrow_down),
+                                                      iconSize: 0,
+                                                      elevation: 16,
+                                                      underline:
+                                                          const SizedBox(),
+                                                      items:
+                                                          nrc_region_state_options_dropDownMenuItems,
+                                                      onChanged:
+                                                          nrcInitialRegionStateOptionschangedDropDownItem,
+                                                    )),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                margin: const EdgeInsets.only(
+                                                    left: 8),
+                                                decoration: shadowDecoration(
+                                                    Colors.white),
+                                                child: DropdownButton(
+                                                  value: nrc_type_options_Value,
+                                                  items:
+                                                      nrc_type_options_dropDownMenuItems,
+                                                  icon: const Icon(Icons
+                                                      .keyboard_arrow_down),
+                                                  iconSize: 0,
+                                                  elevation: 16,
+                                                  underline: const SizedBox(),
+                                                  onChanged:
+                                                      nrcTypeOptionschangedDropDownItem,
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Container(
+                                                  height: 48,
+                                                  margin: const EdgeInsets.only(
+                                                      left: 12),
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 12),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color:
+                                                        const Color(0xffecf0f1),
+                                                  ),
+                                                  child: TextField(
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    controller: nrcController,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      border: InputBorder.none,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 5,
+                                    child: Container(),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                          left: 24, top: 12, bottom: 12),
+                                      child: fluent.DatePicker(
+                                        header: 'မွေးသက္ကရာဇ်ရွေးချယ်မည်',
+                                        headerStyle: TextStyle(fontSize: 15),
+                                        selected: selected,
+                                        onChanged: (time) =>
+                                            setState(() => selected = time),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: Stack(
+                                        children: [
+                                          TextFormField(
+                                            keyboardType: TextInputType.number,
+                                            controller: phoneController,
+                                            decoration: inputBoxDecoration(
+                                                "ဖုန်းနံပါတ်"),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 8, right: 20),
+                                            child: Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: buildOperator()),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: bloodBankNoController,
+                                        decoration: inputBoxDecoration(
+                                            "သွေးဘဏ်ကတ်နံပါတ်"),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: totalDonationController,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        decoration: inputBoxDecoration(
+                                            "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: homeNoController,
+                                        decoration: inputBoxDecoration(
+                                            "အိမ်အမှတ်/တိုက်ခန်းအမှတ်"),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: streetController,
+                                        decoration:
+                                            inputBoxDecoration("လမ်းအမည်"),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: quarterController,
+                                        decoration:
+                                            inputBoxDecoration("ရပ်ကွက်အမည်"),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              left: 20,
+                                              top: 16,
+                                              bottom: 8,
+                                              right: 20),
+                                          child: TypeAheadField(
+                                            hideSuggestionsOnKeyboardHide:
+                                                false,
+                                            textFieldConfiguration:
+                                                TextFieldConfiguration(
+                                              controller: townController,
+                                              autofocus: false,
+                                              decoration: inputBoxDecoration(
+                                                  "မြို့နယ်"),
+                                            ),
+                                            suggestionsCallback: (pattern) {
+                                              townshipsSelected.clear();
+                                              townshipsSelected
+                                                  .addAll(townships);
+                                              townshipsSelected.retainWhere(
+                                                  (s) => s
+                                                      .toLowerCase()
+                                                      .contains(pattern
+                                                          .toLowerCase()));
+                                              return townshipsSelected;
+                                            },
+                                            transitionBuilder: (context,
+                                                suggestionsBox, controller) {
+                                              return suggestionsBox;
+                                            },
+                                            itemBuilder: (context, suggestion) {
+                                              return ListTile(
+                                                title: Text(
+                                                  suggestion.toString(),
+                                                  textScaleFactor: 1.0,
+                                                ),
+                                              );
+                                            },
+                                            errorBuilder: (BuildContext context,
+                                                    Object? error) =>
+                                                Text('$error',
+                                                    style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .errorColor)),
+                                            onSuggestionSelected: (suggestion) {
+                                              townController.text =
+                                                  suggestion.toString();
+                                              setRegion(suggestion.toString());
+                                            },
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              left: 30, bottom: 4, right: 20),
+                                          child: Text(regional,
+                                              textScaleFactor: 1.0,
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: primaryColor)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width / 3,
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 4, bottom: 8, right: 20),
+                                decoration: const BoxDecoration(
+                                    color: Color(0xFFefefef),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(12.0))),
+                                child: TextFormField(
+                                    controller: noteController,
+                                    maxLines: 2,
+                                    decoration: const InputDecoration(
+                                      hintText: "မှတ်ချက်ရေးမည်",
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding: EdgeInsets.only(
+                                          left: 24,
+                                          bottom: 8,
+                                          top: 20,
+                                          right: 15),
+                                      hintStyle: TextStyle(
+                                          fontSize: 16.0, color: Colors.grey),
+                                    )),
+                              ),
+                            ],
+                          ),
+                        )),
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: primaryColor,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(12.0))),
+                        width: MediaQuery.of(context).size.width / 2.8,
+                        margin: const EdgeInsets.only(
+                            left: 54, bottom: 16, right: 8),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                            if (nameController.text.isNotEmpty &&
+                                fatherNameController.text.isNotEmpty &&
+                                phoneController.text.isNotEmpty &&
+                                selectedBloodType != "သွေးအုပ်စု") {
+                              var members = ref.watch(membersProvider);
+                              //check member exist by name, father name and nrc
+                              var exist = members
+                                  .where((element) =>
+                                      element.name ==
+                                          nameController.text.toString() &&
+                                      element.fatherName ==
+                                          fatherNameController.text
+                                              .toString() &&
+                                      element.bloodType == selectedBloodType)
+                                  .toList()
+                                  .isNotEmpty;
+
+                              if (!exist) {
+                                getAutoIncrementKey();
+                              } else {
+                                var data = members
+                                    .where((element) =>
+                                        element.name ==
+                                            nameController.text.toString() &&
+                                        element.fatherName ==
+                                            fatherNameController.text
+                                                .toString() &&
+                                        element.bloodType == selectedBloodType)
+                                    .toList()
+                                    .first;
+                                memberExistDialog(context, data);
+                              }
+                            } else {
+                              Utils.messageDialog(
+                                  "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
+                                  context,
+                                  "ပြင်ဆင်မည်",
+                                  Colors.black);
+                            }
+                          },
+                          child: const Align(
+                              alignment: Alignment.center,
+                              child: Padding(
+                                  padding: EdgeInsets.only(top: 8, bottom: 8),
+                                  child: Text(
+                                    "ထည့်သွင်းမည်",
+                                    textScaleFactor: 1.0,
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.white),
+                                  ))),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
       ),
     );
   }
 
-  static YYDialog memberExistDialog(
-      BuildContext context, String name, Map<String, dynamic> data) {
+  static YYDialog memberExistDialog(BuildContext context, Member data) {
     return YYDialog().build()
       ..width = MediaQuery.of(context).size.width - 60
       ..backgroundColor = Colors.white
@@ -1416,7 +1369,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                 Expanded(
                   flex: 4,
                   child: Text(
-                    data["name"],
+                    data.name.toString(),
                     style: const TextStyle(fontSize: 14, color: Colors.black),
                   ),
                 ),
@@ -1445,7 +1398,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                 Expanded(
                   flex: 4,
                   child: Text(
-                    data["father_name"],
+                    data.fatherName.toString(),
                     style: const TextStyle(fontSize: 14, color: Colors.black),
                   ),
                 ),
@@ -1474,7 +1427,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                 Expanded(
                   flex: 4,
                   child: Text(
-                    data["birth_date"],
+                    data.birthDate.toString(),
                     style: const TextStyle(fontSize: 14, color: Colors.black),
                   ),
                 ),
@@ -1503,7 +1456,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                 Expanded(
                   flex: 4,
                   child: Text(
-                    data["nrc"],
+                    data.nrc.toString(),
                     style: const TextStyle(fontSize: 14, color: Colors.black),
                   ),
                 ),
@@ -1558,6 +1511,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
     if (editable && memberIDController.text.toString().isNotEmpty) {
       if (memberIDController.text.toString().contains("-") &&
           memberIDController.text.toString().length == 6) {
+        DateTime dt = DateTime.parse('2010-01-01 12:00:00');
         ref.watch(realmProvider)!.createMember(
               memberId: memberIDController.text.toString(),
               name: nameController.text.toString(),
@@ -1565,12 +1519,15 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
               birthDate: birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
               nrc: _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
               phone: phoneController.text.toString(),
+              lastDate: dt,
               bloodType: selectedBloodType,
               bloodBankCard: bloodBankNoController.text.toString() != ""
                   ? bloodBankNoController.text.toString()
                   : "-",
               totalCount: totalDonationController.text.toString(),
               memberCount: "0",
+              registerDate: DateTime.now(),
+              status: "available",
               address: homeNoController.text.toString() +
                   " ၊ " +
                   streetController.text.toString() +
@@ -1580,10 +1537,8 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                   townController.text.toString(),
               note: noteController.text.toString(),
             );
+        Navigator.pop(context);
       } else {
-        setState(() {
-          _isLoading = false;
-        });
         Utils.messageDialog("အဖွဲ့ဝင်အမှတ် မှားယွင်းနေပါသည်", context,
             "ပြင်ဆင်မည်", Colors.black);
       }
