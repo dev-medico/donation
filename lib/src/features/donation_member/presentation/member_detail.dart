@@ -1,63 +1,38 @@
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/donation/donation_by_member_data_source.dart';
+import 'package:donation/src/features/donation/donation_detail.dart';
 import 'package:donation/src/features/donation_member/presentation/member_edit.dart';
+import 'package:donation/src/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-class MemberDetailScreen extends StatefulWidget {
+class MemberDetailScreen extends ConsumerStatefulWidget {
   static const routeName = '/member-detail';
   Member data;
   MemberDetailScreen({Key? key, required this.data}) : super(key: key);
 
   @override
-  State<MemberDetailScreen> createState() => _MemberDetailScreenState(data);
+  ConsumerState<MemberDetailScreen> createState() =>
+      _MemberDetailScreenState(data);
 }
 
-class _MemberDetailScreenState extends State<MemberDetailScreen> {
+class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
   Member data;
   _MemberDetailScreenState(this.data);
-  //List<DonationSearchRecords> donationDatas = [];
-
-  @override
-  void initState() {
-    super.initState();
-    //fetchCount();
-  }
-
-  // fetchCount() {
-
-  //   XataRepository()
-  //       .getDonationsListByMemberId(data.memberId.toString())
-  //       .then((value) {
-  //     print("Donation List Response - ${value.body}");
-  //     setState(() {
-  //       donationDatas =
-  //           DonationSearchListResponse.fromJson(jsonDecode(value.body))
-  //               .records!;
-  //       donationDatas.sort((a, b) {
-  //         return DateTime.parse(b.date == null
-  //                 ? "2020-01-01"
-  //                 : b.date.toString().contains("T")
-  //                     ? b.date.toString().split("T")[0]
-  //                     : b.date.toString().contains(" ")
-  //                         ? b.date.toString().split(" ")[0]
-  //                         : "2020-01-01")
-  //             .compareTo(DateTime.parse(a.date == null
-  //                 ? "2020-01-01"
-  //                 : b.date.toString().contains("T")
-  //                     ? b.date.toString().split("T")[0]
-  //                     : b.date.toString().contains(" ")
-  //                         ? b.date.toString().split(" ")[0]
-  //                         : "2020-01-01"));
-  //       });
-  //     });
-  //   });
-  // }
+  List<Donation> donationDatas = [];
 
   @override
   Widget build(BuildContext context) {
+    var donations = ref.watch(donationsProvider);
+    donationDatas = donations
+        .where((element) =>
+            element.memberId.toString() == widget.data.memberId.toString())
+        .toList();
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(
@@ -136,7 +111,10 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                const Text("အဖွဲ့ဝင်သည့်ရက်စွဲ",
+                                Text(
+                                    Responsive.isMobile(context)
+                                        ? "ရက်စွဲ"
+                                        : "အဖွဲ့ဝင်သည့်ရက်စွဲ",
                                     style: TextStyle(
                                         fontSize: 14,
                                         color: Color.fromARGB(
@@ -149,7 +127,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                                         height: 12,
                                       ),
                                 Text(
-                                  data.registerDate.toString(),
+                                  data.registerDate!.string("dd MMM yyyy"),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.black,
@@ -548,41 +526,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                     const SizedBox(
                       height: 12,
                     ),
-                    //TODO Donation Data
-                    // ListView(
-                    //   shrinkWrap: true,
-                    //   physics: const NeverScrollableScrollPhysics(),
-                    //   scrollDirection: Axis.vertical,
-                    //   children: [
-                    //     SizedBox(
-                    //       height: donationDatas.length > 8
-                    //           ? MediaQuery.of(context).size.height *
-                    //               (donationDatas.length / 8)
-                    //           : MediaQuery.of(context).size.height,
-                    //       width: MediaQuery.of(context).size.width * 2.5,
-                    //       child: ListView(
-                    //         shrinkWrap: true,
-                    //         scrollDirection: Axis.horizontal,
-                    //         children: [
-                    //           Column(
-                    //             crossAxisAlignment: CrossAxisAlignment.start,
-                    //             children: [
-                    //               header(),
-                    //               Column(
-                    //                 // shrinkWrap: true,
-                    //                 // scrollDirection: Axis.vertical,
-                    //                 children: donationDatas
-                    //                     .map((DonationSearchRecords document) {
-                    //                   return blood_donationRow(document);
-                    //                 }).toList(),
-                    //               ),
-                    //             ],
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ),
-                    //   ],
-                    // )
+                    buildSimpleTable(donationDatas)
                   ],
                 )
               ],
@@ -594,7 +538,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                   flex: 3,
                   child: Container(
                     width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.9,
+                    height: MediaQuery.of(context).size.height * 0.8,
                     decoration: shadowDecoration(Colors.white),
                     margin: const EdgeInsets.only(
                       left: 20,
@@ -1053,54 +997,38 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                     ),
                   ),
                 ),
-                Expanded(flex: 5, child: Container()
-                    //TODO Donation Data
-                    // child: Container(
-                    //   margin: const EdgeInsets.only(top: 20, left: 8, bottom: 12),
-                    //   height: MediaQuery.of(context).size.height * 0.9,
-                    //   child: ListView(
-                    //     shrinkWrap: true,
-                    //     physics: const BouncingScrollPhysics(),
-                    //     children: [
-                    //       ListView(
-                    //         shrinkWrap: true,
-                    //         physics: const BouncingScrollPhysics(),
-                    //         scrollDirection: Axis.vertical,
-                    //         children: [
-                    //           SizedBox(
-                    //             height: donationDatas.length > 8
-                    //                 ? MediaQuery.of(context).size.height *
-                    //                     (donationDatas.length / 8)
-                    //                 : MediaQuery.of(context).size.height,
-                    //             width: MediaQuery.of(context).size.width * 0.575,
-                    //             child: ListView(
-                    //               shrinkWrap: true,
-                    //               scrollDirection: Axis.horizontal,
-                    //               children: [
-                    //                 Column(
-                    //                   crossAxisAlignment:
-                    //                       CrossAxisAlignment.start,
-                    //                   children: [
-                    //                     header(),
-                    //                     Column(
-                    //                       // shrinkWrap: true,
-                    //                       // scrollDirection: Axis.vertical,
-                    //                       children: donationDatas.map(
-                    //                           (DonationSearchRecords document) {
-                    //                         return blood_donationRow(document);
-                    //                       }).toList(),
-                    //                     ),
-                    //                   ],
-                    //                 ),
-                    //               ],
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
-                    )
+                Expanded(
+                    flex: 5,
+                    child: Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      decoration: shadowDecoration(Colors.white),
+                      margin: const EdgeInsets.only(
+                        left: 20,
+                        top: 30,
+                        bottom: 20,
+                      ),
+                      child: ListView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding:
+                            const EdgeInsets.only(top: 4, left: 18, bottom: 12),
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: const Text("အဖွဲ့နှင့် သွေးလှူဒါန်းမှုများ",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black)),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          buildSimpleTable(donationDatas)
+                        ],
+                      ),
+                    ))
               ],
             ),
     );
@@ -1231,145 +1159,91 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
     );
   }
 
-  // Widget blood_donationRow(DonationSearchRecords data) {
-  //   return GestureDetector(
-  //     behavior: HitTestBehavior.translucent,
-  //     onTap: () async {
-  //       await Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (context) => DonationDetailScreen(
-  //             data: data,
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //     child: Container(
-  //       height: Responsive.isMobile(context) ? 60 : 60,
-  //       decoration: shadowDecoration(Colors.white),
-  //       width: Responsive.isMobile(context)
-  //           ? MediaQuery.of(context).size.width * 2
-  //           : MediaQuery.of(context).size.width * 0.575,
-  //       margin: EdgeInsets.only(
-  //           top: 4,
-  //           left: Responsive.isMobile(context) ? 4 : 32,
-  //           right: Responsive.isMobile(context) ? 20 : 32),
-  //       padding: const EdgeInsets.only(left: 18, right: 20),
-  //       child: ListView(
-  //         shrinkWrap: true,
-  //         scrollDirection: Axis.horizontal,
-  //         children: [
-  //           Row(
-  //             children: [
-  //               SizedBox(
-  //                 width: Responsive.isMobile(context)
-  //                     ? MediaQuery.of(context).size.width / 4.1
-  //                     : MediaQuery.of(context).size.width / 13,
-  //                 child: Text(
-  //                   //data['date'].toString(),
-  //                   data.date!.contains("T")
-  //                       ? data.date!.split("T")[0].toString()
-  //                       : data.date!.contains(" ")
-  //                           ? data.date!.split(" ")[0]
-  //                           : "-",
-  //                   style: TextStyle(
-  //                       fontSize: Responsive.isMobile(context) ? 13 : 14,
-  //                       color: Colors.black),
-  //                 ),
-  //               ),
-  //               const SizedBox(
-  //                 width: 8,
-  //               ),
-  //               SizedBox(
-  //                 width: Responsive.isMobile(context)
-  //                     ? MediaQuery.of(context).size.width / 3.2
-  //                     : MediaQuery.of(context).size.width / 10,
-  //                 child: Text(
-  //                   data.hospital ?? "-",
-  //                   textAlign: TextAlign.center,
-  //                   style: TextStyle(
-  //                       fontSize: Responsive.isMobile(context) ? 14 : 16,
-  //                       color: Colors.black),
-  //                 ),
-  //               ),
-  //               const SizedBox(
-  //                 width: 8,
-  //               ),
-  //               SizedBox(
-  //                 width: Responsive.isMobile(context)
-  //                     ? MediaQuery.of(context).size.width / 3
-  //                     : MediaQuery.of(context).size.width / 10,
-  //                 child: Text(
-  //                   data.patientName == null || data.patientName == ""
-  //                       ? "-"
-  //                       : data.patientName!,
-  //                   style: TextStyle(
-  //                       fontSize: Responsive.isMobile(context) ? 14 : 16,
-  //                       color: Colors.black),
-  //                 ),
-  //               ),
-  //               SizedBox(
-  //                 width: Responsive.isMobile(context) ? 12 : 4,
-  //               ),
-  //               SizedBox(
-  //                 width: Responsive.isMobile(context)
-  //                     ? MediaQuery.of(context).size.width / 2.8
-  //                     : MediaQuery.of(context).size.width / 12,
-  //                 child: Text(
-  //                   data.patientAddress == null ||
-  //                           data.patientAddress == "၊" ||
-  //                           data.patientAddress == ""
-  //                       ? "-"
-  //                       : data.patientAddress!,
-  //                   textAlign: TextAlign.left,
-  //                   style: TextStyle(
-  //                       height: 1.5,
-  //                       fontSize: Responsive.isMobile(context) ? 14 : 16,
-  //                       color: Colors.black),
-  //                 ),
-  //               ),
-  //               const SizedBox(
-  //                 width: 12,
-  //               ),
-  //               SizedBox(
-  //                 width: Responsive.isMobile(context)
-  //                     ? MediaQuery.of(context).size.width / 7.4
-  //                     : MediaQuery.of(context).size.width / 22,
-  //                 child: Text(
-  //                   data.patientAge == null || data.patientAge == ""
-  //                       ? "-"
-  //                       : data.patientAge!,
-  //                   textAlign: TextAlign.center,
-  //                   style: TextStyle(
-  //                       fontSize: Responsive.isMobile(context) ? 13 : 14,
-  //                       color: Colors.black),
-  //                 ),
-  //               ),
-  //               const SizedBox(
-  //                 width: 4,
-  //               ),
-  //               SizedBox(
-  //                 width: Responsive.isMobile(context)
-  //                     ? MediaQuery.of(context).size.width / 3.2
-  //                     : MediaQuery.of(context).size.width / 9,
-  //                 child: Text(
-  //                   data.patientDisease == null || data.patientDisease == ""
-  //                       ? "-"
-  //                       : data.patientDisease!,
-  //                   textAlign: TextAlign.center,
-  //                   style: TextStyle(
-  //                       fontSize: Responsive.isMobile(context) ? 14 : 16,
-  //                       color: Colors.black),
-  //                 ),
-  //               ),
-  //               const SizedBox(
-  //                 width: 6,
-  //               ),
-  //             ],
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+  buildSimpleTable(List<Donation> data) {
+    DonationByMemberDataSource memberDataDataSource =
+        DonationByMemberDataSource(donationData: data, ref: ref);
+    return Container(
+      margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
+      child: SfDataGrid(
+        source: memberDataDataSource,
+        onCellTap: (details) async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DonationDetailScreen(
+                data: data[details.rowColumnIndex.rowIndex - 1],
+              ),
+            ),
+          );
+        },
+        gridLinesVisibility: GridLinesVisibility.both,
+        headerGridLinesVisibility: GridLinesVisibility.both,
+        columnWidthMode: Responsive.isMobile(context)
+            ? ColumnWidthMode.auto
+            : ColumnWidthMode.fitByCellValue,
+        columns: <GridColumn>[
+          GridColumn(
+              columnName: 'ရက်စွဲ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'ရက်စွဲ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'လှူဒါန်းသည့်နေရာ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'လှူဒါန်းသည့်နေရာ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'လူနာအမည်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'လူနာအမည်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'လိပ်စာ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'လိပ်စာ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'အသက်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'အသက်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'ဖြစ်ပွားသည့်ရောဂါ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'ဖြစ်ပွားသည့်ရောဂါ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+        ],
+      ),
+    );
+  }
 }

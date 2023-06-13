@@ -102,8 +102,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                 itemBuilder: (BuildContext context, int index) {
                   return Visibility(
                     visible: widget.data
-                        .where((element) =>
-                            element.member == bloodTypes[index])
+                        .where((element) => element.member == bloodTypes[index])
                         .isNotEmpty,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -117,18 +116,18 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                               color: Colors.black,
                             ),
                           ),
-                          // Text(
-                          //   widget.data
-                          //       .where((element) =>
-                          //           element.member!.bloodType.toString() ==
-                          //           bloodTypes[index])
-                          //       .length
-                          //       .toString(),
-                          //   style: TextStyle(
-                          //     fontSize: Responsive.isMobile(context) ? 15 : 16,
-                          //     color: primaryColor,
-                          //   ),
-                          // ),
+                          Text(
+                            widget.data
+                                .where((element) =>
+                                    element.memberObj!.bloodType!.toString() ==
+                                    bloodTypes[index])
+                                .length
+                                .toString(),
+                            style: TextStyle(
+                              fontSize: Responsive.isMobile(context) ? 15 : 16,
+                              color: primaryColor,
+                            ),
+                          ),
                         ],
                       ),
                     ),

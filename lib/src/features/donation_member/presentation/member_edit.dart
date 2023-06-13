@@ -3,10 +3,10 @@ import 'dart:convert';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:donation/data/response/township_response/datum.dart';
@@ -17,7 +17,6 @@ import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class MemberEditScreen extends ConsumerStatefulWidget {
   Member data;
@@ -54,7 +53,6 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
   String township1ID = " ";
   String regional = " ";
   String post_code = " ";
-  bool _isLoading = false;
   //late FirebaseFirestore firestore;
   late TownshipResponse townshipResponse;
   List<String> townships = <String>[];
@@ -76,6 +74,8 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     return menuItems;
   }
 
+  DateTime? selected;
+
   @override
   void initState() {
     super.initState();
@@ -91,13 +91,13 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     bloodBankNoController.text = data.bloodBankCard ?? "";
     totalDonationController.text = data.totalCount.toString();
     homeNoController.text =
-        data.address != null ? data.address!.split(',')[0] : "";
+        data.address != null ? data.address!.split('၊')[0] : "";
     streetController.text =
-        data.address != null ? data.address!.split(',')[1] : "";
+        data.address != null ? data.address!.split('၊')[1] : "";
     quarterController.text =
-        data.address != null ? data.address!.split(',')[2] : "";
+        data.address != null ? data.address!.split('၊')[2] : "";
     townController.text =
-        data.address != null ? data.address!.split(',')[3] : "";
+        data.address != null ? data.address!.split('၊')[3] : "";
     setRegion(townController.text.toString());
     birthDate = data.birthDate ?? "";
 
@@ -142,36 +142,28 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
   Widget build(BuildContext context) {
     YYDialog.init(context);
     return Scaffold(
-      backgroundColor: const Color(0xfff2f2f2),
-      appBar: AppBar(
-        flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [primaryColor, primaryDark],
-        ))),
-        centerTitle: true,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 4, right: 12),
-          child: Center(
-            child: Text("အဖွဲ့၀င်အချက်အလက် ပြင်ဆင်မည်",
-                textScaleFactor: 1.0,
-                style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15 : 16,
-                    color: Colors.white)),
+        backgroundColor: const Color(0xfff2f2f2),
+        appBar: AppBar(
+          flexibleSpace: Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [primaryColor, primaryDark],
+          ))),
+          centerTitle: true,
+          title: Padding(
+            padding: const EdgeInsets.only(top: 4, right: 12),
+            child: Center(
+              child: Text("အဖွဲ့၀င်အချက်အလက် ပြင်ဆင်မည်",
+                  textScaleFactor: 1.0,
+                  style: TextStyle(
+                      fontSize: Responsive.isMobile(context) ? 15 : 16,
+                      color: Colors.white)),
+            ),
           ),
         ),
-      ),
-      body: ModalProgressHUD(
-        inAsyncCall: _isLoading,
-        color: Colors.black,
-        progressIndicator: const SpinKitCircle(
-          color: Colors.white,
-          size: 60.0,
-        ),
-        dismissible: false,
-        child: SafeArea(
+        body: SafeArea(
           child: Responsive.isMobile(context)
               ? SingleChildScrollView(
                   child: Column(
@@ -206,27 +198,20 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                   ),
                                 ),
                                 Container(
-                                    width: double.infinity,
-                                    height: 50,
-                                    margin: const EdgeInsets.only(
-                                        left: 20, top: 8, bottom: 4, right: 20),
-                                    child: NeumorphicButton(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                            top: birthDate == "မွေးသက္ကရာဇ်"
-                                                ? 0
-                                                : 6.0),
-                                        child: Text(
-                                          birthDate,
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        showDatePicker();
-                                      },
-                                    )),
+                                  margin: EdgeInsets.only(
+                                      left: 24, top: 12, bottom: 12),
+                                  child: fluent.DatePicker(
+                                    header: 'မွေးသက္ကရာဇ်ရွေးချယ်မည်',
+                                    headerStyle: TextStyle(fontSize: 15),
+                                    selected: selected,
+                                    onChanged: (time) => setState(() {
+                                      String formattedDate =
+                                          DateFormat('dd MMM yyyy')
+                                              .format(time);
+                                      birthDate = formattedDate;
+                                    }),
+                                  ),
+                                ),
                                 Container(
                                   margin: const EdgeInsets.only(
                                       left: 20, top: 16, bottom: 8, right: 20),
@@ -475,10 +460,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                       nrcController.text.isNotEmpty &&
                                       phoneController.text.isNotEmpty &&
                                       selectedBloodType != "သွေးအုပ်စု") {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    updateMember(data.id.toString());
+                                    updateMember(data.memberId.toString());
                                   } else {
                                     Utils.messageDialog(
                                         "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
@@ -639,23 +621,18 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                     Expanded(
                                       flex: 3,
                                       child: Container(
-                                        width: double.infinity,
-                                        height: 50,
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 4,
-                                            right: 20),
-                                        child: NeumorphicButton(
-                                          child: Text(
-                                            birthDate,
-                                            style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.black),
-                                          ),
-                                          onPressed: () {
-                                            showDatePicker();
-                                          },
+                                        margin: EdgeInsets.only(
+                                            left: 24, top: 12, bottom: 12),
+                                        child: fluent.DatePicker(
+                                          header: 'မွေးသက္ကရာဇ်ရွေးချယ်မည်',
+                                          headerStyle: TextStyle(fontSize: 15),
+                                          selected: selected,
+                                          onChanged: (time) => setState(() {
+                                            String formattedDate =
+                                                DateFormat('dd MMM yyyy')
+                                                    .format(time);
+                                            birthDate = formattedDate;
+                                          }),
                                         ),
                                       ),
                                     ),
@@ -924,10 +901,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                     nrcController.text.isNotEmpty &&
                                     phoneController.text.isNotEmpty &&
                                     selectedBloodType != "သွေးအုပ်စု") {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  updateMember(data.id.toString());
+                                  updateMember(data.memberId.toString());
                                 } else {
                                   Utils.messageDialog(
                                       "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
@@ -940,12 +914,12 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                   alignment: Alignment.center,
                                   child: Padding(
                                       padding:
-                                          EdgeInsets.only(top: 16, bottom: 16),
+                                          EdgeInsets.only(top: 8, bottom: 8),
                                       child: Text(
                                         "ပြင်ဆင်မည်",
                                         textScaleFactor: 1.0,
                                         style: TextStyle(
-                                            fontSize: 18.0,
+                                            fontSize: 16.0,
                                             color: Colors.white),
                                       ))),
                             ),
@@ -953,9 +927,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                     ],
                   ),
                 ),
-        ),
-      ),
-    );
+        ));
   }
 
   updateMember(String memberId) {
@@ -981,7 +953,6 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
               ? nrcController.text.toString()
               : "-",
           phone: phoneController.text.toString(),
-          //registerDate: now,
           address:
               "${homeNoController.text}, ${streetController.text}, ${quarterController.text}, ${townController.text}, $region1",
         );

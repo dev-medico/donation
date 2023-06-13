@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:donation/realm/realm_services.dart';
+import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/providers/providers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/member_response.dart';
-import 'package:donation/data/response/total_data_response.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
 import 'package:donation/data/response/xata_member_list_response.dart';
@@ -17,10 +18,10 @@ import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
-import 'package:intl/intl.dart';
-import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class NewBloodDonationScreen extends StatefulWidget {
+class NewBloodDonationScreen extends ConsumerStatefulWidget {
   NewBloodDonationScreen({Key? key}) : super(key: key);
   int selectedIndex = 0;
 
@@ -28,7 +29,7 @@ class NewBloodDonationScreen extends StatefulWidget {
   NewBloodDonationState createState() => NewBloodDonationState();
 }
 
-class NewBloodDonationState extends State<NewBloodDonationScreen> {
+class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
   final nameController = TextEditingController();
   final ageController = TextEditingController();
   final quarterController = TextEditingController();
@@ -38,7 +39,7 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
   final diseaseController = TextEditingController();
   bool isSwitched = false;
   String operatorImg = "";
-  String member_record_id = "";
+  Member? selectedMember;
 
   String donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
   DateTime? donationDateDetail;
@@ -49,15 +50,10 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
   String township1ID = " ";
   String regional = " ";
   String post_code = " ";
-  bool _isLoading = false;
   late TownshipResponse townshipResponse;
   List<String> townships = <String>[];
   List<String> townshipsSelected = <String>[];
-  List<String> membersSelected = <String>[];
-  List<String> allMembers = <String>[];
-  List<String> allMemberIDs = <String>[];
-  List<String> allBTypes = <String>[];
-  List<String> allFatherNames = <String>[];
+
   List<Datum> datas = <Datum>[];
   bool switchNew = true;
 
@@ -125,60 +121,35 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
     initial();
   }
 
-  addDonation(
-      String memberRecordId,
-      String name,
-      String age,
-      String selectHospital,
-      String selectDisease,
-      String quarter,
-      String township) {
-    XataRepository()
-        .uploadNewDonations(jsonEncode(<String, dynamic>{
-      "patient_disease": diseaseController.text.toString(),
-      "hospital": selectHospital,
-      "patient_address": "$quarter၊$township",
-      "patient_age": age,
-      "patient_name": name,
-      "date": donationDateDetail.toString(),
-      "member": memberRecordId
-    }))
-        .then((value) {
-      if (value.statusCode.toString().startsWith("2")) {
-        setState(() {
-          _isLoading = false;
-        });
-        Utils.messageSuccessDialog(
-            "သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-            context,
-            "အိုကေ",
-            Colors.black);
+  addDonation(String name, String age, String selectHospital,
+      String selectDisease, String quarter, String township) {
+    ref.watch(realmProvider)!.createDonation(
+          member: selectedMember != null ? selectedMember!.id : null,
+          date: donationDateDetail!.string("dd MMM yyyy"),
+          donationDate: donationDateDetail,
+          hospital: selectHospital,
+          memberObj: selectedMember,
+          memberId:
+              selectedMember != null ? selectedMember!.memberId.toString() : "",
+          patientAddress: "$quarter၊$township",
+          patientAge: age,
+          patientDisease: diseaseController.text.toString(),
+          patientName: name,
+        );
 
-        XataRepository().getDonationsTotal().then((value) {
-          var newMemberCount = int.parse(
-                  TotalDataResponse.fromJson(jsonDecode(value.body))
-                      .records!
-                      .first
-                      .value
-                      .toString()) +
-              1;
-          XataRepository().updateDonationsTotal(newMemberCount);
-          int donationCount = 0;
-          int totalCount = 0;
-          for (var element in allMember) {
-            if (element.id == memberRecordId) {
-              donationCount = (element.donationCounts ?? 0) + 1;
-              totalCount = (element.totalCount ?? 0) + 1;
-            }
-          }
-          XataRepository()
-              .updateMember(memberRecordId, donationCount, totalCount);
-        });
-      } else {
-        log(value.statusCode.toString());
-        log(value.body);
-      }
-    });
+    Utils.messageSuccessDialog(
+        "သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+        context,
+        "အိုကေ",
+        Colors.black);
+
+    ref.watch(realmProvider)!.updateMember(
+          selectedMember!,
+          memberCount:
+              ((int.parse(selectedMember!.memberCount ?? "0")) + 1).toString(),
+          totalCount:
+              ((int.parse(selectedMember!.totalCount ?? "0")) + 1).toString(),
+        );
   }
 
   void initial() async {
@@ -189,11 +160,8 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
       datas.add(element);
       townships.add(element.township!);
     }
-    setState(() {
-      _isLoading = true;
-    });
 
-    callAPI("");
+    // callAPI("");
   }
 
   callAPI(String after) {
@@ -220,15 +188,12 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
             .page!
             .cursor!);
       } else {
-        setState(() {
-          _isLoading = false;
-        });
         allMember.sort((a, b) => a.name!.compareTo(b.name!));
         for (var element in allMember) {
-          allMembers.add(element.name!);
-          allMemberIDs.add(element.id!);
-          allBTypes.add(element.bloodType!);
-          allFatherNames.add(element.fatherName!);
+          // allMembers.add(element.name!);
+          // allMemberIDs.add(element.id!);
+          // allBTypes.add(element.bloodType!);
+          // allFatherNames.add(element.fatherName!);
         }
       }
     });
@@ -236,323 +201,497 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var members = ref.watch(membersProvider);
     YYDialog.init(context);
-    return ModalProgressHUD(
-      inAsyncCall: _isLoading,
-      child: Scaffold(
-        backgroundColor: const Color(0xfff2f2f2),
-        appBar: AppBar(
-          flexibleSpace: Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [primaryColor, primaryDark],
-          ))),
-          centerTitle: true,
-          title: Padding(
-            padding: const EdgeInsets.only(top: 4, right: 18),
-            child: Center(
-              child: Text("သွေးလှူဒါန်းမှုအသစ် ထည့်သွင်းမည်",
-                  textScaleFactor: 1.0,
-                  style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 16,
-                      color: Colors.white)),
-            ),
+    return Scaffold(
+      backgroundColor: const Color(0xfff2f2f2),
+      appBar: AppBar(
+        flexibleSpace: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [primaryColor, primaryDark],
+        ))),
+        centerTitle: true,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 4, right: 18),
+          child: Center(
+            child: Text("သွေးလှူဒါန်းမှုအသစ် ထည့်သွင်းမည်",
+                textScaleFactor: 1.0,
+                style: TextStyle(
+                    fontSize: Responsive.isMobile(context) ? 15 : 16,
+                    color: Colors.white)),
           ),
         ),
-        body: ModalProgressHUD(
-          inAsyncCall: _isLoading,
-          color: Colors.black,
-          progressIndicator: const SpinKitCircle(
-            color: Colors.white,
-            size: 60.0,
-          ),
-          dismissible: false,
-          child: SafeArea(
-            child: Responsive.isMobile(context)
-                ? SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          margin: const EdgeInsets.only(
-                              left: 12, top: 12, bottom: 15, right: 12),
-                          child: Container(
-                            padding: const EdgeInsets.only(
-                                bottom: 20, left: 4, right: 4, top: 8),
-                            decoration: shadowDecoration(Colors.white),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 16.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          "အကျဥ်း",
-                                          textScaleFactor: 1.0,
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: switchNew
-                                                  ? Colors.black
-                                                  : primaryColor),
-                                        ),
-                                        Switch(
-                                            value: switchNew,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                switchNew = value;
-                                              });
-                                            }),
-                                        Text(
-                                          "အပြည့်စုံ",
-                                          textScaleFactor: 1.0,
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: switchNew
-                                                  ? primaryColor
-                                                  : Colors.black),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: double.infinity,
-                                  height: 50,
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 4, right: 20),
-                                  child: NeumorphicButton(
-                                    child: Text(
-                                      donationDate,
+      ),
+      body: SafeArea(
+        child: Responsive.isMobile(context)
+            ? SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, top: 12, bottom: 15, right: 12),
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                            bottom: 20, left: 4, right: 4, top: 8),
+                        decoration: shadowDecoration(Colors.white),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      "အကျဥ်း",
+                                      textScaleFactor: 1.0,
                                       style: TextStyle(
-                                          fontSize: 14, color: primaryColor),
+                                          fontSize: 15,
+                                          color: switchNew
+                                              ? Colors.black
+                                              : primaryColor),
                                     ),
-                                    onPressed: () {
-                                      showDatePicker();
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, right: 20),
-                                  child: TypeAheadField(
-                                    hideSuggestionsOnKeyboardHide: false,
-                                    textFieldConfiguration:
-                                        TextFieldConfiguration(
-                                      controller: memberController,
-                                      autofocus: false,
-                                      decoration:
-                                          inputBoxDecoration("လှူဒါန်းသူ"),
-                                    ),
-                                    suggestionsCallback: (pattern) async {
-                                      membersSelected.clear();
-                                      membersSelected.addAll(allMembers);
-                                      membersSelected.retainWhere((s) => s
-                                          .toLowerCase()
-                                          .contains(pattern.toLowerCase()));
-                                      return membersSelected;
-                                    },
-                                    transitionBuilder:
-                                        (context, suggestionsBox, controller) {
-                                      return suggestionsBox;
-                                    },
-                                    itemBuilder: (context, suggestion) {
-                                      var data = suggestion;
-                                      String bloodType = "";
-                                      String fatherName = "";
-                                      for (var i = 0;
-                                          i < allMembers.length;
-                                          i++) {
-                                        if (allMembers[i] == data) {
-                                          bloodType = allBTypes[i];
-                                          fatherName = allFatherNames[i];
-                                        }
-                                      }
-
-                                      return Column(
-                                        children: [
-                                          ListTile(
-                                            title: Text(data.toString()),
-                                            subtitle:
-                                                Text("$bloodType  $fatherName"),
-                                          ),
-                                          const Divider(
-                                            height: 1,
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                    errorBuilder:
-                                        (BuildContext context, Object? error) =>
-                                            Text('$error',
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .errorColor)),
-                                    onSuggestionSelected: (suggestion) {
-                                      var data = suggestion;
-                                      memberController.text = data.toString();
-                                      for (var i = 0;
-                                          i < allMembers.length;
-                                          i++) {
-                                        if (allMembers[i] == data) {
+                                    Switch(
+                                        value: switchNew,
+                                        onChanged: (value) {
                                           setState(() {
-                                            member_record_id = allMemberIDs[i];
+                                            switchNew = value;
                                           });
-                                        }
-                                      }
-                                    },
-                                  ),
-                                ),
-                                Visibility(
-                                  visible: switchNew,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 20,
-                                        top: 24,
-                                        bottom: 8,
-                                        right: 20),
-                                    child: TextFormField(
-                                      controller: nameController,
-                                      decoration:
-                                          inputBoxDecoration("လူနာအမည်"),
+                                        }),
+                                    Text(
+                                      "အပြည့်စုံ",
+                                      textScaleFactor: 1.0,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          color: switchNew
+                                              ? primaryColor
+                                              : Colors.black),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                Visibility(
-                                  visible: switchNew,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 20,
-                                        top: 16,
-                                        bottom: 8,
-                                        right: 20),
-                                    child: TextFormField(
-                                      controller: ageController,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.digitsOnly
-                                      ],
-                                      decoration:
-                                          inputBoxDecoration("လူနာအသက်"),
-                                    ),
-                                  ),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(
+                                  left: 24, top: 12, bottom: 12),
+                              child: fluent.DatePicker(
+                                header: 'လှူဒါန်းသည့်ရက် ရွေးချယ်မည်',
+                                headerStyle: TextStyle(fontSize: 15),
+                                selected: donationDateDetail,
+                                onChanged: (time) => setState(() {
+                                  donationDate = time.string("dd-MM-yyyy");
+                                  donationDateDetail = time;
+                                }),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  left: 20, top: 16, right: 20),
+                              child: TypeAheadField(
+                                hideSuggestionsOnKeyboardHide: false,
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  controller: memberController,
+                                  autofocus: false,
+                                  decoration: inputBoxDecoration("လှူဒါန်းသူ"),
                                 ),
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, top: 16, bottom: 8, right: 20),
-                                  child: TypeAheadField(
-                                    hideSuggestionsOnKeyboardHide: false,
-                                    textFieldConfiguration:
-                                        TextFieldConfiguration(
-                                      controller: hospitalController,
-                                      autofocus: false,
-                                      decoration: inputBoxDecoration(
-                                          "လှူဒါန်းသည့်နေရာ"),
-                                    ),
-                                    suggestionsCallback: (pattern) {
-                                      hospitalsSelected.clear();
-                                      hospitalsSelected.addAll(hospitals);
-                                      hospitalsSelected.retainWhere((s) => s
+                                suggestionsCallback: (pattern) async {
+                                  var list = members
+                                      .where((element) => element.name!
                                           .toLowerCase()
-                                          .contains(pattern.toLowerCase()));
-                                      return hospitalsSelected;
-                                    },
-                                    transitionBuilder:
-                                        (context, suggestionsBox, controller) {
-                                      return suggestionsBox;
-                                    },
-                                    itemBuilder: (context, suggestion) {
-                                      return ListTile(
+                                          .contains(pattern.toLowerCase()))
+                                      .toList();
+                                  return list;
+                                },
+                                transitionBuilder:
+                                    (context, suggestionsBox, controller) {
+                                  return suggestionsBox;
+                                },
+                                itemBuilder: (context, suggestion) {
+                                  return Container(
+                                    color: Colors.white,
+                                    child: Column(
+                                      children: [
+                                        ListTile(
+                                          title:
+                                              Text(suggestion.name.toString()),
+                                          subtitle: Text(
+                                              "${suggestion.bloodType}  ${suggestion.fatherName}"),
+                                        ),
+                                        const Divider(
+                                          height: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (BuildContext context,
+                                        Object? error) =>
+                                    Text('$error',
+                                        style: TextStyle(
+                                            color:
+                                                Theme.of(context).errorColor)),
+                                onSuggestionSelected: (suggestion) {
+                                  setState(() {
+                                    selectedMember = suggestion;
+                                  });
+                                  memberController.text =
+                                      suggestion.name.toString();
+                                },
+                              ),
+                            ),
+                            Visibility(
+                              visible: switchNew,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 24, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: nameController,
+                                  decoration: inputBoxDecoration("လူနာအမည်"),
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: switchNew,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: ageController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  decoration: inputBoxDecoration("လူနာအသက်"),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  left: 20, top: 16, bottom: 8, right: 20),
+                              child: TypeAheadField(
+                                hideSuggestionsOnKeyboardHide: false,
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  controller: hospitalController,
+                                  autofocus: false,
+                                  decoration:
+                                      inputBoxDecoration("လှူဒါန်းသည့်နေရာ"),
+                                ),
+                                suggestionsCallback: (pattern) {
+                                  hospitalsSelected.clear();
+                                  hospitalsSelected.addAll(hospitals);
+                                  hospitalsSelected.retainWhere((s) => s
+                                      .toLowerCase()
+                                      .contains(pattern.toLowerCase()));
+                                  return hospitalsSelected;
+                                },
+                                transitionBuilder:
+                                    (context, suggestionsBox, controller) {
+                                  return suggestionsBox;
+                                },
+                                itemBuilder: (context, suggestion) {
+                                  return Container(
+                                    color: Colors.white,
+                                    child: ListTile(
+                                      title: Text(
+                                        suggestion.toString(),
+                                        textScaleFactor: 1.0,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (BuildContext context,
+                                        Object? error) =>
+                                    Text('$error',
+                                        style: TextStyle(
+                                            color:
+                                                Theme.of(context).errorColor)),
+                                onSuggestionSelected: (suggestion) {
+                                  hospitalController.text =
+                                      suggestion.toString();
+                                },
+                              ),
+                            ),
+                            Visibility(
+                              visible: switchNew,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: diseaseController,
+                                  keyboardType: TextInputType.text,
+                                  decoration:
+                                      inputBoxDecoration("ဖြစ်ပွားသည့်ရောဂါ"),
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: switchNew,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TextFormField(
+                                  controller: quarterController,
+                                  decoration:
+                                      inputBoxDecoration("ရပ်ကွက်/ရွာအမည်"),
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: switchNew,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 8, right: 20),
+                                child: TypeAheadField(
+                                  hideSuggestionsOnKeyboardHide: false,
+                                  textFieldConfiguration:
+                                      TextFieldConfiguration(
+                                    controller: townController,
+                                    autofocus: false,
+                                    decoration: inputBoxDecoration("မြို့နယ်"),
+                                  ),
+                                  suggestionsCallback: (pattern) {
+                                    townshipsSelected.clear();
+                                    townshipsSelected.addAll(townships);
+                                    townshipsSelected.retainWhere((s) => s
+                                        .toLowerCase()
+                                        .contains(pattern.toLowerCase()));
+                                    return townshipsSelected;
+                                  },
+                                  transitionBuilder:
+                                      (context, suggestionsBox, controller) {
+                                    return suggestionsBox;
+                                  },
+                                  itemBuilder: (context, suggestion) {
+                                    return Container(
+                                      color: Colors.white,
+                                      child: ListTile(
                                         title: Text(
                                           suggestion.toString(),
                                           textScaleFactor: 1.0,
                                         ),
-                                      );
-                                    },
-                                    errorBuilder:
-                                        (BuildContext context, Object? error) =>
-                                            Text('$error',
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .errorColor)),
-                                    onSuggestionSelected: (suggestion) {
-                                      hospitalController.text =
-                                          suggestion.toString();
-                                    },
-                                  ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (BuildContext context,
+                                          Object? error) =>
+                                      Text('$error',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .errorColor)),
+                                  onSuggestionSelected: (suggestion) {
+                                    townController.text = suggestion.toString();
+                                    setRegion(suggestion.toString());
+                                  },
                                 ),
-                                Visibility(
-                                  visible: switchNew,
+                              ),
+                            ),
+                            Visibility(
+                              visible: switchNew,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    left: 30, bottom: 4, right: 20),
+                                child: Text(regional,
+                                    textScaleFactor: 1.0,
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 15, color: primaryColor)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          margin: const EdgeInsets.only(
+                              left: 15, bottom: 16, right: 15),
+                          width: double.infinity,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              if (selectedMember != null &&
+                                  donationDate !=
+                                      "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
+                                addDonation(
+                                    nameController.text.toString(),
+                                    ageController.text.toString(),
+                                    hospitalController.text.toString(),
+                                    diseaseController.text.toString(),
+                                    quarterController.text.toString(),
+                                    townController.text.toString());
+                              } else if (selectedMember == null) {
+                                Utils.messageDialog(
+                                    "လှူဒါန်းသူ ရွေးချယ်ပေးရပါမည်",
+                                    context,
+                                    "ရွေးချယ်မည်",
+                                    Colors.black);
+                              } else if (donationDate ==
+                                  "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
+                                Utils.messageDialog(
+                                    "လှူဒါန်းသည့် ရက်စွဲ ရွေးချယ်ပေးရပါမည်",
+                                    context,
+                                    "ရွေးချယ်မည်",
+                                    Colors.black);
+                              } else {
+                                Utils.messageDialog(
+                                    "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
+                                    context,
+                                    "ပြင်ဆင်မည်",
+                                    Colors.black);
+                              }
+                            },
+                            child: const Align(
+                                alignment: Alignment.center,
+                                child: Padding(
+                                    padding: EdgeInsets.only(top: 8, bottom: 8),
+                                    child: Text(
+                                      "ထည့်သွင်းမည်",
+                                      textScaleFactor: 1.0,
+                                      style: TextStyle(
+                                          fontSize: 16.0, color: Colors.white),
+                                    ))),
+                          ),
+                        ))
+                  ],
+                ),
+              )
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(
+                          left: 54,
+                          top: 12,
+                          bottom: 15,
+                          right: MediaQuery.of(context).size.width * 0.1),
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                            bottom: 20, left: 4, right: 4, top: 8),
+                        decoration: shadowDecoration(Colors.white),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      "အကျဥ်း",
+                                      textScaleFactor: 1.0,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          color: switchNew
+                                              ? Colors.black
+                                              : primaryColor),
+                                    ),
+                                    Switch(
+                                        value: switchNew,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            switchNew = value;
+                                          });
+                                        }),
+                                    Text(
+                                      "အပြည့်စုံ",
+                                      textScaleFactor: 1.0,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          color: switchNew
+                                              ? primaryColor
+                                              : Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
                                   child: Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 20,
-                                        top: 16,
-                                        bottom: 8,
-                                        right: 20),
-                                    child: TextFormField(
-                                      controller: diseaseController,
-                                      keyboardType: TextInputType.text,
-                                      decoration: inputBoxDecoration(
-                                          "ဖြစ်ပွားသည့်ရောဂါ"),
+                                    margin: EdgeInsets.only(
+                                        left: 24, top: 12, bottom: 12),
+                                    child: fluent.DatePicker(
+                                      header: 'လှူဒါန်းသည့်ရက် ရွေးချယ်မည်',
+                                      headerStyle: TextStyle(fontSize: 15),
+                                      selected: donationDateDetail,
+                                      onChanged: (time) => setState(() {
+                                        donationDate =
+                                            time.string("dd-MM-yyyy");
+                                        donationDateDetail = time;
+                                      }),
                                     ),
                                   ),
                                 ),
-                                Visibility(
-                                  visible: switchNew,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 20,
-                                        top: 16,
-                                        bottom: 8,
-                                        right: 20),
-                                    child: TextFormField(
-                                      controller: quarterController,
-                                      decoration:
-                                          inputBoxDecoration("ရပ်ကွက်/ရွာအမည်"),
-                                    ),
-                                  ),
+                                Expanded(
+                                  flex: 5,
+                                  child: Container(),
                                 ),
-                                Visibility(
-                                  visible: switchNew,
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
                                   child: Container(
                                     margin: const EdgeInsets.only(
-                                        left: 20,
-                                        top: 16,
-                                        bottom: 8,
-                                        right: 20),
+                                        left: 20, top: 16, right: 20),
                                     child: TypeAheadField(
                                       hideSuggestionsOnKeyboardHide: false,
                                       textFieldConfiguration:
                                           TextFieldConfiguration(
-                                        controller: townController,
+                                        controller: memberController,
                                         autofocus: false,
                                         decoration:
-                                            inputBoxDecoration("မြို့နယ်"),
+                                            inputBoxDecoration("လှူဒါန်းသူ"),
                                       ),
-                                      suggestionsCallback: (pattern) {
-                                        townshipsSelected.clear();
-                                        townshipsSelected.addAll(townships);
-                                        townshipsSelected.retainWhere((s) => s
-                                            .toLowerCase()
-                                            .contains(pattern.toLowerCase()));
-                                        return townshipsSelected;
+                                      suggestionsCallback: (pattern) async {
+                                        var list = members
+                                            .where((element) => element.name!
+                                                .toLowerCase()
+                                                .contains(
+                                                    pattern.toLowerCase()))
+                                            .toList();
+                                        return list;
                                       },
                                       transitionBuilder: (context,
                                           suggestionsBox, controller) {
                                         return suggestionsBox;
                                       },
                                       itemBuilder: (context, suggestion) {
-                                        return ListTile(
-                                          title: Text(
-                                            suggestion.toString(),
-                                            textScaleFactor: 1.0,
+                                        return Container(
+                                          color: Colors.white,
+                                          child: Column(
+                                            children: [
+                                              ListTile(
+                                                title: Text(
+                                                    suggestion.name.toString()),
+                                                subtitle: Text(
+                                                    "${suggestion.bloodType}  ${suggestion.fatherName}"),
+                                              ),
+                                              const Divider(
+                                                height: 1,
+                                              ),
+                                            ],
                                           ),
                                         );
                                       },
@@ -563,381 +702,212 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                                   color: Theme.of(context)
                                                       .errorColor)),
                                       onSuggestionSelected: (suggestion) {
-                                        townController.text =
-                                            suggestion.toString();
-                                        setRegion(suggestion.toString());
+                                        setState(() {
+                                          selectedMember = suggestion;
+                                        });
+                                        memberController.text =
+                                            suggestion.name.toString();
                                       },
                                     ),
                                   ),
                                 ),
-                                Visibility(
-                                  visible: switchNew,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 30, bottom: 4, right: 20),
-                                    child: Text(regional,
-                                        textScaleFactor: 1.0,
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            fontSize: 15, color: primaryColor)),
+                                Expanded(
+                                  flex: 3,
+                                  child: Visibility(
+                                    visible: switchNew,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 24,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: nameController,
+                                        decoration:
+                                            inputBoxDecoration("လူနာအမည်"),
+                                      ),
+                                    ),
                                   ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Container(),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                        Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(12.0))),
-                              margin: const EdgeInsets.only(
-                                  left: 15, bottom: 16, right: 15),
-                              width: double.infinity,
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTap: () {
-                                  if (member_record_id != "" &&
-                                      donationDate !=
-                                          "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    addDonation(
-                                        member_record_id,
-                                        nameController.text.toString(),
-                                        ageController.text.toString(),
-                                        hospitalController.text.toString(),
-                                        diseaseController.text.toString(),
-                                        quarterController.text.toString(),
-                                        townController.text.toString());
-                                  } else if (member_record_id == "") {
-                                    Utils.messageDialog(
-                                        "လှူဒါန်းသူ ရွေးချယ်ပေးရပါမည်",
-                                        context,
-                                        "ရွေးချယ်မည်",
-                                        Colors.black);
-                                  } else if (donationDate ==
-                                      "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
-                                    Utils.messageDialog(
-                                        "လှူဒါန်းသည့် ရက်စွဲ ရွေးချယ်ပေးရပါမည်",
-                                        context,
-                                        "ရွေးချယ်မည်",
-                                        Colors.black);
-                                  } else {
-                                    Utils.messageDialog(
-                                        "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
-                                        context,
-                                        "ပြင်ဆင်မည်",
-                                        Colors.black);
-                                  }
-
-                                  // if (operatorImg == "") {
-                                  //   Util.messageDialog("ဖုန်းနံပါတ် မှားယွင်းနေပါသည်",
-                                  //       context, "ပြင်ဆင်မည်", Colors.black);
-                                  // } else if (homeNo.text.toString() == "" ||
-                                  //     street.text.toString() == "" ||
-                                  //     quarter.text.toString() == "" ||
-                                  //     town1.toString() == " ") {
-                                  //   Util.messageDialog(
-                                  //       "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
-                                  //       context,
-                                  //       "ဖြည့်သွင်းမည်",
-                                  //       Colors.black);
-                                  // } else {
-
-                                  // }
-                                },
-                                child: const Align(
-                                    alignment: Alignment.center,
-                                    child: Padding(
-                                        padding:
-                                            EdgeInsets.only(top: 8, bottom: 8),
-                                        child: Text(
-                                          "ထည့်သွင်းမည်",
-                                          textScaleFactor: 1.0,
-                                          style: TextStyle(
-                                              fontSize: 16.0,
-                                              color: Colors.white),
-                                        ))),
-                              ),
-                            ))
-                      ],
-                    ),
-                  )
-                : SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(
-                              left: 54,
-                              top: 12,
-                              bottom: 15,
-                              right: MediaQuery.of(context).size.width * 0.1),
-                          child: Container(
-                            padding: const EdgeInsets.only(
-                                bottom: 20, left: 4, right: 4, top: 8),
-                            decoration: shadowDecoration(Colors.white),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 16.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          "အကျဥ်း",
-                                          textScaleFactor: 1.0,
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: switchNew
-                                                  ? Colors.black
-                                                  : primaryColor),
-                                        ),
-                                        Switch(
-                                            value: switchNew,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                switchNew = value;
-                                              });
-                                            }),
-                                        Text(
-                                          "အပြည့်စုံ",
-                                          textScaleFactor: 1.0,
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: switchNew
-                                                  ? primaryColor
-                                                  : Colors.black),
-                                        ),
-                                      ],
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        left: 20,
+                                        top: 16,
+                                        bottom: 8,
+                                        right: 20),
+                                    child: TypeAheadField(
+                                      hideSuggestionsOnKeyboardHide: false,
+                                      textFieldConfiguration:
+                                          TextFieldConfiguration(
+                                        controller: hospitalController,
+                                        autofocus: false,
+                                        decoration: inputBoxDecoration(
+                                            "လှူဒါန်းသည့်နေရာ"),
+                                      ),
+                                      suggestionsCallback: (pattern) {
+                                        hospitalsSelected.clear();
+                                        hospitalsSelected.addAll(hospitals);
+                                        hospitalsSelected.retainWhere((s) => s
+                                            .toLowerCase()
+                                            .contains(pattern.toLowerCase()));
+                                        return hospitalsSelected;
+                                      },
+                                      transitionBuilder: (context,
+                                          suggestionsBox, controller) {
+                                        return suggestionsBox;
+                                      },
+                                      itemBuilder: (context, suggestion) {
+                                        return Container(
+                                          color: Colors.white,
+                                          child: ListTile(
+                                            title: Text(
+                                              suggestion.toString(),
+                                              textScaleFactor: 1.0,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (BuildContext context,
+                                              Object? error) =>
+                                          Text('$error',
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .errorColor)),
+                                      onSuggestionSelected: (suggestion) {
+                                        hospitalController.text =
+                                            suggestion.toString();
+                                      },
                                     ),
                                   ),
                                 ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        width: double.infinity,
-                                        height: 50,
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 4,
-                                            right: 20),
-                                        child: NeumorphicButton(
-                                          child: Text(
-                                            donationDate,
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: primaryColor),
-                                          ),
-                                          onPressed: () {
-                                            showDatePicker();
-                                          },
-                                        ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Visibility(
+                                    visible: switchNew,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: ageController,
+                                        keyboardType: TextInputType.number,
+                                        decoration:
+                                            inputBoxDecoration("လူနာအသက်"),
                                       ),
                                     ),
-                                    Expanded(
-                                      flex: 5,
-                                      child: Container(),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20, top: 16, right: 20),
-                                        child: TypeAheadField(
-                                          hideSuggestionsOnKeyboardHide: false,
-                                          textFieldConfiguration:
-                                              TextFieldConfiguration(
-                                            controller: memberController,
-                                            autofocus: false,
-                                            decoration: inputBoxDecoration(
-                                                "လှူဒါန်းသူ"),
-                                          ),
-                                          suggestionsCallback: (pattern) async {
-                                            membersSelected.clear();
-                                            membersSelected.addAll(allMembers);
-                                            membersSelected.retainWhere((s) => s
-                                                .toLowerCase()
-                                                .contains(
-                                                    pattern.toLowerCase()));
-                                            return membersSelected;
-                                          },
-                                          transitionBuilder: (context,
-                                              suggestionsBox, controller) {
-                                            return suggestionsBox;
-                                          },
-                                          itemBuilder: (context, suggestion) {
-                                            var data = suggestion;
-                                            String bloodType = "";
-                                            String fatherName = "";
-                                            for (var i = 0;
-                                                i < allMembers.length;
-                                                i++) {
-                                              if (allMembers[i] == data) {
-                                                bloodType = allBTypes[i];
-                                                fatherName = allFatherNames[i];
-                                              }
-                                            }
-
-                                            return Column(
-                                              children: [
-                                                ListTile(
-                                                  title: Text(data.toString()),
-                                                  subtitle: Text(
-                                                      "$bloodType  $fatherName"),
-                                                ),
-                                                const Divider(
-                                                  height: 1,
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                          errorBuilder: (BuildContext context,
-                                                  Object? error) =>
-                                              Text('$error',
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .errorColor)),
-                                          onSuggestionSelected: (suggestion) {
-                                            var data = suggestion;
-                                            memberController.text =
-                                                data.toString();
-                                            for (var i = 0;
-                                                i < allMembers.length;
-                                                i++) {
-                                              if (allMembers[i] == data) {
-                                                setState(() {
-                                                  member_record_id =
-                                                      allMemberIDs[i];
-                                                });
-                                              }
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Visibility(
-                                        visible: switchNew,
-                                        child: Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 20,
-                                              top: 24,
-                                              bottom: 8,
-                                              right: 20),
-                                          child: TextFormField(
-                                            controller: nameController,
-                                            decoration:
-                                                inputBoxDecoration("လူနာအမည်"),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(),
-                                    ),
-                                  ],
+                                Expanded(
+                                  flex: 2,
+                                  child: Container(),
                                 ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: TypeAheadField(
-                                          hideSuggestionsOnKeyboardHide: false,
-                                          textFieldConfiguration:
-                                              TextFieldConfiguration(
-                                            controller: hospitalController,
-                                            autofocus: false,
-                                            decoration: inputBoxDecoration(
-                                                "လှူဒါန်းသည့်နေရာ"),
-                                          ),
-                                          suggestionsCallback: (pattern) {
-                                            hospitalsSelected.clear();
-                                            hospitalsSelected.addAll(hospitals);
-                                            hospitalsSelected.retainWhere((s) =>
-                                                s.toLowerCase().contains(
-                                                    pattern.toLowerCase()));
-                                            return hospitalsSelected;
-                                          },
-                                          transitionBuilder: (context,
-                                              suggestionsBox, controller) {
-                                            return suggestionsBox;
-                                          },
-                                          itemBuilder: (context, suggestion) {
-                                            return ListTile(
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Visibility(
+                                    visible: switchNew,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TypeAheadField(
+                                        hideSuggestionsOnKeyboardHide: false,
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          controller: diseaseController,
+                                          autofocus: false,
+                                          decoration: inputBoxDecoration(
+                                              "ဖြစ်ပွားသည့်ရောဂါ"),
+                                        ),
+                                        suggestionsCallback: (pattern) {
+                                          diseasesSelected.clear();
+                                          diseasesSelected.addAll(diseases);
+                                          diseasesSelected.retainWhere((s) => s
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                          return diseasesSelected;
+                                        },
+                                        transitionBuilder: (context,
+                                            suggestionsBox, controller) {
+                                          return suggestionsBox;
+                                        },
+                                        itemBuilder: (context, suggestion) {
+                                          return Container(
+                                            color: Colors.white,
+                                            child: ListTile(
                                               title: Text(
                                                 suggestion.toString(),
                                                 textScaleFactor: 1.0,
                                               ),
-                                            );
-                                          },
-                                          errorBuilder: (BuildContext context,
-                                                  Object? error) =>
-                                              Text('$error',
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .errorColor)),
-                                          onSuggestionSelected: (suggestion) {
-                                            hospitalController.text =
-                                                suggestion.toString();
-                                          },
-                                        ),
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (BuildContext context,
+                                                Object? error) =>
+                                            Text('$error',
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .errorColor)),
+                                        onSuggestionSelected: (suggestion) {
+                                          diseaseController.text =
+                                              suggestion.toString();
+                                        },
                                       ),
                                     ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Visibility(
-                                        visible: switchNew,
-                                        child: Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 20,
-                                              top: 16,
-                                              bottom: 8,
-                                              right: 20),
-                                          child: TextFormField(
-                                            controller: ageController,
-                                            keyboardType: TextInputType.number,
-                                            decoration:
-                                                inputBoxDecoration("လူနာအသက်"),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Visibility(
+                                Expanded(
+                                  flex: 5,
+                                  child: Container(),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Visibility(
+                                    visible: switchNew,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: quarterController,
+                                        decoration: inputBoxDecoration(
+                                            "ရပ်ကွက်/ရွာအမည်"),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Visibility(
                                         visible: switchNew,
                                         child: Container(
                                           margin: const EdgeInsets.only(
@@ -950,30 +920,34 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                                 false,
                                             textFieldConfiguration:
                                                 TextFieldConfiguration(
-                                              controller: diseaseController,
+                                              controller: townController,
                                               autofocus: false,
                                               decoration: inputBoxDecoration(
-                                                  "ဖြစ်ပွားသည့်ရောဂါ"),
+                                                  "မြို့နယ်"),
                                             ),
                                             suggestionsCallback: (pattern) {
-                                              diseasesSelected.clear();
-                                              diseasesSelected.addAll(diseases);
-                                              diseasesSelected.retainWhere(
+                                              townshipsSelected.clear();
+                                              townshipsSelected
+                                                  .addAll(townships);
+                                              townshipsSelected.retainWhere(
                                                   (s) => s
                                                       .toLowerCase()
                                                       .contains(pattern
                                                           .toLowerCase()));
-                                              return diseasesSelected;
+                                              return townshipsSelected;
                                             },
                                             transitionBuilder: (context,
                                                 suggestionsBox, controller) {
                                               return suggestionsBox;
                                             },
                                             itemBuilder: (context, suggestion) {
-                                              return ListTile(
-                                                title: Text(
-                                                  suggestion.toString(),
-                                                  textScaleFactor: 1.0,
+                                              return Container(
+                                                color: Colors.white,
+                                                child: ListTile(
+                                                  title: Text(
+                                                    suggestion.toString(),
+                                                    textScaleFactor: 1.0,
+                                                  ),
                                                 ),
                                               );
                                             },
@@ -984,218 +958,99 @@ class NewBloodDonationState extends State<NewBloodDonationScreen> {
                                                         color: Theme.of(context)
                                                             .errorColor)),
                                             onSuggestionSelected: (suggestion) {
-                                              diseaseController.text =
+                                              townController.text =
                                                   suggestion.toString();
+                                              setRegion(suggestion.toString());
                                             },
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      flex: 5,
-                                      child: Container(),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Visibility(
+                                      Visibility(
                                         visible: switchNew,
                                         child: Container(
                                           margin: const EdgeInsets.only(
-                                              left: 20,
-                                              top: 16,
-                                              bottom: 8,
-                                              right: 20),
-                                          child: TextFormField(
-                                            controller: quarterController,
-                                            decoration: inputBoxDecoration(
-                                                "ရပ်ကွက်/ရွာအမည်"),
-                                          ),
+                                              left: 30, bottom: 4, right: 20),
+                                          child: Text(regional,
+                                              textScaleFactor: 1.0,
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: primaryColor)),
                                         ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Visibility(
-                                            visible: switchNew,
-                                            child: Container(
-                                              margin: const EdgeInsets.only(
-                                                  left: 20,
-                                                  top: 16,
-                                                  bottom: 8,
-                                                  right: 20),
-                                              child: TypeAheadField(
-                                                hideSuggestionsOnKeyboardHide:
-                                                    false,
-                                                textFieldConfiguration:
-                                                    TextFieldConfiguration(
-                                                  controller: townController,
-                                                  autofocus: false,
-                                                  decoration:
-                                                      inputBoxDecoration(
-                                                          "မြို့နယ်"),
-                                                ),
-                                                suggestionsCallback: (pattern) {
-                                                  townshipsSelected.clear();
-                                                  townshipsSelected
-                                                      .addAll(townships);
-                                                  townshipsSelected.retainWhere(
-                                                      (s) => s
-                                                          .toLowerCase()
-                                                          .contains(pattern
-                                                              .toLowerCase()));
-                                                  return townshipsSelected;
-                                                },
-                                                transitionBuilder: (context,
-                                                    suggestionsBox,
-                                                    controller) {
-                                                  return suggestionsBox;
-                                                },
-                                                itemBuilder:
-                                                    (context, suggestion) {
-                                                  return ListTile(
-                                                    title: Text(
-                                                      suggestion.toString(),
-                                                      textScaleFactor: 1.0,
-                                                    ),
-                                                  );
-                                                },
-                                                errorBuilder: (BuildContext
-                                                            context,
-                                                        Object? error) =>
-                                                    Text('$error',
-                                                        style: TextStyle(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .errorColor)),
-                                                onSuggestionSelected:
-                                                    (suggestion) {
-                                                  townController.text =
-                                                      suggestion.toString();
-                                                  setRegion(
-                                                      suggestion.toString());
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                          Visibility(
-                                            visible: switchNew,
-                                            child: Container(
-                                              margin: const EdgeInsets.only(
-                                                  left: 30,
-                                                  bottom: 4,
-                                                  right: 20),
-                                              child: Text(regional,
-                                                  textScaleFactor: 1.0,
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: primaryColor)),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Container(),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Container(),
                                 ),
                               ],
                             ),
-                          ),
+                          ],
                         ),
-                        Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(12.0))),
-                              width: MediaQuery.of(context).size.width / 2.8,
-                              margin: const EdgeInsets.only(
-                                  left: 54, bottom: 16, right: 8),
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTap: () {
-                                  if (member_record_id != "" &&
-                                      donationDate !=
-                                          "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    addDonation(
-                                        member_record_id,
-                                        nameController.text.toString(),
-                                        ageController.text.toString(),
-                                        hospitalController.text.toString(),
-                                        diseaseController.text.toString(),
-                                        quarterController.text.toString(),
-                                        townController.text.toString());
-                                  } else if (member_record_id == "") {
-                                    Utils.messageDialog(
-                                        "လှူဒါန်းသူ ရွေးချယ်ပေးရပါမည်",
-                                        context,
-                                        "ရွေးချယ်မည်",
-                                        Colors.black);
-                                  } else if (donationDate ==
-                                      "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
-                                    Utils.messageDialog(
-                                        "လှူဒါန်းသည့် ရက်စွဲ ရွေးချယ်ပေးရပါမည်",
-                                        context,
-                                        "ရွေးချယ်မည်",
-                                        Colors.black);
-                                  } else {
-                                    Utils.messageDialog(
-                                        "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
-                                        context,
-                                        "ပြင်ဆင်မည်",
-                                        Colors.black);
-                                  }
-                                },
-                                child: const Align(
-                                    alignment: Alignment.center,
-                                    child: Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 16, bottom: 16),
-                                        child: Text(
-                                          "ထည့်သွင်းမည်",
-                                          textScaleFactor: 1.0,
-                                          style: TextStyle(
-                                              fontSize: 16.0,
-                                              color: Colors.white),
-                                        ))),
-                              ),
-                            ))
-                      ],
+                      ),
                     ),
-                  ),
-          ),
-        ),
+                    Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          width: MediaQuery.of(context).size.width / 2.8,
+                          margin: const EdgeInsets.only(
+                              left: 54, bottom: 16, right: 8),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              if (selectedMember != null &&
+                                  donationDate !=
+                                      "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
+                                addDonation(
+                                    nameController.text.toString(),
+                                    ageController.text.toString(),
+                                    hospitalController.text.toString(),
+                                    diseaseController.text.toString(),
+                                    quarterController.text.toString(),
+                                    townController.text.toString());
+                              } else if (selectedMember == null) {
+                                Utils.messageDialog(
+                                    "လှူဒါန်းသူ ရွေးချယ်ပေးရပါမည်",
+                                    context,
+                                    "ရွေးချယ်မည်",
+                                    Colors.black);
+                              } else if (donationDate ==
+                                  "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
+                                Utils.messageDialog(
+                                    "လှူဒါန်းသည့် ရက်စွဲ ရွေးချယ်ပေးရပါမည်",
+                                    context,
+                                    "ရွေးချယ်မည်",
+                                    Colors.black);
+                              } else {
+                                Utils.messageDialog(
+                                    "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
+                                    context,
+                                    "ပြင်ဆင်မည်",
+                                    Colors.black);
+                              }
+                            },
+                            child: const Align(
+                                alignment: Alignment.center,
+                                child: Padding(
+                                    padding: EdgeInsets.only(top: 8, bottom: 8),
+                                    child: Text(
+                                      "ထည့်သွင်းမည်",
+                                      textScaleFactor: 1.0,
+                                      style: TextStyle(
+                                          fontSize: 16.0, color: Colors.white),
+                                    ))),
+                          ),
+                        ))
+                  ],
+                ),
+              ),
       ),
-    );
-  }
-
-  showDatePicker() async {
-    Utils.showCupertinoDatePicker(
-      context,
-      (DateTime newDateTime) {
-        setState(() {
-          String formattedDate = DateFormat('dd MMM yyyy').format(newDateTime);
-          donationDateDetail = newDateTime;
-          donationDate = formattedDate;
-        });
-      },
     );
   }
 

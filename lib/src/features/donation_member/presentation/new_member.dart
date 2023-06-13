@@ -417,19 +417,17 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                 ],
                               ),
                               Container(
-                                width: double.infinity,
-                                height: 50,
-                                margin: const EdgeInsets.only(
-                                    left: 20, top: 16, bottom: 4, right: 20),
-                                child: NeumorphicButton(
-                                  child: Text(
-                                    birthDate,
-                                    style: const TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                  onPressed: () {
-                                    showDatePicker();
-                                  },
+                                margin: EdgeInsets.only(
+                                    left: 24, top: 12, bottom: 12),
+                                child: fluent.DatePicker(
+                                  header: 'မွေးသက္ကရာဇ်ရွေးချယ်မည်',
+                                  headerStyle: TextStyle(fontSize: 15),
+                                  selected: selected,
+                                  onChanged: (time) => setState(() {
+                                    String formattedDate =
+                                        DateFormat('dd MMM yyyy').format(time);
+                                    birthDate = formattedDate;
+                                  }),
                                 ),
                               ),
                               Container(
@@ -1001,8 +999,12 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                         header: 'မွေးသက္ကရာဇ်ရွေးချယ်မည်',
                                         headerStyle: TextStyle(fontSize: 15),
                                         selected: selected,
-                                        onChanged: (time) =>
-                                            setState(() => selected = time),
+                                        onChanged: (time) => setState(() {
+                                          String formattedDate =
+                                              DateFormat('dd MMM yyyy')
+                                                  .format(time);
+                                          birthDate = formattedDate;
+                                        }),
                                       ),
                                     ),
                                   ),
@@ -1537,7 +1539,8 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                   townController.text.toString(),
               note: noteController.text.toString(),
             );
-        Navigator.pop(context);
+        Utils.messageSuccessDialog("အချက်အလက်ထည့်သွင်းခြင်း \nအောင်မြင်ပါသည်။",
+            context, "အိုကေ", Colors.black);
       } else {
         Utils.messageDialog("အဖွဲ့ဝင်အမှတ် မှားယွင်းနေပါသည်", context,
             "ပြင်ဆင်မည်", Colors.black);

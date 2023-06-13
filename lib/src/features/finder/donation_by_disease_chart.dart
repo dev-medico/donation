@@ -45,7 +45,12 @@ class _DonationByDiseaseScreenState
 
     return Container(
       margin: EdgeInsets.only(
-          left: 20, top: 20, right: MediaQuery.of(context).size.width * 0.34),
+          left: Responsive.isMobile(context) ? 16 : 20,
+          top: Responsive.isMobile(context) ? 16 : 20,
+          bottom: Responsive.isMobile(context) ? 32 : 0,
+          right: Responsive.isMobile(context)
+              ? 20
+              : MediaQuery.of(context).size.width * 0.34),
       child: NeumorphicButton(
         style: NeumorphicStyle(
           color: Colors.white,

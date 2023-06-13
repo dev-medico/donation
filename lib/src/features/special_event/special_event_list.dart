@@ -82,7 +82,9 @@ class _SpecialEventListScreenState
           child: buildSimpleTable(data),
         );
       }, loading: () {
-        return Container();
+        return Center(
+          child: CircularProgressIndicator(),
+        );
       }, error: (error, stack) {
         return Container();
       }),
@@ -118,7 +120,7 @@ class _SpecialEventListScreenState
                 titles[index],
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 13 : 14,
+                    fontSize: Responsive.isMobile(context) ? 11 : 14,
                     height: 1.4,
                     color: Colors.white),
               ),
@@ -139,7 +141,9 @@ class _SpecialEventListScreenState
                     child: Center(
                         child: Text(
                       data[rowIndex].date.toString(),
-                      style: const TextStyle(fontSize: 15, color: Colors.black),
+                      style: TextStyle(
+                          fontSize: Responsive.isMobile(context) ? 13 : 15,
+                          color: Colors.black),
                     ))),
               ),
               cells: List<ExpandableTableCell>.generate(
@@ -284,10 +288,12 @@ class _SpecialEventListScreenState
               color: primaryColor,
               height: 74,
               margin: const EdgeInsets.all(1),
-              child: const Center(
+              child: Center(
                   child: Text(
                 'ရက်စွဲ',
-                style: TextStyle(fontSize: 15, color: Colors.white),
+                style: TextStyle(
+                    fontSize: Responsive.isMobile(context) ? 13 : 15,
+                    color: Colors.white),
               ))),
         ),
         headers: header,

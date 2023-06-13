@@ -32,7 +32,9 @@ class DashboardCard extends ConsumerWidget {
     return Expanded(
       child: Container(
         height: Responsive.isMobile(context)
-            ? MediaQuery.of(context).size.height / 4.75
+            ? amount == ""
+                ? MediaQuery.of(context).size.height / 8
+                : MediaQuery.of(context).size.height / 4.3
             : amount == ""
                 ? MediaQuery.of(context).size.height * 0.13
                 : MediaQuery.of(context).size.height * 0.18,
@@ -81,7 +83,7 @@ class DashboardCard extends ConsumerWidget {
                 Text(
                   title,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 16 : 18,
+                      fontSize: Responsive.isMobile(context) ? 15 : 18,
                       fontWeight: FontWeight.bold,
                       color:
                           NeumorphicTheme.of(context)?.current!.variantColor),
@@ -90,7 +92,7 @@ class DashboardCard extends ConsumerWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 14 : 16,
+                      fontSize: Responsive.isMobile(context) ? 13 : 16,
                       color:
                           NeumorphicTheme.of(context)?.current!.variantColor),
                 ),

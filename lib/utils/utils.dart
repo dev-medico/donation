@@ -139,9 +139,9 @@ class Utils {
             onPressed: () {
               Navigator.of(context, rootNavigator: true).pop('dialog');
               Navigator.pop(context);
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
+              // if (Navigator.canPop(context)) {
+              //   Navigator.pop(context);
+              // }
             },
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
@@ -376,5 +376,21 @@ class Utils {
         );
       }
       ..show();
+  }
+}
+
+extension on DateTime {
+  String formatDate() {
+    return DateFormat('dd MMM yyyy').format(this);
+  }
+}
+
+extension FormatExtension on DateTime {
+  String string(String pattern) {
+    try {
+      return new DateFormat(pattern).format(this);
+    } catch (e) {
+      return "";
+    }
   }
 }

@@ -46,6 +46,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           Responsive.isMobile(context)
               ? ListView(
                   shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   children: [
                     Column(
                       children: [

@@ -237,6 +237,7 @@ class RealmServices with ChangeNotifier {
     String? memberId,
     String? patientAddress,
     String? patientAge,
+    DateTime? donationDate,
     String? patientDisease,
     String? patientName,
     ObjectId? member,
@@ -265,6 +266,9 @@ class RealmServices with ChangeNotifier {
       }
       if (member != null) {
         donation.member = member;
+      }
+      if (donationDate != null) {
+        donation.donationDate = donationDate;
       }
     });
     notifyListeners();
