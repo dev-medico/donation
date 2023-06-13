@@ -90,7 +90,9 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                     Expanded(
                       flex: 5,
                       child: Text(
-                        data.donationDate!.string("dd-MM-yyyy"),
+                        data.donationDate != null
+                            ? data.donationDate!.string("dd-MM-yyyy")
+                            : "",
                         style:
                             const TextStyle(fontSize: 14, color: Colors.black),
                       ),
@@ -1169,18 +1171,16 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
   }
 
   deleteDonation() {
-    ref.watch(realmProvider)!.deleteDonation(data);
-
     ref.watch(realmProvider)!.updateMember(
           data.memberObj!,
           memberCount:
-              ((int.parse(data.memberObj!.memberCount ?? "0")) + 1).toString(),
+              ((int.parse(data.memberObj!.memberCount ?? "0")) - 1).toString(),
           totalCount:
-              ((int.parse(data.memberObj!.totalCount ?? "0")) + 1).toString(),
+              ((int.parse(data.memberObj!.totalCount ?? "0")) - 1).toString(),
         );
+    ref.watch(realmProvider)!.deleteDonation(data);
 
-    Utils.messageSuccessDialog("စာရင်း ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။", context,
-        "အိုကေ", Colors.black);
+    Navigator.pop(context);
     // XataRepository().deleteDonationByID(data.id.toString()).then((value) {
     //   if (value.statusCode.toString().startsWith("2")) {
     //     XataRepository().getDonationsTotal().then((value) {

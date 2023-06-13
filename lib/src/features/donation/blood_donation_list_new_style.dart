@@ -449,7 +449,7 @@ class _BloodDonationListNewStyleState
                 Container(
                   padding: const EdgeInsets.only(left: 20, right: 20, top: 2),
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.91,
+                  height: MediaQuery.of(context).size.height * 0.82,
                   child: TabContainer(
                     controller: controller,
                     color: const Color(0xffe3e3e3),

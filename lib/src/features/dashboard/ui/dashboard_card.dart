@@ -36,8 +36,8 @@ class DashboardCard extends ConsumerWidget {
                 ? MediaQuery.of(context).size.height / 8
                 : MediaQuery.of(context).size.height / 4.3
             : amount == ""
-                ? MediaQuery.of(context).size.height * 0.13
-                : MediaQuery.of(context).size.height * 0.18,
+                ? MediaQuery.of(context).size.height * 0.15
+                : MediaQuery.of(context).size.height * 0.2,
         margin: const EdgeInsets.only(top: 12, right: 12),
         child: NeumorphicButton(
           style: NeumorphicStyle(

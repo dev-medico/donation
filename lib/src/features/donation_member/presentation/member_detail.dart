@@ -1175,6 +1175,7 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
               ),
             ),
           );
+          ref.invalidate(membersProvider);
         },
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,
