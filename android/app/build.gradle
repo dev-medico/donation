@@ -41,8 +41,8 @@ android {
         applicationId "com.red.juniors"
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 29
-        versionName "1.1.6"
+        versionCode 30
+        versionName "1.1.7"
     }
 
     signingConfigs {
