@@ -60,8 +60,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final results = ref.watch(
-        membersDataProvider((search: searchKey, bloodType: selectedBloodType)));
+    final results = ref.watch(membersDataProvider);
 
     log("Data " + results.length.toString());
     if (firstTime) {
@@ -306,6 +305,23 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                               setState(() {
                                 searchKey = val;
                               });
+                              dataSegments.clear();
+                              oldData.forEach((element) {
+                                if (element.name
+                                    .toString()
+                                    .toLowerCase()
+                                    .split("")
+                                    .toSet()
+                                    .intersection(searchKey
+                                        .toLowerCase()
+                                        .split("")
+                                        .toSet())
+                                    .isNotEmpty) {
+                                  setState(() {
+                                    dataSegments.add(element);
+                                  });
+                                }
+                              });
                             });
                           },
                           decoration: InputDecoration(
@@ -520,6 +536,23 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                                 Timer(const Duration(milliseconds: 700), () {
                               setState(() {
                                 searchKey = val;
+                              });
+                              dataSegments.clear();
+                              oldData.forEach((element) {
+                                if (element.name
+                                    .toString()
+                                    .toLowerCase()
+                                    .split("")
+                                    .toSet()
+                                    .intersection(searchKey
+                                        .toLowerCase()
+                                        .split("")
+                                        .toSet())
+                                    .isNotEmpty) {
+                                  setState(() {
+                                    dataSegments.add(element);
+                                  });
+                                }
                               });
                             });
                           },

@@ -42,33 +42,12 @@ final memberStreamProvider =
   }
 });
 
-final membersDataProvider =
-    StateProvider.family<RealmResults<Member>, SearchParams>(
-        (ref, searchParam) {
+final membersDataProvider = StateProvider<RealmResults<Member>>((ref) {
   var realmService = ref.watch(realmProvider);
-  log("Search " + searchParam.search.toString());
-  if (searchParam.search != "" &&
-      searchParam.bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
-    final stream = realmService!.realm.query<Member>(
-        "name CONTAINS[c] '${searchParam.search.toString().toLowerCase()}' AND bloodType =='${searchParam.bloodType.toString()}'");
+  final stream =
+      realmService!.realm.query<Member>("TRUEPREDICATE SORT(memberId ASC)");
 
-    return stream;
-  } else if (searchParam.search != "") {
-    final stream = realmService!.realm.query<Member>(
-        "name CONTAINS[c] '${searchParam.search.toString().toLowerCase()}'");
-
-    return stream;
-  } else if (searchParam.bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
-    final stream = realmService!.realm
-        .query<Member>("bloodType =='${searchParam.bloodType.toString()}'");
-
-    return stream;
-  } else {
-    final stream =
-        realmService!.realm.query<Member>("TRUEPREDICATE SORT(memberId ASC)");
-
-    return stream;
-  }
+  return stream;
 });
 
 final searchMemberStreamProvider =

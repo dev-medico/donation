@@ -71,7 +71,7 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
         centerTitle: true,
         title: Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Text("လှူုဒါန်းနိုင်မည့် သွေးလှူရှင်များ",
+          child: Text("လှူဒါန်းနိုင်မည့် သွေးလှူရှင်များ",
               textScaleFactor: 1.0,
               style: TextStyle(
                   fontSize: Responsive.isMobile(context) ? 15 : 16,
