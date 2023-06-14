@@ -307,18 +307,6 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                               });
                               List<Member>? filterdata = [];
                               oldData.forEach((element) {
-                                var a = element.name
-                                    .toString()
-                                    .toLowerCase()
-                                    .split("")
-                                    .toSet()
-                                    .toString();
-                                var b = searchKey
-                                    .toLowerCase()
-                                    .split("")
-                                    .toSet()
-                                    .toString();
-                                log(a + " Contains -- > " + b);
                                 if (element.name
                                         .toString()
                                         .toLowerCase()
@@ -559,18 +547,6 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                               });
                               List<Member>? filterdata = [];
                               oldData.forEach((element) {
-                                var a = element.name
-                                    .toString()
-                                    .toLowerCase()
-                                    .split("")
-                                    .toSet()
-                                    .toString();
-                                var b = searchKey
-                                    .toLowerCase()
-                                    .split("")
-                                    .toSet()
-                                    .toString();
-                                log(a + " Contains -- > " + b);
                                 if (element.name
                                         .toString()
                                         .toLowerCase()
