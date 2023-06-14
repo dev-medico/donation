@@ -13,7 +13,7 @@ import 'package:donation/utils/Colors.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class SearchMemberListScreen extends ConsumerStatefulWidget {
-  static const routeName = "/members";
+  static const routeName = "/search_members";
 
   const SearchMemberListScreen({Key? key}) : super(key: key);
 
@@ -69,6 +69,7 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
       }
       setState(() {
         dataSegments = oldData;
+        firstTime = false;
       });
     }
 

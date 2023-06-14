@@ -71,6 +71,9 @@ flutter:
     - assets/json/
 
   fonts:
+    - family: MyanUni
+      fonts:
+        - asset: assets/fonts/MyanUni/pds_regular.ttf
     - family: YT
       fonts:
         - asset: assets/fonts/yt.ttf

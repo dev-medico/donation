@@ -1,5 +1,6 @@
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
+import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -11,7 +12,6 @@ import 'package:donation/src/features/donation/blood_donation_list_new_style.dar
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/home/home_with_drawer.dart';
 import 'package:donation/src/features/home/home.dart';
-import 'package:donation/src/features/special_event/event_list.dart';
 import 'package:donation/src/features/splash_screen/splash_screen.dart';
 import 'package:donation/utils/custom_scroll.dart';
 
@@ -46,6 +46,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       supportedLocales: const [
         Locale('en', ''),
       ],
+      theme: FluentThemeData(
+        fontFamily: "MyanUni",
+      ),
       themeMode: ThemeMode.light,
       home: currentUser == null ? const LoginScreen() : MobileHomeScreen(),
       onGenerateRoute: (RouteSettings routeSettings) {
@@ -73,6 +76,9 @@ class _MyAppState extends ConsumerState<MyApp> {
 
               case BloodDonationListNewStyle.routeName:
                 return const BloodDonationListNewStyle();
+
+              case SpecialEventListScreen.routeName:
+                return const SpecialEventListScreen();
 
               // case EventListScreen.routeName:
               //   return EventListScreen();
