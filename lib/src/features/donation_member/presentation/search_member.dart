@@ -36,7 +36,6 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
   String? selectedBloodType = "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
   String? selectedRange;
   List<Member> dataSegments = [];
-  List<Member> data = [];
   TextStyle tabStyle = const TextStyle(fontSize: 16);
 
   final searchController = TextEditingController();
@@ -46,6 +45,9 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
   bool inputted = false;
   String searchKey = "";
   Timer? _debounceTimer;
+  bool firstTime = true;
+  List<Member> oldData = [];
+  SearchMemberDataSource? memberDataDataSource;
 
   @override
   void dispose() {
@@ -55,8 +57,20 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final streamAsyncValue = ref.watch(searchMemberStreamProvider(
-        (search: searchKey, bloodType: selectedBloodType)));
+    final results = ref.watch(membersDataProvider);
+
+    log("Data " + results.length.toString());
+    if (firstTime) {
+      oldData.clear();
+      for (int i = 0; i < results.length; i++) {
+        setState(() {
+          oldData.add(results[i]);
+        });
+      }
+      setState(() {
+        dataSegments = oldData;
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -138,19 +152,21 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                               log(selectedBloodType.toString());
                               log(dataSegments.length.toString());
                               List<Member>? filterdata = [];
-                              for (int i = 0; i < data.length; i++) {
+                              for (int i = 0; i < oldData.length; i++) {
                                 //get memberdata from data only where bloodtype is equal to value
                                 if (searchController.text.isNotEmpty) {
-                                  if (data[i].name!.toLowerCase().contains(
+                                  if (oldData[i].name!.toLowerCase().contains(
                                           searchController.text
                                               .toString()
                                               .toLowerCase()) &&
-                                      data[i].bloodType == selectedBloodType) {
-                                    filterdata.add(data[i]);
+                                      oldData[i].bloodType ==
+                                          selectedBloodType) {
+                                    filterdata.add(oldData[i]);
                                   }
                                 } else {
-                                  if (data[i].bloodType == selectedBloodType) {
-                                    filterdata.add(data[i]);
+                                  if (oldData[i].bloodType ==
+                                      selectedBloodType) {
+                                    filterdata.add(oldData[i]);
                                   }
                                 }
                               }
@@ -182,6 +198,31 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                                   Timer(const Duration(milliseconds: 500), () {
                                 setState(() {
                                   searchKey = val;
+                                });
+                                List<Member>? filterdata = [];
+                                oldData.forEach((element) {
+                                  if (element.name
+                                          .toString()
+                                          .toLowerCase()
+                                          .split("")
+                                          .toSet()
+                                          .intersection(searchKey
+                                              .toLowerCase()
+                                              .split("")
+                                              .toSet())
+                                          .length ==
+                                      searchKey
+                                          .toLowerCase()
+                                          .split("")
+                                          .toSet()
+                                          .length) {
+                                    setState(() {
+                                      filterdata.add(element);
+                                    });
+                                  }
+                                });
+                                setState(() {
+                                  dataSegments = filterdata.sublist(0);
                                 });
                               });
                             },
@@ -273,18 +314,19 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                             log(selectedBloodType.toString());
                             log(dataSegments.length.toString());
                             List<Member>? filterdata = [];
-                            for (int i = 0; i < data.length; i++) {
+                            for (int i = 0; i < oldData.length; i++) {
+                              //get memberdata from data only where bloodtype is equal to value
                               if (searchController.text.isNotEmpty) {
-                                if (data[i].name!.toLowerCase().contains(
+                                if (oldData[i].name!.toLowerCase().contains(
                                         searchController.text
                                             .toString()
                                             .toLowerCase()) &&
-                                    data[i].bloodType == selectedBloodType) {
-                                  filterdata.add(data[i]);
+                                    oldData[i].bloodType == selectedBloodType) {
+                                  filterdata.add(oldData[i]);
                                 }
                               } else {
-                                if (data[i].bloodType == selectedBloodType) {
-                                  filterdata.add(data[i]);
+                                if (oldData[i].bloodType == selectedBloodType) {
+                                  filterdata.add(oldData[i]);
                                 }
                               }
                             }
@@ -312,9 +354,34 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                             }
 
                             _debounceTimer =
-                                Timer(const Duration(milliseconds: 700), () {
+                                Timer(const Duration(milliseconds: 500), () {
                               setState(() {
                                 searchKey = val;
+                              });
+                              List<Member>? filterdata = [];
+                              oldData.forEach((element) {
+                                if (element.name
+                                        .toString()
+                                        .toLowerCase()
+                                        .split("")
+                                        .toSet()
+                                        .intersection(searchKey
+                                            .toLowerCase()
+                                            .split("")
+                                            .toSet())
+                                        .length ==
+                                    searchKey
+                                        .toLowerCase()
+                                        .split("")
+                                        .toSet()
+                                        .length) {
+                                  setState(() {
+                                    filterdata.add(element);
+                                  });
+                                }
+                              });
+                              setState(() {
+                                dataSegments = filterdata.sublist(0);
                               });
                             });
                           },
@@ -355,40 +422,12 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                       ),
                     ],
                   ),
-            streamAsyncValue.when(
-              data: (savedData) {
-                final results = savedData.results;
-                log("Data " + results.length.toString());
-
-                List<Member> members = [];
-                for (int i = 0; i < results.length; i++) {
-                  members.add(results[i]);
-                }
-                setState(() {
-                  data = members;
-                });
-                if (searchController.text.isEmpty) {
-                  getRanges();
-                }
-
-                if (data.isNotEmpty) {
-                  return Container(
-                    margin: EdgeInsets.only(
-                        left: 20.0,
-                        top: Responsive.isMobile(context) ? 160 : 100,
-                        bottom: 12),
-                    child: buildSimpleTable(data),
-                  );
-                } else {
-                  return Container();
-                }
-              },
-              error: (Object error, StackTrace stackTrace) {
-                return Text(error.toString());
-              },
-              loading: () {
-                return Container();
-              },
+            Container(
+              margin: EdgeInsets.only(
+                  left: 20.0,
+                  top: Responsive.isMobile(context) ? 160 : 100,
+                  bottom: 12),
+              child: dataSegments.isNotEmpty ? buildSimpleTable() : Container(),
             ),
           ],
         ),
@@ -404,13 +443,12 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
     // }
   }
 
-  buildSimpleTable(List<Member> data) {
-    SearchMemberDataSource memberDataDataSource =
-        SearchMemberDataSource(memberData: data);
+  buildSimpleTable() {
+    memberDataDataSource = SearchMemberDataSource(memberData: dataSegments);
     return Container(
       margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
       child: SfDataGrid(
-        source: memberDataDataSource,
+        source: memberDataDataSource!,
         onCellTap: (details) async {
           Logger logger = Logger();
           logger.i(details.rowColumnIndex.rowIndex);
@@ -418,7 +456,7 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
               context: context,
               builder: (context) => CallOrRemarkDialog(
                     title: "လုပ်ဆောင်ရန်",
-                    member: data[details.rowColumnIndex.rowIndex - 1],
+                    member: dataSegments[details.rowColumnIndex.rowIndex - 1],
                   ));
           // Navigator.push(
           //   context,
