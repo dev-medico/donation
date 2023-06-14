@@ -14,18 +14,16 @@ class DashboardCard extends ConsumerWidget {
   String subtitle;
   String amount;
   Color amountColor;
-  Function() onTap;
 
-  DashboardCard(
-      {Key? key,
-      required this.index,
-      required this.color,
-      required this.title,
-      required this.subtitle,
-      required this.amount,
-      required this.amountColor,
-      required this.onTap})
-      : super(key: key);
+  DashboardCard({
+    Key? key,
+    required this.index,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.amount,
+    required this.amountColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -57,21 +55,17 @@ class DashboardCard extends ConsumerWidget {
               // await Navigator.pushNamed(
               //     context, MemberListBackupScreen.routeName);
               await Navigator.pushNamed(context, MemberListScreen.routeName);
-              onTap.call();
             } else if (index == 1) {
               // ref.watch(donationsProvider).forEach((element) {
               //   ref.watch(realmProvider)!.deleteDonation(element);
               // });
               await Navigator.pushNamed(
                   context, BloodDonationListNewStyle.routeName);
-              onTap.call();
             } else if (index == 2) {
               await Navigator.pushNamed(
                   context, SpecialEventListScreen.routeName);
-              onTap.call();
             } else if (index == 3) {
               await Navigator.pushNamed(context, DonarList.routeName);
-              onTap.call();
             }
           },
           child: Padding(

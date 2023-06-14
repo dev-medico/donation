@@ -305,22 +305,42 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                               setState(() {
                                 searchKey = val;
                               });
-                              dataSegments.clear();
+                              List<Member>? filterdata = [];
                               oldData.forEach((element) {
-                                if (element.name
+                                var a = element.name
                                     .toString()
                                     .toLowerCase()
                                     .split("")
                                     .toSet()
-                                    .intersection(searchKey
+                                    .toString();
+                                var b = searchKey
+                                    .toLowerCase()
+                                    .split("")
+                                    .toSet()
+                                    .toString();
+                                log(a + " Contains -- > " + b);
+                                if (element.name
+                                        .toString()
                                         .toLowerCase()
                                         .split("")
-                                        .toSet())
-                                    .isNotEmpty) {
+                                        .toSet()
+                                        .intersection(searchKey
+                                            .toLowerCase()
+                                            .split("")
+                                            .toSet())
+                                        .length ==
+                                    searchKey
+                                        .toLowerCase()
+                                        .split("")
+                                        .toSet()
+                                        .length) {
                                   setState(() {
-                                    dataSegments.add(element);
+                                    filterdata.add(element);
                                   });
                                 }
+                              });
+                              setState(() {
+                                dataSegments = filterdata.sublist(0);
                               });
                             });
                           },
@@ -537,22 +557,42 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                               setState(() {
                                 searchKey = val;
                               });
-                              dataSegments.clear();
+                              List<Member>? filterdata = [];
                               oldData.forEach((element) {
-                                if (element.name
+                                var a = element.name
                                     .toString()
                                     .toLowerCase()
                                     .split("")
                                     .toSet()
-                                    .intersection(searchKey
+                                    .toString();
+                                var b = searchKey
+                                    .toLowerCase()
+                                    .split("")
+                                    .toSet()
+                                    .toString();
+                                log(a + " Contains -- > " + b);
+                                if (element.name
+                                        .toString()
                                         .toLowerCase()
                                         .split("")
-                                        .toSet())
-                                    .isNotEmpty) {
+                                        .toSet()
+                                        .intersection(searchKey
+                                            .toLowerCase()
+                                            .split("")
+                                            .toSet())
+                                        .length ==
+                                    searchKey
+                                        .toLowerCase()
+                                        .split("")
+                                        .toSet()
+                                        .length) {
                                   setState(() {
-                                    dataSegments.add(element);
+                                    filterdata.add(element);
                                   });
                                 }
+                              });
+                              setState(() {
+                                dataSegments = filterdata.sublist(0);
                               });
                             });
                           },

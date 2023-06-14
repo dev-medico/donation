@@ -3,11 +3,9 @@ import 'dart:convert';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:donation/data/repository/repository.dart';
-import 'package:donation/data/response/total_data_response.dart';
 import 'package:donation/data/response/xata_donation_list_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
-import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:intl/intl.dart';
@@ -27,37 +25,6 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   bool finance = false;
   List<DonationRecord> dataList = [];
   List<DonationRecord> data = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    initial();
-  }
-
-  initial() async {
-    callAPI("");
-    XataRepository().getMembersTotal().then((value) {
-      setState(() {
-        totalMember = int.parse(
-            TotalDataResponse.fromJson(jsonDecode(value.body))
-                .records!
-                .first
-                .value
-                .toString());
-      });
-    });
-    XataRepository().getDonationsTotal().then((value) {
-      setState(() {
-        totalDonation = int.parse(
-            TotalDataResponse.fromJson(jsonDecode(value.body))
-                .records!
-                .first
-                .value
-                .toString());
-      });
-    });
-  }
 
   callAPI(String after) {
     if (after.isEmpty) {
@@ -110,8 +77,6 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     });
   }
 
-  VoidCallback refresh() => initial();
-
   @override
   Widget build(BuildContext context) {
     DateTime date = DateTime.now();
@@ -148,27 +113,23 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       child: Row(
                         children: [
                           DashboardCard(
-                              index: 0,
-                              color: primaryDark,
-                              title: "အဖွဲ့၀င် စာရင်း",
-                              subtitle: "စုစုပေါင်း အရေအတွက်",
-                              amount:
-                                  "${Utils.strToMM(totalMember.toString())} ဦး",
-                              amountColor: Colors.black,
-                              onTap: () {
-                                initial();
-                              }),
+                            index: 0,
+                            color: primaryDark,
+                            title: "အဖွဲ့၀င် စာရင်း",
+                            subtitle: "စုစုပေါင်း အရေအတွက်",
+                            amount:
+                                "${Utils.strToMM(totalMember.toString())} ဦး",
+                            amountColor: Colors.black,
+                          ),
                           DashboardCard(
-                              index: 1,
-                              color: primaryDark,
-                              title: "သွေးလှူမှု မှတ်တမ်း",
-                              subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                              amount:
-                                  "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                              amountColor: Colors.blue,
-                              onTap: () {
-                                initial();
-                              }),
+                            index: 1,
+                            color: primaryDark,
+                            title: "သွေးလှူမှု မှတ်တမ်း",
+                            subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                            amount:
+                                "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                            amountColor: Colors.blue,
+                          ),
                         ],
                       ),
                     ),
@@ -178,25 +139,21 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       child: Row(
                         children: [
                           DashboardCard(
-                              index: 2,
-                              color: primaryDark,
-                              title: "ထူးခြားဖြစ်စဉ်",
-                              subtitle: "",
-                              amount: "",
-                              amountColor: Colors.black,
-                              onTap: () {
-                                initial();
-                              }),
+                            index: 2,
+                            color: primaryDark,
+                            title: "ထူးခြားဖြစ်စဉ်",
+                            subtitle: "",
+                            amount: "",
+                            amountColor: Colors.black,
+                          ),
                           DashboardCard(
-                              index: 3,
-                              color: primaryDark,
-                              title: "ရ/သုံး ငွေစာရင်း",
-                              subtitle: "",
-                              amount: "",
-                              amountColor: Colors.black,
-                              onTap: () {
-                                initial();
-                              }),
+                            index: 3,
+                            color: primaryDark,
+                            title: "ရ/သုံး ငွေစာရင်း",
+                            subtitle: "",
+                            amount: "",
+                            amountColor: Colors.black,
+                          ),
                         ],
                       ),
                     ),
@@ -223,30 +180,26 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       child: Row(
                         children: [
                           DashboardCard(
-                              index: 0,
-                              color: primaryDark,
-                              title: "အဖွဲ့၀င် စာရင်း",
-                              subtitle: "စုစုပေါင်း အရေအတွက်",
-                              amount:
-                                  "${Utils.strToMM(totalMember.toString())} ဦး",
-                              amountColor: Colors.black,
-                              onTap: () {
-                                initial();
-                              }),
+                            index: 0,
+                            color: primaryDark,
+                            title: "အဖွဲ့၀င် စာရင်း",
+                            subtitle: "စုစုပေါင်း အရေအတွက်",
+                            amount:
+                                "${Utils.strToMM(totalMember.toString())} ဦး",
+                            amountColor: Colors.black,
+                          ),
                           const SizedBox(
                             width: 12,
                           ),
                           DashboardCard(
-                              index: 1,
-                              color: primaryDark,
-                              title: "သွေးလှူမှု မှတ်တမ်း",
-                              subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                              amount:
-                                  "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                              amountColor: Colors.blue,
-                              onTap: () {
-                                initial();
-                              }),
+                            index: 1,
+                            color: primaryDark,
+                            title: "သွေးလှူမှု မှတ်တမ်း",
+                            subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                            amount:
+                                "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                            amountColor: Colors.blue,
+                          ),
                         ],
                       ),
                     ),
@@ -263,28 +216,24 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       child: Row(
                         children: [
                           DashboardCard(
-                              index: 2,
-                              color: primaryDark,
-                              title: "ထူးခြားဖြစ်စဉ်",
-                              subtitle: "အသေးစိတ် ကြည့်မည်",
-                              amount: "",
-                              amountColor: Colors.black,
-                              onTap: () {
-                                initial();
-                              }),
+                            index: 2,
+                            color: primaryDark,
+                            title: "ထူးခြားဖြစ်စဉ်",
+                            subtitle: "အသေးစိတ် ကြည့်မည်",
+                            amount: "",
+                            amountColor: Colors.black,
+                          ),
                           const SizedBox(
                             width: 12,
                           ),
                           DashboardCard(
-                              index: 3,
-                              color: primaryDark,
-                              title: "ရ/သုံး ငွေစာရင်း",
-                              subtitle: "အသေးစိတ် ကြည့်မည်",
-                              amount: "",
-                              amountColor: Colors.black,
-                              onTap: () {
-                                initial();
-                              }),
+                            index: 3,
+                            color: primaryDark,
+                            title: "ရ/သုံး ငွေစာရင်း",
+                            subtitle: "အသေးစိတ် ကြည့်မည်",
+                            amount: "",
+                            amountColor: Colors.black,
+                          ),
                         ],
                       ),
                     ),

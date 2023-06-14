@@ -74,8 +74,8 @@ class _MyAppState extends ConsumerState<MyApp> {
               case BloodDonationListNewStyle.routeName:
                 return const BloodDonationListNewStyle();
 
-              case EventListScreen.routeName:
-                return EventListScreen();
+              // case EventListScreen.routeName:
+              //   return EventListScreen();
 
               case DonarList.routeName:
                 return DonarList();
