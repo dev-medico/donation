@@ -3,6 +3,7 @@ import 'dart:convert';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/services.dart';
@@ -279,9 +280,11 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                               ),
                               Container(
                                 width: double.infinity,
+                                decoration: shadowDecoration(Colors.white),
                                 margin: const EdgeInsets.only(
                                     left: 20, top: 16, bottom: 8, right: 20),
                                 child: DropdownButtonFormField(
+                                    dropdownColor: Colors.white,
                                     value: selectedBloodType,
                                     style: const TextStyle(
                                         fontSize: 13.5, color: Colors.black),
@@ -328,6 +331,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                           decoration:
                                               shadowDecoration(Colors.white),
                                           child: DropdownButton(
+                                            dropdownColor: Colors.white,
                                             value: nrc_initial_options_Value,
                                             items:
                                                 nrc_initial_options_dropDownMenuItems,
@@ -356,6 +360,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                               padding: const EdgeInsets.only(
                                                   left: 8, right: 8),
                                               child: DropdownButton(
+                                                dropdownColor: Colors.white,
                                                 value:
                                                     nrc_region_state_options_Value,
                                                 icon: const Icon(
@@ -377,6 +382,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                           decoration:
                                               shadowDecoration(Colors.white),
                                           child: DropdownButton(
+                                            dropdownColor: Colors.white,
                                             value: nrc_type_options_Value,
                                             items:
                                                 nrc_type_options_dropDownMenuItems,
@@ -424,6 +430,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   headerStyle: TextStyle(fontSize: 15),
                                   selected: selected,
                                   onChanged: (time) => setState(() {
+                                    selected = time;
                                     String formattedDate =
                                         DateFormat('dd MMM yyyy').format(time);
                                     birthDate = formattedDate;
@@ -505,6 +512,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   hideSuggestionsOnKeyboardHide: false,
                                   textFieldConfiguration:
                                       TextFieldConfiguration(
+                                    cursorColor: Colors.white,
                                     controller: townController,
                                     autofocus: false,
 
@@ -537,6 +545,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   },
                                   itemBuilder: (context, suggestion) {
                                     return ListTile(
+                                      hoverColor: Colors.white,
                                       title: Text(
                                         suggestion.toString(),
                                         textScaleFactor: 1.0,
@@ -813,12 +822,15 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                     flex: 3,
                                     child: Container(
                                       width: double.infinity,
+                                      decoration:
+                                          shadowDecoration(Colors.white),
                                       margin: const EdgeInsets.only(
                                           left: 20,
                                           top: 16,
                                           bottom: 8,
                                           right: 20),
                                       child: DropdownButtonFormField(
+                                          dropdownColor: Colors.white,
                                           value: selectedBloodType,
                                           style: const TextStyle(
                                               fontSize: 13.5,
@@ -884,6 +896,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                 decoration: shadowDecoration(
                                                     Colors.white),
                                                 child: DropdownButton(
+                                                  dropdownColor: Colors.white,
                                                   value:
                                                       nrc_initial_options_Value,
                                                   items:
@@ -915,6 +928,8 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                         const EdgeInsets.only(
                                                             left: 8, right: 8),
                                                     child: DropdownButton(
+                                                      dropdownColor:
+                                                          Colors.white,
                                                       value:
                                                           nrc_region_state_options_Value,
                                                       icon: const Icon(Icons
@@ -938,6 +953,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                 decoration: shadowDecoration(
                                                     Colors.white),
                                                 child: DropdownButton(
+                                                  dropdownColor: Colors.white,
                                                   value: nrc_type_options_Value,
                                                   items:
                                                       nrc_type_options_dropDownMenuItems,
@@ -1000,6 +1016,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                         headerStyle: TextStyle(fontSize: 15),
                                         selected: selected,
                                         onChanged: (time) => setState(() {
+                                          selected = time;
                                           String formattedDate =
                                               DateFormat('dd MMM yyyy')
                                                   .format(time);
@@ -1158,6 +1175,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                 false,
                                             textFieldConfiguration:
                                                 TextFieldConfiguration(
+                                              cursorColor: Colors.white,
                                               controller: townController,
                                               autofocus: false,
                                               decoration: inputBoxDecoration(
@@ -1180,6 +1198,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                             },
                                             itemBuilder: (context, suggestion) {
                                               return ListTile(
+                                                hoverColor: Colors.white,
                                                 title: Text(
                                                   suggestion.toString(),
                                                   textScaleFactor: 1.0,
@@ -1539,6 +1558,8 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                   townController.text.toString(),
               note: noteController.text.toString(),
             );
+        ref.invalidate(membersProvider);
+        ref.invalidate(membersDataProvider);
         Utils.messageSuccessDialog("အချက်အလက်ထည့်သွင်းခြင်း \nအောင်မြင်ပါသည်။",
             context, "အိုကေ", Colors.black);
       } else {

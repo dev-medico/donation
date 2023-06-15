@@ -663,6 +663,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
         onCellTap: (details) async {
           Logger logger = Logger();
           logger.i(details.rowColumnIndex.rowIndex);
+          
           await Navigator.push(
             context,
             MaterialPageRoute(

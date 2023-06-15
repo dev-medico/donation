@@ -983,6 +983,7 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                                   ],
                                 ),
                                 onTap: () {
+                                  // ref.watch(realmProvider)!.deleteMember(data);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
