@@ -212,6 +212,11 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                       ),
                                       child: TextFormField(
                                         controller: nameController,
+                                        onChanged: (val) {
+                                          setState(() {
+                                            nameChecked = false;
+                                          });
+                                        },
                                         decoration: inputBoxDecoration("အမည်"),
                                       ),
                                     ),
@@ -233,28 +238,40 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                             behavior:
                                                 HitTestBehavior.translucent,
                                             onTap: () {
-                                              // FirebaseFirestore.instance
-                                              //     .collection('members')
-                                              //     .where('name',
-                                              //         isEqualTo:
-                                              //             nameController.text
-                                              //                 .toString())
-                                              //     .get()
-                                              //     .then((value) {
-                                              //   if (value.docs.isEmpty) {
-                                              //     setState(() {
-                                              //       nameChecked = true;
-                                              //     });
-                                              //   } else {
-                                              //     Map<String, dynamic> data =
-                                              //         value.docs.first.data();
-                                              //     memberExistDialog(
-                                              //         context,
-                                              //         nameController.text
-                                              //             .toString(),
-                                              //         data);
-                                              //   }
-                                              // });
+                                              var oldData =
+                                                  ref.watch(membersProvider);
+                                              List<Member>? filterdata = [];
+                                              oldData.forEach((element) {
+                                                if (element.name
+                                                        .toString()
+                                                        .toLowerCase()
+                                                        .split("")
+                                                        .toSet()
+                                                        .intersection(
+                                                            nameController.text
+                                                                .toLowerCase()
+                                                                .split("")
+                                                                .toSet())
+                                                        .length ==
+                                                    nameController.text
+                                                        .toLowerCase()
+                                                        .split("")
+                                                        .toSet()
+                                                        .length) {
+                                                  setState(() {
+                                                    filterdata.add(element);
+                                                  });
+                                                }
+                                              });
+
+                                              if (filterdata.isNotEmpty) {
+                                                membersFoundDialog(
+                                                    context, filterdata);
+                                              } else {
+                                                setState(() {
+                                                  nameChecked = true;
+                                                });
+                                              }
                                             },
                                             child: Padding(
                                               padding: const EdgeInsets.only(
@@ -738,6 +755,11 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                             ),
                                             child: TextFormField(
                                               controller: nameController,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  nameChecked = false;
+                                                });
+                                              },
                                               decoration:
                                                   inputBoxDecoration("အမည်"),
                                             ),
@@ -761,33 +783,43 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                   behavior: HitTestBehavior
                                                       .translucent,
                                                   onTap: () {
-                                                    // FirebaseFirestore.instance
-                                                    //     .collection('members')
-                                                    //     .where('name',
-                                                    //         isEqualTo:
-                                                    //             nameController
-                                                    //                 .text
-                                                    //                 .toString())
-                                                    //     .get()
-                                                    //     .then((value) {
-                                                    //   if (value
-                                                    //       .docs.isEmpty) {
-                                                    //     setState(() {
-                                                    //       nameChecked = true;
-                                                    //     });
-                                                    //   } else {
-                                                    //     Map<String, dynamic>
-                                                    //         data = value
-                                                    //             .docs.first
-                                                    //             .data();
-                                                    //     memberExistDialog(
-                                                    //         context,
-                                                    //         nameController
-                                                    //             .text
-                                                    //             .toString(),
-                                                    //         data);
-                                                    //   }
-                                                    // });
+                                                    var oldData = ref
+                                                        .watch(membersProvider);
+                                                    List<Member>? filterdata =
+                                                        [];
+                                                    oldData.forEach((element) {
+                                                      if (element.name
+                                                              .toString()
+                                                              .toLowerCase()
+                                                              .split("")
+                                                              .toSet()
+                                                              .intersection(
+                                                                  nameController
+                                                                      .text
+                                                                      .toLowerCase()
+                                                                      .split("")
+                                                                      .toSet())
+                                                              .length ==
+                                                          nameController.text
+                                                              .toLowerCase()
+                                                              .split("")
+                                                              .toSet()
+                                                              .length) {
+                                                        setState(() {
+                                                          filterdata
+                                                              .add(element);
+                                                        });
+                                                      }
+                                                    });
+
+                                                    if (filterdata.isNotEmpty) {
+                                                      membersFoundDialog(
+                                                          context, filterdata);
+                                                    } else {
+                                                      setState(() {
+                                                        nameChecked = true;
+                                                      });
+                                                    }
                                                   },
                                                   child: Padding(
                                                     padding:
@@ -1531,6 +1563,78 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                         style: TextStyle(fontSize: 15, color: Colors.white))
                   ]),
             )),
+      ))
+      ..animatedFunc = (child, animation) {
+        return ScaleTransition(
+          scale: Tween(begin: 0.0, end: 1.0).animate(animation),
+          child: child,
+        );
+      }
+      ..show();
+  }
+
+  static YYDialog membersFoundDialog(BuildContext context, List<Member> data) {
+    return YYDialog().build()
+      ..width = Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width - 60
+          : MediaQuery.of(context).size.width * 0.4
+      ..backgroundColor = Colors.white
+      ..borderRadius = 20.0
+      ..showCallBack = () {}
+      ..dismissCallBack = () {}
+      ..widget(ListView(
+        shrinkWrap: true,
+        children: [
+          const SizedBox(height: 30),
+          Image.asset(
+            "assets/images/list_exist.png",
+            height: 50,
+            width: 50,
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(5, 24, 0, 12),
+            child: const Text(
+              "အဖွဲ့ဝင် ရှိပြီသားစာရင်း",
+              textAlign: TextAlign.center,
+              maxLines: 4,
+              style: TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.red),
+            ),
+          ),
+          Container(
+            height: data.length > 5
+                ? MediaQuery.of(context).size.height * 0.7
+                : (data.length * 80) + 30,
+            child: ListView.builder(
+              shrinkWrap: true,
+              //physics: NeverScrollableScrollPhysics(),
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: Text(data[index].name.toString()),
+                        subtitle: Text(
+                            "${data[index].bloodType} ${data[index].fatherName}  [${data[index].birthDate}]"),
+                      ),
+                      const Divider(
+                        height: 1,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          SizedBox(
+            height: 30,
+          )
+        ],
       ))
       ..animatedFunc = (child, animation) {
         return ScaleTransition(

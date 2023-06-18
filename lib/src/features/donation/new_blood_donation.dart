@@ -188,12 +188,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
             .cursor!);
       } else {
         allMember.sort((a, b) => a.name!.compareTo(b.name!));
-        for (var element in allMember) {
-          // allMembers.add(element.name!);
-          // allMemberIDs.add(element.id!);
-          // allBTypes.add(element.bloodType!);
-          // allFatherNames.add(element.fatherName!);
-        }
       }
     });
   }
@@ -351,7 +345,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                           title:
                                               Text(suggestion.name.toString()),
                                           subtitle: Text(
-                                              "${suggestion.bloodType}  ${suggestion.fatherName}"),
+                                              "${suggestion.bloodType}  ${suggestion.fatherName} ${suggestion.birthDate}"),
                                         ),
                                         const Divider(
                                           height: 1,
@@ -761,7 +755,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                                 title: Text(
                                                     suggestion.name.toString()),
                                                 subtitle: Text(
-                                                    "${suggestion.bloodType}  ${suggestion.fatherName}"),
+                                                    "${suggestion.bloodType} ${suggestion.fatherName}  [${suggestion.birthDate}]"),
                                               ),
                                               const Divider(
                                                 height: 1,
