@@ -83,13 +83,16 @@ class DashboardCard extends ConsumerWidget {
                           NeumorphicTheme.of(context)?.current!.variantColor),
                 ),
                 const Spacer(),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 13 : 16,
-                      color:
-                          NeumorphicTheme.of(context)?.current!.variantColor),
-                ),
+                Responsive.isMobile(context)
+                    ? Container()
+                    : Text(
+                        subtitle,
+                        style: TextStyle(
+                            fontSize: Responsive.isMobile(context) ? 13 : 16,
+                            color: NeumorphicTheme.of(context)
+                                ?.current!
+                                .variantColor),
+                      ),
                 const SizedBox(
                   height: 12,
                 ),

@@ -63,7 +63,9 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
                               DashboardCard(
                                 index: 0,
                                 color: primaryDark,
-                                title: "အဖွဲ့၀င် စာရင်း",
+                                title: Responsive.isMobile(context)
+                                    ? "အဖွဲ့၀င် \nစာရင်း"
+                                    : "အဖွဲ့၀င် စာရင်း",
                                 subtitle: "စုစုပေါင်း အရေအတွက်",
                                 amount:
                                     "${Utils.strToMM(totalMember.toString())} ဦး",

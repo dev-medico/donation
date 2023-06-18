@@ -65,6 +65,7 @@ class _SpecialEventListScreenState
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: () async {
           await Navigator.push(
             context,
