@@ -772,137 +772,53 @@ class _BloodDonationListNewStyleState
       }
     }
     filterData1.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData1 = filterData1.reversed.toList();
+    //filterData1 = filterData1.reversed.toList();
     filterData2.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData2 = filterData2.reversed.toList();
+    //filterData2 = filterData2.reversed.toList();
     filterData3.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData3 = filterData3.reversed.toList();
+    //filterData3 = filterData3.reversed.toList();
     filterData4.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData4 = filterData4.reversed.toList();
+    //filterData4 = filterData4.reversed.toList();
     filterData5.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData5 = filterData5.reversed.toList();
+    //filterData5 = filterData5.reversed.toList();
     filterData6.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData6 = filterData6.reversed.toList();
+    //filterData6 = filterData6.reversed.toList();
     filterData7.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData7 = filterData7.reversed.toList();
+    //filterData7 = filterData7.reversed.toList();
     filterData8.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData8 = filterData8.reversed.toList();
+    //filterData8 = filterData8.reversed.toList();
     filterData9.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData9 = filterData9.reversed.toList();
+    //filterData9 = filterData9.reversed.toList();
     filterData10.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData10 = filterData10.reversed.toList();
+    //filterData10 = filterData10.reversed.toList();
     filterData11.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData11 = filterData11.reversed.toList();
+    // filterData11 = filterData11.reversed.toList();
     filterData12.sort((a, b) {
-      return DateTime.parse(
-              b.date.toString() == "null" || !b.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : b.date.toString().split("T")[0])
-          .compareTo(DateTime.parse(
-              a.date.toString() == "null" || !a.date.toString().contains("T")
-                  ? "2020-01-01"
-                  : a.date.toString().split("T")[0]));
+      return a.donationDate!.compareTo(b.donationDate!);
     });
-    filterData12 = filterData12.reversed.toList();
+    //filterData12 = filterData12.reversed.toList();
 
     setState(() {
       dataSegments1 = filterData1;

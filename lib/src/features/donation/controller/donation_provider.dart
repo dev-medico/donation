@@ -10,7 +10,7 @@ final donationStreamProvider =
   var realmService = ref.watch(realmProvider);
 
   final stream = realmService!.realm
-      .query<Donation>("TRUEPREDICATE SORT(donationDate ASC)")
+      .query<Donation>("TRUEPREDICATE SORT(donationDate DESC)")
       .changes;
 
   return stream;

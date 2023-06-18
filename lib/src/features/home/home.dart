@@ -54,44 +54,47 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return NavigationView(
-      onOpenSearch: () {
-        switchUI();
-        ref.read(openDrawerProvider.notifier).update((state) => true);
-      },
-      pane: NavigationPane(
-        size: NavigationPaneSize(
-            compactWidth: Responsive.isMobile(context) ? 46 : 56,
-            openWidth: Responsive.isMobile(context)
-                ? MediaQuery.of(context).size.width * 0.7
-                : 240),
-        selected: topIndex,
-        onChanged: (index) => setState(() {
-          topIndex = index;
-        }),
-        displayMode: PaneDisplayMode.compact,
-        items: items,
-        footerItems: [
-          PaneItem(
-            onTap: () {
-              ref.watch(realmProvider)!.close();
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                  (route) => false);
-            },
-            icon: CustomIcon(
-              icon: icons[5],
+    return SafeArea(
+      top: true,
+      child: NavigationView(
+        onOpenSearch: () {
+          switchUI();
+          ref.read(openDrawerProvider.notifier).update((state) => true);
+        },
+        pane: NavigationPane(
+          size: NavigationPaneSize(
+              compactWidth: Responsive.isMobile(context) ? 46 : 56,
+              openWidth: Responsive.isMobile(context)
+                  ? MediaQuery.of(context).size.width * 0.7
+                  : 240),
+          selected: topIndex,
+          onChanged: (index) => setState(() {
+            topIndex = index;
+          }),
+          displayMode: PaneDisplayMode.compact,
+          items: items,
+          footerItems: [
+            PaneItem(
+              onTap: () {
+                ref.watch(realmProvider)!.close();
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    (route) => false);
+              },
+              icon: CustomIcon(
+                icon: icons[5],
+              ),
+              title: Text(
+                titles[5],
+                style: smallTextStyle(context),
+              ),
+              body: const Text(
+                'အပြင်အဆင်',
+              ),
             ),
-            title: Text(
-              titles[5],
-              style: smallTextStyle(context),
-            ),
-            body: const Text(
-              'အပြင်အဆင်',
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -100,7 +103,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     items = [
       PaneItem(
         selectedTileColor: ButtonState.resolveWith((state) {
-          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
+          if (state.isPressing) return Color.fromARGB(39, 103, 103, 111);
           if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
 
           return null;
@@ -214,7 +217,7 @@ class CustomIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       icon,
-      width: 24,
+      width: 32,
     );
   }
 }
