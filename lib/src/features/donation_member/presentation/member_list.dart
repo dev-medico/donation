@@ -11,6 +11,7 @@ import 'package:donation/src/features/donation_member/presentation/controller/me
 import 'package:donation/src/features/donation_member/presentation/new_member.dart';
 import 'package:donation/src/features/donation_member/domain/member_data_source.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:realm/realm.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MemberListScreen extends ConsumerStatefulWidget {
@@ -614,7 +615,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                   left: 20.0,
                   top: Responsive.isMobile(context) ? 160 : 100,
                   bottom: 12),
-              child: dataSegments.isNotEmpty ? buildSimpleTable() : Container(),
+              child: dataSegments.isNotEmpty
+                  ? buildSimpleTable(results)
+                  : Container(),
             ),
           ],
         ),
@@ -628,47 +631,51 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
               builder: (context) => NewMemberScreen(),
             ),
           );
-          setState(() {
-            oldData.clear();
-            for (int i = 0; i < results.length; i++) {
-              setState(() {
-                oldData.add(results[i]);
-              });
-            }
-            setState(() {
-              dataSegments = oldData;
-            });
-            ranges.clear();
-            getRanges(oldData);
-            if (searchController.text.isNotEmpty) {
-              setState(() {
-                searchKey = searchController.text;
-              });
-              List<Member>? filterdata = [];
-              oldData.forEach((element) {
-                if (element.name
-                        .toString()
-                        .toLowerCase()
-                        .split("")
-                        .toSet()
-                        .intersection(searchKey.toLowerCase().split("").toSet())
-                        .length ==
-                    searchKey.toLowerCase().split("").toSet().length) {
-                  setState(() {
-                    filterdata.add(element);
-                  });
-                }
-              });
-              log("call here");
-              setState(() {
-                dataSegments = filterdata.sublist(0);
-              });
-            }
-          });
+          refresh(results);
         },
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  refresh(RealmResults<Member> results) {
+    setState(() {
+      oldData.clear();
+      for (int i = 0; i < results.length; i++) {
+        setState(() {
+          oldData.add(results[i]);
+        });
+      }
+      setState(() {
+        dataSegments = oldData;
+      });
+      ranges.clear();
+      getRanges(oldData);
+      if (searchController.text.isNotEmpty) {
+        setState(() {
+          searchKey = searchController.text;
+        });
+        List<Member>? filterdata = [];
+        oldData.forEach((element) {
+          if (element.name
+                  .toString()
+                  .toLowerCase()
+                  .split("")
+                  .toSet()
+                  .intersection(searchKey.toLowerCase().split("").toSet())
+                  .length ==
+              searchKey.toLowerCase().split("").toSet().length) {
+            setState(() {
+              filterdata.add(element);
+            });
+          }
+        });
+        log("call here");
+        setState(() {
+          dataSegments = filterdata.sublist(0);
+        });
+      }
+    });
   }
 
   getRanges(List<Member> data) {
@@ -691,7 +698,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
     log("Ranges + " + ranges.length.toString());
   }
 
-  buildSimpleTable() {
+  buildSimpleTable(RealmResults<Member> results) {
     memberDataDataSource = MemberDataSource(memberData: dataSegments);
     return Container(
       margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
@@ -710,6 +717,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
             ),
           );
           ref.invalidate(membersDataProvider);
+          refresh(results);
         },
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,
