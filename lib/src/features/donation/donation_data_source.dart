@@ -69,47 +69,90 @@ class DonationDataSource extends DataGridSource {
   DonationDataSource(
       {required List<Donation> donationData, required WidgetRef ref}) {
     _donationData = donationData.map<DataGridRow>((e) {
-      var member = ref
+      if (ref
           .read(membersProvider)
-          .where((data) => data.id.toString() == e.member.toString()
-            ..toString())
-          .first;
-      return DataGridRow(cells: [
-        DataGridCell<String>(
-            columnName: 'ရက်စွဲ',
-            value: DateFormat('dd-MM-yyyy')
-                .format(DateTime.parse(e.donationDate.toString()))),
-        DataGridCell<String>(
-            columnName: 'သွေးအလှူရှင်',
-            value: "        ${member.name.toString()}        "),
-        DataGridCell<String>(
-            columnName: 'သွေးအုပ်စု', value: member.bloodType.toString()),
-        DataGridCell<String>(
-            columnName: 'လှူဒါန်းသည့်နေရာ',
-            value: e.hospital!.isEmpty
-                ? "                                "
-                : "        ${e.hospital}        "),
-        DataGridCell<String>(
-            columnName: 'လူနာအမည်',
-            value: e.patientName!.isEmpty
-                ? "                 "
-                : e.patientName.toString()),
-        DataGridCell<String>(
-            columnName: 'လိပ်စာ',
-            value: e.patientAddress.toString() == "၊"
-                ? "                                "
-                : "     ${e.patientAddress}    "),
-        DataGridCell<String>(
-            columnName: 'အသက်',
-            value: e.patientAge.toString().isEmpty
-                ? "                 "
-                : "  ${Utils.strToMM(e.patientAge.toString())}   "),
-        DataGridCell<String>(
-            columnName: 'ဖြစ်ပွားသည့်ရောဂါ',
-            value: e.patientDisease!.isEmpty
-                ? "                                "
-                : "     ${e.patientDisease}     "),
-      ]);
+          .where((data) =>
+              e.memberObj != null && data.id.toString() == e.member.toString()
+                ..toString())
+          .isEmpty) {
+        return DataGridRow(cells: [
+          DataGridCell<String>(
+              columnName: 'ရက်စွဲ',
+              value: DateFormat('dd-MM-yyyy')
+                  .format(DateTime.parse(e.donationDate.toString()))),
+          DataGridCell<String>(
+              columnName: 'သွေးအလှူရှင်', value: "        -        "),
+          DataGridCell<String>(columnName: 'သွေးအုပ်စု', value: "    -   "),
+          DataGridCell<String>(
+              columnName: 'လှူဒါန်းသည့်နေရာ',
+              value: e.hospital!.isEmpty
+                  ? "                                "
+                  : "        ${e.hospital}        "),
+          DataGridCell<String>(
+              columnName: 'လူနာအမည်',
+              value: e.patientName!.isEmpty
+                  ? "                 "
+                  : e.patientName.toString()),
+          DataGridCell<String>(
+              columnName: 'လိပ်စာ',
+              value: e.patientAddress.toString() == "၊"
+                  ? "                                "
+                  : "     ${e.patientAddress}    "),
+          DataGridCell<String>(
+              columnName: 'အသက်',
+              value: e.patientAge.toString().isEmpty
+                  ? "                 "
+                  : "  ${Utils.strToMM(e.patientAge.toString())}   "),
+          DataGridCell<String>(
+              columnName: 'ဖြစ်ပွားသည့်ရောဂါ',
+              value: e.patientDisease!.isEmpty
+                  ? "                                "
+                  : "     ${e.patientDisease}     "),
+        ]);
+      } else {
+        var member = ref
+            .read(membersProvider)
+            .where((data) =>
+                e.memberObj != null && data.id.toString() == e.member.toString()
+                  ..toString())
+            .first;
+        return DataGridRow(cells: [
+          DataGridCell<String>(
+              columnName: 'ရက်စွဲ',
+              value: DateFormat('dd-MM-yyyy')
+                  .format(DateTime.parse(e.donationDate.toString()))),
+          DataGridCell<String>(
+              columnName: 'သွေးအလှူရှင်',
+              value: "        ${member.name.toString()}        "),
+          DataGridCell<String>(
+              columnName: 'သွေးအုပ်စု', value: member.bloodType.toString()),
+          DataGridCell<String>(
+              columnName: 'လှူဒါန်းသည့်နေရာ',
+              value: e.hospital!.isEmpty
+                  ? "                                "
+                  : "        ${e.hospital}        "),
+          DataGridCell<String>(
+              columnName: 'လူနာအမည်',
+              value: e.patientName!.isEmpty
+                  ? "                 "
+                  : e.patientName.toString()),
+          DataGridCell<String>(
+              columnName: 'လိပ်စာ',
+              value: e.patientAddress.toString() == "၊"
+                  ? "                                "
+                  : "     ${e.patientAddress}    "),
+          DataGridCell<String>(
+              columnName: 'အသက်',
+              value: e.patientAge.toString().isEmpty
+                  ? "                 "
+                  : "  ${Utils.strToMM(e.patientAge.toString())}   "),
+          DataGridCell<String>(
+              columnName: 'ဖြစ်ပွားသည့်ရောဂါ',
+              value: e.patientDisease!.isEmpty
+                  ? "                                "
+                  : "     ${e.patientDisease}     "),
+        ]);
+      }
     }).toList();
   }
 

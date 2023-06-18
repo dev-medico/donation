@@ -2,6 +2,7 @@ import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donation/donation_by_member_data_source.dart';
 import 'package:donation/src/features/donation/donation_detail.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_edit.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:flutter/material.dart';
@@ -999,6 +1000,9 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                                         ref
                                             .watch(realmProvider)!
                                             .deleteMember(data);
+                                        ref.invalidate(membersProvider);
+                                        ref.invalidate(memberStreamProvider);
+                                        ref.invalidate(membersDataProvider);
                                         Navigator.pop(context);
                                       });
                                     }),

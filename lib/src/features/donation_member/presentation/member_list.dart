@@ -631,6 +631,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
               builder: (context) => NewMemberScreen(),
             ),
           );
+          setState(() {
+            
+          });
           refresh(results);
         },
         child: const Icon(Icons.add),

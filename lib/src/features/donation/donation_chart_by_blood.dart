@@ -102,6 +102,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                   return Visibility(
                     visible: widget.data
                         .where((element) =>
+                            element.memberObj != null &&
                             element.memberObj!.bloodType! == bloodTypes[index])
                         .isNotEmpty,
                     child: Padding(
@@ -119,8 +120,9 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                           Text(
                             widget.data
                                 .where((element) =>
+                                    element.memberObj != null &&
                                     element.memberObj!.bloodType!.toString() ==
-                                    bloodTypes[index])
+                                        bloodTypes[index])
                                 .length
                                 .toString(),
                             style: TextStyle(
