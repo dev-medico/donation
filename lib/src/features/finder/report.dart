@@ -1,3 +1,4 @@
+import 'package:donation/realm/schemas.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
 import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
@@ -21,6 +22,11 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     var totalMember = ref.watch(totalMembersProvider);
     var totalDonations = ref.watch(totalDonationsProvider);
     var donations = ref.watch(donationsProvider);
+
+    List<Donation> donationList = [];
+    donations.forEach((element) {
+      donationList.add(element);
+    });
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -104,7 +110,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
                     Padding(
                       padding: const EdgeInsets.all(12),
                       child: DonationChartByBlood(
-                        data: donations,
+                        data: donationList,
                         fromDashboard: true,
                       ),
                     ),
@@ -188,7 +194,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
                         margin: const EdgeInsets.only(top: 12),
                         padding: const EdgeInsets.all(20.0),
                         child: DonationChartByBlood(
-                          data: donations,
+                          data: donationList,
                           fromDashboard: true,
                         ),
                       ),

@@ -3,7 +3,6 @@ import 'dart:convert';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -90,16 +89,28 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     selectedBloodType = data.bloodType ?? "";
     bloodBankNoController.text = data.bloodBankCard ?? "";
     totalDonationController.text = data.totalCount.toString();
-    homeNoController.text =
-        data.address != null ? data.address!.split('၊')[0] : "";
-    streetController.text =
-        data.address != null ? data.address!.split('၊')[1] : "";
-    quarterController.text =
-        data.address != null ? data.address!.split('၊')[2] : "";
-    townController.text =
-        data.address != null ? data.address!.split('၊')[3] : "";
-    setRegion(townController.text.toString());
     birthDate = data.birthDate ?? "";
+    if (data.address!.contains('၊')) {
+      homeNoController.text =
+          data.address != null ? data.address!.split('၊')[0] : "";
+      streetController.text =
+          data.address != null ? data.address!.split('၊')[1] : "";
+      quarterController.text =
+          data.address != null ? data.address!.split('၊')[2] : "";
+      townController.text =
+          data.address != null ? data.address!.split('၊')[3] : "";
+      setRegion(townController.text.toString());
+    } else if (data.address!.contains(',')) {
+      homeNoController.text =
+          data.address != null ? data.address!.split(',')[0] : "";
+      streetController.text =
+          data.address != null ? data.address!.split(',')[1] : "";
+      quarterController.text =
+          data.address != null ? data.address!.split(',')[2] : "";
+      townController.text =
+          data.address != null ? data.address!.split(',')[3] : "";
+      setRegion(townController.text.toString());
+    }
 
     final String response =
         await rootBundle.loadString('assets/json/township.json');
@@ -200,16 +211,24 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                 Container(
                                   margin: EdgeInsets.only(
                                       left: 24, top: 12, bottom: 12),
-                                  child: fluent.DatePicker(
-                                    header: 'မွေးသက္ကရာဇ်ရွေးချယ်မည်',
-                                    headerStyle: TextStyle(fontSize: 15),
-                                    selected: selected,
-                                    onChanged: (time) => setState(() {
-                                      String formattedDate =
-                                          DateFormat('dd MMM yyyy')
-                                              .format(time);
-                                      birthDate = formattedDate;
-                                    }),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    margin: const EdgeInsets.only(
+                                        left: 20,
+                                        top: 16,
+                                        bottom: 4,
+                                        right: 20),
+                                    child: NeumorphicButton(
+                                      child: Text(
+                                        birthDate,
+                                        style: TextStyle(
+                                            fontSize: 14, color: primaryColor),
+                                      ),
+                                      onPressed: () {
+                                        showDatePicker();
+                                      },
+                                    ),
                                   ),
                                 ),
                                 Container(
@@ -622,17 +641,26 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                       flex: 3,
                                       child: Container(
                                         margin: EdgeInsets.only(
-                                            left: 24, top: 12, bottom: 12),
-                                        child: fluent.DatePicker(
-                                          header: 'မွေးသက္ကရာဇ်ရွေးချယ်မည်',
-                                          headerStyle: TextStyle(fontSize: 15),
-                                          selected: selected,
-                                          onChanged: (time) => setState(() {
-                                            String formattedDate =
-                                                DateFormat('dd MMM yyyy')
-                                                    .format(time);
-                                            birthDate = formattedDate;
-                                          }),
+                                            top: 12, bottom: 12),
+                                        child: Container(
+                                          width: double.infinity,
+                                          height: 50,
+                                          margin: const EdgeInsets.only(
+                                              left: 20,
+                                              top: 16,
+                                              bottom: 4,
+                                              right: 20),
+                                          child: NeumorphicButton(
+                                            child: Text(
+                                              birthDate,
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: primaryColor),
+                                            ),
+                                            onPressed: () {
+                                              showDatePicker();
+                                            },
+                                          ),
                                         ),
                                       ),
                                     ),

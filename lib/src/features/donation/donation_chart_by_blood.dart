@@ -3,10 +3,9 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:intl/intl.dart';
-import 'package:realm/realm.dart';
 
 class DonationChartByBlood extends StatefulWidget {
-  final RealmResults<Donation> data;
+  final List<Donation> data;
   bool? fromDashboard;
   DonationChartByBlood({Key? key, required this.data, this.fromDashboard})
       : super(key: key);
@@ -63,7 +62,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
             children: [
               Text(
                 widget.fromDashboard ?? false
-                    ? "$donationYear ခုနှစ် သွေးအုပ်စုအလိုက် လှူဒါန်းမှု မှတ်တမ်း"
+                    ? "သွေးအုပ်စုအလိုက် လှူဒါန်းမှု မှတ်တမ်း"
                     : "သွေးအုပ်စုအလိုက် မှတ်တမ်း",
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 16.5 : 17.5,
@@ -71,7 +70,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(
-                height: Responsive.isMobile(context) ? 10 : 20,
+                height: Responsive.isMobile(context) ? 10 : 8,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -102,7 +101,8 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                 itemBuilder: (BuildContext context, int index) {
                   return Visibility(
                     visible: widget.data
-                        .where((element) => element.member == bloodTypes[index])
+                        .where((element) =>
+                            element.memberObj!.bloodType! == bloodTypes[index])
                         .isNotEmpty,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -136,7 +136,9 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
               ),
               Container(
                 margin: const EdgeInsets.only(
-                    left: 12, right: 16, top: 8, bottom: 8),
+                  left: 12,
+                  right: 16,
+                ),
                 width: double.infinity,
                 height: 1,
                 color: Colors.grey,

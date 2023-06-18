@@ -1,5 +1,5 @@
+import 'package:donation/realm/schemas.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:donation/data/response/xata_donation_list_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
 import 'package:donation/src/features/donation/donation_chart_by_desease.dart';
@@ -7,7 +7,7 @@ import 'package:donation/src/features/donation/donation_chart_by_hospital.dart';
 import 'package:donation/utils/Colors.dart';
 
 class BloodDonationReportScreen extends StatefulWidget {
-  final List<DonationRecord> data;
+  final List<Donation> data;
   final int month;
   final String year;
   const BloodDonationReportScreen(
@@ -70,11 +70,11 @@ class _BloodDonationReportScreenState extends State<BloodDonationReportScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Expanded(
-              //     flex: 1,
-              //     child: DonationChartByBlood(
-              //       data: widget.data,
-              //     )),
+              Expanded(
+                  flex: 1,
+                  child: DonationChartByBlood(
+                    data: widget.data,
+                  )),
               const SizedBox(
                 width: 20,
               ),

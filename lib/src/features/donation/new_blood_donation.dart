@@ -18,7 +18,6 @@ import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NewBloodDonationScreen extends ConsumerStatefulWidget {
@@ -282,15 +281,31 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                             Container(
                               margin: EdgeInsets.only(
                                   left: 24, top: 12, bottom: 12),
-                              child: fluent.DatePicker(
-                                header: 'လှူဒါန်းသည့်ရက် ရွေးချယ်မည်',
-                                headerStyle: TextStyle(fontSize: 15),
-                                selected: donationDateDetail,
-                                onChanged: (time) => setState(() {
-                                  donationDate = time.string("dd-MM-yyyy");
-                                  donationDateDetail = time;
-                                }),
+                              child: Container(
+                                width: double.infinity,
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                    left: 20, top: 16, bottom: 4, right: 20),
+                                child: NeumorphicButton(
+                                  child: Text(
+                                    donationDate,
+                                    style: TextStyle(
+                                        fontSize: 14, color: primaryColor),
+                                  ),
+                                  onPressed: () {
+                                    showDatePicker();
+                                  },
+                                ),
                               ),
+                              // child: fluent.DatePicker(
+                              //   header: 'လှူဒါန်းသည့်ရက် ရွေးချယ်မည်',
+                              //   headerStyle: TextStyle(fontSize: 15),
+                              //   selected: donationDateDetail,
+                              //   onChanged: (time) => setState(() {
+                              //     donationDate = time.string("dd-MM-yyyy");
+                              //     donationDateDetail = time;
+                              //   }),
+                              // ),
                             ),
                             Container(
                               margin: const EdgeInsets.only(
@@ -667,17 +682,26 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                 Expanded(
                                   flex: 3,
                                   child: Container(
-                                    margin: EdgeInsets.only(
-                                        left: 24, top: 12, bottom: 12),
-                                    child: fluent.DatePicker(
-                                      header: 'လှူဒါန်းသည့်ရက် ရွေးချယ်မည်',
-                                      headerStyle: TextStyle(fontSize: 15),
-                                      selected: donationDateDetail,
-                                      onChanged: (time) => setState(() {
-                                        donationDate =
-                                            time.string("dd-MM-yyyy");
-                                        donationDateDetail = time;
-                                      }),
+                                    margin: EdgeInsets.only(top: 12, bottom: 4),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 50,
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 4,
+                                          right: 20),
+                                      child: NeumorphicButton(
+                                        child: Text(
+                                          donationDate,
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: primaryColor),
+                                        ),
+                                        onPressed: () {
+                                          showDatePicker();
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1216,5 +1240,17 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     }
 
     return operator;
+  }
+
+  showDatePicker() async {
+    Utils.showCupertinoDatePicker(
+      context,
+      (DateTime newDateTime) {
+        setState(() {
+          donationDate = newDateTime.string("dd-MM-yyyy");
+          donationDateDetail = newDateTime;
+        });
+      },
+    );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/donation/blood_donation_report.dart';
 import 'package:donation/src/features/donation/controller/donation_provider.dart';
 import 'package:donation/src/features/donation/donation_detail.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -248,40 +249,40 @@ class _BloodDonationListNewStyleState
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
                           int selectedMonth = controller.index;
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder:
-                          //             (context) => BloodDonationReportScreen(
-                          //                   month: selectedMonth,
-                          //                   year: selectedYear,
-                          //                   data: selectedMonth == 0
-                          //                       ? dataSegments1
-                          //                       : selectedMonth == 1
-                          //                           ? dataSegments2
-                          //                           : selectedMonth == 2
-                          //                               ? dataSegments3
-                          //                               : selectedMonth == 3
-                          //                                   ? dataSegments4
-                          //                                   : selectedMonth == 4
-                          //                                       ? dataSegments5
-                          //                                       : selectedMonth ==
-                          //                                               5
-                          //                                           ? dataSegments6
-                          //                                           : selectedMonth ==
-                          //                                                   6
-                          //                                               ? dataSegments7
-                          //                                               : selectedMonth ==
-                          //                                                       7
-                          //                                                   ? dataSegments8
-                          //                                                   : selectedMonth == 8
-                          //                                                       ? dataSegments9
-                          //                                                       : selectedMonth == 9
-                          //                                                           ? dataSegments10
-                          //                                                           : selectedMonth == 10
-                          //                                                               ? dataSegments11
-                          //                                                               : dataSegments12,
-                          //                 )));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder:
+                                      (context) => BloodDonationReportScreen(
+                                            month: selectedMonth,
+                                            year: selectedYear,
+                                            data: selectedMonth == 0
+                                                ? dataSegments1
+                                                : selectedMonth == 1
+                                                    ? dataSegments2
+                                                    : selectedMonth == 2
+                                                        ? dataSegments3
+                                                        : selectedMonth == 3
+                                                            ? dataSegments4
+                                                            : selectedMonth == 4
+                                                                ? dataSegments5
+                                                                : selectedMonth ==
+                                                                        5
+                                                                    ? dataSegments6
+                                                                    : selectedMonth ==
+                                                                            6
+                                                                        ? dataSegments7
+                                                                        : selectedMonth ==
+                                                                                7
+                                                                            ? dataSegments8
+                                                                            : selectedMonth == 8
+                                                                                ? dataSegments9
+                                                                                : selectedMonth == 9
+                                                                                    ? dataSegments10
+                                                                                    : selectedMonth == 10
+                                                                                        ? dataSegments11
+                                                                                        : dataSegments12,
+                                          )));
                         },
                         child: Align(
                             alignment: Alignment.center,
@@ -384,40 +385,40 @@ class _BloodDonationListNewStyleState
                             behavior: HitTestBehavior.translucent,
                             onTap: () {
                               int selectedMonth = controller.index;
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) =>
-                              //             BloodDonationReportScreen(
-                              //               month: selectedMonth,
-                              //               year: selectedYear,
-                              //               data: selectedMonth == 0
-                              //                   ? dataSegments1
-                              //                   : selectedMonth == 1
-                              //                       ? dataSegments2
-                              //                       : selectedMonth == 2
-                              //                           ? dataSegments3
-                              //                           : selectedMonth == 3
-                              //                               ? dataSegments4
-                              //                               : selectedMonth == 4
-                              //                                   ? dataSegments5
-                              //                                   : selectedMonth ==
-                              //                                           5
-                              //                                       ? dataSegments6
-                              //                                       : selectedMonth ==
-                              //                                               6
-                              //                                           ? dataSegments7
-                              //                                           : selectedMonth ==
-                              //                                                   7
-                              //                                               ? dataSegments8
-                              //                                               : selectedMonth == 8
-                              //                                                   ? dataSegments9
-                              //                                                   : selectedMonth == 9
-                              //                                                       ? dataSegments10
-                              //                                                       : selectedMonth == 10
-                              //                                                           ? dataSegments11
-                              //                                                           : dataSegments12,
-                              //             )));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          BloodDonationReportScreen(
+                                            month: selectedMonth,
+                                            year: selectedYear,
+                                            data: selectedMonth == 0
+                                                ? dataSegments1
+                                                : selectedMonth == 1
+                                                    ? dataSegments2
+                                                    : selectedMonth == 2
+                                                        ? dataSegments3
+                                                        : selectedMonth == 3
+                                                            ? dataSegments4
+                                                            : selectedMonth == 4
+                                                                ? dataSegments5
+                                                                : selectedMonth ==
+                                                                        5
+                                                                    ? dataSegments6
+                                                                    : selectedMonth ==
+                                                                            6
+                                                                        ? dataSegments7
+                                                                        : selectedMonth ==
+                                                                                7
+                                                                            ? dataSegments8
+                                                                            : selectedMonth == 8
+                                                                                ? dataSegments9
+                                                                                : selectedMonth == 9
+                                                                                    ? dataSegments10
+                                                                                    : selectedMonth == 10
+                                                                                        ? dataSegments11
+                                                                                        : dataSegments12,
+                                          )));
                             },
                             child: Align(
                                 alignment: Alignment.center,

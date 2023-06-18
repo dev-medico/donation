@@ -5,7 +5,6 @@ import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/providers/providers.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -425,16 +424,26 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                               Container(
                                 margin: EdgeInsets.only(
                                     left: 24, top: 12, bottom: 12),
-                                child: fluent.DatePicker(
-                                  header: 'မွေးသက္ကရာဇ်ရွေးချယ်မည်',
-                                  headerStyle: TextStyle(fontSize: 15),
-                                  selected: selected,
-                                  onChanged: (time) => setState(() {
-                                    selected = time;
-                                    String formattedDate =
-                                        DateFormat('dd MMM yyyy').format(time);
-                                    birthDate = formattedDate;
-                                  }),
+                                child: Container(
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    margin: const EdgeInsets.only(
+                                        left: 20,
+                                        top: 16,
+                                        bottom: 4,
+                                        right: 20),
+                                    child: NeumorphicButton(
+                                      child: Text(
+                                        birthDate,
+                                        style: TextStyle(
+                                            fontSize: 14, color: primaryColor),
+                                      ),
+                                      onPressed: () {
+                                        showDatePicker();
+                                      },
+                                    ),
+                                  ),
                                 ),
                               ),
                               Container(
@@ -1009,19 +1018,23 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   Expanded(
                                     flex: 3,
                                     child: Container(
-                                      margin: EdgeInsets.only(
-                                          left: 24, top: 12, bottom: 12),
-                                      child: fluent.DatePicker(
-                                        header: 'မွေးသက္ကရာဇ်ရွေးချယ်မည်',
-                                        headerStyle: TextStyle(fontSize: 15),
-                                        selected: selected,
-                                        onChanged: (time) => setState(() {
-                                          selected = time;
-                                          String formattedDate =
-                                              DateFormat('dd MMM yyyy')
-                                                  .format(time);
-                                          birthDate = formattedDate;
-                                        }),
+                                      width: double.infinity,
+                                      height: 50,
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 16,
+                                          bottom: 4,
+                                          right: 20),
+                                      child: NeumorphicButton(
+                                        child: Text(
+                                          birthDate,
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: primaryColor),
+                                        ),
+                                        onPressed: () {
+                                          showDatePicker();
+                                        },
                                       ),
                                     ),
                                   ),
