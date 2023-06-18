@@ -622,12 +622,49 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         onPressed: () async {
-          Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => NewMemberScreen(),
             ),
           );
+          setState(() {
+            oldData.clear();
+            for (int i = 0; i < results.length; i++) {
+              setState(() {
+                oldData.add(results[i]);
+              });
+            }
+            setState(() {
+              dataSegments = oldData;
+            });
+            ranges.clear();
+            getRanges(oldData);
+            if (searchController.text.isNotEmpty) {
+              setState(() {
+                searchKey = searchController.text;
+              });
+              List<Member>? filterdata = [];
+              oldData.forEach((element) {
+                if (element.name
+                        .toString()
+                        .toLowerCase()
+                        .split("")
+                        .toSet()
+                        .intersection(searchKey.toLowerCase().split("").toSet())
+                        .length ==
+                    searchKey.toLowerCase().split("").toSet().length) {
+                  setState(() {
+                    filterdata.add(element);
+                  });
+                }
+              });
+              log("call here");
+              setState(() {
+                dataSegments = filterdata.sublist(0);
+              });
+            }
+          });
         },
         child: const Icon(Icons.add),
       ),
@@ -663,7 +700,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
         onCellTap: (details) async {
           Logger logger = Logger();
           logger.i(details.rowColumnIndex.rowIndex);
-          
+
           await Navigator.push(
             context,
             MaterialPageRoute(
