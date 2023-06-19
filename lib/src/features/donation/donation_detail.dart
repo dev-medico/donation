@@ -91,7 +91,7 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                       flex: 5,
                       child: Text(
                         data.donationDate != null
-                            ? data.donationDate!.string("dd-MM-yyyy")
+                            ? data.donationDate!.toLocal().string("dd-MM-yyyy")
                             : "",
                         style:
                             const TextStyle(fontSize: 14, color: Colors.black),

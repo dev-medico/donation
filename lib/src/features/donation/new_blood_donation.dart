@@ -125,7 +125,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     ref.watch(realmProvider)!.createDonation(
           member: selectedMember != null ? selectedMember!.id : null,
           date: donationDateDetail!.string("dd MMM yyyy"),
-          donationDate: donationDateDetail,
+          donationDate: donationDateDetail!.toLocal(),
           hospital: selectHospital,
           memberObj: selectedMember,
           memberId:
@@ -1242,7 +1242,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       (DateTime newDateTime) {
         setState(() {
           donationDate = newDateTime.string("dd-MM-yyyy");
-          donationDateDetail = newDateTime;
+          donationDateDetail = newDateTime.toLocal();
         });
       },
     );

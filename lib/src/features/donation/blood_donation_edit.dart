@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
@@ -115,10 +116,11 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
           patientName: name,
           patientAge: age,
           hospital: selectHospital,
-          donationDate: donationDateDetail,
+          donationDate: donationDateDetail!.toLocal(),
           patientDisease: selectDisease,
           patientAddress: "$quarter၊$township",
         );
+    log("donationDateDetail ${donationDateDetail!.toLocal()}");
     Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
         context, "အိုကေ", Colors.black);
     nameController.clear();
@@ -1056,8 +1058,9 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
       (DateTime newDateTime) {
         setState(() {
           donationDate = newDateTime.string("dd-MM-yyyy");
-          donationDateDetail = newDateTime;
+          donationDateDetail = newDateTime.toLocal();
         });
+        log("newDateTime: ${newDateTime.toLocal()}");
       },
     );
   }

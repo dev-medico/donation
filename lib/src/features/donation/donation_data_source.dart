@@ -78,8 +78,8 @@ class DonationDataSource extends DataGridSource {
         return DataGridRow(cells: [
           DataGridCell<String>(
               columnName: 'ရက်စွဲ',
-              value: DateFormat('dd-MM-yyyy')
-                  .format(DateTime.parse(e.donationDate.toString()))),
+              value: DateFormat('dd-MM-yyyy').format(
+                  DateTime.parse(e.donationDate!.toLocal().toString()))),
           DataGridCell<String>(
               columnName: 'သွေးအလှူရှင်', value: "        -        "),
           DataGridCell<String>(columnName: 'သွေးအုပ်စု', value: "    -   "),
@@ -119,8 +119,8 @@ class DonationDataSource extends DataGridSource {
         return DataGridRow(cells: [
           DataGridCell<String>(
               columnName: 'ရက်စွဲ',
-              value: DateFormat('dd-MM-yyyy')
-                  .format(DateTime.parse(e.donationDate.toString()))),
+              value: DateFormat('dd-MM-yyyy').format(
+                  DateTime.parse(e.donationDate!.toLocal().toString()))),
           DataGridCell<String>(
               columnName: 'သွေးအလှူရှင်',
               value: "        ${member.name.toString()}        "),

@@ -725,7 +725,7 @@ class _BloodDonationListNewStyleState
     List<Donation> filterData12 = [];
     for (int i = 0; i < data!.length; i++) {
       if (data![i].date.toString() != "null" && data![i].date != null) {
-        DateTime dateTime = data![i].donationDate!;
+        DateTime dateTime = data![i].donationDate!.toLocal();
         // if (data![i].date!.contains("T")) {
         //   dateTime = DateTime.parse(data![i].date!.split("T")[0].toString());
         // } else if (data![i].date!.contains(" ")) {
@@ -773,51 +773,51 @@ class _BloodDonationListNewStyleState
       }
     }
     filterData1.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData1 = filterData1.reversed.toList();
     filterData2.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData2 = filterData2.reversed.toList();
     filterData3.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData3 = filterData3.reversed.toList();
     filterData4.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData4 = filterData4.reversed.toList();
     filterData5.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData5 = filterData5.reversed.toList();
     filterData6.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData6 = filterData6.reversed.toList();
     filterData7.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData7 = filterData7.reversed.toList();
     filterData8.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData8 = filterData8.reversed.toList();
     filterData9.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData9 = filterData9.reversed.toList();
     filterData10.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData10 = filterData10.reversed.toList();
     filterData11.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     // filterData11 = filterData11.reversed.toList();
     filterData12.sort((a, b) {
-      return a.donationDate!.compareTo(b.donationDate!);
+      return a.donationDate!.toLocal().compareTo(b.donationDate!.toLocal());
     });
     //filterData12 = filterData12.reversed.toList();
 
