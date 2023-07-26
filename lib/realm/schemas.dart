@@ -44,3 +44,29 @@ class _Donation {
   @MapTo('owner_id')
   late String ownerId;
 }
+
+@RealmModel()
+class _SpecialEvent {
+  @MapTo('_id')
+  @PrimaryKey()
+  late ObjectId id;
+  String? date;
+  int? haemoglobin;
+  int? hbsAg;
+  int? hcvAb;
+  int? mpIct;
+  int? retroTest;
+  int? vdrlTest;
+  String? labName;
+  int? total;
+}
+
+@RealmModel()
+class _Donar {
+  @MapTo('_id')
+  @PrimaryKey()
+  late ObjectId id;
+  int? amount;
+  String? date;
+  String? name;
+}

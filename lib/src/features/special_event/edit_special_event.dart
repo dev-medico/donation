@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:donation/realm/schemas.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:donation/data/repository/repository.dart';
-import 'package:donation/data/response/special_event_list_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
@@ -13,7 +12,7 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:intl/intl.dart';
 
 class EditSpecialEventScreen extends StatefulWidget {
-  SpecialEventData event;
+  SpecialEvent event;
   EditSpecialEventScreen({Key? key, required this.event}) : super(key: key);
 
   @override
@@ -440,51 +439,51 @@ class _EditSpecialEventScreenState extends State<EditSpecialEventScreen> {
         },
       ),
     );
-    XataRepository()
-        .updateSpecialEvent(
-      widget.event.id!,
-      jsonEncode(
-        <String, dynamic>{
-          "date": dateFilter.toString(),
-          "retro_test": retorTestController.text.toString().isEmpty
-              ? 0
-              : int.parse(retorTestController.text.toString()),
-          "hbs_ag": hbsAgController.text.toString().isEmpty
-              ? 0
-              : int.parse(hbsAgController.text.toString()),
-          "hcv_ab": hcvAbController.text.toString().isEmpty
-              ? 0
-              : int.parse(hcvAbController.text.toString()),
-          "vdrl_test": vdrlController.text.toString().isEmpty
-              ? 0
-              : int.parse(vdrlController.text.toString()),
-          "mp_ict": mpICTController.text.toString().isEmpty
-              ? 0
-              : int.parse(mpICTController.text.toString()),
-          "haemoglobin": haemoglobinController.text.toString().isEmpty
-              ? 0
-              : int.parse(haemoglobinController.text.toString()),
-          "lab_name": labNameController.text.isEmpty
-              ? ""
-              : labNameController.text.toString(),
-          "total": total
-        },
-      ),
-    )
-        .then((response) {
-      log(response.statusCode.toString());
-      setState(() {
-        isLoading = false;
-      });
-      if (response.statusCode.toString().startsWith("2")) {
-        Utils.messageSuccessSinglePopDialog(
-            "ထူးခြားဖြစ်စဥ် ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
-            context,
-            "အိုကေ",
-            Colors.black);
-      } else {
-        Navigator.pop(context);
-      }
-    });
+    // XataRepository()
+    //     .updateSpecialEvent(
+    //   widget.event.id,
+    //   jsonEncode(
+    //     <String, dynamic>{
+    //       "date": dateFilter.toString(),
+    //       "retro_test": retorTestController.text.toString().isEmpty
+    //           ? 0
+    //           : int.parse(retorTestController.text.toString()),
+    //       "hbs_ag": hbsAgController.text.toString().isEmpty
+    //           ? 0
+    //           : int.parse(hbsAgController.text.toString()),
+    //       "hcv_ab": hcvAbController.text.toString().isEmpty
+    //           ? 0
+    //           : int.parse(hcvAbController.text.toString()),
+    //       "vdrl_test": vdrlController.text.toString().isEmpty
+    //           ? 0
+    //           : int.parse(vdrlController.text.toString()),
+    //       "mp_ict": mpICTController.text.toString().isEmpty
+    //           ? 0
+    //           : int.parse(mpICTController.text.toString()),
+    //       "haemoglobin": haemoglobinController.text.toString().isEmpty
+    //           ? 0
+    //           : int.parse(haemoglobinController.text.toString()),
+    //       "lab_name": labNameController.text.isEmpty
+    //           ? ""
+    //           : labNameController.text.toString(),
+    //       "total": total
+    //     },
+    //   ),
+    // )
+    //     .then((response) {
+    //   log(response.statusCode.toString());
+    //   setState(() {
+    //     isLoading = false;
+    //   });
+    //   if (response.statusCode.toString().startsWith("2")) {
+    //     Utils.messageSuccessSinglePopDialog(
+    //         "ထူးခြားဖြစ်စဥ် ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
+    //         context,
+    //         "အိုကေ",
+    //         Colors.black);
+    //   } else {
+    //     Navigator.pop(context);
+    //   }
+    // });
   }
 }

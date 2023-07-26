@@ -321,3 +321,167 @@ class Donation extends _Donation
     ]);
   }
 }
+
+class SpecialEvent extends _SpecialEvent
+    with RealmEntity, RealmObjectBase, RealmObject {
+  SpecialEvent(
+    ObjectId id, {
+    String? date,
+    int? haemoglobin,
+    int? hbsAg,
+    int? hcvAb,
+    int? mpIct,
+    int? retroTest,
+    int? vdrlTest,
+    String? labName,
+    int? total,
+  }) {
+    RealmObjectBase.set(this, '_id', id);
+    RealmObjectBase.set(this, 'date', date);
+    RealmObjectBase.set(this, 'haemoglobin', haemoglobin);
+    RealmObjectBase.set(this, 'hbsAg', hbsAg);
+    RealmObjectBase.set(this, 'hcvAb', hcvAb);
+    RealmObjectBase.set(this, 'mpIct', mpIct);
+    RealmObjectBase.set(this, 'retroTest', retroTest);
+    RealmObjectBase.set(this, 'vdrlTest', vdrlTest);
+    RealmObjectBase.set(this, 'labName', labName);
+    RealmObjectBase.set(this, 'total', total);
+  }
+
+  SpecialEvent._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, '_id', value);
+
+  @override
+  String? get date => RealmObjectBase.get<String>(this, 'date') as String?;
+  @override
+  set date(String? value) => RealmObjectBase.set(this, 'date', value);
+
+  @override
+  int? get haemoglobin => RealmObjectBase.get<int>(this, 'haemoglobin') as int?;
+  @override
+  set haemoglobin(int? value) =>
+      RealmObjectBase.set(this, 'haemoglobin', value);
+
+  @override
+  int? get hbsAg => RealmObjectBase.get<int>(this, 'hbsAg') as int?;
+  @override
+  set hbsAg(int? value) => RealmObjectBase.set(this, 'hbsAg', value);
+
+  @override
+  int? get hcvAb => RealmObjectBase.get<int>(this, 'hcvAb') as int?;
+  @override
+  set hcvAb(int? value) => RealmObjectBase.set(this, 'hcvAb', value);
+
+  @override
+  int? get mpIct => RealmObjectBase.get<int>(this, 'mpIct') as int?;
+  @override
+  set mpIct(int? value) => RealmObjectBase.set(this, 'mpIct', value);
+
+  @override
+  int? get retroTest => RealmObjectBase.get<int>(this, 'retroTest') as int?;
+  @override
+  set retroTest(int? value) => RealmObjectBase.set(this, 'retroTest', value);
+
+  @override
+  int? get vdrlTest => RealmObjectBase.get<int>(this, 'vdrlTest') as int?;
+  @override
+  set vdrlTest(int? value) => RealmObjectBase.set(this, 'vdrlTest', value);
+
+  @override
+  String? get labName =>
+      RealmObjectBase.get<String>(this, 'labName') as String?;
+  @override
+  set labName(String? value) => RealmObjectBase.set(this, 'labName', value);
+
+  @override
+  int? get total => RealmObjectBase.get<int>(this, 'total') as int?;
+  @override
+  set total(int? value) => RealmObjectBase.set(this, 'total', value);
+
+  @override
+  Stream<RealmObjectChanges<SpecialEvent>> get changes =>
+      RealmObjectBase.getChanges<SpecialEvent>(this);
+
+  @override
+  SpecialEvent freeze() => RealmObjectBase.freezeObject<SpecialEvent>(this);
+
+  static SchemaObject get schema => _schema ??= _initSchema();
+  static SchemaObject? _schema;
+  static SchemaObject _initSchema() {
+    RealmObjectBase.registerFactory(SpecialEvent._);
+    return const SchemaObject(
+        ObjectType.realmObject, SpecialEvent, 'SpecialEvent', [
+      SchemaProperty('id', RealmPropertyType.objectid,
+          mapTo: '_id', primaryKey: true),
+      SchemaProperty('date', RealmPropertyType.string, optional: true),
+      SchemaProperty('haemoglobin', RealmPropertyType.int, optional: true),
+      SchemaProperty('hbsAg', RealmPropertyType.int, optional: true),
+      SchemaProperty('hcvAb', RealmPropertyType.int, optional: true),
+      SchemaProperty('mpIct', RealmPropertyType.int, optional: true),
+      SchemaProperty('retroTest', RealmPropertyType.int, optional: true),
+      SchemaProperty('vdrlTest', RealmPropertyType.int, optional: true),
+      SchemaProperty('labName', RealmPropertyType.string, optional: true),
+      SchemaProperty('total', RealmPropertyType.int, optional: true),
+    ]);
+  }
+}
+
+class Donar extends _Donar with RealmEntity, RealmObjectBase, RealmObject {
+  Donar(
+    ObjectId id, {
+    int? amount,
+    String? date,
+    String? name,
+  }) {
+    RealmObjectBase.set(this, '_id', id);
+    RealmObjectBase.set(this, 'amount', amount);
+    RealmObjectBase.set(this, 'date', date);
+    RealmObjectBase.set(this, 'name', name);
+  }
+
+  Donar._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, '_id', value);
+
+  @override
+  int? get amount => RealmObjectBase.get<int>(this, 'amount') as int?;
+  @override
+  set amount(int? value) => RealmObjectBase.set(this, 'amount', value);
+
+  @override
+  String? get date => RealmObjectBase.get<String>(this, 'date') as String?;
+  @override
+  set date(String? value) => RealmObjectBase.set(this, 'date', value);
+
+  @override
+  String? get name => RealmObjectBase.get<String>(this, 'name') as String?;
+  @override
+  set name(String? value) => RealmObjectBase.set(this, 'name', value);
+
+  @override
+  Stream<RealmObjectChanges<Donar>> get changes =>
+      RealmObjectBase.getChanges<Donar>(this);
+
+  @override
+  Donar freeze() => RealmObjectBase.freezeObject<Donar>(this);
+
+  static SchemaObject get schema => _schema ??= _initSchema();
+  static SchemaObject? _schema;
+  static SchemaObject _initSchema() {
+    RealmObjectBase.registerFactory(Donar._);
+    return const SchemaObject(ObjectType.realmObject, Donar, 'Donar', [
+      SchemaProperty('id', RealmPropertyType.objectid,
+          mapTo: '_id', primaryKey: true),
+      SchemaProperty('amount', RealmPropertyType.int, optional: true),
+      SchemaProperty('date', RealmPropertyType.string, optional: true),
+      SchemaProperty('name', RealmPropertyType.string, optional: true),
+    ]);
+  }
+}

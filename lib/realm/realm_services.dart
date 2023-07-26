@@ -16,6 +16,8 @@ final realmProvider = ChangeNotifierProvider<RealmServices?>((ref) {
 class RealmServices with ChangeNotifier {
   static const String queryAllName = "getAllSubscription";
   static const String queryAllDonationName = "getAllDonation";
+  static const String queryAllSpecialEvent = "getAllSpecialEvent";
+  static const String queryAllDonar = "getAllDonar";
 
   bool offlineModeOn = false;
   bool isWaiting = false;
@@ -29,7 +31,7 @@ class RealmServices with ChangeNotifier {
       realm = Realm(
         Configuration.flexibleSync(
           currentUser!,
-          [Donation.schema, Member.schema],
+          [Donation.schema, Member.schema, SpecialEvent.schema],
         ),
       );
       if (realm.subscriptions.isEmpty) {
@@ -45,6 +47,10 @@ class RealmServices with ChangeNotifier {
       mutableSubscriptions.add(realm.all<Member>(), name: queryAllName);
       mutableSubscriptions.add(realm.all<Donation>(),
           name: queryAllDonationName);
+      mutableSubscriptions.add(realm.all<SpecialEvent>(),
+          name: queryAllSpecialEvent);
+       mutableSubscriptions.add(realm.all<Donar>(),
+          name: queryAllDonar);
     });
     await realm.subscriptions.waitForSynchronization();
   }
@@ -276,6 +282,11 @@ class RealmServices with ChangeNotifier {
 
   void deleteDonation(Donation donation) {
     realm.write(() => realm.delete(donation));
+    notifyListeners();
+  }
+
+  void createSpecialEvent(SpecialEvent newSpecialEvent) {
+    realm.write<SpecialEvent>(() => realm.add<SpecialEvent>(newSpecialEvent));
     notifyListeners();
   }
 

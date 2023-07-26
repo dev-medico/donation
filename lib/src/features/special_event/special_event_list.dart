@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:donation/realm/realm_services.dart';
+import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/special_event/special_event_provider.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_expandable_table/flutter_expandable_table.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -14,12 +17,13 @@ import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:realm/realm.dart';
 
-final specialEventsProvider =
-    FutureProvider<List<SpecialEventData>>((ref) async {
-  var data = await getEventsFromXata();
-  return data;
-});
+// final specialEventsProvider =
+//     FutureProvider<List<SpecialEventData>>((ref) async {
+//   var data = await getEventsFromXata();
+//   return data;
+// });
 
 class SpecialEventListScreen extends ConsumerStatefulWidget {
   static const routeName = "/special_event_list";
@@ -33,16 +37,21 @@ class SpecialEventListScreen extends ConsumerStatefulWidget {
 class _SpecialEventListScreenState
     extends ConsumerState<SpecialEventListScreen> {
   //List<SpecialEventData>? data = [];
+  bool notloaded = true;
   @override
   void initState() {
     super.initState();
-    getEventsFromXata();
   }
 
   @override
   Widget build(BuildContext context) {
-    var data = ref.watch(specialEventsProvider);
+    // var data = ref.watch(specialEventsProvider);
+    final results = ref.watch(specialEventsDataProvider);
     YYDialog.init(context);
+    if (notloaded) {
+      getEventsFromXata(ref);
+      notloaded = false;
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -73,26 +82,18 @@ class _SpecialEventListScreenState
               builder: (context) => const NewEventAddScreen(),
             ),
           );
-          getEventsFromXata();
+          getEventsFromXata(ref);
         },
         child: const Icon(Icons.add),
       ),
-      body: data.when(data: (data) {
-        return Padding(
-          padding: const EdgeInsets.only(left: 20, top: 40, right: 20),
-          child: buildSimpleTable(data),
-        );
-      }, loading: () {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      }, error: (error, stack) {
-        return Container();
-      }),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 20, top: 40, right: 20),
+        child: buildSimpleTable(results),
+      ),
     );
   }
 
-  ExpandableTable buildSimpleTable(List<SpecialEventData> data) {
+  ExpandableTable buildSimpleTable(RealmResults<SpecialEvent> data) {
     const int COLUMN_COUNT = 10;
     int ROWCOUNT = data.length;
     List<String> titles = [
@@ -159,7 +160,7 @@ class _SpecialEventListScreenState
                               builder: (context) => EditSpecialEventScreen(
                                     event: data[rowIndex],
                                   )));
-                      getEventsFromXata();
+                      getEventsFromXata(ref);
                     },
                     child: columnIndex == 8
                         ? Container(
@@ -181,7 +182,7 @@ class _SpecialEventListScreenState
                                                   EditSpecialEventScreen(
                                                     event: data[rowIndex],
                                                   )));
-                                      getEventsFromXata();
+                                      getEventsFromXata(ref);
                                     }),
                                 const SizedBox(
                                   width: 4,
@@ -211,7 +212,7 @@ class _SpecialEventListScreenState
                                                 context,
                                                 "အိုကေ",
                                                 Colors.black);
-                                            getEventsFromXata();
+                                            getEventsFromXata(ref);
                                           }
                                         });
                                       });
@@ -473,7 +474,7 @@ class _SpecialEventListScreenState
   }
 }
 
-Future<List<SpecialEventData>> getEventsFromXata() async {
+Future<List<SpecialEventData>> getEventsFromXata(WidgetRef ref) async {
   Map<String, String> headers = {
     "Accept": "application/json",
     "content-type": 'application/json',
@@ -490,6 +491,20 @@ Future<List<SpecialEventData>> getEventsFromXata() async {
   log(response.statusCode.toString());
   log(response.body.toString());
   if (response.statusCode.toString().startsWith("2")) {
+    var data = SpecialEventListResponse.fromJson(jsonDecode(response.body))
+        .specialEventData!;
+    data.forEach((element) {
+      ref.watch(realmProvider)!.createSpecialEvent(SpecialEvent(ObjectId(),
+          date: element.date,
+          haemoglobin: element.haemoglobin,
+          hbsAg: element.hbsAg,
+          hcvAb: element.hcvAb,
+          mpIct: element.mpIct,
+          retroTest: element.retroTest,
+          vdrlTest: element.vdrlTest,
+          labName: element.labName,
+          total: element.total));
+    });
     return SpecialEventListResponse.fromJson(jsonDecode(response.body))
         .specialEventData!;
   } else {
