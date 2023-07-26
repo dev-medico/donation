@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:donation/realm/realm_services.dart';
+import 'package:donation/realm/schemas.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:donation/data/repository/repository.dart';
@@ -14,12 +16,14 @@ import 'package:donation/src/features/donar/new_expense_record.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:realm/realm.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
-class DonarList extends StatefulWidget {
+class DonarList extends ConsumerStatefulWidget {
   static const routeName = "/donars";
 
   const DonarList({Key? key}) : super(key: key);
@@ -28,7 +32,7 @@ class DonarList extends StatefulWidget {
   _DonarListState createState() => _DonarListState();
 }
 
-class _DonarListState extends State<DonarList> {
+class _DonarListState extends ConsumerState<DonarList> {
   List<String> ranges = [
     "2023",
     "2022",
@@ -784,6 +788,16 @@ class _DonarListState extends State<DonarList> {
         setState(() {
           dataFullLoaded = true;
         });
+        data.forEach((element) {
+          ref.watch(realmProvider)!.createDonar(DonarRecord(
+                ObjectId(),
+                name: element.name,
+                amount: element.amount,
+                date: DateTime.parse(
+                    (element.date!.replaceAll("T", " ")).replaceAll("Z", "")),
+              ));
+        });
+
         callExpenseAPI("");
       }
     });
@@ -817,6 +831,15 @@ class _DonarListState extends State<DonarList> {
       } else {
         setState(() {
           dataExpenseFullLoaded = true;
+        });
+        expensesData.forEach((element) {
+          ref.watch(realmProvider)!.createExpenseRecord(ExpensesRecord(
+                ObjectId(),
+                name: element.name,
+                amount: element.amount,
+                date: DateTime.parse(
+                    (element.date!.replaceAll("T", " ")).replaceAll("Z", "")),
+              ));
         });
         sortBySegments();
       }

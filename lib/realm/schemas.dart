@@ -62,21 +62,21 @@ class _SpecialEvent {
 }
 
 @RealmModel()
-class _Donar {
+class _DonarRecord {
   @MapTo('_id')
   @PrimaryKey()
   late ObjectId id;
   int? amount;
-  String? date;
+  DateTime? date;
   String? name;
 }
 
 @RealmModel()
-class _ExpenseRecord {
+class _ExpensesRecord {
   @MapTo('_id')
   @PrimaryKey()
   late ObjectId id;
   int? amount;
-  String? date;
+  DateTime? date;
   String? name;
 }

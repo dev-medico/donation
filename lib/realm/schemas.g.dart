@@ -430,11 +430,12 @@ class SpecialEvent extends _SpecialEvent
   }
 }
 
-class Donar extends _Donar with RealmEntity, RealmObjectBase, RealmObject {
-  Donar(
+class DonarRecord extends _DonarRecord
+    with RealmEntity, RealmObjectBase, RealmObject {
+  DonarRecord(
     ObjectId id, {
     int? amount,
-    String? date,
+    DateTime? date,
     String? name,
   }) {
     RealmObjectBase.set(this, '_id', id);
@@ -443,7 +444,7 @@ class Donar extends _Donar with RealmEntity, RealmObjectBase, RealmObject {
     RealmObjectBase.set(this, 'name', name);
   }
 
-  Donar._();
+  DonarRecord._();
 
   @override
   ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
@@ -456,9 +457,10 @@ class Donar extends _Donar with RealmEntity, RealmObjectBase, RealmObject {
   set amount(int? value) => RealmObjectBase.set(this, 'amount', value);
 
   @override
-  String? get date => RealmObjectBase.get<String>(this, 'date') as String?;
+  DateTime? get date =>
+      RealmObjectBase.get<DateTime>(this, 'date') as DateTime?;
   @override
-  set date(String? value) => RealmObjectBase.set(this, 'date', value);
+  set date(DateTime? value) => RealmObjectBase.set(this, 'date', value);
 
   @override
   String? get name => RealmObjectBase.get<String>(this, 'name') as String?;
@@ -466,32 +468,33 @@ class Donar extends _Donar with RealmEntity, RealmObjectBase, RealmObject {
   set name(String? value) => RealmObjectBase.set(this, 'name', value);
 
   @override
-  Stream<RealmObjectChanges<Donar>> get changes =>
-      RealmObjectBase.getChanges<Donar>(this);
+  Stream<RealmObjectChanges<DonarRecord>> get changes =>
+      RealmObjectBase.getChanges<DonarRecord>(this);
 
   @override
-  Donar freeze() => RealmObjectBase.freezeObject<Donar>(this);
+  DonarRecord freeze() => RealmObjectBase.freezeObject<DonarRecord>(this);
 
   static SchemaObject get schema => _schema ??= _initSchema();
   static SchemaObject? _schema;
   static SchemaObject _initSchema() {
-    RealmObjectBase.registerFactory(Donar._);
-    return const SchemaObject(ObjectType.realmObject, Donar, 'Donar', [
+    RealmObjectBase.registerFactory(DonarRecord._);
+    return const SchemaObject(
+        ObjectType.realmObject, DonarRecord, 'DonarRecord', [
       SchemaProperty('id', RealmPropertyType.objectid,
           mapTo: '_id', primaryKey: true),
       SchemaProperty('amount', RealmPropertyType.int, optional: true),
-      SchemaProperty('date', RealmPropertyType.string, optional: true),
+      SchemaProperty('date', RealmPropertyType.timestamp, optional: true),
       SchemaProperty('name', RealmPropertyType.string, optional: true),
     ]);
   }
 }
 
-class ExpenseRecord extends _ExpenseRecord
+class ExpensesRecord extends _ExpensesRecord
     with RealmEntity, RealmObjectBase, RealmObject {
-  ExpenseRecord(
+  ExpensesRecord(
     ObjectId id, {
     int? amount,
-    String? date,
+    DateTime? date,
     String? name,
   }) {
     RealmObjectBase.set(this, '_id', id);
@@ -500,7 +503,7 @@ class ExpenseRecord extends _ExpenseRecord
     RealmObjectBase.set(this, 'name', name);
   }
 
-  ExpenseRecord._();
+  ExpensesRecord._();
 
   @override
   ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
@@ -513,9 +516,10 @@ class ExpenseRecord extends _ExpenseRecord
   set amount(int? value) => RealmObjectBase.set(this, 'amount', value);
 
   @override
-  String? get date => RealmObjectBase.get<String>(this, 'date') as String?;
+  DateTime? get date =>
+      RealmObjectBase.get<DateTime>(this, 'date') as DateTime?;
   @override
-  set date(String? value) => RealmObjectBase.set(this, 'date', value);
+  set date(DateTime? value) => RealmObjectBase.set(this, 'date', value);
 
   @override
   String? get name => RealmObjectBase.get<String>(this, 'name') as String?;
@@ -523,22 +527,22 @@ class ExpenseRecord extends _ExpenseRecord
   set name(String? value) => RealmObjectBase.set(this, 'name', value);
 
   @override
-  Stream<RealmObjectChanges<ExpenseRecord>> get changes =>
-      RealmObjectBase.getChanges<ExpenseRecord>(this);
+  Stream<RealmObjectChanges<ExpensesRecord>> get changes =>
+      RealmObjectBase.getChanges<ExpensesRecord>(this);
 
   @override
-  ExpenseRecord freeze() => RealmObjectBase.freezeObject<ExpenseRecord>(this);
+  ExpensesRecord freeze() => RealmObjectBase.freezeObject<ExpensesRecord>(this);
 
   static SchemaObject get schema => _schema ??= _initSchema();
   static SchemaObject? _schema;
   static SchemaObject _initSchema() {
-    RealmObjectBase.registerFactory(ExpenseRecord._);
+    RealmObjectBase.registerFactory(ExpensesRecord._);
     return const SchemaObject(
-        ObjectType.realmObject, ExpenseRecord, 'ExpenseRecord', [
+        ObjectType.realmObject, ExpensesRecord, 'ExpensesRecord', [
       SchemaProperty('id', RealmPropertyType.objectid,
           mapTo: '_id', primaryKey: true),
       SchemaProperty('amount', RealmPropertyType.int, optional: true),
-      SchemaProperty('date', RealmPropertyType.string, optional: true),
+      SchemaProperty('date', RealmPropertyType.timestamp, optional: true),
       SchemaProperty('name', RealmPropertyType.string, optional: true),
     ]);
   }

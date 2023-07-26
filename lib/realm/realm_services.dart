@@ -32,7 +32,13 @@ class RealmServices with ChangeNotifier {
       realm = Realm(
         Configuration.flexibleSync(
           currentUser!,
-          [Donation.schema, Member.schema, SpecialEvent.schema],
+          [
+            Donation.schema,
+            Member.schema,
+            SpecialEvent.schema,
+            DonarRecord.schema,
+            ExpensesRecord.schema
+          ],
         ),
       );
       if (realm.subscriptions.isEmpty) {
@@ -50,8 +56,8 @@ class RealmServices with ChangeNotifier {
           name: queryAllDonationName);
       mutableSubscriptions.add(realm.all<SpecialEvent>(),
           name: queryAllSpecialEvent);
-      mutableSubscriptions.add(realm.all<Donar>(), name: queryAllDonar);
-      mutableSubscriptions.add(realm.all<ExpenseRecord>(),
+      mutableSubscriptions.add(realm.all<DonarRecord>(), name: queryAllDonar);
+      mutableSubscriptions.add(realm.all<ExpensesRecord>(),
           name: queryAllExpenseRecord);
     });
     await realm.subscriptions.waitForSynchronization();
@@ -292,15 +298,15 @@ class RealmServices with ChangeNotifier {
     notifyListeners();
   }
 
-  void createDonar(Donar newDonar) {
-    realm.write<Donar>(() => realm.add<Donar>(newDonar));
+  void createDonar(DonarRecord newDonar) {
+    realm.write<DonarRecord>(() => realm.add<DonarRecord>(newDonar));
     notifyListeners();
   }
 
   Future<void> updateDonar(
-    Donar donar, {
+    DonarRecord donar, {
     int? amount,
-    String? date,
+    DateTime? date,
     String? name,
   }) async {
     realm.write(() {
@@ -317,21 +323,21 @@ class RealmServices with ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteDonar(Donar donar) {
+  void deleteDonar(DonarRecord donar) {
     realm.write(() => realm.delete(donar));
     notifyListeners();
   }
 
   void createExpenseRecord(newExpenseRecord) {
-    realm
-        .write<ExpenseRecord>(() => realm.add<ExpenseRecord>(newExpenseRecord));
+    realm.write<ExpensesRecord>(
+        () => realm.add<ExpensesRecord>(newExpenseRecord));
     notifyListeners();
   }
 
   Future<void> updateExpenseRecord(
-    ExpenseRecord expenseRecord, {
+    ExpensesRecord expenseRecord, {
     int? amount,
-    String? date,
+    DateTime? date,
     String? name,
   }) async {
     realm.write(() {
@@ -348,7 +354,7 @@ class RealmServices with ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteExpenseRecord(ExpenseRecord expenseRecord) {
+  void deleteExpenseRecord(ExpensesRecord expenseRecord) {
     realm.write(() => realm.delete(expenseRecord));
     notifyListeners();
   }
