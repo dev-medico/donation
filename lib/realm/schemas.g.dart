@@ -485,3 +485,61 @@ class Donar extends _Donar with RealmEntity, RealmObjectBase, RealmObject {
     ]);
   }
 }
+
+class ExpenseRecord extends _ExpenseRecord
+    with RealmEntity, RealmObjectBase, RealmObject {
+  ExpenseRecord(
+    ObjectId id, {
+    int? amount,
+    String? date,
+    String? name,
+  }) {
+    RealmObjectBase.set(this, '_id', id);
+    RealmObjectBase.set(this, 'amount', amount);
+    RealmObjectBase.set(this, 'date', date);
+    RealmObjectBase.set(this, 'name', name);
+  }
+
+  ExpenseRecord._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, '_id', value);
+
+  @override
+  int? get amount => RealmObjectBase.get<int>(this, 'amount') as int?;
+  @override
+  set amount(int? value) => RealmObjectBase.set(this, 'amount', value);
+
+  @override
+  String? get date => RealmObjectBase.get<String>(this, 'date') as String?;
+  @override
+  set date(String? value) => RealmObjectBase.set(this, 'date', value);
+
+  @override
+  String? get name => RealmObjectBase.get<String>(this, 'name') as String?;
+  @override
+  set name(String? value) => RealmObjectBase.set(this, 'name', value);
+
+  @override
+  Stream<RealmObjectChanges<ExpenseRecord>> get changes =>
+      RealmObjectBase.getChanges<ExpenseRecord>(this);
+
+  @override
+  ExpenseRecord freeze() => RealmObjectBase.freezeObject<ExpenseRecord>(this);
+
+  static SchemaObject get schema => _schema ??= _initSchema();
+  static SchemaObject? _schema;
+  static SchemaObject _initSchema() {
+    RealmObjectBase.registerFactory(ExpenseRecord._);
+    return const SchemaObject(
+        ObjectType.realmObject, ExpenseRecord, 'ExpenseRecord', [
+      SchemaProperty('id', RealmPropertyType.objectid,
+          mapTo: '_id', primaryKey: true),
+      SchemaProperty('amount', RealmPropertyType.int, optional: true),
+      SchemaProperty('date', RealmPropertyType.string, optional: true),
+      SchemaProperty('name', RealmPropertyType.string, optional: true),
+    ]);
+  }
+}

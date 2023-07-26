@@ -18,6 +18,7 @@ class RealmServices with ChangeNotifier {
   static const String queryAllDonationName = "getAllDonation";
   static const String queryAllSpecialEvent = "getAllSpecialEvent";
   static const String queryAllDonar = "getAllDonar";
+  static const String queryAllExpenseRecord = "queryAllExpenseRecord";
 
   bool offlineModeOn = false;
   bool isWaiting = false;
@@ -49,8 +50,9 @@ class RealmServices with ChangeNotifier {
           name: queryAllDonationName);
       mutableSubscriptions.add(realm.all<SpecialEvent>(),
           name: queryAllSpecialEvent);
-       mutableSubscriptions.add(realm.all<Donar>(),
-          name: queryAllDonar);
+      mutableSubscriptions.add(realm.all<Donar>(), name: queryAllDonar);
+      mutableSubscriptions.add(realm.all<ExpenseRecord>(),
+          name: queryAllExpenseRecord);
     });
     await realm.subscriptions.waitForSynchronization();
   }
@@ -287,6 +289,67 @@ class RealmServices with ChangeNotifier {
 
   void createSpecialEvent(SpecialEvent newSpecialEvent) {
     realm.write<SpecialEvent>(() => realm.add<SpecialEvent>(newSpecialEvent));
+    notifyListeners();
+  }
+
+  void createDonar(Donar newDonar) {
+    realm.write<Donar>(() => realm.add<Donar>(newDonar));
+    notifyListeners();
+  }
+
+  Future<void> updateDonar(
+    Donar donar, {
+    int? amount,
+    String? date,
+    String? name,
+  }) async {
+    realm.write(() {
+      if (date != null) {
+        donar.date = date;
+      }
+      if (amount != null) {
+        donar.amount = amount;
+      }
+      if (name != null) {
+        donar.name = name;
+      }
+    });
+    notifyListeners();
+  }
+
+  void deleteDonar(Donar donar) {
+    realm.write(() => realm.delete(donar));
+    notifyListeners();
+  }
+
+  void createExpenseRecord(newExpenseRecord) {
+    realm
+        .write<ExpenseRecord>(() => realm.add<ExpenseRecord>(newExpenseRecord));
+    notifyListeners();
+  }
+
+  Future<void> updateExpenseRecord(
+    ExpenseRecord expenseRecord, {
+    int? amount,
+    String? date,
+    String? name,
+  }) async {
+    realm.write(() {
+      if (date != null) {
+        expenseRecord.date = date;
+      }
+      if (amount != null) {
+        expenseRecord.amount = amount;
+      }
+      if (name != null) {
+        expenseRecord.name = name;
+      }
+    });
+    notifyListeners();
+  }
+
+  void deleteExpenseRecord(ExpenseRecord expenseRecord) {
+    realm.write(() => realm.delete(expenseRecord));
     notifyListeners();
   }
 

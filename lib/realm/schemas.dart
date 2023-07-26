@@ -70,3 +70,13 @@ class _Donar {
   String? date;
   String? name;
 }
+
+@RealmModel()
+class _ExpenseRecord {
+  @MapTo('_id')
+  @PrimaryKey()
+  late ObjectId id;
+  int? amount;
+  String? date;
+  String? name;
+}
