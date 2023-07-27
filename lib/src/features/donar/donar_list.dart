@@ -1,12 +1,11 @@
 import 'dart:convert';
 
-import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/donar/controller/dona_data_provider.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/xata_closing_balance_response.dart';
-import 'package:donation/data/response/xata_donors_list_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donar/donar_data_source.dart';
 import 'package:donation/src/features/donar/donar_yearly_report.dart';
@@ -17,7 +16,6 @@ import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:realm/realm.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 import 'package:intl/intl.dart';
@@ -33,6 +31,7 @@ class DonarList extends ConsumerStatefulWidget {
 }
 
 class _DonarListState extends ConsumerState<DonarList> {
+  bool firstTime = true;
   List<String> ranges = [
     "2023",
     "2022",
@@ -47,6 +46,9 @@ class _DonarListState extends ConsumerState<DonarList> {
     "2013",
     "2012",
   ];
+
+  List<DonarRecord> oldDonarsData = [];
+  List<ExpensesRecord> oldExpenseRecordData = [];
 
   List<bool> rangesSelect = [
     true,
@@ -93,31 +95,31 @@ class _DonarListState extends ConsumerState<DonarList> {
     "12",
   ];
 
-  List<DonorData> dataSegments1 = [];
-  List<DonorData> dataSegments2 = [];
-  List<DonorData> dataSegments3 = [];
-  List<DonorData> dataSegments4 = [];
-  List<DonorData> dataSegments5 = [];
-  List<DonorData> dataSegments6 = [];
-  List<DonorData> dataSegments7 = [];
-  List<DonorData> dataSegments8 = [];
-  List<DonorData> dataSegments9 = [];
-  List<DonorData> dataSegments10 = [];
-  List<DonorData> dataSegments11 = [];
-  List<DonorData> dataSegments12 = [];
+  List<DonarRecord> dataSegments1 = [];
+  List<DonarRecord> dataSegments2 = [];
+  List<DonarRecord> dataSegments3 = [];
+  List<DonarRecord> dataSegments4 = [];
+  List<DonarRecord> dataSegments5 = [];
+  List<DonarRecord> dataSegments6 = [];
+  List<DonarRecord> dataSegments7 = [];
+  List<DonarRecord> dataSegments8 = [];
+  List<DonarRecord> dataSegments9 = [];
+  List<DonarRecord> dataSegments10 = [];
+  List<DonarRecord> dataSegments11 = [];
+  List<DonarRecord> dataSegments12 = [];
 
-  List<DonorData> expensedataSegments1 = [];
-  List<DonorData> expensedataSegments2 = [];
-  List<DonorData> expensedataSegments3 = [];
-  List<DonorData> expensedataSegments4 = [];
-  List<DonorData> expensedataSegments5 = [];
-  List<DonorData> expensedataSegments6 = [];
-  List<DonorData> expensedataSegments7 = [];
-  List<DonorData> expensedataSegments8 = [];
-  List<DonorData> expensedataSegments9 = [];
-  List<DonorData> expensedataSegments10 = [];
-  List<DonorData> expensedataSegments11 = [];
-  List<DonorData> expensedataSegments12 = [];
+  List<ExpensesRecord> expensedataSegments1 = [];
+  List<ExpensesRecord> expensedataSegments2 = [];
+  List<ExpensesRecord> expensedataSegments3 = [];
+  List<ExpensesRecord> expensedataSegments4 = [];
+  List<ExpensesRecord> expensedataSegments5 = [];
+  List<ExpensesRecord> expensedataSegments6 = [];
+  List<ExpensesRecord> expensedataSegments7 = [];
+  List<ExpensesRecord> expensedataSegments8 = [];
+  List<ExpensesRecord> expensedataSegments9 = [];
+  List<ExpensesRecord> expensedataSegments10 = [];
+  List<ExpensesRecord> expensedataSegments11 = [];
+  List<ExpensesRecord> expensedataSegments12 = [];
   String dataMonth = "";
   String expensedataMonth = "";
   bool dataFullLoaded = false;
@@ -138,8 +140,8 @@ class _DonarListState extends ConsumerState<DonarList> {
 
   TabContainerController controller = TabContainerController(length: 12);
 
-  List<DonorData> data = [];
-  List<DonorData> expensesData = [];
+  List<DonarRecord> data = [];
+  List<ExpensesRecord> expensesData = [];
 
   tabCreate() => Scaffold(
         backgroundColor: Colors.white,
@@ -686,7 +688,6 @@ class _DonarListState extends ConsumerState<DonarList> {
   void initState() {
     super.initState();
     calculateLeftBalance();
-    callAPI("");
   }
 
   calculateLeftBalance() {
@@ -761,94 +762,112 @@ class _DonarListState extends ConsumerState<DonarList> {
     }
   }
 
-  callAPI(String after) {
-    if (after.isEmpty) {
-      setState(() {
-        data = [];
-      });
-    }
-    XataRepository().getDonorsList(after).then((response) {
-      logger.i(response.body);
+  // callAPI(String after) {
+  //   if (after.isEmpty) {
+  //     setState(() {
+  //       data = [];
+  //     });
+  //   }
+  //   XataRepository().getDonorsList(after).then((response) {
+  //     logger.i(response.body);
 
-      setState(() {
-        data.addAll(XataDonorsListResponse.fromJson(jsonDecode(response.body))
-            .records!);
-      });
+  //     setState(() {
+  //       data.addAll(XataDonorsListResponse.fromJson(jsonDecode(response.body))
+  //           .records!);
+  //     });
 
-      if (XataDonorsListResponse.fromJson(jsonDecode(response.body))
-              .meta!
-              .page!
-              .more ??
-          false) {
-        callAPI(XataDonorsListResponse.fromJson(jsonDecode(response.body))
-            .meta!
-            .page!
-            .cursor!);
-      } else {
-        setState(() {
-          dataFullLoaded = true;
-        });
-        data.forEach((element) {
-          ref.watch(realmProvider)!.createDonar(DonarRecord(
-                ObjectId(),
-                name: element.name,
-                amount: element.amount,
-                date: DateTime.parse(
-                    (element.date!.replaceAll("T", " ")).replaceAll("Z", "")),
-              ));
-        });
+  //     if (XataDonorsListResponse.fromJson(jsonDecode(response.body))
+  //             .meta!
+  //             .page!
+  //             .more ??
+  //         false) {
+  //       callAPI(XataDonorsListResponse.fromJson(jsonDecode(response.body))
+  //           .meta!
+  //           .page!
+  //           .cursor!);
+  //     } else {
+  //       setState(() {
+  //         dataFullLoaded = true;
+  //       });
+  //       data.forEach((element) {
+  //         ref.watch(realmProvider)!.createDonar(DonarRecord(
+  //               ObjectId(),
+  //               name: element.name,
+  //               amount: element.amount,
+  //               date: DateTime.parse(
+  //                   (element.date!.replaceAll("T", " ")).replaceAll("Z", "")),
+  //             ));
+  //       });
 
-        callExpenseAPI("");
-      }
-    });
-  }
+  //       callExpenseAPI("");
+  //     }
+  //   });
+  // }
 
-  callExpenseAPI(String after) {
-    if (after.isEmpty) {
-      setState(() {
-        expensesData = [];
-      });
-    }
-    XataRepository().getExpensesList(after).then((response) {
-      logger.i(response.body);
+  // callExpenseAPI(String after) {
+  //   if (after.isEmpty) {
+  //     setState(() {
+  //       expensesData = [];
+  //     });
+  //   }
+  //   XataRepository().getExpensesList(after).then((response) {
+  //     logger.i(response.body);
 
-      setState(() {
-        expensesData.addAll(
-            XataDonorsListResponse.fromJson(jsonDecode(response.body))
-                .records!);
-      });
+  //     setState(() {
+  //       expensesData.addAll(
+  //           XataDonorsListResponse.fromJson(jsonDecode(response.body))
+  //               .records!);
+  //     });
 
-      if (XataDonorsListResponse.fromJson(jsonDecode(response.body))
-              .meta!
-              .page!
-              .more ??
-          false) {
-        callExpenseAPI(
-            XataDonorsListResponse.fromJson(jsonDecode(response.body))
-                .meta!
-                .page!
-                .cursor!);
-      } else {
-        setState(() {
-          dataExpenseFullLoaded = true;
-        });
-        expensesData.forEach((element) {
-          ref.watch(realmProvider)!.createExpenseRecord(ExpensesRecord(
-                ObjectId(),
-                name: element.name,
-                amount: element.amount,
-                date: DateTime.parse(
-                    (element.date!.replaceAll("T", " ")).replaceAll("Z", "")),
-              ));
-        });
-        sortBySegments();
-      }
-    });
-  }
+  //     if (XataDonorsListResponse.fromJson(jsonDecode(response.body))
+  //             .meta!
+  //             .page!
+  //             .more ??
+  //         false) {
+  //       callExpenseAPI(
+  //           XataDonorsListResponse.fromJson(jsonDecode(response.body))
+  //               .meta!
+  //               .page!
+  //               .cursor!);
+  //     } else {
+  //       setState(() {
+  //         dataExpenseFullLoaded = true;
+  //       });
+  //       expensesData.forEach((element) {
+  //         ref.watch(realmProvider)!.createExpenseRecord(ExpensesRecord(
+  //               ObjectId(),
+  //               name: element.name,
+  //               amount: element.amount,
+  //               date: DateTime.parse(
+  //                   (element.date!.replaceAll("T", " ")).replaceAll("Z", "")),
+  //             ));
+  //       });
+  //       sortBySegments();
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     YYDialog.init(context);
+    final results = ref.watch(donarsDataProvider);
+    final expenses = ref.watch(expensesDataProvider);
+
+    if (firstTime) {
+      oldDonarsData.clear();
+      oldExpenseRecordData.clear();
+      results.forEach((element) {
+        oldDonarsData.add(element);
+      });
+      expenses.forEach((element) {
+        oldExpenseRecordData.add(element);
+      });
+      data.addAll(oldDonarsData);
+      expensesData.addAll(oldExpenseRecordData);
+      setState(() {
+        firstTime = false;
+      });
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -867,31 +886,26 @@ class _DonarListState extends ConsumerState<DonarList> {
               style: TextStyle(fontSize: 15, color: Colors.white)),
         ),
       ),
-      body: dataExpenseFullLoaded
-          ? tabCreate()
-          : const Center(
-              child: CircularProgressIndicator(),
-            ),
+      body: tabCreate(),
     );
   }
 
   sortBySegments() {
-    List<DonorData> filterData1 = [];
-    List<DonorData> filterData2 = [];
-    List<DonorData> filterData3 = [];
-    List<DonorData> filterData4 = [];
-    List<DonorData> filterData5 = [];
-    List<DonorData> filterData6 = [];
-    List<DonorData> filterData7 = [];
-    List<DonorData> filterData8 = [];
-    List<DonorData> filterData9 = [];
-    List<DonorData> filterData10 = [];
-    List<DonorData> filterData11 = [];
-    List<DonorData> filterData12 = [];
+    List<DonarRecord> filterData1 = [];
+    List<DonarRecord> filterData2 = [];
+    List<DonarRecord> filterData3 = [];
+    List<DonarRecord> filterData4 = [];
+    List<DonarRecord> filterData5 = [];
+    List<DonarRecord> filterData6 = [];
+    List<DonarRecord> filterData7 = [];
+    List<DonarRecord> filterData8 = [];
+    List<DonarRecord> filterData9 = [];
+    List<DonarRecord> filterData10 = [];
+    List<DonarRecord> filterData11 = [];
+    List<DonarRecord> filterData12 = [];
 
     for (int i = 0; i < data.length; i++) {
-      var tempDate = DateFormat('MMM yyyy').format(DateTime.parse(
-          (data[i].date!.replaceAll("T", " ")).replaceAll("Z", "")));
+      var tempDate = DateFormat('MMM yyyy').format(data[i].date!);
       if (tempDate.split(" ")[1] == selectedYear &&
           tempDate.split(" ")[0] == "Jan") {
         filterData1.add(data[i]);
@@ -946,185 +960,6 @@ class _DonarListState extends ConsumerState<DonarList> {
       });
     }
 
-    // filterData1 = filterData1.reversed.toList();
-
-    // filterData2 = filterData2.reversed.toList();
-
-    // filterData3 = filterData3.reversed.toList();
-
-    // filterData4 = filterData4.reversed.toList();
-
-    // filterData5 = filterData5.reversed.toList();
-
-    // filterData6 = filterData6.reversed.toList();
-
-    // filterData7 = filterData7.reversed.toList();
-
-    // filterData8 = filterData8.reversed.toList();
-
-    // filterData9 = filterData9.reversed.toList();
-
-    // filterData10 = filterData10.reversed.toList();
-
-    // filterData11 = filterData11.reversed.toList();
-
-    // filterData12 = filterData12.reversed.toList();
-    // filterData1.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData1 = filterData1.reversed.toList();
-
-    // filterData2.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData2 = filterData2.reversed.toList();
-
-    // filterData3.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData3 = filterData3.reversed.toList();
-
-    // filterData4.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData4 = filterData4.reversed.toList();
-
-    // filterData5.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData5 = filterData5.reversed.toList();
-
-    // filterData6.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData6 = filterData6.reversed.toList();
-
-    // filterData7.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData7 = filterData7.reversed.toList();
-
-    // filterData8.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData8 = filterData8.reversed.toList();
-
-    // filterData9.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData9 = filterData9.reversed.toList();
-
-    // filterData10.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData10 = filterData10.reversed.toList();
-
-    // filterData11.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData11 = filterData11.reversed.toList();
-
-    // filterData12.sort((a, b) {
-    //   log(b.date.toString());
-    //   return DateTime.parse(
-    //           b.date.toString() == "null" || !b.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : b.date.toString().split("T")[0])
-    //       .compareTo(DateTime.parse(
-    //           a.date.toString() == "null" || !a.date.toString().contains("T")
-    //               ? "2020-01-01"
-    //               : a.date.toString().split("T")[0]));
-    // });
-    // filterData12 = filterData12.reversed.toList();
-
     setState(() {
       dataSegments1 = filterData1;
       dataSegments2 = filterData2;
@@ -1140,22 +975,21 @@ class _DonarListState extends ConsumerState<DonarList> {
       dataSegments12 = filterData12;
     });
 
-    List<DonorData> expensefilterData1 = [];
-    List<DonorData> expensefilterData2 = [];
-    List<DonorData> expensefilterData3 = [];
-    List<DonorData> expensefilterData4 = [];
-    List<DonorData> expensefilterData5 = [];
-    List<DonorData> expensefilterData6 = [];
-    List<DonorData> expensefilterData7 = [];
-    List<DonorData> expensefilterData8 = [];
-    List<DonorData> expensefilterData9 = [];
-    List<DonorData> expensefilterData10 = [];
-    List<DonorData> expensefilterData11 = [];
-    List<DonorData> expensefilterData12 = [];
+    List<ExpensesRecord> expensefilterData1 = [];
+    List<ExpensesRecord> expensefilterData2 = [];
+    List<ExpensesRecord> expensefilterData3 = [];
+    List<ExpensesRecord> expensefilterData4 = [];
+    List<ExpensesRecord> expensefilterData5 = [];
+    List<ExpensesRecord> expensefilterData6 = [];
+    List<ExpensesRecord> expensefilterData7 = [];
+    List<ExpensesRecord> expensefilterData8 = [];
+    List<ExpensesRecord> expensefilterData9 = [];
+    List<ExpensesRecord> expensefilterData10 = [];
+    List<ExpensesRecord> expensefilterData11 = [];
+    List<ExpensesRecord> expensefilterData12 = [];
 
     for (int i = 0; i < expensesData.length; i++) {
-      var tempDate = DateFormat('MMM yyyy').format(DateTime.parse(
-          (expensesData[i].date!.replaceAll("T", " ")).replaceAll("Z", "")));
+      var tempDate = DateFormat('MMM yyyy').format(expensesData[i].date!);
       if (tempDate.split(" ")[1] == selectedYear &&
           tempDate.split(" ")[0] == "Jan") {
         expensefilterData1.add(expensesData[i]);
@@ -1211,30 +1045,6 @@ class _DonarListState extends ConsumerState<DonarList> {
       });
     }
 
-    // expensefilterData1 = expensefilterData1.reversed.toList();
-
-    // expensefilterData2 = expensefilterData2.reversed.toList();
-
-    // expensefilterData3 = expensefilterData3.reversed.toList();
-
-    // expensefilterData4 = expensefilterData4.reversed.toList();
-
-    // expensefilterData5 = expensefilterData5.reversed.toList();
-
-    // expensefilterData6 = expensefilterData6.reversed.toList();
-
-    // expensefilterData7 = expensefilterData7.reversed.toList();
-
-    // expensefilterData8 = expensefilterData8.reversed.toList();
-
-    // expensefilterData9 = expensefilterData9.reversed.toList();
-
-    // expensefilterData10 = expensefilterData10.reversed.toList();
-
-    // expensefilterData11 = expensefilterData11.reversed.toList();
-
-    // expensefilterData12 = expensefilterData12.reversed.toList();
-
     setState(() {
       expensedataSegments1 = expensefilterData1;
       expensedataSegments2 = expensefilterData2;
@@ -1257,9 +1067,7 @@ class _DonarListState extends ConsumerState<DonarList> {
       ..width = Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width * 0.8
           : MediaQuery.of(context).size.width * 0.3
-//      ..height = 110
-      ..backgroundColor =
-          Colors.white //Colors.black.withOpacity(0.8)//main_theme_color
+      ..backgroundColor = Colors.white
       ..borderRadius = 10.0
       ..barrierColor = const Color(0xDD000000)
       ..showCallBack = () {
@@ -1414,8 +1222,8 @@ class _DonarListState extends ConsumerState<DonarList> {
       ..show();
   }
 
-  buildSimpleTable(List<DonorData> data, List<DonorData> expenses, int month,
-      int leftBalance) {
+  buildSimpleTable(List<DonarRecord> data, List<ExpensesRecord> expenses,
+      int month, int leftBalance) {
     const int COLUMN_COUNT = 5;
     int ROWCOUNT = data.length;
     int totalDonation = 0;
@@ -1459,11 +1267,11 @@ class _DonarListState extends ConsumerState<DonarList> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => EditDonarScreen(
-                                donor:
+                                donar:
                                     data[details.rowColumnIndex.rowIndex - 1],
                               )));
                   calculateLeftBalance();
-                  callAPI("");
+                  // callAPI("");
                 },
                 gridLinesVisibility: GridLinesVisibility.both,
                 headerGridLinesVisibility: GridLinesVisibility.both,
@@ -1537,8 +1345,6 @@ class _DonarListState extends ConsumerState<DonarList> {
                     const SizedBox(
                       height: 24,
                     ),
-
-                    //New
                     Table(
                       border: TableBorder.all(),
                       columnWidths: const <int, TableColumnWidth>{
@@ -1556,7 +1362,6 @@ class _DonarListState extends ConsumerState<DonarList> {
                                 "ဝင်ငွေ",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  // fontFamily: "Times New Roman",
                                   color: Colors.black,
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
@@ -1570,7 +1375,6 @@ class _DonarListState extends ConsumerState<DonarList> {
                                 "အသုံးစရိတ်",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  // fontFamily: "Times New Roman",
                                   color: Colors.black,
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
@@ -1762,7 +1566,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                                                       Colors
                                                                           .black);
                                                                   calculateLeftBalance();
-                                                                  callAPI("");
+                                                                  // callAPI("");
                                                                 }
                                                               });
                                                             });
@@ -1939,7 +1743,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                 ),
                               );
                               calculateLeftBalance();
-                              callAPI("");
+                              // callAPI("");
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -1983,7 +1787,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                 ),
                               );
                               calculateLeftBalance();
-                              callAPI("");
+                              // callAPI("");
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -2042,7 +1846,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           "အိုကေ",
                                           Colors.black);
                                       calculateLeftBalance();
-                                      callAPI("");
+                                      // callAPI("");
                                     });
                                   } else {
                                     XataRepository()
@@ -2064,7 +1868,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           "အိုကေ",
                                           Colors.black);
                                       calculateLeftBalance();
-                                      callAPI("");
+                                      // callAPI("");
                                     });
                                   }
                                 });
@@ -2163,11 +1967,11 @@ class _DonarListState extends ConsumerState<DonarList> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => EditDonarScreen(
-                                donor:
+                                donar:
                                     data[details.rowColumnIndex.rowIndex - 1],
                               )));
                   calculateLeftBalance();
-                  callAPI("");
+                  // callAPI("");
                 },
                 gridLinesVisibility: GridLinesVisibility.both,
                 headerGridLinesVisibility: GridLinesVisibility.both,
@@ -2241,8 +2045,6 @@ class _DonarListState extends ConsumerState<DonarList> {
                     const SizedBox(
                       height: 24,
                     ),
-
-                    //New
                     Table(
                       border: TableBorder.all(),
                       columnWidths: const <int, TableColumnWidth>{
@@ -2260,7 +2062,6 @@ class _DonarListState extends ConsumerState<DonarList> {
                                 "ဝင်ငွေ",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  // fontFamily: "Times New Roman",
                                   color: Colors.black,
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
@@ -2274,7 +2075,6 @@ class _DonarListState extends ConsumerState<DonarList> {
                                 "အသုံးစရိတ်",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  // fontFamily: "Times New Roman",
                                   color: Colors.black,
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
@@ -2458,7 +2258,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                                                     Colors
                                                                         .black);
                                                                 calculateLeftBalance();
-                                                                callAPI("");
+                                                                // callAPI("");
                                                               }
                                                             });
                                                           }),
@@ -2634,7 +2434,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                 ),
                               );
                               calculateLeftBalance();
-                              callAPI("");
+                              // callAPI("");
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -2678,7 +2478,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                 ),
                               );
                               calculateLeftBalance();
-                              callAPI("");
+                              // callAPI("");
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -2737,7 +2537,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           "အိုကေ",
                                           Colors.black);
                                       calculateLeftBalance();
-                                      callAPI("");
+                                      // callAPI("");
                                     });
                                   } else {
                                     XataRepository()
@@ -2759,7 +2559,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           "အိုကေ",
                                           Colors.black);
                                       calculateLeftBalance();
-                                      callAPI("");
+                                      // callAPI("");
                                     });
                                   }
                                 });
@@ -2842,12 +2642,10 @@ class _DonarListState extends ConsumerState<DonarList> {
   }
 
   convertToMonthName(int month) {
-    //convert month index int to  name with Format "MMM"
     return DateFormat("MMM").format(DateTime(2021, month + 1, 1));
   }
 
   convertToMMMonthName(int month) {
-    //convert month index int to  name with Format "MMM"
     if (month == 0) return "ဇန်နဝါရီ";
     if (month == 1) return "ဖေဖော်ဝါရီ";
     if (month == 2) return "မတ်";

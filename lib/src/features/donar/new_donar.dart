@@ -1,12 +1,14 @@
 import 'dart:convert';
 
+import 'package:donation/realm/realm_services.dart';
+import 'package:donation/realm/schemas.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
-import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
 import 'package:donation/responsive.dart';
@@ -15,8 +17,9 @@ import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:intl/intl.dart';
+import 'package:realm/realm.dart';
 
-class NewDonarScreen extends StatefulWidget {
+class NewDonarScreen extends ConsumerStatefulWidget {
   NewDonarScreen({Key? key}) : super(key: key);
   int selectedIndex = 0;
 
@@ -24,7 +27,7 @@ class NewDonarScreen extends StatefulWidget {
   NewDonarState createState() => NewDonarState();
 }
 
-class NewDonarState extends State<NewDonarScreen> {
+class NewDonarState extends ConsumerState<NewDonarScreen> {
   final nameController = TextEditingController();
   final amountController = TextEditingController();
   bool isSwitched = false;
@@ -49,29 +52,38 @@ class NewDonarState extends State<NewDonarScreen> {
       printer: PrettyPrinter(),
     );
     logger.i(donationDateDetail.toString());
-    XataRepository()
-        .uploadNewDonor(jsonEncode(<String, dynamic>{
-      "name": name,
-      "amount": int.parse(amount),
-      "date": "${donationDateDetail.toString().replaceAll(" ", "T")}Z",
-    }))
-        .then((value) {
-      if (value.statusCode.toString().startsWith("2")) {
-        setState(() {
-          _isLoading = false;
-        });
-        Utils.messageSuccessSinglePopDialog(
-            "အလှူရှင်မှတ်တမ်း အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-            context,
-            "အိုကေ",
-            Colors.black);
-        nameController.clear();
-        amountController.clear();
-      } else {
-        logger.i(value.statusCode.toString());
-        logger.i(value.body);
-      }
-    });
+    ref.watch(realmProvider)!.createDonar(DonarRecord(
+          ObjectId(),
+          name: name,
+          amount: int.parse(amount),
+          date: donationDateDetail!.toLocal(),
+        ));
+    Utils.messageSuccessSinglePopDialog(
+        "အလှူရှင်မှတ်တမ်း အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+        context,
+        "အိုကေ",
+        Colors.black);
+    nameController.clear();
+    amountController.clear();
+    // XataRepository()
+    //     .uploadNewDonor(jsonEncode(<String, dynamic>{
+    //   "name": name,
+    //   "amount": int.parse(amount),
+    //   "date": "${donationDateDetail.toString().replaceAll(" ", "T")}Z",
+    // }))
+    //     .then((value) {
+    //   if (value.statusCode.toString().startsWith("2")) {
+    //     setState(() {
+    //       _isLoading = false;
+    //     });
+
+    //     nameController.clear();
+    //     amountController.clear();
+    //   } else {
+    //     logger.i(value.statusCode.toString());
+    //     logger.i(value.body);
+    //   }
+    // });
   }
 
   void initial() async {

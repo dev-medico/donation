@@ -1,14 +1,14 @@
 import 'dart:developer';
 
+import 'package:donation/realm/schemas.dart';
 import 'package:flutter/material.dart';
-import 'package:donation/data/response/xata_donors_list_response.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:intl/intl.dart';
 
 class DonarDataSource extends DataGridSource {
   /// Creates the employee data source class with required details.
-  DonarDataSource({required List<DonorData> donarData}) {
+  DonarDataSource({required List<DonarRecord> donarData}) {
     for (int i = 0; i < donarData.length; i++) {
       _donarData.add(DataGridRow(cells: [
         DataGridCell<String>(
@@ -17,7 +17,7 @@ class DonarDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'ရက်စွဲ',
             value:
-                "        ${DateFormat('dd MMM yyyy').format(DateTime.parse((donarData[i].date!.replaceAll("T", " ")).replaceAll("Z", "")))}        "),
+                "        ${DateFormat('dd MMM yyyy').format(donarData[i].date!)}        "),
         DataGridCell<String>(
             columnName: 'အမည်', value: "      ${donarData[i].name}\t\t\t\t"),
         DataGridCell<String>(
