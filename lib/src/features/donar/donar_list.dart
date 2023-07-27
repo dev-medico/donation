@@ -693,73 +693,61 @@ class _DonarListState extends ConsumerState<DonarList> {
 
   calculateLeftBalance() {
     for (int month = 0; month < 12; month++) {
-      XataRepository()
-          .getClosingBalance(
-              month == 0 ? 12 : month,
-              month == 0
-                  ? (int.parse(selectedYear) - 1).toString()
-                  : selectedYear)
-          .then((value) {
-        logger.i("Month $month - ${value.body}");
-        if (XataClosingBalanceResponse.fromJson(jsonDecode(value.body))
-            .records!
-            .isNotEmpty) {
-          var leftBalance = int.parse(
-              XataClosingBalanceResponse.fromJson(jsonDecode(value.body))
-                  .records![0]
-                  .amount
-                  .toString());
-          if (month == 0) {
-            setState(() {
-              leftBalance1 = leftBalance;
-            });
-          } else if (month == 1) {
-            setState(() {
-              leftBalance2 = leftBalance;
-            });
-          } else if (month == 2) {
-            setState(() {
-              leftBalance3 = leftBalance;
-            });
-          } else if (month == 3) {
-            setState(() {
-              leftBalance4 = leftBalance;
-            });
-          } else if (month == 4) {
-            setState(() {
-              leftBalance5 = leftBalance;
-            });
-          } else if (month == 5) {
-            setState(() {
-              leftBalance6 = leftBalance;
-            });
-          } else if (month == 6) {
-            setState(() {
-              leftBalance7 = leftBalance;
-            });
-          } else if (month == 7) {
-            setState(() {
-              leftBalance8 = leftBalance;
-            });
-          } else if (month == 8) {
-            setState(() {
-              leftBalance9 = leftBalance;
-            });
-          } else if (month == 9) {
-            setState(() {
-              leftBalance10 = leftBalance;
-            });
-          } else if (month == 10) {
-            setState(() {
-              leftBalance11 = leftBalance;
-            });
-          } else if (month == 11) {
-            setState(() {
-              leftBalance12 = leftBalance;
-            });
-          }
-        }
-      });
+      var leftBalance = ref.watch(closingBalanceDataProvider((
+        month: month == 0 ? 12 : month,
+        year:
+            month == 0 ? (int.parse(selectedYear) - 1) : int.parse(selectedYear)
+      )));
+
+      if (month == 0) {
+        setState(() {
+          leftBalance1 = leftBalance;
+        });
+      } else if (month == 1) {
+        setState(() {
+          leftBalance2 = leftBalance;
+        });
+      } else if (month == 2) {
+        setState(() {
+          leftBalance3 = leftBalance;
+        });
+      } else if (month == 3) {
+        setState(() {
+          leftBalance4 = leftBalance;
+        });
+      } else if (month == 4) {
+        setState(() {
+          leftBalance5 = leftBalance;
+        });
+      } else if (month == 5) {
+        setState(() {
+          leftBalance6 = leftBalance;
+        });
+      } else if (month == 6) {
+        setState(() {
+          leftBalance7 = leftBalance;
+        });
+      } else if (month == 7) {
+        setState(() {
+          leftBalance8 = leftBalance;
+        });
+      } else if (month == 8) {
+        setState(() {
+          leftBalance9 = leftBalance;
+        });
+      } else if (month == 9) {
+        setState(() {
+          leftBalance10 = leftBalance;
+        });
+      } else if (month == 10) {
+        setState(() {
+          leftBalance11 = leftBalance;
+        });
+      } else if (month == 11) {
+        setState(() {
+          leftBalance12 = leftBalance;
+        });
+      }
     }
   }
 
@@ -1840,90 +1828,6 @@ class _DonarListState extends ConsumerState<DonarList> {
                             padding: const EdgeInsets.only(top: 20),
                             child: GestureDetector(
                               onTap: () {
-                                XataRepository()
-                                    .getClosingBalance(month + 1, selectedYear)
-                                    .then((value) {
-                                  if (XataClosingBalanceResponse.fromJson(
-                                          jsonDecode(value.body))
-                                      .records!
-                                      .isEmpty) {
-                                    XataRepository()
-                                        .uploadNewClosingBalance(
-                                            jsonEncode(<String, dynamic>{
-                                      "month": "${month + 1}-$selectedYear",
-                                      "amount": thisMonthLeftBalance,
-                                    }))
-                                        .then((value) {
-                                      Utils.messageSuccessNoPopDialog(
-                                          "စာရင်းပိတ်ခြင်း \nအောင်မြင်ပါသည်။",
-                                          context,
-                                          "အိုကေ",
-                                          Colors.black);
-                                      calculateLeftBalance();
-                                      // callAPI("");
-                                    });
-                                  } else {
-                                    XataRepository()
-                                        .updatewClosingBalance(
-                                            XataClosingBalanceResponse.fromJson(
-                                                    jsonDecode(value.body))
-                                                .records![0]
-                                                .id
-                                                .toString(),
-                                            jsonEncode(<String, dynamic>{
-                                              "month":
-                                                  "${month + 1}-$selectedYear",
-                                              "amount": thisMonthLeftBalance,
-                                            }))
-                                        .then((value) {
-                                      Utils.messageSuccessNoPopDialog(
-                                          "စာရင်းပိတ်ခြင်း \nအောင်မြင်ပါသည်။",
-                                          context,
-                                          "အိုကေ",
-                                          Colors.black);
-                                      calculateLeftBalance();
-                                      // callAPI("");
-                                    });
-                                  }
-                                });
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(12.0))),
-                                child: Row(
-                                  children: const [
-                                    SizedBox(
-                                      width: 20,
-                                    ),
-                                    Icon(Icons.calculate_outlined,
-                                        color: Colors.white),
-                                    Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 12, bottom: 12, left: 12),
-                                        child: Text(
-                                          "စာရင်းပိတ်မည်",
-                                          textScaleFactor: 1.0,
-                                          style: TextStyle(
-                                              fontSize: 15.0,
-                                              color: Colors.white),
-                                        )),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: GestureDetector(
-                              onTap: () {
                                 Navigator.pop(context);
                               },
                               child: Container(
@@ -1953,6 +1857,13 @@ class _DonarListState extends ConsumerState<DonarList> {
                               ),
                             ),
                           ),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(),
                         ),
                       ],
                     )
