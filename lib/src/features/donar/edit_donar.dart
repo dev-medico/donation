@@ -9,7 +9,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
-import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
 import 'package:donation/responsive.dart';
@@ -260,21 +259,26 @@ class NewDonarState extends ConsumerState<EditDonarScreen> {
                         onTap: () {
                           confirmDeleteDialog(
                               "ဖျက်မည်မှာ သေချာပါသလား?",
-                              "အသုံးစရိတ်အား ဖျက်မည်မှာ \nသေချာပါသလား?",
+                              "အလှူရှင်မှတ်တမ်းအား ဖျက်မည်မှာ \nသေချာပါသလား?",
                               context,
                               "အိုကေ",
                               Colors.black, () {
-                            XataRepository()
-                                .deleteExpenseByID(widget.donar!.id.toString())
-                                .then((value) {
-                              if (value.statusCode.toString().startsWith("2")) {
-                                Utils.messageSuccessSinglePopDialog(
-                                    "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-                                    context,
-                                    "အိုကေ",
-                                    Colors.black);
-                              }
-                            });
+                            ref.watch(realmProvider)!.deleteDonar(
+                                  widget.donar!,
+                                );
+                            Utils.messageSuccessSinglePopDialog(
+                                "အလှူရှင်မှတ်တမ်း ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                context,
+                                "အိုကေ",
+                                Colors.black);
+
+                            // XataRepository()
+                            //     .deleteExpenseByID(widget.donar!.id.toString())
+                            //     .then((value) {
+                            //   if (value.statusCode.toString().startsWith("2")) {
+
+                            //   }
+                            // });
                           });
                         },
                         child: Align(

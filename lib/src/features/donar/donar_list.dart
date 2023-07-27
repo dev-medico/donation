@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donar/controller/dona_data_provider.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
@@ -1546,29 +1547,42 @@ class _DonarListState extends ConsumerState<DonarList> {
                                                                 "အိုကေ",
                                                                 Colors.black,
                                                                 () {
-                                                              XataRepository()
-                                                                  .deleteExpenseByID(
+                                                              ref
+                                                                  .watch(
+                                                                      realmProvider)!
+                                                                  .deleteExpenseRecord(
                                                                       expenses[
-                                                                              index]
-                                                                          .id
-                                                                          .toString())
-                                                                  .then(
-                                                                      (value) {
-                                                                if (value
-                                                                    .statusCode
-                                                                    .toString()
-                                                                    .startsWith(
-                                                                        "2")) {
-                                                                  Utils.messageSuccessNoPopDialog(
-                                                                      "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-                                                                      context,
-                                                                      "အိုကေ",
-                                                                      Colors
-                                                                          .black);
-                                                                  calculateLeftBalance();
-                                                                  // callAPI("");
-                                                                }
-                                                              });
+                                                                          index]);
+                                                              calculateLeftBalance();
+                                                              Utils.messageSuccessSinglePopDialog(
+                                                                  "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                                  context,
+                                                                  "အိုကေ",
+                                                                  Colors.black);
+
+                                                              // XataRepository()
+                                                              //     .deleteExpenseByID(
+                                                              //         expenses[
+                                                              //                 index]
+                                                              //             .id
+                                                              //             .toString())
+                                                              //     .then(
+                                                              //         (value) {
+                                                              //   if (value
+                                                              //       .statusCode
+                                                              //       .toString()
+                                                              //       .startsWith(
+                                                              //           "2")) {
+                                                              //     Utils.messageSuccessNoPopDialog(
+                                                              //         "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                              //         context,
+                                                              //         "အိုကေ",
+                                                              //         Colors
+                                                              //             .black);
+                                                              //     calculateLeftBalance();
+                                                              //     // callAPI("");
+                                                              //   }
+                                                              // });
                                                             });
                                                           }),
                                                     ),
@@ -2239,28 +2253,40 @@ class _DonarListState extends ConsumerState<DonarList> {
                                                             color: Colors.red,
                                                           ),
                                                           onPressed: () {
-                                                            XataRepository()
-                                                                .deleteExpenseByID(
+                                                            ref
+                                                                .watch(
+                                                                    realmProvider)!
+                                                                .deleteExpenseRecord(
                                                                     expenses[
-                                                                            index]
-                                                                        .id
-                                                                        .toString())
-                                                                .then((value) {
-                                                              if (value
-                                                                  .statusCode
-                                                                  .toString()
-                                                                  .startsWith(
-                                                                      "2")) {
-                                                                Utils.messageSuccessNoPopDialog(
-                                                                    "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-                                                                    context,
-                                                                    "အိုကေ",
-                                                                    Colors
-                                                                        .black);
-                                                                calculateLeftBalance();
-                                                                // callAPI("");
-                                                              }
-                                                            });
+                                                                        index]);
+                                                            calculateLeftBalance();
+                                                            Utils.messageSuccessSinglePopDialog(
+                                                                "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                                context,
+                                                                "အိုကေ",
+                                                                Colors.black);
+                                                            // XataRepository()
+                                                            //     .deleteExpenseByID(
+                                                            //         expenses[
+                                                            //                 index]
+                                                            //             .id
+                                                            //             .toString())
+                                                            //     .then((value) {
+                                                            //   if (value
+                                                            //       .statusCode
+                                                            //       .toString()
+                                                            //       .startsWith(
+                                                            //           "2")) {
+                                                            //     Utils.messageSuccessNoPopDialog(
+                                                            //         "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
+                                                            //         context,
+                                                            //         "အိုကေ",
+                                                            //         Colors
+                                                            //             .black);
+                                                            //     calculateLeftBalance();
+                                                            //     // callAPI("");
+                                                            //   }
+                                                            // });
                                                           }),
                                                     ),
                                                   ],
