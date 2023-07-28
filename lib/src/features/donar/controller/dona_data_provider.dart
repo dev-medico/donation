@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,21 +31,34 @@ final closingBalanceDataProvider =
   int totalDonation = 0;
   int totalExpenses = 0;
   int closingBalance = 0;
+  log("Year - " + param.month.toString() + " - " + param.year.toString());
   donars
-      .where((element) =>
-          element.date!.isBefore(DateTime(param.year!, param.month!)))
+      .where((element) => element.date!.isBefore(DateTime(
+            param.year!,
+            param.month!,
+          )))
       .forEach((element) {
     totalDonation += element.amount!;
   });
 
   expenses
-      .where((element) =>
-          element.date!.isBefore(DateTime(param.year!, param.month!)))
-      .forEach((element) {
-    totalExpenses += element.amount!;
+      .where((element2) => element2.date!.isBefore(DateTime(
+            param.year!,
+            param.month!,
+          )))
+      .forEach((data) {
+    totalExpenses += data.amount!;
   });
 
   closingBalance = totalDonation - totalExpenses;
+
+  log("Total Donation - " +
+      totalDonation.toString() +
+      " - " +
+      totalExpenses.toString());
+
+  log("Closing Balance  - " + closingBalance.toString());
+  log("-------------------------------------------");
 
   return closingBalance;
 });

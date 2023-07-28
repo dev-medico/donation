@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
@@ -685,19 +686,12 @@ class _DonarListState extends ConsumerState<DonarList> {
                 )));
   }
 
-  @override
-  void initState() {
-    super.initState();
-    calculateLeftBalance();
-  }
-
   calculateLeftBalance() {
     for (int month = 0; month < 12; month++) {
-      var leftBalance = ref.watch(closingBalanceDataProvider((
-        month: month == 0 ? 12 : month,
-        year:
-            month == 0 ? (int.parse(selectedYear) - 1) : int.parse(selectedYear)
-      )));
+      var leftBalance = ref.read(closingBalanceDataProvider(
+          (month: month + 1, year: int.parse(selectedYear))));
+
+      log("Left Balance - " + leftBalance.toString());
 
       if (month == 0) {
         setState(() {
@@ -856,6 +850,7 @@ class _DonarListState extends ConsumerState<DonarList> {
       setState(() {
         firstTime = false;
       });
+      calculateLeftBalance();
     }
     return Scaffold(
       backgroundColor: Colors.white,
@@ -1213,8 +1208,7 @@ class _DonarListState extends ConsumerState<DonarList> {
 
   buildSimpleTable(List<DonarRecord> data, List<ExpensesRecord> expenses,
       int month, int leftBalance) {
-    const int COLUMN_COUNT = 5;
-    int ROWCOUNT = data.length;
+    
     int totalDonation = 0;
     int totalExpense = 0;
     int thisMonthLeftBalance = 0;
