@@ -36,6 +36,8 @@ final closingBalanceDataProvider =
       .where((element) => element.date!.isBefore(DateTime(
             param.year!,
             param.month!,
+            31
+
           )))
       .forEach((element) {
     totalDonation += element.amount!;
@@ -45,6 +47,7 @@ final closingBalanceDataProvider =
       .where((element2) => element2.date!.isBefore(DateTime(
             param.year!,
             param.month!,
+            31
           )))
       .forEach((data) {
     totalExpenses += data.amount!;

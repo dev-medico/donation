@@ -691,7 +691,7 @@ class _DonarListState extends ConsumerState<DonarList> {
       var leftBalance = ref.read(closingBalanceDataProvider(
           (month: month + 1, year: int.parse(selectedYear))));
 
-      log("Left Balance - " + leftBalance.toString());
+      log("Left Balance - ${month + 1} - $selectedYear" + leftBalance.toString());
 
       if (month == 0) {
         setState(() {
