@@ -42,9 +42,9 @@ class RealmServices with ChangeNotifier {
         ),
       );
 
-      if (realm.subscriptions.isEmpty) {
-        updateSubscriptions();
-      }
+      
+
+      updateSubscriptions();
     }
   }
 

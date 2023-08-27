@@ -7,6 +7,7 @@ import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final drawerIndexProvider = StateProvider<int?>((ref) => 0);
 
@@ -44,7 +45,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        margin: const EdgeInsets.only(top: 90),
+        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.2),
         child: Column(
           children: [
             Expanded(
@@ -76,11 +77,14 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
         child: InkWell(
           splashColor: Colors.grey.withOpacity(0.1),
           highlightColor: Colors.transparent,
-          onTap: () {
+          onTap: () async {
             ref.watch(drawerControllerProvider)!.toggle!.call();
             ref.read(drawerIndexProvider.notifier).state = index;
             if (index == 6) {
-              ref.watch(realmProvider)!.close();
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.remove('token');
+              prefs.remove('name');
+
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),

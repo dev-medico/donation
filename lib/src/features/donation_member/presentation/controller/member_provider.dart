@@ -50,6 +50,15 @@ final membersDataProvider = StateProvider<RealmResults<Member>>((ref) {
   return stream;
 });
 
+final membersDataByPhoneProvider =
+    StateProvider.family<Member?, String>((ref, phone) {
+  var realmService = ref.watch(realmProvider);
+  final stream = realmService!.realm.query<Member>(
+      "phone CONTAINS[c] '$phone' AND TRUEPREDICATE SORT(memberId ASC)");
+
+  return stream.isEmpty ? null : stream.first;
+});
+
 final searchMemberStreamProvider =
     StreamProvider.family<RealmResultsChanges<Member>, SearchParams>(
         (ref, searchParam) {

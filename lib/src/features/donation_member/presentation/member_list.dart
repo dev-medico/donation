@@ -18,8 +18,9 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MemberListScreen extends ConsumerStatefulWidget {
   static const routeName = "/members";
+  final bool fromHome;
 
-  const MemberListScreen({Key? key}) : super(key: key);
+  const MemberListScreen({Key? key, this.fromHome = false}) : super(key: key);
 
   @override
   _MemberListScreenState createState() => _MemberListScreenState();
@@ -91,14 +92,24 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
           colors: [primaryColor, primaryDark],
         ))),
         centerTitle: true,
-         leading:Responsive.isMobile(context) ? Padding(
-          padding: const EdgeInsets.only(top: 4, left: 8),
-          child: Humberger(
-            onTap: () {
-              ref.watch(drawerControllerProvider)!.toggle!.call();
-            },
-          ),
-        ):null,
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: Humberger(
+                  onTap: () {
+                    ref.watch(drawerControllerProvider)!.toggle!.call();
+                  },
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
         title: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Text("အဖွဲ့၀င်များ",
@@ -641,9 +652,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
               builder: (context) => NewMemberScreen(),
             ),
           );
-          setState(() {
-            
-          });
+          setState(() {});
           refresh(results);
         },
         child: const Icon(Icons.add),

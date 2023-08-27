@@ -12,7 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ReportScreen extends ConsumerStatefulWidget {
-  const ReportScreen({super.key});
+  const ReportScreen({
+    super.key,
+  });
 
   @override
   ConsumerState<ReportScreen> createState() => _ReportScreenState();

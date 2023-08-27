@@ -14,7 +14,7 @@ class CallMultiPhoneDialog extends StatelessWidget {
     return CommonDialog(
       title: title.toString(),
       height: Responsive.isMobile(context)
-          ? MediaQuery.of(context).size.height * 0.6
+          ? MediaQuery.of(context).size.height * 0.5
           : MediaQuery.of(context).size.width * 0.23,
       width: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width

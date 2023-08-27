@@ -16,8 +16,9 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class SearchMemberListScreen extends ConsumerStatefulWidget {
   static const routeName = "/search_members";
-
-  const SearchMemberListScreen({Key? key}) : super(key: key);
+  final bool fromHome;
+  const SearchMemberListScreen({Key? key, this.fromHome = false})
+      : super(key: key);
 
   @override
   _SearchMemberListScreenState createState() => _SearchMemberListScreenState();
@@ -85,14 +86,24 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
           end: Alignment.centerRight,
           colors: [primaryColor, primaryDark],
         ))),
-         leading:Responsive.isMobile(context) ? Padding(
-          padding: const EdgeInsets.only(top: 4, left: 8),
-          child: Humberger(
-            onTap: () {
-              ref.watch(drawerControllerProvider)!.toggle!.call();
-            },
-          ),
-        ):null,
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: Humberger(
+                  onTap: () {
+                    ref.watch(drawerControllerProvider)!.toggle!.call();
+                  },
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
         centerTitle: true,
         title: Padding(
           padding: const EdgeInsets.only(top: 4),

@@ -1,23 +1,30 @@
+import 'dart:developer';
+
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animated_widgets/animated_widgets.dart';
+import 'package:donation/realm/app_services.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
+import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
 import 'package:donation/src/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   SplashScreen({Key? key}) : super(key: key);
   static const routeName = '/splash';
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   String name = "";
+  String memberPhone = "";
 
   @override
   void initState() {
@@ -30,16 +37,54 @@ class _SplashScreenState extends State<SplashScreen> {
     setState(() {
       try {
         name = prefs.getString("name")!;
+        memberPhone = prefs.getString("memberPhone")!;
       } catch (e) {
         name = '';
+        memberPhone = '';
       }
     });
-    Future.delayed(const Duration(seconds: 3), () {
+    log("Phone - " + memberPhone);
+    log("name - " + memberPhone);
+    Future.delayed(const Duration(seconds: 3), () async {
       if (name == "") {
+        if (memberPhone == "") {
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        } else {
+          var appServices = ref.read(appServiceProvider);
+          try {
+            await appServices.logInUserEmailPassword(
+                "member@gmail.com", "12345678");
+          } catch (err) {}
+          var member = ref.read(membersDataByPhoneProvider(memberPhone));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MemberDetailScreen(
+                data: member!,
+              ),
+            ),
+          );
+        }
         //Navigator.pushReplacementNamed(context, NavigationHomeScreen.routeName);
-        Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       } else {
-        Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+        if (memberPhone != "") {
+          var appServices = ref.read(appServiceProvider);
+          try {
+            await appServices.logInUserEmailPassword(
+                "member@gmail.com", "12345678");
+          } catch (err) {}
+          var member = ref.read(membersDataByPhoneProvider(memberPhone));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MemberDetailScreen(
+                data: member!,
+              ),
+            ),
+          );
+        } else {
+          Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+        }
       }
     });
     print(name);

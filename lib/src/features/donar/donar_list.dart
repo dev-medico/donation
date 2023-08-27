@@ -27,8 +27,8 @@ import 'package:logger/logger.dart';
 
 class DonarList extends ConsumerStatefulWidget {
   static const routeName = "/donars";
-
-  const DonarList({Key? key}) : super(key: key);
+  final bool fromHome;
+  const DonarList({Key? key, this.fromHome = false}) : super(key: key);
 
   @override
   _DonarListState createState() => _DonarListState();
@@ -693,7 +693,8 @@ class _DonarListState extends ConsumerState<DonarList> {
       var leftBalance = ref.read(closingBalanceDataProvider(
           (month: month + 1, year: int.parse(selectedYear))));
 
-      log("Left Balance - ${month + 1} - $selectedYear" + leftBalance.toString());
+      log("Left Balance - ${month + 1} - $selectedYear" +
+          leftBalance.toString());
 
       if (month == 0) {
         setState(() {
@@ -865,14 +866,24 @@ class _DonarListState extends ConsumerState<DonarList> {
           colors: [primaryColor, primaryDark],
         ))),
         centerTitle: true,
-         leading:Responsive.isMobile(context) ? Padding(
-          padding: const EdgeInsets.only(top: 4, left: 8),
-          child: Humberger(
-            onTap: () {
-              ref.watch(drawerControllerProvider)!.toggle!.call();
-            },
-          ),
-        ):null,
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: Humberger(
+                  onTap: () {
+                    ref.watch(drawerControllerProvider)!.toggle!.call();
+                  },
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
         title: const Padding(
           padding: EdgeInsets.only(top: 4),
           child: Text("ရ/သုံး ငွေစာရင်း",
@@ -1218,7 +1229,6 @@ class _DonarListState extends ConsumerState<DonarList> {
 
   buildSimpleTable(List<DonarRecord> data, List<ExpensesRecord> expenses,
       int month, int leftBalance) {
-    
     int totalDonation = 0;
     int totalExpense = 0;
     int thisMonthLeftBalance = 0;

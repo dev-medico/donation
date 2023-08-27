@@ -563,7 +563,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                   if (nameController.text.isNotEmpty &&
                                       fatherNameController.text.isNotEmpty &&
                                       nrcController.text.isNotEmpty &&
-                                      phoneController.text.isNotEmpty &&
+                                      phoneList.isNotEmpty &&
                                       selectedBloodType != "သွေးအုပ်စု") {
                                     updateMember(data.memberId.toString());
                                   } else {

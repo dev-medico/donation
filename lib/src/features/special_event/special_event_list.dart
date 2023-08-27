@@ -29,7 +29,9 @@ import 'package:realm/realm.dart';
 
 class SpecialEventListScreen extends ConsumerStatefulWidget {
   static const routeName = "/special_event_list";
-  const SpecialEventListScreen({Key? key}) : super(key: key);
+  final bool fromHome;
+  const SpecialEventListScreen({Key? key, this.fromHome = false})
+      : super(key: key);
 
   @override
   ConsumerState<SpecialEventListScreen> createState() =>
@@ -51,7 +53,7 @@ class _SpecialEventListScreenState
     final results = ref.watch(specialEventsDataProvider);
     YYDialog.init(context);
     if (notloaded) {
-      getEventsFromXata(ref);
+      //
       notloaded = false;
     }
 
@@ -66,14 +68,24 @@ class _SpecialEventListScreenState
           colors: [primaryColor, primaryDark],
         ))),
         centerTitle: true,
-         leading:Responsive.isMobile(context) ? Padding(
-          padding: const EdgeInsets.only(top: 4, left: 8),
-          child: Humberger(
-            onTap: () {
-              ref.watch(drawerControllerProvider)!.toggle!.call();
-            },
-          ),
-        ):null,
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: Humberger(
+                  onTap: () {
+                    ref.watch(drawerControllerProvider)!.toggle!.call();
+                  },
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
         title: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Text("ထူးခြားဖြစ်စဥ်များ",
@@ -92,7 +104,6 @@ class _SpecialEventListScreenState
               builder: (context) => const NewEventAddScreen(),
             ),
           );
-          getEventsFromXata(ref);
         },
         child: const Icon(Icons.add),
       ),
@@ -170,14 +181,13 @@ class _SpecialEventListScreenState
                               builder: (context) => EditSpecialEventScreen(
                                     event: data[rowIndex],
                                   )));
-                      getEventsFromXata(ref);
                     },
                     child: columnIndex == 8
                         ? Container(
                             decoration: borderDecorationNoRadius(Colors.grey),
                             margin: const EdgeInsets.all(1),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              // mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 IconButton(
                                     icon: const Icon(
@@ -192,10 +202,9 @@ class _SpecialEventListScreenState
                                                   EditSpecialEventScreen(
                                                     event: data[rowIndex],
                                                   )));
-                                      getEventsFromXata(ref);
                                     }),
-                                const SizedBox(
-                                  width: 4,
+                                SizedBox(
+                                  width: Responsive.isMobile(context) ? 0 : 4,
                                 ),
                                 IconButton(
                                     icon: const Icon(
@@ -222,7 +231,6 @@ class _SpecialEventListScreenState
                                                 context,
                                                 "အိုကေ",
                                                 Colors.black);
-                                            getEventsFromXata(ref);
                                           }
                                         });
                                       });
@@ -481,43 +489,5 @@ class _SpecialEventListScreenState
         );
       }
       ..show();
-  }
-}
-
-Future<List<SpecialEventData>> getEventsFromXata(WidgetRef ref) async {
-  Map<String, String> headers = {
-    "Accept": "application/json",
-    "content-type": 'application/json',
-    "Authorization": "Bearer xau_n8jyl0ncOhjMYXFMQvgU5re57VDW9vSX2"
-  };
-
-  final response = await http.post(
-      Uri.parse(
-          'https://sithu-aung-s-workspace-oc5cng.us-east-1.xata.sh/db/next:main/tables/Records/query'),
-      headers: headers,
-      body: jsonEncode(<String, dynamic>{
-        "page": {"size": 200}
-      }));
-  log(response.statusCode.toString());
-  log(response.body.toString());
-  if (response.statusCode.toString().startsWith("2")) {
-    var data = SpecialEventListResponse.fromJson(jsonDecode(response.body))
-        .specialEventData!;
-    data.forEach((element) {
-      ref.watch(realmProvider)!.createSpecialEvent(SpecialEvent(ObjectId(),
-          date: element.date,
-          haemoglobin: element.haemoglobin,
-          hbsAg: element.hbsAg,
-          hcvAb: element.hcvAb,
-          mpIct: element.mpIct,
-          retroTest: element.retroTest,
-          vdrlTest: element.vdrlTest,
-          labName: element.labName,
-          total: element.total));
-    });
-    return SpecialEventListResponse.fromJson(jsonDecode(response.body))
-        .specialEventData!;
-  } else {
-    throw Exception("");
   }
 }

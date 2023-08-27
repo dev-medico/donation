@@ -52,7 +52,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         fontFamily: "MyanUni",
       ),
       themeMode: ThemeMode.light,
-      home: currentUser == null ? const LoginScreen() : HomeScreen(),
+      home:  SplashScreen(),
       onGenerateRoute: (RouteSettings routeSettings) {
         return MaterialPageRoute<void>(
           settings: routeSettings,

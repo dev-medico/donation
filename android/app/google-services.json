@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1000702292405:android:a1b773111a7871f73ca9fc",
+        "mobilesdk_app_id": "1:1000702292405:android:c06376fab7d5c7e73ca9fc",
         "android_client_info": {
           "package_name": "com.red.juniors"
         }
@@ -29,6 +29,13 @@
             {
               "client_id": "1000702292405-s572v83hi6sg0fgpf8mieat5taeltkru.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1000702292405-coq349vqnq466g6rni4nao7bee4rjoj0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.red.juniors"
+              }
             }
           ]
         }

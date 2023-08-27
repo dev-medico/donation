@@ -17,7 +17,9 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 class MemberDetailScreen extends ConsumerStatefulWidget {
   static const routeName = '/member-detail';
   Member data;
-  MemberDetailScreen({Key? key, required this.data}) : super(key: key);
+  bool isEditable;
+  MemberDetailScreen({Key? key, required this.data, this.isEditable = true})
+      : super(key: key);
 
   @override
   ConsumerState<MemberDetailScreen> createState() =>
@@ -474,42 +476,45 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                         width: MediaQuery.of(context).size.width - 80,
                         color: Colors.grey,
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            top: 12,
-                            right: 12,
-                          ),
-                          child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text("ပြင်ဆင်မည်",
-                                      style: TextStyle(
-                                          fontSize: 15, color: primaryColor)),
-                                  const SizedBox(
-                                    width: 8,
-                                  ),
-                                  Image.asset(
-                                    "assets/images/edit.png",
-                                    width: 24,
-                                    color: primaryColor,
-                                  ),
-                                ],
+                      widget.isEditable
+                          ? Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 12,
+                                  right: 12,
+                                ),
+                                child: GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text("ပြင်ဆင်မည်",
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                color: primaryColor)),
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
+                                        Image.asset(
+                                          "assets/images/edit.png",
+                                          width: 24,
+                                          color: primaryColor,
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              MemberEditScreen(data: data),
+                                        ),
+                                      );
+                                    }),
                               ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        MemberEditScreen(data: data),
-                                  ),
-                                );
-                              }),
-                        ),
-                      ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ),
@@ -1009,35 +1014,38 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                                 SizedBox(
                                   width: 24,
                                 ),
-                                GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text("ပြင်ဆင်မည်",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: primaryColor)),
-                                        const SizedBox(
-                                          width: 8,
+                                widget.isEditable
+                                    ? GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text("ပြင်ဆင်မည်",
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: primaryColor)),
+                                            const SizedBox(
+                                              width: 8,
+                                            ),
+                                            Image.asset(
+                                              "assets/images/edit.png",
+                                              width: 24,
+                                              color: primaryColor,
+                                            ),
+                                          ],
                                         ),
-                                        Image.asset(
-                                          "assets/images/edit.png",
-                                          width: 24,
-                                          color: primaryColor,
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      // ref.watch(realmProvider)!.deleteMember(data);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              MemberEditScreen(data: data),
-                                        ),
-                                      );
-                                    }),
+                                        onTap: () {
+                                          // ref.watch(realmProvider)!.deleteMember(data);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  MemberEditScreen(data: data),
+                                            ),
+                                          );
+                                        })
+                                    : Container(),
                               ],
                             ),
                           ),

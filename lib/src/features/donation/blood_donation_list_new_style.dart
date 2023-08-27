@@ -18,8 +18,10 @@ import 'package:tab_container/tab_container.dart';
 
 class BloodDonationListNewStyle extends ConsumerStatefulWidget {
   static const routeName = "/donations";
+  final bool fromHome;
 
-  const BloodDonationListNewStyle({Key? key}) : super(key: key);
+  const BloodDonationListNewStyle({Key? key, this.fromHome = false})
+      : super(key: key);
 
   @override
   _BloodDonationListNewStyleState createState() =>
@@ -655,14 +657,24 @@ class _BloodDonationListNewStyleState
           end: Alignment.centerRight,
           colors: [primaryColor, primaryDark],
         ))),
-         leading:Responsive.isMobile(context) ? Padding(
-          padding: const EdgeInsets.only(top: 4, left: 8),
-          child: Humberger(
-            onTap: () {
-              ref.watch(drawerControllerProvider)!.toggle!.call();
-            },
-          ),
-        ):null,
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: Humberger(
+                  onTap: () {
+                    ref.watch(drawerControllerProvider)!.toggle!.call();
+                  },
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
         centerTitle: true,
         title: Padding(
           padding: const EdgeInsets.only(top: 4),

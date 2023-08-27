@@ -1,3 +1,4 @@
+import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
@@ -32,13 +33,36 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
 
   List<Widget> widgets = [
     ReportScreen(),
-    SearchMemberListScreen(),
-    MemberListScreen(),
-    BloodDonationListNewStyle(),
-    SpecialEventListScreen(),
-    DonarList(),
+    SearchMemberListScreen(
+      fromHome: true,
+    ),
+    MemberListScreen(
+      fromHome: true,
+    ),
+    BloodDonationListNewStyle(
+      fromHome: true,
+    ),
+    SpecialEventListScreen(
+      fromHome: true,
+    ),
+    DonarList(
+      fromHome: true,
+    ),
     Container(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      switchUI();
+    });
+  }
+
+  switchUI() async {
+    var realmServices = ref.watch(realmProvider);
+    await realmServices!.sessionSwitch();
+  }
 
   @override
   Widget build(BuildContext context) {
