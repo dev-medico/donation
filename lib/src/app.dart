@@ -1,5 +1,7 @@
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
+import 'package:donation/src/features/home/desktop_home.dart';
+import 'package:donation/src/features/home/home.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,7 +13,7 @@ import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/home/home_with_drawer.dart';
-import 'package:donation/src/features/home/home.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/splash_screen/splash_screen.dart';
 import 'package:donation/utils/custom_scroll.dart';
 
@@ -50,7 +52,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         fontFamily: "MyanUni",
       ),
       themeMode: ThemeMode.light,
-      home: currentUser == null ? const LoginScreen() : MobileHomeScreen(),
+      home: currentUser == null ? const LoginScreen() : HomeScreen(),
       onGenerateRoute: (RouteSettings routeSettings) {
         return MaterialPageRoute<void>(
           settings: routeSettings,
@@ -63,11 +65,14 @@ class _MyAppState extends ConsumerState<MyApp> {
                 return const LoginScreen();
               case DashBoardScreen.routeName:
                 return const DashBoardScreen();
-
               case NavigationHomeScreen.routeName:
                 return const NavigationHomeScreen();
               case MobileHomeScreen.routeName:
                 return const MobileHomeScreen();
+              case HomeScreen.routeName:
+                return const HomeScreen();
+              case DesktopHomeScreen.routeName:
+                return const DesktopHomeScreen();
               case MemberListScreen.routeName:
                 return const MemberListScreen();
 

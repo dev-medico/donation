@@ -32,7 +32,7 @@ dependencies:
   flutter_spinkit: ^5.2.0
   flutter_svg: ^2.0.6
   flutter_typeahead: ^4.3.8
-  flutter_zoom_drawer: ^3.0.4+1
+  flutter_zoom_drawer: ^3.1.1
   # google_fonts: ^2.3.2
   
   hooks_riverpod: ^2.3.6

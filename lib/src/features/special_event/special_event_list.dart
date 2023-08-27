@@ -3,6 +3,8 @@ import 'dart:developer';
 
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
+import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/features/special_event/special_event_provider.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_expandable_table/flutter_expandable_table.dart';
@@ -64,6 +66,14 @@ class _SpecialEventListScreenState
           colors: [primaryColor, primaryDark],
         ))),
         centerTitle: true,
+         leading:Responsive.isMobile(context) ? Padding(
+          padding: const EdgeInsets.only(top: 4, left: 8),
+          child: Humberger(
+            onTap: () {
+              ref.watch(drawerControllerProvider)!.toggle!.call();
+            },
+          ),
+        ):null,
         title: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Text("ထူးခြားဖြစ်စဥ်များ",

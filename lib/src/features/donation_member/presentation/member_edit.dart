@@ -45,6 +45,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
   bool isSwitched = false;
   String operatorImg = "";
   int id = 0;
+  List<String> phoneList = [];
 
   String region1 = " ";
   String town1 = " ";
@@ -85,12 +86,16 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     nameController.text = data.name ?? "";
     fatherNameController.text = data.fatherName ?? "";
     nrcController.text = data.nrc ?? "";
-    phoneController.text = data.phone ?? "";
+    if (data.phone!.contains(",")) {
+      phoneList = data.phone!.split(",");
+    } else {
+      phoneList.add(data.phone!);
+    }
     selectedBloodType = data.bloodType ?? "";
     bloodBankNoController.text = data.bloodBankCard ?? "";
     totalDonationController.text = data.totalCount.toString();
     birthDate = data.birthDate ?? "";
-    if (data.address!.contains('၊')) {
+    if (data.address!.contains('၊') && !(data.address!.contains(','))) {
       homeNoController.text =
           data.address != null ? data.address!.split('၊')[0] : "";
       streetController.text =
@@ -209,8 +214,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(
-                                      left: 24, top: 12, bottom: 12),
+                                  margin: EdgeInsets.only(bottom: 12),
                                   child: Container(
                                     width: double.infinity,
                                     height: 50,
@@ -243,23 +247,105 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                 Container(
                                   margin: const EdgeInsets.only(
                                       left: 20, top: 16, bottom: 8, right: 20),
-                                  child: Stack(
+                                  child: Row(
                                     children: [
-                                      TextFormField(
-                                        keyboardType: TextInputType.number,
-                                        controller: phoneController,
-                                        decoration:
-                                            inputBoxDecoration("ဖုန်းနံပါတ်"),
+                                      Expanded(
+                                        child: Stack(
+                                          children: [
+                                            TextFormField(
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              controller: phoneController,
+                                              decoration: inputBoxDecoration(
+                                                  "ဖုန်းနံပါတ်"),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, right: 20),
+                                              child: Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: buildOperator()),
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 8, right: 20),
-                                        child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: buildOperator()),
+                                      InkWell(
+                                        onTap: () {
+                                          var newPhone =
+                                              phoneController.text.toString();
+                                          if (checkPhone(newPhone) !=
+                                                  "Not_Valid" &&
+                                              !phoneList.contains(newPhone)) {
+                                            setState(() {
+                                              phoneList.add(phoneController.text
+                                                  .toString());
+                                              phoneController.clear();
+                                            });
+                                          }
+                                        },
+                                        child: Container(
+                                            margin: EdgeInsets.only(left: 8),
+                                            width: 46,
+                                            height: 46,
+                                            decoration:
+                                                shadowDecorationWithBorder(
+                                                    Colors.white, primaryColor),
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 24,
+                                            )),
                                       )
                                     ],
                                   ),
+                                ),
+                                SizedBox(
+                                  //  height: context.heightPx / 30,
+                                  child: ListView.separated(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 20),
+                                      separatorBuilder: (context, index) =>
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                      shrinkWrap: true,
+                                      //   scrollDirection: Axis.horizontal,
+                                      itemCount: phoneList.length ?? 0,
+                                      itemBuilder: (context, index) {
+                                        var data = phoneList[index];
+                                        return Material(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          elevation: 3,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(data ?? ''),
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      phoneList.removeAt(index);
+                                                    });
+                                                  },
+                                                  child: Icon(
+                                                    Icons.delete,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                                // Text(data),
+                                                // Text(" ,"),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }),
                                 ),
                                 Container(
                                   width: double.infinity,
@@ -636,12 +722,13 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                   ],
                                 ),
                                 Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Expanded(
                                       flex: 3,
                                       child: Container(
-                                        margin: EdgeInsets.only(
-                                            top: 12, bottom: 12),
+                                        margin: EdgeInsets.only(bottom: 12),
                                         child: Container(
                                           width: double.infinity,
                                           height: 50,
@@ -666,31 +753,143 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                     ),
                                     Expanded(
                                       flex: 3,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 20,
-                                            top: 16,
-                                            bottom: 8,
-                                            right: 20),
-                                        child: Stack(
-                                          children: [
-                                            TextFormField(
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              controller: phoneController,
-                                              decoration: inputBoxDecoration(
-                                                  "ဖုန်းနံပါတ်"),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                left: 20,
+                                                top: 16,
+                                                bottom: 8,
+                                                right: 20),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Stack(
+                                                    children: [
+                                                      TextFormField(
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        controller:
+                                                            phoneController,
+                                                        decoration:
+                                                            inputBoxDecoration(
+                                                                "ဖုန်းနံပါတ်"),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                top: 8,
+                                                                right: 20),
+                                                        child: Align(
+                                                            alignment: Alignment
+                                                                .centerRight,
+                                                            child:
+                                                                buildOperator()),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    var newPhone =
+                                                        phoneController.text
+                                                            .toString();
+                                                    if (checkPhone(newPhone) !=
+                                                            "Not_Valid" &&
+                                                        !phoneList.contains(
+                                                            newPhone)) {
+                                                      setState(() {
+                                                        phoneList.add(
+                                                            phoneController.text
+                                                                .toString());
+                                                        phoneController.clear();
+                                                      });
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 8),
+                                                      width: 46,
+                                                      height: 46,
+                                                      decoration:
+                                                          shadowDecorationWithBorder(
+                                                              Colors.white,
+                                                              primaryColor),
+                                                      child: Icon(
+                                                        Icons.add,
+                                                        size: 24,
+                                                      )),
+                                                )
+                                              ],
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 8, right: 20),
-                                              child: Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: buildOperator()),
-                                            )
-                                          ],
-                                        ),
+                                          ),
+                                          GridView.count(
+                                            childAspectRatio: 5,
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                            ),
+                                            shrinkWrap: true,
+                                            crossAxisCount: 2,
+                                            //   scrollDirection: Axis.horizontal,
+                                            // itemCount: phoneList.length ?? 0,
+                                            children: List.generate(
+                                              phoneList.length,
+                                              (index) {
+                                                var data = phoneList[index];
+                                                return Container(
+                                                  height: 40,
+                                                  margin:
+                                                      EdgeInsets.only(right: 8),
+                                                  child: Material(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    elevation: 3,
+                                                    child: Container(
+                                                      height: 50,
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10.0),
+                                                      child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                            child: Text(
+                                                                data ?? ''),
+                                                          ),
+                                                          SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                phoneList
+                                                                    .removeAt(
+                                                                        index);
+                                                              });
+                                                            },
+                                                            child: Icon(
+                                                              Icons.delete,
+                                                              color: Colors.red,
+                                                            ),
+                                                          ),
+                                                          // Text(data),
+                                                          // Text(" ,"),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
                                     Expanded(
@@ -698,6 +897,9 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                       child: Container(),
                                     ),
                                   ],
+                                ),
+                                SizedBox(
+                                  height: 12,
                                 ),
                                 Row(
                                   children: [
@@ -927,7 +1129,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                 if (nameController.text.isNotEmpty &&
                                     fatherNameController.text.isNotEmpty &&
                                     nrcController.text.isNotEmpty &&
-                                    phoneController.text.isNotEmpty &&
+                                    phoneList.isNotEmpty &&
                                     selectedBloodType != "သွေးအုပ်စု") {
                                   updateMember(data.memberId.toString());
                                 } else {
@@ -959,6 +1161,12 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
   }
 
   updateMember(String memberId) {
+    if (phoneController.text.toString().isNotEmpty &&
+        !phoneList.contains(phoneController.text.toString())) {
+      setState(() {
+        phoneList.add(phoneController.text.toString());
+      });
+    }
     ref.watch(realmProvider)!.updateMember(
           widget.data,
           name: nameController.text.toString(),
@@ -980,7 +1188,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
           nrc: nrcController.text.toString() != ""
               ? nrcController.text.toString()
               : "-",
-          phone: phoneController.text.toString(),
+          phone: phoneList.join(","),
           address:
               "${homeNoController.text}, ${streetController.text}, ${quarterController.text}, ${townController.text}, $region1",
         );

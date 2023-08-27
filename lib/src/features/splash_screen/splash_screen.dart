@@ -1,9 +1,10 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animated_widgets/animated_widgets.dart';
+import 'package:donation/src/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
-import 'package:donation/src/features/home/home.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
         //Navigator.pushReplacementNamed(context, NavigationHomeScreen.routeName);
         Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       } else {
-        Navigator.pushReplacementNamed(context, MobileHomeScreen.routeName);
+        Navigator.pushReplacementNamed(context, HomeScreen.routeName);
       }
     });
     print(name);

@@ -3,6 +3,8 @@ import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
 import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
 import 'package:donation/src/features/finder/donation_by_disease_chart.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
+import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
@@ -36,6 +38,16 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           end: Alignment.centerRight,
           colors: [primaryColor, primaryDark],
         ))),
+        leading: Responsive.isMobile(context)
+            ? Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: Humberger(
+                  onTap: () {
+                    ref.watch(drawerControllerProvider)!.toggle!.call();
+                  },
+                ),
+              )
+            : null,
         centerTitle: true,
         title: Padding(
           padding: const EdgeInsets.only(top: 4),

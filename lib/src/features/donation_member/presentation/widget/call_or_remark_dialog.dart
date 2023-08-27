@@ -1,5 +1,6 @@
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation_member/presentation/widget/call_multi_phone_dialog.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/common_dialog.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/remark_write_dialog.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,16 @@ class CallOrRemarkDialog extends StatelessWidget {
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () {
-                launchUrl(Uri.parse("tel:" + member!.phone.toString()));
+                Navigator.pop(context);
+                if (member!.phone!.contains(",")) {
+                  showDialog(
+                      context: context,
+                      builder: (context) => CallMultiPhoneDialog(
+                          title: "ဖုန်းခေါ်ဆိုမည်",
+                          phones: member!.phone!.split(",")));
+                } else {
+                  launchUrl(Uri.parse("tel:" + member!.phone.toString()));
+                }
               },
               child: Align(
                   alignment: Alignment.center,
@@ -59,7 +69,7 @@ class CallOrRemarkDialog extends StatelessWidget {
                             "ဖုန်းခေါ်ဆိုမည်",
                             textScaleFactor: 1.0,
                             style:
-                                TextStyle(fontSize: 16.0, color: Colors.black),
+                                TextStyle(fontSize: 15.0, color: Colors.black),
                           ),
                           SizedBox(
                             width: 30,
@@ -110,7 +120,7 @@ class CallOrRemarkDialog extends StatelessWidget {
                             "မှတ်ချက်ရေးမည်",
                             textScaleFactor: 1.0,
                             style:
-                                TextStyle(fontSize: 16.0, color: Colors.black),
+                                TextStyle(fontSize: 15.0, color: Colors.black),
                           ),
                           SizedBox(
                             width: 30,

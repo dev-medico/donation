@@ -1,5 +1,6 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation/realm/app_services.dart';
+import 'package:donation/src/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/data/response/login_response/login_response.dart';
 import 'package:donation/responsive.dart';
-import 'package:donation/src/features/home/home.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
@@ -315,7 +316,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _isLoading = false;
       });
       if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, MobileHomeScreen.routeName,
+        Navigator.pushNamedAndRemoveUntil(context, HomeScreen.routeName,
             (Route<dynamic> route) => false);
       }
     } catch (err) {
@@ -332,6 +333,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     prefs.setString("userName", response.user!.name!.toString());
     prefs.setString("userPhone", response.user!.phones![0].toString());
     Navigator.pushNamedAndRemoveUntil(
-        context, MobileHomeScreen.routeName, (Route<dynamic> route) => false);
+        context, HomeScreen.routeName, (Route<dynamic> route) => false);
   }
 }
