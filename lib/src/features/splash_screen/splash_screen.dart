@@ -35,56 +35,33 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   initial() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      try {
-        name = prefs.getString("name")!;
-        memberPhone = prefs.getString("memberPhone")!;
-      } catch (e) {
-        name = '';
-        memberPhone = '';
-      }
+      name = prefs.getString("name") ?? "";
+      memberPhone = prefs.getString("memberPhone") ?? "";
     });
     log("Phone - " + memberPhone);
     log("name - " + memberPhone);
     Future.delayed(const Duration(seconds: 3), () async {
-      if (name == "") {
-        if (memberPhone == "") {
+      if (memberPhone == "") {
+        if (name == "") {
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-        } else {
-          var appServices = ref.read(appServiceProvider);
-          try {
-            await appServices.logInUserEmailPassword(
-                "member@gmail.com", "12345678");
-          } catch (err) {}
-          var member = ref.read(membersDataByPhoneProvider(memberPhone));
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MemberDetailScreen(
-                data: member!,
-              ),
-            ),
-          );
-        }
-        //Navigator.pushReplacementNamed(context, NavigationHomeScreen.routeName);
-      } else {
-        if (memberPhone != "") {
-          var appServices = ref.read(appServiceProvider);
-          try {
-            await appServices.logInUserEmailPassword(
-                "member@gmail.com", "12345678");
-          } catch (err) {}
-          var member = ref.read(membersDataByPhoneProvider(memberPhone));
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MemberDetailScreen(
-                data: member!,
-              ),
-            ),
-          );
         } else {
           Navigator.pushReplacementNamed(context, HomeScreen.routeName);
         }
+      } else {
+        var appServices = ref.read(appServiceProvider);
+        try {
+          await appServices.logInUserEmailPassword(
+              "member@gmail.com", "12345678");
+        } catch (err) {}
+        var member = ref.read(membersDataByPhoneProvider(memberPhone));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MemberDetailScreen(
+              data: member!,
+            ),
+          ),
+        );
       }
     });
     print(name);

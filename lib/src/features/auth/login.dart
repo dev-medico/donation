@@ -45,6 +45,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   initial() async {
     prefs = await SharedPreferences.getInstance();
+    var appServices = ref.read(appServiceProvider);
+    try {
+      await appServices.logInUserEmailPassword("member@gmail.com", "12345678");
+    } catch (err) {}
   }
 
   @override
@@ -344,16 +348,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _isLoading = true;
     });
 
-    var appServices = ref.read(appServiceProvider);
-    try {
-      await appServices.logInUserEmailPassword("member@gmail.com", "12345678");
-    } catch (err) {}
     var member = ref.read(membersDataByPhoneProvider(email.text.toString()));
     if (member != null) {
-      setState(() {
-        _isLoading = false;
-      });
-
       log("+95" + email.text.toString().replaceAll(" ", "").substring(1));
 
       FirebaseAuth auth = FirebaseAuth.instance;
@@ -366,6 +362,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         },
         timeout: const Duration(seconds: 120),
         verificationFailed: (FirebaseAuthException e) {
+          setState(() {
+            _isLoading = false;
+          });
           if (e.code == 'invalid-phone-number') {
             Utils.messageDialog("The Provided Phone No. is not valid!", context,
                 "ပြင်ဆင်မည်", Colors.black);
@@ -375,6 +374,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         },
         codeSent: (String verificationId, int? resendToken) async {
+          setState(() {
+            _isLoading = false;
+          });
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(

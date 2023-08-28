@@ -5,6 +5,7 @@ import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
 import 'package:donation/src/features/new_features/member/member_detail_new_style.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -308,11 +309,23 @@ class NewRegisterOTPState extends State<OTPScreen> {
       setState(() {
         isLoading = false;
       });
-      var snackBar = SnackBar(
-        content: Text(e.toString()),
-      );
+      if (e.toString().contains('The sms code has expired.')) {
+        prefs.setString("memberPhone", widget.phone.toString());
+        log(prefs.getString("memberPhone") ?? "");
 
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        Future.delayed(const Duration(seconds: 1), () {
+          // Navigator.pop(context);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  MemberDetailScreen(data: widget.member!, isEditable: false),
+            ),
+          );
+        });
+      } else {
+        Utils.messageDialog(e.toString(), context, "OK", Colors.black);
+      }
     }
   }
 
