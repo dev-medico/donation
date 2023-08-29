@@ -1,12 +1,19 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker_fork/flutter_cupertino_date_picker_fork.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 
 final formatter = NumberFormat("#,###", "en_US");
+
+final downloadableUrlProvider = StateProvider((ref) => "");
+final uploadProgressProvider = StateProvider((ref) => 0);
 
 class Utils {
   static String strToMM(String str) {
@@ -376,6 +383,39 @@ class Utils {
         );
       }
       ..show();
+  }
+
+  uploadToFireStorage(File file, WidgetRef ref) {
+    // Create a reference to the Firebase Storage bucket
+    final storageRef = FirebaseStorage.instance.ref();
+
+    // Upload file and metadata to the path 'images/mountains.jpg'
+    final uploadTask =
+        storageRef.child("images/" + file.path.split('/').last).putFile(file);
+
+    uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) async {
+      switch (taskSnapshot.state) {
+        case TaskState.running:
+          final progress =
+              100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
+          ref.read(uploadProgressProvider.notifier).state = progress.toInt();
+          print("Upload is $progress% complete.");
+          break;
+        case TaskState.paused:
+          print("Upload is paused.");
+          break;
+        case TaskState.canceled:
+          print("Upload was canceled");
+          break;
+        case TaskState.error:
+          // Handle unsuccessful uploads
+          break;
+        case TaskState.success:
+          String link = await taskSnapshot.ref.getDownloadURL();
+          ref.read(downloadableUrlProvider.notifier).state = link;
+          break;
+      }
+    });
   }
 }
 
