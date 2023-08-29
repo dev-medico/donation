@@ -5,11 +5,11 @@ import 'package:animated_widgets/animated_widgets.dart';
 import 'package:donation/realm/app_services.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
+import 'package:donation/src/features/feed/feed.dart';
 import 'package:donation/src/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
-import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,8 +57,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => MemberDetailScreen(
+            builder: (context) => FeedScreen(
               data: member!,
+              isEditable: false,
             ),
           ),
         );

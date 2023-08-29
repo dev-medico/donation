@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
+import 'package:donation/src/features/feed/feed.dart';
 import 'package:donation/src/features/new_features/member/member_detail_new_style.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
@@ -300,7 +301,7 @@ class NewRegisterOTPState extends State<OTPScreen> {
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  MemberDetailScreen(data: widget.member!, isEditable: false),
+                  FeedScreen(data: widget.member!, isEditable: false),
             ),
           );
         });

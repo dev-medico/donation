@@ -41,34 +41,38 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
         .toList();
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
-      appBar: AppBar(
-        flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [primaryColor, primaryDark],
-        ))),
-        centerTitle: true,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 4, right: 20),
-          child: Center(
-            child: Text("အဖွဲ့၀င် အချက်အလက်များ",
-                textScaleFactor: 1.0,
-                style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 14 : 17,
-                    color: Colors.white)),
-          ),
-        ),
-      ),
+      appBar: widget.isEditable
+          ? AppBar(
+              flexibleSpace: Container(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [primaryColor, primaryDark],
+              ))),
+              centerTitle: true,
+              title: Padding(
+                padding: const EdgeInsets.only(top: 4, right: 20),
+                child: Center(
+                  child: Text("အဖွဲ့၀င် အချက်အလက်များ",
+                      textScaleFactor: 1.0,
+                      style: TextStyle(
+                          fontSize: Responsive.isMobile(context) ? 14 : 17,
+                          color: Colors.white)),
+                ),
+              ),
+            )
+          : null,
       body: Responsive.isMobile(context)
           ? ListView(
               shrinkWrap: true,
+              padding: EdgeInsets.zero,
               children: [
                 Container(
                   width: double.infinity,
                   decoration: shadowDecoration(Colors.white),
-                  margin: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.only(
+                      top: 8, left: 20, right: 20, bottom: 20),
                   child: ListView(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
