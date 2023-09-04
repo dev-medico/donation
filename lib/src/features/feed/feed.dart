@@ -1,5 +1,6 @@
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
+import 'package:donation/src/features/feed/new_feed.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 
@@ -18,11 +19,27 @@ class _FeedScreenState extends State<FeedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      floatingActionButton: FloatingActionButton(
+          backgroundColor: primaryColor,
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NewFeedScreen(),
+              ),
+            );
+          }),
       body: DefaultTabController(
         length: 2,
         initialIndex: 0,
         child: Container(
-          margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+          margin: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 8,
+          ),
           child: Stack(
             children: [
               Container(

@@ -1,9 +1,13 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker_fork/flutter_cupertino_date_picker_fork.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -385,13 +389,14 @@ class Utils {
       ..show();
   }
 
-  uploadToFireStorage(File file, WidgetRef ref) {
+  static uploadToFireStorage(File file, WidgetRef ref) {
     // Create a reference to the Firebase Storage bucket
     final storageRef = FirebaseStorage.instance.ref();
 
     // Upload file and metadata to the path 'images/mountains.jpg'
-    final uploadTask =
-        storageRef.child("images/" + file.path.split('/').last).putFile(file);
+    final uploadTask = storageRef
+        .child("images/" + file.path.split(Platform.pathSeparator).last)
+        .putFile(file);
 
     uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) async {
       switch (taskSnapshot.state) {
@@ -412,11 +417,50 @@ class Utils {
           break;
         case TaskState.success:
           String link = await taskSnapshot.ref.getDownloadURL();
+          log("Link -  $link");
           ref.read(downloadableUrlProvider.notifier).state = link;
           break;
       }
     });
   }
+
+  static Future<bool> sendMessageByFcm(Map<String, dynamic> data) async {
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization':
+          'key=AAAA6P6BMbU:APA91bFX33mNlKV8TNsT2muiLsn99wV5bXuarVrgT9XpQJDSaRRRx6o2lRKrpiWDV63ZwFGPZAd1_xIobDLyNeOoj54fazrkd7ehJ_HZIGBSFqH71r5WcbR_YwEoVTrszOGlJ3HVTQic'
+    };
+
+    final response = await http.post(Uri.parse(
+
+            //"https://fcm.googleapis.com/v1/projects/redjuniors-be113/messages:send",
+            // "https://fcm.googleapis.com/v1/redjuniors-be113/messages:send"
+            'https://fcm.googleapis.com/fcm/send'),
+        body: json.encode(data),
+        encoding: Encoding.getByName('utf-8'),
+        headers: headers);
+
+    log(response.body);
+    if (response.statusCode == 200) {
+      // on success do sth
+      return true;
+    } else {
+      // on failure do sth
+      return false;
+    }
+  }
+}
+
+Future<File> compressFile(File file, String targetPath) async {
+  var result = await FlutterImageCompress.compressAndGetFile(
+    file.absolute.path,
+    targetPath,
+    quality: 88,
+  );
+
+  print(file.lengthSync());
+
+  return File(result!.path);
 }
 
 extension on DateTime {
