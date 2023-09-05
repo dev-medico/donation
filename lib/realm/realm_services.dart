@@ -19,6 +19,10 @@ class RealmServices with ChangeNotifier {
   static const String queryAllSpecialEvent = "getAllSpecialEvent";
   static const String queryAllDonar = "getAllDonar";
   static const String queryAllExpenseRecord = "queryAllExpenseRecord";
+  static const String queryAllPost = "queryAllPost";
+  static const String queryAllNotification = "queryAllNotification";
+  static const String queryAllReaction = "queryAllReaction";
+  static const String queryAllComment = "queryAllReaction";
 
   bool offlineModeOn = false;
   bool isWaiting = false;
@@ -37,12 +41,14 @@ class RealmServices with ChangeNotifier {
             Member.schema,
             SpecialEvent.schema,
             DonarRecord.schema,
-            ExpensesRecord.schema
+            ExpensesRecord.schema,
+            Post.schema,
+            Noti.schema,
+            Reaction.schema,
+            Comment.schema,
           ],
         ),
       );
-
-      
 
       updateSubscriptions();
     }
@@ -60,6 +66,10 @@ class RealmServices with ChangeNotifier {
       mutableSubscriptions.add(realm.all<DonarRecord>(), name: queryAllDonar);
       mutableSubscriptions.add(realm.all<ExpensesRecord>(),
           name: queryAllExpenseRecord);
+      mutableSubscriptions.add(realm.all<Post>(), name: queryAllPost);
+      mutableSubscriptions.add(realm.all<Noti>(), name: queryAllNotification);
+      mutableSubscriptions.add(realm.all<Reaction>(), name: queryAllReaction);
+      mutableSubscriptions.add(realm.all<Comment>(), name: queryAllComment);
     });
     await realm.subscriptions.waitForSynchronization();
   }

@@ -558,9 +558,8 @@ class ExpensesRecord extends _ExpensesRecord
   }
 }
 
-class Notification extends _Notification
-    with RealmEntity, RealmObjectBase, RealmObject {
-  Notification(
+class Noti extends _Noti with RealmEntity, RealmObjectBase, RealmObject {
+  Noti(
     ObjectId id, {
     String? title,
     String? body,
@@ -572,7 +571,7 @@ class Notification extends _Notification
     RealmObjectBase.set(this, 'payload', payload);
   }
 
-  Notification._();
+  Noti._();
 
   @override
   ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
@@ -596,18 +595,17 @@ class Notification extends _Notification
   set payload(String? value) => RealmObjectBase.set(this, 'payload', value);
 
   @override
-  Stream<RealmObjectChanges<Notification>> get changes =>
-      RealmObjectBase.getChanges<Notification>(this);
+  Stream<RealmObjectChanges<Noti>> get changes =>
+      RealmObjectBase.getChanges<Noti>(this);
 
   @override
-  Notification freeze() => RealmObjectBase.freezeObject<Notification>(this);
+  Noti freeze() => RealmObjectBase.freezeObject<Noti>(this);
 
   static SchemaObject get schema => _schema ??= _initSchema();
   static SchemaObject? _schema;
   static SchemaObject _initSchema() {
-    RealmObjectBase.registerFactory(Notification._);
-    return const SchemaObject(
-        ObjectType.realmObject, Notification, 'Notification', [
+    RealmObjectBase.registerFactory(Noti._);
+    return const SchemaObject(ObjectType.realmObject, Noti, 'Noti', [
       SchemaProperty('id', RealmPropertyType.objectid,
           mapTo: '_id', primaryKey: true),
       SchemaProperty('title', RealmPropertyType.string, optional: true),

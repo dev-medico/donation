@@ -83,7 +83,7 @@ class _ExpensesRecord {
 }
 
 @RealmModel()
-class _Notification {
+class _Noti {
   @MapTo('_id')
   @PrimaryKey()
   late ObjectId id;
