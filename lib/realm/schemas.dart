@@ -19,6 +19,7 @@ class _Member {
   String? nrc;
   String? phone;
   String? address;
+  String? profileUrl;
   DateTime? registerDate;
   String? totalCount;
   String? status;
@@ -79,4 +80,46 @@ class _ExpensesRecord {
   int? amount;
   DateTime? date;
   String? name;
+}
+
+@RealmModel()
+class _Notification {
+  @MapTo('_id')
+  @PrimaryKey()
+  late ObjectId id;
+  String? title;
+  String? body;
+  String? payload;
+}
+
+@RealmModel()
+class _Post {
+  @MapTo('_id')
+  @PrimaryKey()
+  late ObjectId id;
+  String? text;
+  late List<String> images;
+  late List<_Reaction> reactions;
+  late List<_Comment> comments;
+}
+
+@RealmModel()
+class _Reaction {
+  @MapTo('_id')
+  @PrimaryKey()
+  late ObjectId id;
+  String? emoji;
+  String? type;
+  _Member? member;
+}
+
+@RealmModel()
+class _Comment {
+  @MapTo('_id')
+  @PrimaryKey()
+  late ObjectId id;
+  String? text;
+  _Member? member;
+  late List<_Reaction> reactions;
+  late List<_Comment> comments;
 }

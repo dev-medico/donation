@@ -22,6 +22,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
     String? nrc,
     String? phone,
     String? address,
+    String? profileUrl,
     DateTime? registerDate,
     String? totalCount,
     String? status,
@@ -39,6 +40,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
     RealmObjectBase.set(this, 'nrc', nrc);
     RealmObjectBase.set(this, 'phone', phone);
     RealmObjectBase.set(this, 'address', address);
+    RealmObjectBase.set(this, 'profileUrl', profileUrl);
     RealmObjectBase.set(this, 'registerDate', registerDate);
     RealmObjectBase.set(this, 'totalCount', totalCount);
     RealmObjectBase.set(this, 'status', status);
@@ -124,6 +126,13 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
   set address(String? value) => RealmObjectBase.set(this, 'address', value);
 
   @override
+  String? get profileUrl =>
+      RealmObjectBase.get<String>(this, 'profileUrl') as String?;
+  @override
+  set profileUrl(String? value) =>
+      RealmObjectBase.set(this, 'profileUrl', value);
+
+  @override
   DateTime? get registerDate =>
       RealmObjectBase.get<DateTime>(this, 'registerDate') as DateTime?;
   @override
@@ -173,6 +182,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
       SchemaProperty('nrc', RealmPropertyType.string, optional: true),
       SchemaProperty('phone', RealmPropertyType.string, optional: true),
       SchemaProperty('address', RealmPropertyType.string, optional: true),
+      SchemaProperty('profileUrl', RealmPropertyType.string, optional: true),
       SchemaProperty('registerDate', RealmPropertyType.timestamp,
           optional: true),
       SchemaProperty('totalCount', RealmPropertyType.string, optional: true),
@@ -544,6 +554,274 @@ class ExpensesRecord extends _ExpensesRecord
       SchemaProperty('amount', RealmPropertyType.int, optional: true),
       SchemaProperty('date', RealmPropertyType.timestamp, optional: true),
       SchemaProperty('name', RealmPropertyType.string, optional: true),
+    ]);
+  }
+}
+
+class Notification extends _Notification
+    with RealmEntity, RealmObjectBase, RealmObject {
+  Notification(
+    ObjectId id, {
+    String? title,
+    String? body,
+    String? payload,
+  }) {
+    RealmObjectBase.set(this, '_id', id);
+    RealmObjectBase.set(this, 'title', title);
+    RealmObjectBase.set(this, 'body', body);
+    RealmObjectBase.set(this, 'payload', payload);
+  }
+
+  Notification._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, '_id', value);
+
+  @override
+  String? get title => RealmObjectBase.get<String>(this, 'title') as String?;
+  @override
+  set title(String? value) => RealmObjectBase.set(this, 'title', value);
+
+  @override
+  String? get body => RealmObjectBase.get<String>(this, 'body') as String?;
+  @override
+  set body(String? value) => RealmObjectBase.set(this, 'body', value);
+
+  @override
+  String? get payload =>
+      RealmObjectBase.get<String>(this, 'payload') as String?;
+  @override
+  set payload(String? value) => RealmObjectBase.set(this, 'payload', value);
+
+  @override
+  Stream<RealmObjectChanges<Notification>> get changes =>
+      RealmObjectBase.getChanges<Notification>(this);
+
+  @override
+  Notification freeze() => RealmObjectBase.freezeObject<Notification>(this);
+
+  static SchemaObject get schema => _schema ??= _initSchema();
+  static SchemaObject? _schema;
+  static SchemaObject _initSchema() {
+    RealmObjectBase.registerFactory(Notification._);
+    return const SchemaObject(
+        ObjectType.realmObject, Notification, 'Notification', [
+      SchemaProperty('id', RealmPropertyType.objectid,
+          mapTo: '_id', primaryKey: true),
+      SchemaProperty('title', RealmPropertyType.string, optional: true),
+      SchemaProperty('body', RealmPropertyType.string, optional: true),
+      SchemaProperty('payload', RealmPropertyType.string, optional: true),
+    ]);
+  }
+}
+
+class Post extends _Post with RealmEntity, RealmObjectBase, RealmObject {
+  Post(
+    ObjectId id, {
+    String? text,
+    Iterable<String> images = const [],
+    Iterable<Reaction> reactions = const [],
+    Iterable<Comment> comments = const [],
+  }) {
+    RealmObjectBase.set(this, '_id', id);
+    RealmObjectBase.set(this, 'text', text);
+    RealmObjectBase.set<RealmList<String>>(
+        this, 'images', RealmList<String>(images));
+    RealmObjectBase.set<RealmList<Reaction>>(
+        this, 'reactions', RealmList<Reaction>(reactions));
+    RealmObjectBase.set<RealmList<Comment>>(
+        this, 'comments', RealmList<Comment>(comments));
+  }
+
+  Post._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, '_id', value);
+
+  @override
+  String? get text => RealmObjectBase.get<String>(this, 'text') as String?;
+  @override
+  set text(String? value) => RealmObjectBase.set(this, 'text', value);
+
+  @override
+  RealmList<String> get images =>
+      RealmObjectBase.get<String>(this, 'images') as RealmList<String>;
+  @override
+  set images(covariant RealmList<String> value) =>
+      throw RealmUnsupportedSetError();
+
+  @override
+  RealmList<Reaction> get reactions =>
+      RealmObjectBase.get<Reaction>(this, 'reactions') as RealmList<Reaction>;
+  @override
+  set reactions(covariant RealmList<Reaction> value) =>
+      throw RealmUnsupportedSetError();
+
+  @override
+  RealmList<Comment> get comments =>
+      RealmObjectBase.get<Comment>(this, 'comments') as RealmList<Comment>;
+  @override
+  set comments(covariant RealmList<Comment> value) =>
+      throw RealmUnsupportedSetError();
+
+  @override
+  Stream<RealmObjectChanges<Post>> get changes =>
+      RealmObjectBase.getChanges<Post>(this);
+
+  @override
+  Post freeze() => RealmObjectBase.freezeObject<Post>(this);
+
+  static SchemaObject get schema => _schema ??= _initSchema();
+  static SchemaObject? _schema;
+  static SchemaObject _initSchema() {
+    RealmObjectBase.registerFactory(Post._);
+    return const SchemaObject(ObjectType.realmObject, Post, 'Post', [
+      SchemaProperty('id', RealmPropertyType.objectid,
+          mapTo: '_id', primaryKey: true),
+      SchemaProperty('text', RealmPropertyType.string, optional: true),
+      SchemaProperty('images', RealmPropertyType.string,
+          collectionType: RealmCollectionType.list),
+      SchemaProperty('reactions', RealmPropertyType.object,
+          linkTarget: 'Reaction', collectionType: RealmCollectionType.list),
+      SchemaProperty('comments', RealmPropertyType.object,
+          linkTarget: 'Comment', collectionType: RealmCollectionType.list),
+    ]);
+  }
+}
+
+class Reaction extends _Reaction
+    with RealmEntity, RealmObjectBase, RealmObject {
+  Reaction(
+    ObjectId id, {
+    String? emoji,
+    String? type,
+    Member? member,
+  }) {
+    RealmObjectBase.set(this, '_id', id);
+    RealmObjectBase.set(this, 'emoji', emoji);
+    RealmObjectBase.set(this, 'type', type);
+    RealmObjectBase.set(this, 'member', member);
+  }
+
+  Reaction._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, '_id', value);
+
+  @override
+  String? get emoji => RealmObjectBase.get<String>(this, 'emoji') as String?;
+  @override
+  set emoji(String? value) => RealmObjectBase.set(this, 'emoji', value);
+
+  @override
+  String? get type => RealmObjectBase.get<String>(this, 'type') as String?;
+  @override
+  set type(String? value) => RealmObjectBase.set(this, 'type', value);
+
+  @override
+  Member? get member => RealmObjectBase.get<Member>(this, 'member') as Member?;
+  @override
+  set member(covariant Member? value) =>
+      RealmObjectBase.set(this, 'member', value);
+
+  @override
+  Stream<RealmObjectChanges<Reaction>> get changes =>
+      RealmObjectBase.getChanges<Reaction>(this);
+
+  @override
+  Reaction freeze() => RealmObjectBase.freezeObject<Reaction>(this);
+
+  static SchemaObject get schema => _schema ??= _initSchema();
+  static SchemaObject? _schema;
+  static SchemaObject _initSchema() {
+    RealmObjectBase.registerFactory(Reaction._);
+    return const SchemaObject(ObjectType.realmObject, Reaction, 'Reaction', [
+      SchemaProperty('id', RealmPropertyType.objectid,
+          mapTo: '_id', primaryKey: true),
+      SchemaProperty('emoji', RealmPropertyType.string, optional: true),
+      SchemaProperty('type', RealmPropertyType.string, optional: true),
+      SchemaProperty('member', RealmPropertyType.object,
+          optional: true, linkTarget: 'Member'),
+    ]);
+  }
+}
+
+class Comment extends _Comment with RealmEntity, RealmObjectBase, RealmObject {
+  Comment(
+    ObjectId id, {
+    String? text,
+    Member? member,
+    Iterable<Reaction> reactions = const [],
+    Iterable<Comment> comments = const [],
+  }) {
+    RealmObjectBase.set(this, '_id', id);
+    RealmObjectBase.set(this, 'text', text);
+    RealmObjectBase.set(this, 'member', member);
+    RealmObjectBase.set<RealmList<Reaction>>(
+        this, 'reactions', RealmList<Reaction>(reactions));
+    RealmObjectBase.set<RealmList<Comment>>(
+        this, 'comments', RealmList<Comment>(comments));
+  }
+
+  Comment._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, '_id', value);
+
+  @override
+  String? get text => RealmObjectBase.get<String>(this, 'text') as String?;
+  @override
+  set text(String? value) => RealmObjectBase.set(this, 'text', value);
+
+  @override
+  Member? get member => RealmObjectBase.get<Member>(this, 'member') as Member?;
+  @override
+  set member(covariant Member? value) =>
+      RealmObjectBase.set(this, 'member', value);
+
+  @override
+  RealmList<Reaction> get reactions =>
+      RealmObjectBase.get<Reaction>(this, 'reactions') as RealmList<Reaction>;
+  @override
+  set reactions(covariant RealmList<Reaction> value) =>
+      throw RealmUnsupportedSetError();
+
+  @override
+  RealmList<Comment> get comments =>
+      RealmObjectBase.get<Comment>(this, 'comments') as RealmList<Comment>;
+  @override
+  set comments(covariant RealmList<Comment> value) =>
+      throw RealmUnsupportedSetError();
+
+  @override
+  Stream<RealmObjectChanges<Comment>> get changes =>
+      RealmObjectBase.getChanges<Comment>(this);
+
+  @override
+  Comment freeze() => RealmObjectBase.freezeObject<Comment>(this);
+
+  static SchemaObject get schema => _schema ??= _initSchema();
+  static SchemaObject? _schema;
+  static SchemaObject _initSchema() {
+    RealmObjectBase.registerFactory(Comment._);
+    return const SchemaObject(ObjectType.realmObject, Comment, 'Comment', [
+      SchemaProperty('id', RealmPropertyType.objectid,
+          mapTo: '_id', primaryKey: true),
+      SchemaProperty('text', RealmPropertyType.string, optional: true),
+      SchemaProperty('member', RealmPropertyType.object,
+          optional: true, linkTarget: 'Member'),
+      SchemaProperty('reactions', RealmPropertyType.object,
+          linkTarget: 'Reaction', collectionType: RealmCollectionType.list),
+      SchemaProperty('comments', RealmPropertyType.object,
+          linkTarget: 'Comment', collectionType: RealmCollectionType.list),
     ]);
   }
 }
