@@ -1,17 +1,22 @@
+import 'dart:developer';
 import 'dart:ffi';
 import 'dart:io';
+import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/common_widgets/customLoader.dart';
 import 'package:donation/src/features/feed/widget/circular_image.dart';
 import 'package:donation/src/features/feed/widget/composeBottomIconWidget.dart';
-import 'package:donation/src/features/feed/widget/composeTweetImage.dart';
 import 'package:donation/src/features/feed/widget/customAppBar.dart';
 import 'package:donation/src/features/feed/widget/customUrlText.dart';
+import 'package:donation/src/features/feed/widget/newfeed_multiple_imageview.dart';
 import 'package:donation/src/features/feed/widgetView.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider/provider.dart';
+import 'package:realm/realm.dart';
 
 final scrollingDownController = StateProvider((ref) => false);
 final isBusyController = StateProvider((ref) => false);
@@ -31,8 +36,9 @@ class _ComposeTweetReplyPageState extends ConsumerState<NewPostScreen> {
   bool isScrollingDown = false;
   late Post? model;
   late ScrollController scrollController;
+  late CustomLoader loader;
 
-  List<File> images = [];
+  List<String> images = [];
   late TextEditingController _textEditingController;
 
   @override
@@ -47,6 +53,7 @@ class _ComposeTweetReplyPageState extends ConsumerState<NewPostScreen> {
     scrollController = ScrollController();
     _textEditingController = TextEditingController();
     scrollController.addListener(_scrollListener);
+    loader = CustomLoader();
     super.initState();
   }
 
@@ -63,15 +70,19 @@ class _ComposeTweetReplyPageState extends ConsumerState<NewPostScreen> {
     }
   }
 
-  void _onCrossIconPressed() {
-    images = [];
+  void onCrossIconPressed(int index) {
+    setState(() {
+      images.removeAt(index);
+    });
   }
 
   void _onImageIconSelected(List<File> files) {
-    images.addAll(files);
+    log("Result " + files.length.toString());
+    setState(() {
+      images.addAll(files.map((e) => e.path).toList());
+    });
   }
 
-  /// Submit tweet to save in firebase database
   void _submitButton() async {
     if (_textEditingController.text.isEmpty ||
         _textEditingController.text.length > 280) {
@@ -79,25 +90,28 @@ class _ComposeTweetReplyPageState extends ConsumerState<NewPostScreen> {
     }
 
     await createTweetModel();
-    String? tweetId;
 
-    /// If tweet contain image
-    /// First image is uploaded on firebase storage
-    /// After successful image upload to firebase storage it returns image path
-    /// Add this image path to tweet model and save to firebase database
-    if (images.isNotEmpty) {
-      //imagePath
-    }
-
-    /// If tweet did not contain image
-    else {}
     Navigator.pop(context);
   }
 
   createTweetModel() async {
-    var profilePic = dummyProfilePic;
+    loader.showLoader(context);
+    List<String> imageUrls = [];
+    if (images.isNotEmpty) {
+      imageUrls = await Utils.uploadToFireStorage(
+          images.map((e) => File(e)).toList(), ref);
+    }
+    var newPost = Post(
+      ObjectId(),
+      text: _textEditingController.text,
+      images: imageUrls,
+      createdAt: DateTime.now(),
+      postedBy: "Red Juniors",
+      posterProfileUrl: dummyProfilePic,
+    );
 
-    _textEditingController.text;
+    ref.watch(realmProvider)!.createPost(newPost);
+    loader.hideLoader();
   }
 
   @override
@@ -158,18 +172,62 @@ class _ComposeTweetReplyPageState extends ConsumerState<NewPostScreen> {
             ],
           ),
           Flexible(
-            child: Stack(
-              children: <Widget>[
-                ComposeTweetImages(
-                  images: images,
-                  onCrossIconPressed: _onCrossIconPressed,
+            child: Container(
+                margin: EdgeInsets.only(top: 12),
+                child: images.isEmpty
+                    ? Container()
+                    : NewsfeedMultipleImageView(
+                        imageUrls: images,
+                        type: 'post',
+                        onImageDeleted: onCrossIconPressed,
+                      )
+                // : ListView.builder(
+                //     itemCount: images.length,
+                //     itemBuilder: (context, index) {
+                //       return Stack(
+                //         children: <Widget>[
+                //           InteractiveViewer(
+                //             child: Container(
+                //               alignment: Alignment.topRight,
+                //               child: Container(
+                //                 height: 220,
+                //                 width: MediaQuery.of(context).size.width * .8,
+                //                 decoration: BoxDecoration(
+                //                   borderRadius: const BorderRadius.all(
+                //                       Radius.circular(10)),
+                //                   image: DecorationImage(
+                //                       image: FileImage(images[index]),
+                //                       fit: BoxFit.cover),
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //           Align(
+                //             alignment: Alignment.topRight,
+                //             child: Container(
+                //               padding: const EdgeInsets.all(0),
+                //               decoration: const BoxDecoration(
+                //                   shape: BoxShape.circle,
+                //                   color: Colors.black54),
+                //               child: IconButton(
+                //                 padding: const EdgeInsets.all(0),
+                //                 iconSize: 20,
+                //                 onPressed: () {
+                //                   onCrossIconPressed(index);
+                //                 },
+                //                 icon: Icon(
+                //                   Icons.close,
+                //                   color:
+                //                       Theme.of(context).colorScheme.onPrimary,
+                //                 ),
+                //               ),
+                //             ),
+                //           )
+                //         ],
+                //       );
+                //     },
+                //   ),
                 ),
-                // _UserList(
-                //   list: Provider.of<SearchState>(context).userlist,
-                //   textEditingController: viewState._textEditingController,
-                // )
-              ],
-            ),
           ),
         ],
       ),
@@ -190,6 +248,7 @@ class _TextField extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         TextField(
+          style: const TextStyle(fontSize: 15, letterSpacing: 0.5, height: 1.5),
           controller: textEditingController,
           onChanged: (text) {},
           maxLines: null,

@@ -1,130 +1,68 @@
-import 'package:donation/realm/schemas.dart';
-import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
-import 'package:donation/src/features/feed/new_noti.dart';
-import 'package:donation/src/features/feed/new_post.dart';
-import 'package:donation/utils/Colors.dart';
-import 'package:donation/utils/app_icons.dart';
-import 'package:donation/utils/tool_widgets.dart';
+import 'package:donation/src/common_widgets/customLoader.dart';
+import 'package:donation/src/common_widgets/emptyList.dart';
+import 'package:donation/src/features/feed/controller/feed_controller.dart';
+import 'package:donation/src/features/feed/post.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class FeedScreen extends StatefulWidget {
-  final Member? data;
-  final bool? isEditable;
-  FeedScreen({Key? key, required this.data, this.isEditable = true})
-      : super(key: key);
+class FeedScreen extends ConsumerStatefulWidget {
+  const FeedScreen({super.key});
 
   @override
-  State<FeedScreen> createState() => _FeedScreenState();
+  ConsumerState<FeedScreen> createState() => _FeedScreenState();
 }
 
-class _FeedScreenState extends State<FeedScreen> {
+class _FeedScreenState extends ConsumerState<FeedScreen> {
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NewPostScreen(),
-            ),
-          );
-        },
-        child: customIcon(
-          context,
-          icon: AppIcon.fabTweet,
-          isTwitterIcon: true,
-          iconColor: Colors.white,
-          size: 25,
-        ),
-      ),
-      // floatingActionButton: FloatingActionButton(
-      //     backgroundColor: primaryColor,
-      //     child: Icon(
-      //       Icons.add,
-      //       color: Colors.white,
-      //     ),
-      //     onPressed: () {
-      //       Navigator.push(
-      //         context,
-      //         MaterialPageRoute(
-      //           builder: (context) => NewFeedScreen(),
-      //         ),
-      //       );
-      //     }),
-      body: DefaultTabController(
-        length: 2,
-        initialIndex: 0,
-        child: Container(
-          margin: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top + 8,
-          ),
-          child: Stack(
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: 60),
-                child: TabBarView(
-                  children: [
-                    Container(
-                      color: Colors.white,
-                      child: Center(
-                        child: Text(" No Post Yet",
-                            style: TextStyle(
-                                fontSize: 19,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.red)),
-                      ),
-                    ),
-                    MemberDetailScreen(
-                      data: widget.data!,
-                      isEditable: widget.isEditable!,
-                    ),
-                  ],
+    var streamAsyncValue = ref.watch(postDataProvider);
+    return CustomScrollView(
+      slivers: <Widget>[
+        streamAsyncValue.when(
+          data: (savedData) {
+            final results = savedData.results;
+            if (results.isEmpty) {
+              return SliverToBoxAdapter(
+                child: EmptyList(
+                  'No Post added yet',
+                  subTitle:
+                      'When new Post added, they\'ll show up here \n Tap post button to add new',
+                ),
+              );
+            } else {
+              return SliverList(
+                delegate: SliverChildListDelegate(
+                  results.map(
+                    (post) {
+                      return Container(
+                        color: Colors.white,
+                        child: PostItem(
+                          model: post,
+                          scaffoldKey: scaffoldKey,
+                        ),
+                      );
+                    },
+                  ).toList(),
+                ),
+              );
+            }
+          },
+          error: (Object error, StackTrace stackTrace) {
+            return Text(error.toString());
+          },
+          loading: () {
+            return SliverToBoxAdapter(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height - 135,
+                child: CustomScreenLoader(
+                  height: double.infinity,
+                  width: double.infinity,
+                  backgroundColor: Colors.white,
                 ),
               ),
-              Container(
-                  height: 54,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 52,
-                        child: getTabbar(),
-                      ),
-                      PreferredSize(
-                        child: Container(
-                          color: Colors.grey.shade200,
-                          height: 1.0,
-                        ),
-                        preferredSize: const Size.fromHeight(0.0),
-                      ),
-                    ],
-                  ))
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  getTabbar() {
-    return TabBar(
-      unselectedLabelColor: Colors.grey,
-      labelColor: Colors.black,
-      indicatorWeight: 4,
-      indicatorColor: primaryColor,
-      indicatorSize: TabBarIndicatorSize.label,
-      tabs: [
-        Tab(
-          height: 50,
-          child: Text(" For you ",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-        ),
-        Tab(
-          height: 50,
-          child: Text(" အဖွဲ့ဝင်မှတ်တမ်း ",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+            );
+          },
         ),
       ],
     );

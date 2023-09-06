@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:donation/src/features/feed/widget/customText.dart';
@@ -119,19 +120,21 @@ class _ComposeBottomIconWidgetState extends State<ComposeBottomIconWidget> {
     ImagePicker()
         .pickImage(source: ImageSource.camera, imageQuality: 20)
         .then((XFile? file) {
-      setState(() {
-        // _image = file;
-        widget.onImageIconSelected([File(file!.path)]);
-      });
+      if (file != null) {
+        setState(() {
+          widget.onImageIconSelected([File(file.path)]);
+        });
+      }
     });
   }
 
   void setImageGallery() {
     ImagePicker().pickMultiImage(imageQuality: 20).then((List<XFile>? files) {
+      log("message: " + files!.length.toString());
       setState(() {
         List<File> results = [];
-        if (files == null) {
-          files!.forEach((element) {
+        if (files.isNotEmpty) {
+          files.forEach((element) {
             results.add(File(element.path));
           });
         }

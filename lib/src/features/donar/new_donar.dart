@@ -87,7 +87,7 @@ class NewDonarState extends ConsumerState<NewDonarScreen> {
   }
 
   void initial() async {
-    donationDateDetail = DateTime.now();
+    donationDateDetail = DateTime.now().toLocal();
     donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
 
     final String response =

@@ -90,6 +90,7 @@ class _Noti {
   String? title;
   String? body;
   String? payload;
+  DateTime? createdAt;
 }
 
 @RealmModel()
@@ -101,6 +102,9 @@ class _Post {
   late List<String> images;
   late List<_Reaction> reactions;
   late List<_Comment> comments;
+  DateTime? createdAt;
+  String? postedBy;
+  String? posterProfileUrl;
 }
 
 @RealmModel()
@@ -111,6 +115,7 @@ class _Reaction {
   String? emoji;
   String? type;
   _Member? member;
+  DateTime? createdAt;
 }
 
 @RealmModel()
@@ -122,4 +127,5 @@ class _Comment {
   _Member? member;
   late List<_Reaction> reactions;
   late List<_Comment> comments;
+  DateTime? createdAt;
 }

@@ -564,11 +564,13 @@ class Noti extends _Noti with RealmEntity, RealmObjectBase, RealmObject {
     String? title,
     String? body,
     String? payload,
+    DateTime? createdAt,
   }) {
     RealmObjectBase.set(this, '_id', id);
     RealmObjectBase.set(this, 'title', title);
     RealmObjectBase.set(this, 'body', body);
     RealmObjectBase.set(this, 'payload', payload);
+    RealmObjectBase.set(this, 'createdAt', createdAt);
   }
 
   Noti._();
@@ -595,6 +597,13 @@ class Noti extends _Noti with RealmEntity, RealmObjectBase, RealmObject {
   set payload(String? value) => RealmObjectBase.set(this, 'payload', value);
 
   @override
+  DateTime? get createdAt =>
+      RealmObjectBase.get<DateTime>(this, 'createdAt') as DateTime?;
+  @override
+  set createdAt(DateTime? value) =>
+      RealmObjectBase.set(this, 'createdAt', value);
+
+  @override
   Stream<RealmObjectChanges<Noti>> get changes =>
       RealmObjectBase.getChanges<Noti>(this);
 
@@ -611,6 +620,7 @@ class Noti extends _Noti with RealmEntity, RealmObjectBase, RealmObject {
       SchemaProperty('title', RealmPropertyType.string, optional: true),
       SchemaProperty('body', RealmPropertyType.string, optional: true),
       SchemaProperty('payload', RealmPropertyType.string, optional: true),
+      SchemaProperty('createdAt', RealmPropertyType.timestamp, optional: true),
     ]);
   }
 }
@@ -619,12 +629,18 @@ class Post extends _Post with RealmEntity, RealmObjectBase, RealmObject {
   Post(
     ObjectId id, {
     String? text,
+    DateTime? createdAt,
+    String? postedBy,
+    String? posterProfileUrl,
     Iterable<String> images = const [],
     Iterable<Reaction> reactions = const [],
     Iterable<Comment> comments = const [],
   }) {
     RealmObjectBase.set(this, '_id', id);
     RealmObjectBase.set(this, 'text', text);
+    RealmObjectBase.set(this, 'createdAt', createdAt);
+    RealmObjectBase.set(this, 'postedBy', postedBy);
+    RealmObjectBase.set(this, 'posterProfileUrl', posterProfileUrl);
     RealmObjectBase.set<RealmList<String>>(
         this, 'images', RealmList<String>(images));
     RealmObjectBase.set<RealmList<Reaction>>(
@@ -667,6 +683,26 @@ class Post extends _Post with RealmEntity, RealmObjectBase, RealmObject {
       throw RealmUnsupportedSetError();
 
   @override
+  DateTime? get createdAt =>
+      RealmObjectBase.get<DateTime>(this, 'createdAt') as DateTime?;
+  @override
+  set createdAt(DateTime? value) =>
+      RealmObjectBase.set(this, 'createdAt', value);
+
+  @override
+  String? get postedBy =>
+      RealmObjectBase.get<String>(this, 'postedBy') as String?;
+  @override
+  set postedBy(String? value) => RealmObjectBase.set(this, 'postedBy', value);
+
+  @override
+  String? get posterProfileUrl =>
+      RealmObjectBase.get<String>(this, 'posterProfileUrl') as String?;
+  @override
+  set posterProfileUrl(String? value) =>
+      RealmObjectBase.set(this, 'posterProfileUrl', value);
+
+  @override
   Stream<RealmObjectChanges<Post>> get changes =>
       RealmObjectBase.getChanges<Post>(this);
 
@@ -687,6 +723,10 @@ class Post extends _Post with RealmEntity, RealmObjectBase, RealmObject {
           linkTarget: 'Reaction', collectionType: RealmCollectionType.list),
       SchemaProperty('comments', RealmPropertyType.object,
           linkTarget: 'Comment', collectionType: RealmCollectionType.list),
+      SchemaProperty('createdAt', RealmPropertyType.timestamp, optional: true),
+      SchemaProperty('postedBy', RealmPropertyType.string, optional: true),
+      SchemaProperty('posterProfileUrl', RealmPropertyType.string,
+          optional: true),
     ]);
   }
 }
@@ -698,11 +738,13 @@ class Reaction extends _Reaction
     String? emoji,
     String? type,
     Member? member,
+    DateTime? createdAt,
   }) {
     RealmObjectBase.set(this, '_id', id);
     RealmObjectBase.set(this, 'emoji', emoji);
     RealmObjectBase.set(this, 'type', type);
     RealmObjectBase.set(this, 'member', member);
+    RealmObjectBase.set(this, 'createdAt', createdAt);
   }
 
   Reaction._();
@@ -729,6 +771,13 @@ class Reaction extends _Reaction
       RealmObjectBase.set(this, 'member', value);
 
   @override
+  DateTime? get createdAt =>
+      RealmObjectBase.get<DateTime>(this, 'createdAt') as DateTime?;
+  @override
+  set createdAt(DateTime? value) =>
+      RealmObjectBase.set(this, 'createdAt', value);
+
+  @override
   Stream<RealmObjectChanges<Reaction>> get changes =>
       RealmObjectBase.getChanges<Reaction>(this);
 
@@ -746,6 +795,7 @@ class Reaction extends _Reaction
       SchemaProperty('type', RealmPropertyType.string, optional: true),
       SchemaProperty('member', RealmPropertyType.object,
           optional: true, linkTarget: 'Member'),
+      SchemaProperty('createdAt', RealmPropertyType.timestamp, optional: true),
     ]);
   }
 }
@@ -755,12 +805,14 @@ class Comment extends _Comment with RealmEntity, RealmObjectBase, RealmObject {
     ObjectId id, {
     String? text,
     Member? member,
+    DateTime? createdAt,
     Iterable<Reaction> reactions = const [],
     Iterable<Comment> comments = const [],
   }) {
     RealmObjectBase.set(this, '_id', id);
     RealmObjectBase.set(this, 'text', text);
     RealmObjectBase.set(this, 'member', member);
+    RealmObjectBase.set(this, 'createdAt', createdAt);
     RealmObjectBase.set<RealmList<Reaction>>(
         this, 'reactions', RealmList<Reaction>(reactions));
     RealmObjectBase.set<RealmList<Comment>>(
@@ -800,6 +852,13 @@ class Comment extends _Comment with RealmEntity, RealmObjectBase, RealmObject {
       throw RealmUnsupportedSetError();
 
   @override
+  DateTime? get createdAt =>
+      RealmObjectBase.get<DateTime>(this, 'createdAt') as DateTime?;
+  @override
+  set createdAt(DateTime? value) =>
+      RealmObjectBase.set(this, 'createdAt', value);
+
+  @override
   Stream<RealmObjectChanges<Comment>> get changes =>
       RealmObjectBase.getChanges<Comment>(this);
 
@@ -820,6 +879,7 @@ class Comment extends _Comment with RealmEntity, RealmObjectBase, RealmObject {
           linkTarget: 'Reaction', collectionType: RealmCollectionType.list),
       SchemaProperty('comments', RealmPropertyType.object,
           linkTarget: 'Comment', collectionType: RealmCollectionType.list),
+      SchemaProperty('createdAt', RealmPropertyType.timestamp, optional: true),
     ]);
   }
 }

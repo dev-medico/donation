@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 Color primaryColor = const Color(0xffA70507);
+const Color darkGrey = Color(0xff1657786);
+Color mystic = const Color.fromRGBO(230, 236, 240, 1.0);
 Color paleSky = const Color.fromRGBO(101, 119, 133, 1.0);
 Color extraLightGrey = Color(0xffE1E8ED);
 Color primaryDark = const Color(0xffC01719);
@@ -15,3 +17,4 @@ const creamColor = Color(0xFFFFFFFF);
 const snowColor = Color(0xFFFFFAFA);
 const bgColor = Color(0xFF212332);
 const secondaryColor = Color(0xFF333333);
+Color ceriseRed = const Color.fromRGBO(224, 36, 94, 1.0);

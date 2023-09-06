@@ -31,7 +31,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
   @override
   void initState() {
     super.initState();
-    var now = DateTime.now();
+    var now = DateTime.now().toLocal();
     String formattedDate = DateFormat('dd MMM yyyy').format(now);
     dateFilter = formattedDate;
   }

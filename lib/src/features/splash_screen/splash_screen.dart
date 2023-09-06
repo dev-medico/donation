@@ -5,7 +5,7 @@ import 'package:animated_widgets/animated_widgets.dart';
 import 'package:donation/realm/app_services.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
-import 'package:donation/src/features/feed/feed.dart';
+import 'package:donation/src/features/feed/feed_main.dart';
 import 'package:donation/src/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
@@ -54,10 +54,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               "member@gmail.com", "12345678");
         } catch (err) {}
         var member = ref.read(membersDataByPhoneProvider(memberPhone));
+        ref.read(loginMemberProvider.notifier).state = member;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => FeedScreen(
+            builder: (context) => FeedMainScreen(
               data: member!,
               isEditable: false,
             ),

@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
-import 'package:donation/src/features/feed/feed.dart';
+import 'package:donation/src/features/feed/feed_main.dart';
 import 'package:donation/src/features/new_features/member/member_detail_new_style.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
@@ -11,11 +12,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class OTPScreen extends StatefulWidget {
+class OTPScreen extends ConsumerStatefulWidget {
   final String? phone;
   final Member? member;
   final String? verificationId;
@@ -26,10 +28,10 @@ class OTPScreen extends StatefulWidget {
       required this.member})
       : super(key: key);
   @override
-  State<StatefulWidget> createState() => NewRegisterOTPState();
+  ConsumerState<OTPScreen> createState() => NewRegisterOTPState();
 }
 
-class NewRegisterOTPState extends State<OTPScreen> {
+class NewRegisterOTPState extends ConsumerState<OTPScreen> {
   String enterOTP = "";
 
   String? fire_token;
@@ -296,12 +298,13 @@ class NewRegisterOTPState extends State<OTPScreen> {
         log(prefs.getString("memberPhone") ?? "");
 
         Future.delayed(const Duration(seconds: 1), () {
+          ref.read(loginMemberProvider.notifier).state = widget.member!;
           // Navigator.pop(context);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  FeedScreen(data: widget.member!, isEditable: false),
+                  FeedMainScreen(data: widget.member!, isEditable: false),
             ),
           );
         });

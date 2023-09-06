@@ -460,7 +460,7 @@ class _NewNotiScreenState extends ConsumerState<NewNotiScreen> {
 
     var result =
         await compressFile(file!, tempDir.path + file!.path.split("/").last);
-    Utils.uploadToFireStorage(result, ref);
+    List<String> imageUrls = await Utils.uploadToFireStorage([result], ref);
   }
 
   Future getImagefromCamera() async {

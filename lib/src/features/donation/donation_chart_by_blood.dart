@@ -30,7 +30,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
   @override
   void initState() {
     super.initState();
-    var date = DateTime.now();
+    var date = DateTime.now().toLocal();
     donationYear = DateFormat('yyyy').format(date);
   }
 

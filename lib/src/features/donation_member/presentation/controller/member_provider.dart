@@ -59,6 +59,9 @@ final membersDataByPhoneProvider =
   return stream.isEmpty ? null : stream.first;
 });
 
+final loginMemberProvider = StateProvider<Member?>(
+    (ref) => null);
+
 final searchMemberStreamProvider =
     StreamProvider.family<RealmResultsChanges<Member>, SearchParams>(
         (ref, searchParam) {

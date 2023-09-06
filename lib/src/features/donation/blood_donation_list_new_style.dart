@@ -176,7 +176,7 @@ class _BloodDonationListNewStyleState
     //       existCount++;
     //       var donationDate = element.date.toString() != "null"
     //           ? DateTime.parse(element.date!.replaceAll("Z", ""))
-    //           : DateTime.now();
+    //           : DateTime.now().toLocal();
     //       bool noMember = ref
     //           .read(membersProvider)
     //           .where((data) =>

@@ -92,7 +92,7 @@ class NewDonarState extends ConsumerState<EditDonarScreen> {
       donationDateDetail = widget.donar!.date!;
       donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
     } else {
-      donationDateDetail = DateTime.now();
+      donationDateDetail = DateTime.now().toLocal();
       donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
     }
 

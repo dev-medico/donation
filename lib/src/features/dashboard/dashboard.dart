@@ -53,7 +53,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         data = [];
         for (int i = 0; i < dataList.length; i++) {
           //get current year
-          var date = DateTime.now();
+          var date = DateTime.now().toLocal();
           String donationYear = DateFormat('yyyy').format(date);
 
           var tempDate = "";
@@ -79,7 +79,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime date = DateTime.now();
+    DateTime date = DateTime.now().toLocal();
     String dateFormat = DateFormat('dd MMM yyyy ( EEEE )').format(date);
 
     return Scaffold(

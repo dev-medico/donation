@@ -33,6 +33,7 @@ dependencies:
   flutter_expandable_table: ^2.0.0
   flutter_hooks: ^0.18.6
   flutter_image_compress: ^2.0.4
+  flutter_image_slideshow: ^0.1.6
   flutter_local_notifications: ^15.1.1
   flutter_localizations:
     sdk: flutter
@@ -44,6 +45,7 @@ dependencies:
   flutter_zoom_drawer: ^3.1.1
   # google_fonts: ^2.3.2
   
+  google_fonts: ^4.0.4
   hooks_riverpod: ^2.3.6
   http: ^0.13.6
   image_picker: ^1.0.2
@@ -61,6 +63,7 @@ dependencies:
   syncfusion_flutter_charts: ^21.2.9
   syncfusion_flutter_datagrid: ^21.2.4
   tab_container: ^2.0.0
+  transparent_image: ^2.0.1
   url_launcher: ^6.1.11
 
 dev_dependencies:

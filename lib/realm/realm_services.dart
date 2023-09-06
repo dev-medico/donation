@@ -375,6 +375,11 @@ class RealmServices with ChangeNotifier {
     notifyListeners();
   }
 
+  void createPost(Post newPost) {
+    realm.write<Post>(() => realm.add<Post>(newPost));
+    notifyListeners();
+  }
+
   Future<void> close() async {
     if (currentUser != null) {
       await currentUser?.logOut();

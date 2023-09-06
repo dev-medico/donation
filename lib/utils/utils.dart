@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -47,6 +48,66 @@ class Utils {
       return false;
     }
     return double.tryParse(s) != null;
+  }
+
+  static String getPostTime2(DateTime date) {
+    var dat = DateFormat.jm().format(date) +
+        ' - ' +
+        DateFormat("dd MMM yy").format(date);
+    return dat;
+  }
+
+  static String getChatTime(DateTime date) {
+    String msg = '';
+    var dt = date.toLocal();
+
+    if (DateTime.now().toLocal().isBefore(dt)) {
+      return DateFormat.jm().format(date.toLocal()).toString();
+    }
+
+    var dur = DateTime.now().toLocal().difference(dt);
+    if (dur.inDays > 365) {
+      msg = DateFormat.yMMMd().format(dt);
+    } else if (dur.inDays > 30) {
+      msg = DateFormat.yMMMd().format(dt);
+    } else if (dur.inDays > 0) {
+      msg = '${dur.inDays} d';
+      return dur.inDays == 1 ? '1d' : DateFormat.MMMd().format(dt);
+    } else if (dur.inHours > 0) {
+      msg = '${dur.inHours} h';
+    } else if (dur.inMinutes > 0) {
+      msg = '${dur.inMinutes} m';
+    } else if (dur.inSeconds > 0) {
+      msg = '${dur.inSeconds} s';
+    } else {
+      msg = 'now';
+    }
+    return msg;
+  }
+
+  static void copyToClipBoard({
+    required BuildContext context,
+    required String text,
+    required String message,
+  }) {
+    var data = ClipboardData(text: text);
+    Clipboard.setData(data);
+    customSnackBar(context, message);
+  }
+
+  static customSnackBar(BuildContext context, String msg,
+      {double height = 30, Color backgroundColor = Colors.black}) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    final snackBar = SnackBar(
+      backgroundColor: backgroundColor,
+      content: Text(
+        msg,
+        style: const TextStyle(
+          color: Colors.white,
+        ),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   static showCupertinoDatePicker(
@@ -390,39 +451,23 @@ class Utils {
       ..show();
   }
 
-  static uploadToFireStorage(File file, WidgetRef ref) {
+  static Future<List<String>> uploadToFireStorage(
+      List<File> files, WidgetRef ref) async {
+    List<String> _downloadUrls = [];
+
     // Create a reference to the Firebase Storage bucket
     final storageRef = FirebaseStorage.instance.ref();
 
     // Upload file and metadata to the path 'images/mountains.jpg'
-    final uploadTask = storageRef
-        .child("images/" + file.path.split(Platform.pathSeparator).last)
-        .putFile(file);
-
-    uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) async {
-      switch (taskSnapshot.state) {
-        case TaskState.running:
-          final progress =
-              100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
-          ref.read(uploadProgressProvider.notifier).state = progress.toInt();
-          print("Upload is $progress% complete.");
-          break;
-        case TaskState.paused:
-          print("Upload is paused.");
-          break;
-        case TaskState.canceled:
-          print("Upload was canceled");
-          break;
-        case TaskState.error:
-          // Handle unsuccessful uploads
-          break;
-        case TaskState.success:
-          String link = await taskSnapshot.ref.getDownloadURL();
-          log("Link -  $link");
-          ref.read(downloadableUrlProvider.notifier).state = link;
-          break;
-      }
+    await Future.forEach(files, (file) async {
+      var uploadTask = storageRef
+          .child("images/" + file.path.split(Platform.pathSeparator).last)
+          .putFile(file);
+      var taskSnapshot = await uploadTask.whenComplete(() {});
+      final url = await taskSnapshot.ref.getDownloadURL();
+      _downloadUrls.add(url);
     });
+    return _downloadUrls;
   }
 
   static launchURL(String url) async {
