@@ -13,10 +13,12 @@ dependencies:
   animated_widgets: ^1.1.0
   # charts_flutter: ^0.12.0
   #cloud_firestore: ^4.7.0
+  cached_network_image: ^3.2.3
   dio: ^5.1.2
   dotted_line: ^3.1.0
   dropdown_button2: ^2.1.2
   #firebase_core: ^2.12.0
+  equatable: ^2.0.5
   firebase_analytics: ^10.4.5
   firebase_auth: ^4.8.0
   firebase_core: ^2.15.1
@@ -83,6 +85,9 @@ flutter:
     - shorebird.yaml
 
   fonts:
+    - family: TwitterIcon
+      fonts:
+        - asset: assets/fonts/icons.ttf
     - family: MyanUni
       fonts:
         - asset: assets/fonts/MyanUni/pds_regular.ttf

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 Color primaryColor = const Color(0xffA70507);
+Color paleSky = const Color.fromRGBO(101, 119, 133, 1.0);
+Color extraLightGrey = Color(0xffE1E8ED);
 Color primaryDark = const Color(0xffC01719);
 Color secondColor = const Color(0xffF8A340);
 Color orangePale = const Color(0xffFE9762);

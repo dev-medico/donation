@@ -1,3 +1,4 @@
+import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/dashboard.dart';
@@ -69,7 +70,7 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen>
         setState(() {
           animationController = AnimationController(
               duration: const Duration(milliseconds: 600), vsync: this);
-          screenView = const BloodDonationListNewStyle();
+          screenView = const DonationListScreen();
         });
       } else {
         setState(() {

@@ -13,6 +13,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final formatter = NumberFormat("#,###", "en_US");
 
@@ -422,6 +423,21 @@ class Utils {
           break;
       }
     });
+  }
+
+  static launchURL(String url) async {
+    if (url == "") {
+      return;
+    }
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
+      );
+    } else {
+      print('Could not launch $url');
+    }
   }
 
   static Future<bool> sendMessageByFcm(Map<String, dynamic> data) async {

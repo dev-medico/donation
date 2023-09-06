@@ -22,7 +22,7 @@ class RealmServices with ChangeNotifier {
   static const String queryAllPost = "queryAllPost";
   static const String queryAllNotification = "queryAllNotification";
   static const String queryAllReaction = "queryAllReaction";
-  static const String queryAllComment = "queryAllReaction";
+  static const String queryAllComment = "queryAllComment";
 
   bool offlineModeOn = false;
   bool isWaiting = false;

@@ -1,4 +1,5 @@
 import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
+import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -60,7 +61,7 @@ class DashboardCard extends ConsumerWidget {
               //   ref.watch(realmProvider)!.deleteDonation(element);
               // });
               await Navigator.pushNamed(
-                  context, BloodDonationListNewStyle.routeName);
+                  context, DonationListScreen.routeName);
             } else if (index == 2) {
               await Navigator.pushNamed(
                   context, SpecialEventListScreen.routeName);

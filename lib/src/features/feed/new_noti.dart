@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:donation/src/features/donation_member/presentation/widget/common_dialog.dart';
@@ -7,24 +6,20 @@ import 'package:donation/utils/utils.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
-import 'package:async/async.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class NewFeedScreen extends ConsumerStatefulWidget {
-  const NewFeedScreen({Key? key}) : super(key: key);
+class NewNotiScreen extends ConsumerStatefulWidget {
+  const NewNotiScreen({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<NewFeedScreen> createState() => _NewFeedScreenState();
+  ConsumerState<NewNotiScreen> createState() => _NewNotiScreenState();
 }
 
-class _NewFeedScreenState extends ConsumerState<NewFeedScreen> {
+class _NewNotiScreenState extends ConsumerState<NewNotiScreen> {
   String? selectedType;
   File? file;
   bool isLoading = false;

@@ -17,7 +17,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:tab_container/tab_container.dart';
 
 class BloodDonationListNewStyle extends ConsumerStatefulWidget {
-  static const routeName = "/donations";
+  static const routeName = "/donations_old";
   final bool fromHome;
 
   const BloodDonationListNewStyle({Key? key, this.fromHome = false})

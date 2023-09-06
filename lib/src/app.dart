@@ -1,4 +1,5 @@
 import 'package:donation/realm/realm_services.dart';
+import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:donation/src/features/home/desktop_home.dart';
 import 'package:donation/src/features/home/home.dart';
@@ -79,8 +80,8 @@ class _MyAppState extends ConsumerState<MyApp> {
               case MemberListBackupScreen.routeName:
                 return const MemberListBackupScreen();
 
-              case BloodDonationListNewStyle.routeName:
-                return const BloodDonationListNewStyle();
+              case DonationListScreen.routeName:
+                return const DonationListScreen();
 
               case SpecialEventListScreen.routeName:
                 return const SpecialEventListScreen();

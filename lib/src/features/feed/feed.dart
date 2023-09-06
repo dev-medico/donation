@@ -1,7 +1,10 @@
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
-import 'package:donation/src/features/feed/new_feed.dart';
+import 'package:donation/src/features/feed/new_noti.dart';
+import 'package:donation/src/features/feed/new_post.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/app_icons.dart';
+import 'package:donation/utils/tool_widgets.dart';
 import 'package:flutter/material.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -20,19 +23,37 @@ class _FeedScreenState extends State<FeedScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
-          backgroundColor: primaryColor,
-          child: Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NewFeedScreen(),
-              ),
-            );
-          }),
+        backgroundColor: primaryColor,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NewPostScreen(),
+            ),
+          );
+        },
+        child: customIcon(
+          context,
+          icon: AppIcon.fabTweet,
+          isTwitterIcon: true,
+          iconColor: Colors.white,
+          size: 25,
+        ),
+      ),
+      // floatingActionButton: FloatingActionButton(
+      //     backgroundColor: primaryColor,
+      //     child: Icon(
+      //       Icons.add,
+      //       color: Colors.white,
+      //     ),
+      //     onPressed: () {
+      //       Navigator.push(
+      //         context,
+      //         MaterialPageRoute(
+      //           builder: (context) => NewFeedScreen(),
+      //         ),
+      //       );
+      //     }),
       body: DefaultTabController(
         length: 2,
         initialIndex: 0,
