@@ -71,14 +71,14 @@ class Utils {
     } else if (dur.inDays > 30) {
       msg = DateFormat.yMMMd().format(dt);
     } else if (dur.inDays > 0) {
-      msg = '${dur.inDays} d';
-      return dur.inDays == 1 ? '1d' : DateFormat.MMMd().format(dt);
+      msg = '${dur.inDays} days ago';
+      return dur.inDays == 1 ? '1 day ago' : DateFormat.MMMd().format(dt);
     } else if (dur.inHours > 0) {
-      msg = '${dur.inHours} h';
+      msg = '${dur.inHours} hours ago';
     } else if (dur.inMinutes > 0) {
-      msg = '${dur.inMinutes} m';
+      msg = '${dur.inMinutes} minutes ago';
     } else if (dur.inSeconds > 0) {
-      msg = '${dur.inSeconds} s';
+      msg = '${dur.inSeconds} seconds ago';
     } else {
       msg = 'now';
     }

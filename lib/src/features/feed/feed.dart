@@ -64,6 +64,9 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             );
           },
         ),
+        SliverToBoxAdapter(
+          child: Container(height: 80),
+        )
       ],
     );
   }

@@ -100,43 +100,42 @@ class _PostItemBody extends StatelessWidget {
     FontWeight descriptionFontWeight = FontWeight.w400;
     TextStyle textStyle = TextStyle(
         color: Colors.black,
-        height: 1.4,
-        letterSpacing: 0.8,
+        height: 1.35,
+        letterSpacing: 0.5,
         fontSize: descriptionFontSize,
         fontWeight: descriptionFontWeight);
     TextStyle urlStyle = TextStyle(
         color: Colors.blue,
         fontSize: descriptionFontSize,
         fontWeight: descriptionFontWeight);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        const SizedBox(width: 10),
-        SizedBox(
-          width: 46,
-          height: 46,
-          child: GestureDetector(
-            onTap: () {
-              // If postItem is displaying on someone's profile then no need to navigate to same user's profile again.
-              if (isDisplayOnProfile) {
-                return;
-              }
-            },
-            child: CircularImage(path: dummyProfilePic),
-          ),
-        ),
-        const SizedBox(width: 16),
-        SizedBox(
-          width: MediaQuery.of(context).size.width - 90,
-          child: Column(
+    return Padding(
+      padding: const EdgeInsets.only(left: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Expanded(
-                    child: Row(
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: GestureDetector(
+                  onTap: () {
+                    if (isDisplayOnProfile) {
+                      return;
+                    }
+                  },
+                  child: CircularImage(path: dummyProfilePic),
+                ),
+              ),
+              const SizedBox(width: 16),
+              SizedBox(
+                width: MediaQuery.of(context).size.width - 90,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         ConstrainedBox(
                           constraints: BoxConstraints(
@@ -147,20 +146,9 @@ class _PostItemBody extends StatelessWidget {
                               fontWeight: FontWeight.w800,
                               overflow: TextOverflow.ellipsis),
                         ),
-                        const SizedBox(width: 3),
-                        Flexible(
-                          child: customText(
-                            '${model.postedBy}',
-                            style: TextStyle(
-                                color: darkGrey,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
+                        const SizedBox(height: 2),
                         customText(
-                          '· ${Utils.getChatTime(model.createdAt!)}',
+                          Utils.getChatTime(model.createdAt!),
                           style: TextStyle(
                               color: darkGrey,
                               fontSize: 12,
@@ -168,28 +156,31 @@ class _PostItemBody extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    SizedBox(height: 8),
+                  ],
+                ),
               ),
-              SizedBox(height: 8),
-              model.text == null
-                  ? const SizedBox()
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        UrlText(
-                          text: model.text!.toString().removeSpaces,
-                          onHashTagPressed: (tag) {},
-                          style: textStyle,
-                          urlStyle: urlStyle,
-                        ),
-                      ],
-                    ),
+              const SizedBox(width: 10),
             ],
           ),
-        ),
-        const SizedBox(width: 10),
-      ],
+          model.text == null
+              ? const SizedBox()
+              : Padding(
+                  padding: const EdgeInsets.only(left: 4, right: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      UrlText(
+                        text: model.text!.toString().removeSpaces,
+                        onHashTagPressed: (tag) {},
+                        style: textStyle,
+                        urlStyle: urlStyle,
+                      ),
+                    ],
+                  ),
+                ),
+        ],
+      ),
     );
   }
 }
