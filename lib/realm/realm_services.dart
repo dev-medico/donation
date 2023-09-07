@@ -380,6 +380,11 @@ class RealmServices with ChangeNotifier {
     notifyListeners();
   }
 
+  void deletePost(Post post) {
+    realm.write(() => realm.delete(post));
+    notifyListeners();
+  }
+
   Future<void> close() async {
     if (currentUser != null) {
       await currentUser?.logOut();

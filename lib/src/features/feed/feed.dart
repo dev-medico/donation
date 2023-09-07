@@ -1,12 +1,17 @@
 import 'package:donation/src/common_widgets/customLoader.dart';
 import 'package:donation/src/common_widgets/emptyList.dart';
 import 'package:donation/src/features/feed/controller/feed_controller.dart';
+import 'package:donation/src/features/feed/new_post.dart';
 import 'package:donation/src/features/feed/post.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/app_icons.dart';
+import 'package:donation/utils/tool_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
-  const FeedScreen({super.key});
+  const FeedScreen({super.key, this.admin = false});
+  final bool admin;
 
   @override
   ConsumerState<FeedScreen> createState() => _FeedScreenState();
@@ -39,6 +44,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                         color: Colors.white,
                         child: PostItem(
                           model: post,
+                          admin: widget.admin,
                           scaffoldKey: scaffoldKey,
                         ),
                       );

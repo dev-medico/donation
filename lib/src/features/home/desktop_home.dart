@@ -6,6 +6,9 @@ import 'package:donation/src/features/donation/blood_donation_list_new_style.dar
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/donation_member/presentation/search_member.dart';
+import 'package:donation/src/features/feed/feed.dart';
+import 'package:donation/src/features/feed/feed_admin.dart';
+import 'package:donation/src/features/feed/feed_main.dart';
 import 'package:donation/src/features/finder/report.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -31,7 +34,8 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'သွေးလှူမှု မှတ်တမ်း',
     'ထူးခြားဖြစ်စဥ်',
     'ရ/သုံး ငွေစာရင်း',
-    'Log Out'
+    'ပို့စ်/အသိပေးချက်များ'
+        'Log Out'
   ];
   List<NavigationPaneItem> items = [];
   List<String> icons = [
@@ -40,6 +44,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'assets/images/donations.png',
     'assets/images/special_case.png',
     'assets/images/finance.png',
+    'assets/images/post.png',
     'assets/images/settings.png',
   ];
   @override
@@ -203,6 +208,23 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
           style: smallTextStyle(context),
         ),
         body: DonarList(),
+      ),
+      PaneItemSeparator(),
+      PaneItem(
+        selectedTileColor: ButtonState.resolveWith((state) {
+          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
+          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
+
+          return null;
+        }),
+        icon: CustomIcon(
+          icon: icons[5],
+        ),
+        title: Text(
+          titles[5],
+          style: smallTextStyle(context),
+        ),
+        body: FeedAdminScreen(),
       ),
     ];
   }

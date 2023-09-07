@@ -97,6 +97,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         height: 60,
                         padding: const EdgeInsets.only(left: 30, top: 20),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Radio(
                                 value: 0,
@@ -454,6 +455,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       setState(() {
         _isLoading = false;
       });
+      prefs.setString("name", email.text.toString());
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
             context, HomeScreen.routeName, (Route<dynamic> route) => false);

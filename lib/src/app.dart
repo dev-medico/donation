@@ -53,7 +53,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         fontFamily: "MyanUni",
       ),
       themeMode: ThemeMode.light,
-      home:  SplashScreen(),
+      home: SplashScreen(),
       onGenerateRoute: (RouteSettings routeSettings) {
         return MaterialPageRoute<void>(
           settings: routeSettings,
@@ -66,8 +66,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 return const LoginScreen();
               case DashBoardScreen.routeName:
                 return const DashBoardScreen();
-              case NavigationHomeScreen.routeName:
-                return const NavigationHomeScreen();
+
               case MobileHomeScreen.routeName:
                 return const MobileHomeScreen();
               case HomeScreen.routeName:

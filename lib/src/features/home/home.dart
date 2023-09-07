@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const routeName = "/mobile_home";
+  static const routeName = "/home";
   const HomeScreen({super.key});
 
   @override
