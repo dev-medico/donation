@@ -125,7 +125,7 @@ class PostIconsRow extends ConsumerWidget {
               Utils.getPostTime2(model.createdAt!),
             ),
             const SizedBox(width: 10),
-            customText('Red Juniors',
+            customText('RED Juniors',
                 style: TextStyle(color: Theme.of(context).primaryColor))
           ],
         ),

@@ -51,6 +51,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     print('Message notification: ${message.notification?.title}');
     print('Message notification: ${message.notification?.body}');
   }
+ // _showNotification(message.data['title'] ?? '', message.data['body'] ?? '');
 }
 
 Future<void> _showNotification(String title, String body) async {

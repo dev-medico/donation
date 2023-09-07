@@ -70,15 +70,16 @@ class _ComposeBottomIconWidgetState extends State<ComposeBottomIconWidget> {
                   size: 24,
                   isTwitterIcon: true,
                   iconColor: primaryColor)),
-          IconButton(
-              onPressed: () {
-                setImageCamera();
-              },
-              icon: customIcon(context,
-                  icon: AppIcon.camera,
-                  size: 24,
-                  isTwitterIcon: true,
-                  iconColor: primaryColor)),
+          if (Platform.isIOS || Platform.isAndroid)
+            IconButton(
+                onPressed: () {
+                  setImageCamera();
+                },
+                icon: customIcon(context,
+                    icon: AppIcon.camera,
+                    size: 24,
+                    isTwitterIcon: true,
+                    iconColor: primaryColor)),
           Expanded(
               child: Align(
             alignment: Alignment.centerRight,

@@ -4,6 +4,7 @@ import 'package:donation/src/features/donation/blood_donation_list_new_style.dar
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/donation_member/presentation/search_member.dart';
+import 'package:donation/src/features/feed/feed_admin.dart';
 import 'package:donation/src/features/finder/report.dart';
 import 'package:donation/src/features/home/mobile_home/home_menu.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
@@ -47,6 +48,9 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
       fromHome: true,
     ),
     DonarList(
+      fromHome: true,
+    ),
+    FeedAdminScreen(
       fromHome: true,
     ),
     Container(),

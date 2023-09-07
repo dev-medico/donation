@@ -34,8 +34,8 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'သွေးလှူမှု မှတ်တမ်း',
     'ထူးခြားဖြစ်စဥ်',
     'ရ/သုံး ငွေစာရင်း',
-    'ပို့စ်/အသိပေးချက်များ'
-        'Log Out'
+    'ပို့စ်/အသိပေးချက်များ',
+    'Log Out'
   ];
   List<NavigationPaneItem> items = [];
   List<String> icons = [

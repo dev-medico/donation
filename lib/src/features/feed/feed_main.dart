@@ -3,6 +3,7 @@ import 'package:donation/src/features/donation_member/presentation/member_detail
 import 'package:donation/src/features/feed/feed.dart';
 import 'package:donation/src/features/feed/new_noti.dart';
 import 'package:donation/src/features/feed/new_post.dart';
+import 'package:donation/src/features/feed/widget/feed_or_noti_dialog.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/app_icons.dart';
 import 'package:donation/utils/tool_widgets.dart';
@@ -23,24 +24,21 @@ class _FeedMainScreenState extends State<FeedMainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NewPostScreen(),
-            ),
-          );
-        },
-        child: customIcon(
-          context,
-          icon: AppIcon.fabTweet,
-          isTwitterIcon: true,
-          iconColor: Colors.white,
-          size: 25,
-        ),
-      ),
+
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: primaryColor,
+      //   onPressed: () {
+      //     showDialog(
+      //         context: context, builder: (context) => FeedOrNotiDialog());
+      //   },
+      //   child: customIcon(
+      //     context,
+      //     icon: AppIcon.fabTweet,
+      //     isTwitterIcon: true,
+      //     iconColor: Colors.white,
+      //     size: 25,
+      //   ),
+      // ),
       // floatingActionButton: FloatingActionButton(
       //     backgroundColor: primaryColor,
       //     child: Icon(

@@ -15,6 +15,7 @@ import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 
 class PostItem extends StatelessWidget {
   final Post model;
@@ -63,6 +64,7 @@ class PostItem extends StatelessWidget {
                   child: _PostItemBody(
                     isDisplayOnProfile: isDisplayOnProfile,
                     model: model,
+                    admin: admin,
                   )),
               model.images.isNotEmpty
                   ? Padding(
@@ -74,15 +76,18 @@ class PostItem extends StatelessWidget {
                       ),
                     )
                   : Container(),
-              Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: PostIconsRow(
-                  model: model,
-                  iconColor: Theme.of(context).textTheme.bodySmall!.color!,
-                  iconEnableColor: ceriseRed,
-                  size: 20,
-                  scaffoldKey: GlobalKey<ScaffoldState>(),
-                ),
+              // Padding(
+              //   padding: EdgeInsets.only(left: 10),
+              //   child: PostIconsRow(
+              //     model: model,
+              //     iconColor: Theme.of(context).textTheme.bodySmall!.color!,
+              //     iconEnableColor: ceriseRed,
+              //     size: 20,
+              //     scaffoldKey: GlobalKey<ScaffoldState>(),
+              //   ),
+              // ),
+              SizedBox(
+                height: 20,
               ),
               Divider(thickness: 12, color: Colors.grey[200]),
             ],
@@ -95,21 +100,25 @@ class PostItem extends StatelessWidget {
 
 class _PostItemBody extends ConsumerWidget {
   final Post model;
+  final bool admin;
 
   final bool isDisplayOnProfile;
   const _PostItemBody(
-      {Key? key, required this.model, required this.isDisplayOnProfile})
+      {Key? key,
+      required this.model,
+      required this.isDisplayOnProfile,
+      required this.admin})
       : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     YYDialog.init(context);
-    double descriptionFontSize = 15;
+    double descriptionFontSize = model.text!.length > 100 ? 13.5 : 15;
     FontWeight descriptionFontWeight = FontWeight.w400;
     TextStyle textStyle = TextStyle(
         color: Colors.black,
-        height: 1.35,
-        letterSpacing: 0.5,
+        height: model.text!.length > 100 ? 1.3 : 1.35,
+        letterSpacing: model.text!.length > 100 ? 0.2 : 0.5,
         fontSize: descriptionFontSize,
         fontWeight: descriptionFontWeight);
     TextStyle urlStyle = TextStyle(
@@ -142,8 +151,8 @@ class _PostItemBody extends ConsumerWidget {
                   const SizedBox(width: 16),
                   SizedBox(
                     width: Responsive.isMobile(context)
-                        ? MediaQuery.of(context).size.width - 90
-                        : MediaQuery.of(context).size.width * 0.3 - 90,
+                        ? MediaQuery.of(context).size.width * 0.7
+                        : MediaQuery.of(context).size.width * 0.25 - 90,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -174,29 +183,29 @@ class _PostItemBody extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 10),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: GestureDetector(
-                  onTap: () {
-                    messageDialog("Are you sure to delete this post?", context,
-                        "Yes", Colors.red, ref);
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(
-                      right: 12,
-                      bottom: 12,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 26,
+              if (admin)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      messageDialog("Are you sure to delete this post?",
+                          context, "Yes", Colors.red, ref);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                        right: 12,
+                        bottom: 12,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.red,
+                        size: 22,
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
           model.text == null
@@ -206,12 +215,29 @@ class _PostItemBody extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      UrlText(
-                        text: model.text!.toString().removeSpaces,
-                        onHashTagPressed: (tag) {},
+                      ReadMoreText(
+                        model.text!.toString().removeSpaces,
+                        trimLines: 6,
+                        colorClickableText: Colors.blue,
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: 'See more',
+                        trimExpandedText: '  See less',
                         style: textStyle,
-                        urlStyle: urlStyle,
+                        lessStyle: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor),
+                        moreStyle: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor),
                       ),
+                      // UrlText(
+                      //   text: model.text!.toString().removeSpaces,
+                      //   onHashTagPressed: (tag) {},
+                      //   style: textStyle,
+                      //   urlStyle: urlStyle,
+                      // ),
                     ],
                   ),
                 ),

@@ -28,6 +28,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'သွေးလှူမှု မှတ်တမ်း',
     'ထူးခြားဖြစ်စဥ်',
     'ရ/သုံး ငွေစာရင်း',
+    'ပို့စ်/အသိပေးချက်များ',
     'Log Out'
   ];
   List<String> icons = [
@@ -37,6 +38,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'assets/images/donations.png',
     'assets/images/special_case.png',
     'assets/images/finance.png',
+    'assets/images/post.png',
     'assets/images/settings.png',
   ];
 
@@ -80,7 +82,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
           onTap: () async {
             ref.watch(drawerControllerProvider)!.toggle!.call();
             ref.read(drawerIndexProvider.notifier).state = index;
-            if (index == 6) {
+            if (index == 7) {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.remove('token');
               prefs.remove('name');

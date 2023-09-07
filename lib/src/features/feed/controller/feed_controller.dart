@@ -6,7 +6,7 @@ import 'package:realm/realm.dart';
 final postDataProvider = StreamProvider<RealmResultsChanges<Post>>((ref) {
   var realmService = ref.watch(realmProvider);
   final stream =
-      realmService!.realm.query<Post>("TRUEPREDICATE SORT(_id ASC)").changes;
+      realmService!.realm.query<Post>("TRUEPREDICATE SORT(_id DESC)").changes;
 
   return stream;
 });

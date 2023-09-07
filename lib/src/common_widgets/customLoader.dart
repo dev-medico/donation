@@ -62,7 +62,7 @@ class CustomScreenLoader extends StatelessWidget {
   final double width;
   const CustomScreenLoader(
       {Key? key,
-      this.backgroundColor = const Color(0xfff8f8f8),
+      this.backgroundColor = Colors.transparent,
       this.height = 30,
       this.width = 30})
       : super(key: key);

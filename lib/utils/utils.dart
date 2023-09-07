@@ -460,11 +460,11 @@ class Utils {
 
     // Upload file and metadata to the path 'images/mountains.jpg'
     await Future.forEach(files, (file) async {
-      var uploadTask = storageRef
-          .child("images/" + file.path.split(Platform.pathSeparator).last)
-          .putFile(file);
+      var uploadTask =
+          storageRef.child("images/" + file.path.split("/").last).putFile(file);
       var taskSnapshot = await uploadTask.whenComplete(() {});
       final url = await taskSnapshot.ref.getDownloadURL();
+      log(url);
       _downloadUrls.add(url);
     });
     return _downloadUrls;
