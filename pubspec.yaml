@@ -105,4 +105,7 @@ flutter:
 msix_config:
   display_name: Safe Blood
   msix_version: 1.4.1.0
-  logo_path: C:\Users\Administrator\Desktop\ic_launcher.png
+  logo_path: C:\my_project\donation\favicon.ico
+  start_menu_icon_path: C:\my_project\donation\ic_launcher.png
+  tile_icon_path: C:\my_project\donation\ic_launcher.png
+
