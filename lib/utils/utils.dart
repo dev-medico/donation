@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker_fork/flutter_cupertino_date_picker_fork.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
@@ -456,17 +456,17 @@ class Utils {
     List<String> _downloadUrls = [];
 
     // Create a reference to the Firebase Storage bucket
-    final storageRef = FirebaseStorage.instance.ref();
+    // final storageRef = FirebaseStorage.instance.ref();
 
-    // Upload file and metadata to the path 'images/mountains.jpg'
-    await Future.forEach(files, (file) async {
-      var uploadTask =
-          storageRef.child("images/" + file.path.split("/").last).putFile(file);
-      var taskSnapshot = await uploadTask.whenComplete(() {});
-      final url = await taskSnapshot.ref.getDownloadURL();
-      log(url);
-      _downloadUrls.add(url);
-    });
+    // // Upload file and metadata to the path 'images/mountains.jpg'
+    // await Future.forEach(files, (file) async {
+    //   var uploadTask =
+    //       storageRef.child("images/" + file.path.split("/").last).putFile(file);
+    //   var taskSnapshot = await uploadTask.whenComplete(() {});
+    //   final url = await taskSnapshot.ref.getDownloadURL();
+    //   log(url);
+    //   _downloadUrls.add(url);
+    // });
     return _downloadUrls;
   }
 

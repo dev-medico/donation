@@ -5,7 +5,7 @@ import 'package:donation/realm/app_services.dart';
 import 'package:donation/src/features/auth/otp.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/home/home.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -353,42 +353,43 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (member != null) {
       log("+95" + email.text.toString().replaceAll(" ", "").substring(1));
 
-      FirebaseAuth auth = FirebaseAuth.instance;
-      await auth.verifyPhoneNumber(
-        phoneNumber:
-            "+95" + email.text.toString().replaceAll(" ", "").substring(1),
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          var user = await auth.signInWithCredential(credential);
-          user.user!.getIdToken(true).toString();
-        },
-        timeout: const Duration(seconds: 120),
-        verificationFailed: (FirebaseAuthException e) {
-          setState(() {
-            _isLoading = false;
-          });
-          if (e.code == 'invalid-phone-number') {
-            Utils.messageDialog("The Provided Phone No. is not valid!", context,
-                "ပြင်ဆင်မည်", Colors.black);
-          } else {
-            Utils.messageDialog(
-                e.message.toString(), context, "OK", Colors.black);
-          }
-        },
-        codeSent: (String verificationId, int? resendToken) async {
-          setState(() {
-            _isLoading = false;
-          });
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => OTPScreen(
-                        phone: email.text.toString(),
-                        member: member,
-                        verificationId: verificationId,
-                      )));
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
+      // FirebaseAuth auth = FirebaseAuth.instance;
+      // await auth.verifyPhoneNumber(
+      //   phoneNumber:
+      //       "+95" + email.text.toString().replaceAll(" ", "").substring(1),
+      //   verificationCompleted: (PhoneAuthCredential credential) async {
+      //     var user = await auth.signInWithCredential(credential);
+      //     user.user!.getIdToken(true).toString();
+      //   },
+      //   timeout: const Duration(seconds: 120),
+      //   verificationFailed: (FirebaseAuthException e) {
+      //     setState(() {
+      //       _isLoading = false;
+      //     });
+      //     if (e.code == 'invalid-phone-number') {
+      //       Utils.messageDialog("The Provided Phone No. is not valid!", context,
+      //           "ပြင်ဆင်မည်", Colors.black);
+      //     } else {
+      //       Utils.messageDialog(
+      //           e.message.toString(), context, "OK", Colors.black);
+      //     }
+      //   },
+      //   codeSent: (String verificationId, int? resendToken) async {
+      //     setState(() {
+      //       _isLoading = false;
+      //     });
+      //     Navigator.pushReplacement(
+      //         context,
+      //         MaterialPageRoute(
+      //             builder: (context) => OTPScreen(
+      //                   phone: email.text.toString(),
+      //                   member: member,
+      //                   verificationId: verificationId,
+      //                 )));
+      //   },
+      //   codeAutoRetrievalTimeout: (String verificationId) {},
+      // );
+    
     } else {
       setState(() {
         _isLoading = false;
