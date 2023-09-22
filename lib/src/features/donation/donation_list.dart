@@ -6,6 +6,7 @@ import 'package:donation/src/common_widgets/common_tab_bar.dart';
 import 'package:donation/src/features/donation/controller/donation_list_controller.dart';
 import 'package:donation/src/features/donation/donation_data_source.dart';
 import 'package:donation/src/features/donation/donation_detail.dart';
+import 'package:donation/src/features/donation/new_blood_donation.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/utils/Colors.dart';
@@ -75,6 +76,18 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
         year: int.parse(years[_yearSelected]), month: _monthSelected + 1)));
     return Scaffold(
       backgroundColor: Colors.white,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.red,
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NewBloodDonationScreen(),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
       appBar: AppBar(
         flexibleSpace: Container(
             decoration: BoxDecoration(
