@@ -305,7 +305,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                               margin: const EdgeInsets.only(
                                   left: 20, top: 16, right: 20),
                               child: TypeAheadField(
-                                hideSuggestionsOnKeyboardHide: false,
+                                hideSuggestionsOnKeyboardHide: true,
                                 textFieldConfiguration: TextFieldConfiguration(
                                   controller: memberController,
                                   autofocus: false,
@@ -399,7 +399,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                               margin: const EdgeInsets.only(
                                   left: 20, top: 16, bottom: 8, right: 20),
                               child: TypeAheadField(
-                                hideSuggestionsOnKeyboardHide: false,
+                                hideSuggestionsOnKeyboardHide: true,
                                 textFieldConfiguration: TextFieldConfiguration(
                                   controller: hospitalController,
                                   autofocus: false,
@@ -485,7 +485,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                 margin: const EdgeInsets.only(
                                     left: 20, top: 16, bottom: 8, right: 20),
                                 child: TypeAheadField(
-                                  hideSuggestionsOnKeyboardHide: false,
+                                  hideSuggestionsOnKeyboardHide: true,
                                   textFieldConfiguration:
                                       TextFieldConfiguration(
                                     controller: townController,
@@ -713,7 +713,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                     margin: const EdgeInsets.only(
                                         left: 20, top: 16, right: 20),
                                     child: TypeAheadField(
-                                      hideSuggestionsOnKeyboardHide: false,
+                                      hideSuggestionsOnKeyboardHide: true,
                                       textFieldConfiguration:
                                           TextFieldConfiguration(
                                         controller: memberController,
@@ -815,7 +815,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                         bottom: 8,
                                         right: 20),
                                     child: TypeAheadField(
-                                      hideSuggestionsOnKeyboardHide: false,
+                                      hideSuggestionsOnKeyboardHide: true,
                                       textFieldConfiguration:
                                           TextFieldConfiguration(
                                         controller: hospitalController,
@@ -910,7 +910,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                           bottom: 8,
                                           right: 20),
                                       child: TypeAheadField(
-                                        hideSuggestionsOnKeyboardHide: false,
+                                        hideSuggestionsOnKeyboardHide: true,
                                         textFieldConfiguration:
                                             TextFieldConfiguration(
                                           controller: diseaseController,
@@ -937,6 +937,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                                   .split("")
                                                   .toSet()
                                                   .length);
+
                                           return diseasesSelected;
                                         },
                                         transitionBuilder: (context,
@@ -1012,7 +1013,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                               right: 20),
                                           child: TypeAheadField(
                                             hideSuggestionsOnKeyboardHide:
-                                                false,
+                                                true,
                                             textFieldConfiguration:
                                                 TextFieldConfiguration(
                                               controller: townController,
