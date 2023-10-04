@@ -65,11 +65,11 @@ SPEC CHECKSUMS:
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   modal_progress_hud_nsn: eff428e9fb32ddd232c5b66f8371b2150f36e989
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
-  realm: f9d430f5c8e373fd8e9fbeafd2038a8c4de40ebc
+  realm: 8836c2263630ef217506fdd4d402294d14ad6c3c
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   sqflite: a5789cceda41d54d23f31d6de539d65bb14100ea
   url_launcher_macos: d2691c7dd33ed713bf3544850a623080ec693d95
 
 PODFILE CHECKSUM: 8d40c19d3cbdb380d870685c3a564c989f1efa52
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.13.0

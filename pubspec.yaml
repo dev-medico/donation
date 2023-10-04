@@ -13,10 +13,10 @@ dependencies:
   animated_widgets: ^1.1.0
   # charts_flutter: ^0.12.0
   #cloud_firestore: ^4.7.0
-  cached_network_image: ^3.2.3
-  dio: ^5.1.2
-  dotted_line: ^3.1.0
-  dropdown_button2: ^2.1.2
+  cached_network_image: ^3.3.0
+  dio: ^5.3.3
+  dotted_line: ^3.2.2
+  dropdown_button2: ^2.3.9
   #firebase_core: ^2.12.0
   equatable: ^2.0.5
   # firebase_analytics: ^10.4.5
@@ -25,7 +25,7 @@ dependencies:
   # firebase_messaging: ^14.6.7
   # firebase_storage: ^11.2.6
   fl_chart: ^0.62.0
-  fluent_ui: ^4.6.1
+  fluent_ui: ^4.7.5
   flutter:
     sdk: flutter
   flutter_cupertino_date_picker_fork: ^1.0.7
