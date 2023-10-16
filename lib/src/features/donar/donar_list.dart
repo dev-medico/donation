@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/responsive_two_column_layout.dart';
 import 'package:donation/src/features/donar/controller/dona_data_provider.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
@@ -1745,94 +1746,80 @@ class _DonarListState extends ConsumerState<DonarList> {
                     const SizedBox(
                       height: 20,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NewDonarScreen(),
-                                ),
-                              );
-                              calculateLeftBalance();
-                              // callAPI("");
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(12.0))),
-                              child: Row(
-                                children: const [
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Icon(Icons.calculate_outlined,
-                                      color: Colors.white),
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 12, bottom: 12, left: 12),
-                                      child: Text(
-                                        "အလှူရှင် ထည့်မည်",
-                                        textScaleFactor: 1.0,
-                                        style: TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.white),
-                                      )),
-                                ],
-                              ),
+                    ResponsiveTwoColumnLayout(
+                      spacing: 20,
+                      startContent: GestureDetector(
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NewDonarScreen(),
                             ),
+                          );
+                          calculateLeftBalance();
+                          // callAPI("");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          child: Row(
+                            children: const [
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Icon(Icons.calculate_outlined,
+                                  color: Colors.white),
+                              Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 12, bottom: 12, left: 12),
+                                  child: Text(
+                                    "အလှူရှင် ထည့်မည်",
+                                    textScaleFactor: 1.0,
+                                    style: TextStyle(
+                                        fontSize: 15.0, color: Colors.white),
+                                  )),
+                            ],
                           ),
                         ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      NewExpenseRecordScreen(),
-                                ),
-                              );
-                              calculateLeftBalance();
-                              // callAPI("");
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(12.0))),
-                              child: Row(
-                                children: const [
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Icon(Icons.calculate_outlined,
-                                      color: Colors.white),
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 12, bottom: 12, left: 12),
-                                      child: Text(
-                                        "အသုံးစာရင်း ထည့်မည်",
-                                        textScaleFactor: 1.0,
-                                        style: TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.white),
-                                      )),
-                                ],
-                              ),
+                      ),
+                      endContent: GestureDetector(
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NewExpenseRecordScreen(),
                             ),
+                          );
+                          calculateLeftBalance();
+                          // callAPI("");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          child: Row(
+                            children: const [
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Icon(Icons.calculate_outlined,
+                                  color: Colors.white),
+                              Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 12, bottom: 12, left: 12),
+                                  child: Text(
+                                    "အသုံးစာရင်း ထည့်မည်",
+                                    textScaleFactor: 1.0,
+                                    style: TextStyle(
+                                        fontSize: 15.0, color: Colors.white),
+                                  )),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
                     Row(
                       children: [

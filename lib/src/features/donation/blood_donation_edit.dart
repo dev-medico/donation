@@ -116,11 +116,13 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
           patientName: name,
           patientAge: age,
           hospital: selectHospital,
-          donationDate: donationDateDetail!.toLocal(),
+          donationDate: donationDateDetail == null
+              ? data.donationDate
+              : donationDateDetail!.toLocal(),
           patientDisease: selectDisease,
           patientAddress: "$quarter၊$township",
         );
-    log("donationDateDetail ${donationDateDetail!.toLocal()}");
+
     Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
         context, "အိုကေ", Colors.black);
     nameController.clear();
