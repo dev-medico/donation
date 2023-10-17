@@ -31,7 +31,7 @@ class _DonationChartByDiseaseState extends State<DonationChartByDisease> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-          horizontal: Responsive.isMobile(context) ? 18 : 8),
+          horizontal: Responsive.isMobile(context) ? 0 : 8),
       margin: const EdgeInsets.all(
         2,
       ),
@@ -48,6 +48,9 @@ class _DonationChartByDiseaseState extends State<DonationChartByDisease> {
         ),
         onPressed: () async {},
         child: ListView(
+          physics: Responsive.isMobile(context)
+              ? const NeverScrollableScrollPhysics()
+              : const BouncingScrollPhysics(),
           shrinkWrap: true,
           children: [
             Text(
@@ -96,11 +99,13 @@ class _DonationChartByDiseaseState extends State<DonationChartByDisease> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          diseases[index] == "" ? "-" : diseases[index],
-                          style: TextStyle(
-                            fontSize: Responsive.isMobile(context) ? 15 : 16,
-                            color: Colors.black,
+                        Expanded(
+                          child: Text(
+                            diseases[index] == "" ? "-" : diseases[index],
+                            style: TextStyle(
+                              fontSize: Responsive.isMobile(context) ? 15 : 16,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                         Text(

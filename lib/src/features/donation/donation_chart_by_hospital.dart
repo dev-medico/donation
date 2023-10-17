@@ -32,7 +32,8 @@ class _DonationChartByHospitalState extends State<DonationChartByHospital> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-          horizontal: Responsive.isMobile(context) ? 18 : 8),
+          horizontal: Responsive.isMobile(context) ? 0 : 8,
+          vertical: Responsive.isMobile(context) ? 12 : 0),
       margin: const EdgeInsets.all(
         2,
       ),
@@ -49,6 +50,9 @@ class _DonationChartByHospitalState extends State<DonationChartByHospital> {
         ),
         onPressed: () async {},
         child: ListView(
+          physics: Responsive.isMobile(context)
+              ? const NeverScrollableScrollPhysics()
+              : const BouncingScrollPhysics(),
           shrinkWrap: true,
           children: [
             Text(

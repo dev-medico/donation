@@ -73,27 +73,45 @@ class _BloodDonationReportScreenState extends State<BloodDonationReportScreen> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                  flex: 1,
-                  child: DonationChartByBlood(
-                    data: widget.data,
-                  )),
-              const SizedBox(
-                width: 20,
-              ),
-              Expanded(
-                  flex: 1, child: DonationChartByHospital(data: widget.data)),
-              const SizedBox(
-                width: 20,
-              ),
-              Expanded(
-                  flex: 1, child: DonationChartByDisease(data: widget.data)),
-            ],
-          ),
+          child: Responsive.isMobile(context)
+              ? ListView(
+                  children: [
+                    DonationChartByBlood(
+                      data: widget.data,
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    DonationChartByHospital(data: widget.data),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    DonationChartByDisease(data: widget.data)
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                        flex: 1,
+                        child: DonationChartByBlood(
+                          data: widget.data,
+                        )),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Expanded(
+                        flex: 1,
+                        child: DonationChartByHospital(data: widget.data)),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Expanded(
+                        flex: 1,
+                        child: DonationChartByDisease(data: widget.data)),
+                  ],
+                ),
         ));
   }
 }
