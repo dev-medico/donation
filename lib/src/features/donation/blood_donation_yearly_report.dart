@@ -10,13 +10,8 @@ class BloodDonationReportScreen extends StatefulWidget {
   final List<Donation> data;
   final int month;
   final String year;
-  final bool isYearly;
   const BloodDonationReportScreen(
-      {Key? key,
-      required this.data,
-      required this.month,
-      required this.year,
-      required this.isYearly})
+      {Key? key, required this.data, required this.month, required this.year})
       : super(key: key);
 
   @override
@@ -62,9 +57,7 @@ class _BloodDonationReportScreenState extends State<BloodDonationReportScreen> {
           title: Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
-                widget.isYearly
-                    ? "${widget.year} ခုနှစ် သွေးလှူဒါန်းမှုမှတ်တမ်း"
-                    : "${widget.year} ${months[widget.month]} လ သွေးလှူဒါန်းမှုမှတ်တမ်း",
+                "${widget.year} ${months[widget.month]} သွေးလှူဒါန်းမှုမှတ်တမ်း",
                 textScaleFactor: 1.0,
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 15 : 16,

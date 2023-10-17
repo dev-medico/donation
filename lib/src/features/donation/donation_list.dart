@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/common_widgets/common_tab_bar.dart';
+import 'package:donation/src/features/donation/blood_donation_report.dart';
 import 'package:donation/src/features/donation/controller/donation_list_controller.dart';
+import 'package:donation/src/features/donation/controller/donation_provider.dart';
 import 'package:donation/src/features/donation/donation_data_source.dart';
 import 'package:donation/src/features/donation/donation_detail.dart';
 import 'package:donation/src/features/donation/new_blood_donation.dart';
@@ -192,23 +194,202 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
               child: donationData.when(
                 data: (results) {
                   if (results.isEmpty) {
-                    return Center(
-                        child: Text(years[_yearSelected] +
-                            " " +
-                            months[_monthSelected] +
-                            " လ အတွက် သွေးလှူရှင်မှတ်တမ်း မရှိသေးပါ။"));
+                    return Stack(
+                      children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            height: 60,
+                            decoration: BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(12.0))),
+                            margin: const EdgeInsets.only(
+                              left: 15,
+                              top: 12,
+                            ),
+                            width: 164,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                var data = ref.watch(donationByYearProvider(
+                                    int.parse(years[_yearSelected])));
+                                List<Donation> yearData = [];
+                                data.forEach((element) {
+                                  yearData.add(element);
+                                });
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            BloodDonationReportScreen(
+                                              month: _monthSelected,
+                                              isYearly: true,
+                                              year: years[_yearSelected],
+                                              data: yearData,
+                                            )));
+                              },
+                              child: Align(
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    children: const [
+                                      SizedBox(
+                                        width: 12,
+                                      ),
+                                      Icon(Icons.list_alt_outlined,
+                                          color: Colors.white),
+                                      Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 12, bottom: 12, left: 12),
+                                          child: Text(
+                                            "နှစ်ချုပ် မှတ်တမ်း",
+                                            textScaleFactor: 1.0,
+                                            style: TextStyle(
+                                                fontSize: 15.0,
+                                                color: Colors.white),
+                                          )),
+                                    ],
+                                  )),
+                            ),
+                          ),
+                        ),
+                        Center(
+                            child: Text(years[_yearSelected] +
+                                " " +
+                                months[_monthSelected] +
+                                " လ အတွက် သွေးလှူရှင်မှတ်တမ်း မရှိသေးပါ။")),
+                      ],
+                    );
                   } else {
-                    return Container(
-                      color: Colors.white,
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Container(
-                        padding: EdgeInsets.only(
-                            left: Responsive.isMobile(context) ? 8 : 12,
-                            top: Responsive.isMobile(context) ? 8 : 12,
-                            bottom: 12),
-                        child: buildSimpleTable(results),
-                      ),
+                    return Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(12.0))),
+                                margin: const EdgeInsets.only(
+                                  left: 15,
+                                  top: 12,
+                                ),
+                                width: 164,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  onTap: () {
+                                    var data = ref.watch(donationByYearProvider(
+                                        int.parse(years[_yearSelected])));
+                                    List<Donation> yearData = [];
+                                    data.forEach((element) {
+                                      yearData.add(element);
+                                    });
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                BloodDonationReportScreen(
+                                                  month: _monthSelected,
+                                                  isYearly: true,
+                                                  year: years[_yearSelected],
+                                                  data: yearData,
+                                                )));
+                                  },
+                                  child: Align(
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        children: const [
+                                          SizedBox(
+                                            width: 12,
+                                          ),
+                                          Icon(Icons.list_alt_outlined,
+                                              color: Colors.white),
+                                          Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: 12,
+                                                  bottom: 12,
+                                                  left: 12),
+                                              child: Text(
+                                                "နှစ်ချုပ် မှတ်တမ်း",
+                                                textScaleFactor: 1.0,
+                                                style: TextStyle(
+                                                    fontSize: 15.0,
+                                                    color: Colors.white),
+                                              )),
+                                        ],
+                                      )),
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(12.0))),
+                                margin: const EdgeInsets.only(
+                                  left: 15,
+                                  top: 12,
+                                ),
+                                width: 160,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                BloodDonationReportScreen(
+                                                  isYearly: false,
+                                                  month: _monthSelected,
+                                                  year: years[_yearSelected],
+                                                  data: results,
+                                                )));
+                                  },
+                                  child: Align(
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        children: const [
+                                          SizedBox(
+                                            width: 12,
+                                          ),
+                                          Icon(Icons.list_alt_outlined,
+                                              color: Colors.white),
+                                          Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: 12,
+                                                  bottom: 12,
+                                                  left: 12),
+                                              child: Text(
+                                                "လချုပ် မှတ်တမ်း",
+                                                textScaleFactor: 1.0,
+                                                style: TextStyle(
+                                                    fontSize: 15.0,
+                                                    color: Colors.white),
+                                              )),
+                                        ],
+                                      )),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            color: Colors.white,
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left: Responsive.isMobile(context) ? 8 : 12,
+                                  top: Responsive.isMobile(context) ? 8 : 12,
+                                  bottom: 12),
+                              child: buildSimpleTable(results),
+                            ),
+                          ),
+                        ),
+                      ],
                     );
                   }
                 },

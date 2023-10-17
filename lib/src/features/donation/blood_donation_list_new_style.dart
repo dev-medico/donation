@@ -260,6 +260,7 @@ class _BloodDonationListNewStyleState
                                       (context) => BloodDonationReportScreen(
                                             month: selectedMonth,
                                             year: selectedYear,
+                                            isYearly: false,
                                             data: selectedMonth == 0
                                                 ? dataSegments1
                                                 : selectedMonth == 1
@@ -396,6 +397,7 @@ class _BloodDonationListNewStyleState
                                           BloodDonationReportScreen(
                                             month: selectedMonth,
                                             year: selectedYear,
+                                            isYearly: false,
                                             data: selectedMonth == 0
                                                 ? dataSegments1
                                                 : selectedMonth == 1
