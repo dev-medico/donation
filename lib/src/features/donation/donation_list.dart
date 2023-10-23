@@ -197,7 +197,7 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                     return Stack(
                       children: [
                         Align(
-                          alignment: Alignment.topRight,
+                          alignment: Alignment.topLeft,
                           child: Container(
                             height: 60,
                             decoration: BoxDecoration(
@@ -264,9 +264,9 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                     return Column(
                       children: [
                         Align(
-                          alignment: Alignment.topRight,
+                          alignment: Alignment.topLeft,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Container(
                                 decoration: BoxDecoration(

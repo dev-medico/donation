@@ -829,7 +829,9 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      data.memberObj!.memberId.toString(),
+                                      data.memberObj != null
+                                          ? data.memberObj!.memberId.toString()
+                                          : "-",
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -861,7 +863,9 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      data.memberObj!.name.toString(),
+                                      data.memberObj != null
+                                          ? data.memberObj!.name.toString()
+                                          : "-",
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -893,7 +897,10 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      data.memberObj!.fatherName.toString(),
+                                      data.memberObj != null
+                                          ? data.memberObj!.fatherName
+                                              .toString()
+                                          : "-",
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -925,7 +932,9 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      data.memberObj!.bloodType.toString(),
+                                      data.memberObj != null
+                                          ? data.memberObj!.bloodType.toString()
+                                          : "-",
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -957,7 +966,9 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      data.memberObj!.birthDate.toString(),
+                                      data.memberObj != null
+                                          ? data.memberObj!.birthDate.toString()
+                                          : "-",
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -989,7 +1000,10 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                                   Expanded(
                                     flex: 4,
                                     child: Text(
-                                      data.memberObj!.bloodBankCard.toString(),
+                                      data.memberObj != null
+                                          ? data.memberObj!.bloodBankCard
+                                              .toString()
+                                          : "-",
                                       style: const TextStyle(
                                           fontSize: 14, color: Colors.black),
                                     ),
@@ -1171,13 +1185,16 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
   }
 
   deleteDonation() {
-    ref.watch(realmProvider)!.updateMember(
-          data.memberObj!,
-          memberCount:
-              ((int.parse(data.memberObj!.memberCount ?? "0")) - 1).toString(),
-          totalCount:
-              ((int.parse(data.memberObj!.totalCount ?? "0")) - 1).toString(),
-        );
+    if (data.memberObj != null) {
+      ref.watch(realmProvider)!.updateMember(
+            data.memberObj!,
+            memberCount: ((int.parse(data.memberObj!.memberCount ?? "0")) - 1)
+                .toString(),
+            totalCount:
+                ((int.parse(data.memberObj!.totalCount ?? "0")) - 1).toString(),
+          );
+    }
+
     ref.watch(realmProvider)!.deleteDonation(data);
 
     Navigator.pop(context);
