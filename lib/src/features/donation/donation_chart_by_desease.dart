@@ -25,6 +25,12 @@ class _DonationChartByDiseaseState extends State<DonationChartByDisease> {
 
     //delete duplicate from diseases
     diseases = diseases.toSet().toList();
+    diseases.sort((a, b) => widget.data
+        .where((element) => element.patientDisease == b)
+        .length
+        .compareTo(widget.data
+            .where((element) => element.patientDisease == a)
+            .length));
   }
 
   @override

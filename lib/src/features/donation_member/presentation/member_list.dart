@@ -330,20 +330,25 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                               List<Member>? filterdata = [];
                               oldData.forEach((element) {
                                 if (element.name
-                                        .toString()
-                                        .toLowerCase()
-                                        .split("")
-                                        .toSet()
-                                        .intersection(searchKey
-                                            .toLowerCase()
-                                            .split("")
-                                            .toSet())
-                                        .length ==
-                                    searchKey
-                                        .toLowerCase()
-                                        .split("")
-                                        .toSet()
-                                        .length) {
+                                    .toString()
+                                    .toLowerCase()
+                                    .startsWith(searchKey.toLowerCase()))
+                                // if (element.name
+                                //         .toString()
+                                //         .toLowerCase()
+                                //         .split("")
+                                //         .toSet()
+                                //         .intersection(searchKey
+                                //             .toLowerCase()
+                                //             .split("")
+                                //             .toSet())
+                                //         .length ==
+                                //     searchKey
+                                //         .toLowerCase()
+                                //         .split("")
+                                //         .toSet()
+                                //         .length)
+                                {
                                   setState(() {
                                     filterdata.add(element);
                                   });
@@ -570,20 +575,25 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                               List<Member>? filterdata = [];
                               oldData.forEach((element) {
                                 if (element.name
-                                        .toString()
-                                        .toLowerCase()
-                                        .split("")
-                                        .toSet()
-                                        .intersection(searchKey
-                                            .toLowerCase()
-                                            .split("")
-                                            .toSet())
-                                        .length ==
-                                    searchKey
-                                        .toLowerCase()
-                                        .split("")
-                                        .toSet()
-                                        .length) {
+                                    .toString()
+                                    .toLowerCase()
+                                    .startsWith(searchKey.toLowerCase()))
+                                // if (element.name
+                                //         .toString()
+                                //         .toLowerCase()
+                                //         .split("")
+                                //         .toSet()
+                                //         .intersection(searchKey
+                                //             .toLowerCase()
+                                //             .split("")
+                                //             .toSet())
+                                //         .length ==
+                                //     searchKey
+                                //         .toLowerCase()
+                                //         .split("")
+                                //         .toSet()
+                                //         .length)
+                                {
                                   setState(() {
                                     filterdata.add(element);
                                   });
@@ -680,13 +690,18 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
         List<Member>? filterdata = [];
         oldData.forEach((element) {
           if (element.name
-                  .toString()
-                  .toLowerCase()
-                  .split("")
-                  .toSet()
-                  .intersection(searchKey.toLowerCase().split("").toSet())
-                  .length ==
-              searchKey.toLowerCase().split("").toSet().length) {
+              .toString()
+              .toLowerCase()
+              .startsWith(searchKey.toLowerCase()))
+          //   if (element.name
+          //           .toString()
+          //           .toLowerCase()
+          //           .split("")
+          //           .toSet()
+          //           .intersection(searchKey.toLowerCase().split("").toSet())
+          //           .length ==
+          //       searchKey.toLowerCase().split("").toSet().length)
+          {
             setState(() {
               filterdata.add(element);
             });

@@ -312,24 +312,29 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                   decoration: inputBoxDecoration("လှူဒါန်းသူ"),
                                 ),
                                 suggestionsCallback: (pattern) async {
-                                  var list = members
-                                      .where((element) =>
-                                          element.name
-                                              .toString()
-                                              .toLowerCase()
-                                              .split("")
-                                              .toSet()
-                                              .intersection(pattern
-                                                  .toLowerCase()
-                                                  .split("")
-                                                  .toSet())
-                                              .length ==
-                                          pattern
-                                              .toLowerCase()
-                                              .split("")
-                                              .toSet()
-                                              .length)
-                                      .toList();
+                                  var list = members.where((element) => element
+                                      .name
+                                      .toString()
+                                      .toString()
+                                      .startsWith(pattern.toLowerCase()));
+                                  //   var list = members
+                                  //       .where((element) =>
+                                  //           element.name
+                                  //               .toString()
+                                  //               .toLowerCase()
+                                  //               .split("")
+                                  //               .toSet()
+                                  //               .intersection(pattern
+                                  //                   .toLowerCase()
+                                  //                   .split("")
+                                  //                   .toSet())
+                                  //               .length ==
+                                  //           pattern
+                                  //               .toLowerCase()
+                                  //               .split("")
+                                  //               .toSet()
+                                  //               .length)
+                                  //       .toList();
                                   return list;
                                 },
                                 transitionBuilder:
@@ -409,22 +414,26 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                 suggestionsCallback: (pattern) {
                                   hospitalsSelected.clear();
                                   hospitalsSelected.addAll(hospitals);
-                                  hospitalsSelected.retainWhere((s) =>
-                                      s
-                                          .toString()
-                                          .toLowerCase()
-                                          .split("")
-                                          .toSet()
-                                          .intersection(pattern
-                                              .toLowerCase()
-                                              .split("")
-                                              .toSet())
-                                          .length ==
-                                      pattern
-                                          .toLowerCase()
-                                          .split("")
-                                          .toSet()
-                                          .length);
+                                  hospitalsSelected.where((element) => element
+                                      .toString()
+                                      .toString()
+                                      .startsWith(pattern.toLowerCase()));
+                                  //   hospitalsSelected.retainWhere((s) =>
+                                  //       s
+                                  //           .toString()
+                                  //           .toLowerCase()
+                                  //           .split("")
+                                  //           .toSet()
+                                  //           .intersection(pattern
+                                  //               .toLowerCase()
+                                  //               .split("")
+                                  //               .toSet())
+                                  //           .length ==
+                                  //       pattern
+                                  //           .toLowerCase()
+                                  //           .split("")
+                                  //           .toSet()
+                                  //           .length);
                                   return hospitalsSelected;
                                 },
                                 transitionBuilder:
@@ -495,22 +504,26 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                   suggestionsCallback: (pattern) {
                                     townshipsSelected.clear();
                                     townshipsSelected.addAll(townships);
-                                    townshipsSelected.retainWhere((s) =>
-                                        s
-                                            .toString()
-                                            .toLowerCase()
-                                            .split("")
-                                            .toSet()
-                                            .intersection(pattern
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet())
-                                            .length ==
-                                        pattern
-                                            .toLowerCase()
-                                            .split("")
-                                            .toSet()
-                                            .length);
+                                    townshipsSelected.where((element) => element
+                                        .toString()
+                                        .toString()
+                                        .startsWith(pattern.toLowerCase()));
+                                    // townshipsSelected.retainWhere((s) =>
+                                    //     s
+                                    //         .toString()
+                                    //         .toLowerCase()
+                                    //         .split("")
+                                    //         .toSet()
+                                    //         .intersection(pattern
+                                    //             .toLowerCase()
+                                    //             .split("")
+                                    //             .toSet())
+                                    //         .length ==
+                                    //     pattern
+                                    //         .toLowerCase()
+                                    //         .split("")
+                                    //         .toSet()
+                                    //      .length);
                                     return townshipsSelected;
                                   },
                                   transitionBuilder:
@@ -722,24 +735,30 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                             inputBoxDecoration("လှူဒါန်းသူ"),
                                       ),
                                       suggestionsCallback: (pattern) async {
-                                        var list = members
-                                            .where((element) =>
-                                                element.name
-                                                    .toString()
-                                                    .toLowerCase()
-                                                    .split("")
-                                                    .toSet()
-                                                    .intersection(pattern
-                                                        .toLowerCase()
-                                                        .split("")
-                                                        .toSet())
-                                                    .length ==
-                                                pattern
-                                                    .toLowerCase()
-                                                    .split("")
-                                                    .toSet()
-                                                    .length)
-                                            .toList();
+                                        var list = members.where((element) =>
+                                            element.name
+                                                .toString()
+                                                .toString()
+                                                .startsWith(
+                                                    pattern.toLowerCase()));
+                                        // var list = members
+                                        //     .where((element) =>
+                                        //         element.name
+                                        //             .toString()
+                                        //             .toLowerCase()
+                                        //             .split("")
+                                        //             .toSet()
+                                        //             .intersection(pattern
+                                        //                 .toLowerCase()
+                                        //                 .split("")
+                                        //                 .toSet())
+                                        //             .length ==
+                                        //         pattern
+                                        //             .toLowerCase()
+                                        //             .split("")
+                                        //             .toSet()
+                                        //             .length)
+                                        //     .toList();
                                         return list;
                                       },
                                       transitionBuilder: (context,
@@ -826,22 +845,28 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                       suggestionsCallback: (pattern) {
                                         hospitalsSelected.clear();
                                         hospitalsSelected.addAll(hospitals);
-                                        hospitalsSelected.retainWhere((s) =>
-                                            s
+                                        hospitalsSelected.retainWhere(
+                                            (element) => element
                                                 .toString()
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .intersection(pattern
-                                                    .toLowerCase()
-                                                    .split("")
-                                                    .toSet())
-                                                .length ==
-                                            pattern
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .length);
+                                                .toString()
+                                                .startsWith(
+                                                    pattern.toLowerCase()));
+                                        // hospitalsSelected.retainWhere((s) =>
+                                        //     s
+                                        //         .toString()
+                                        //         .toLowerCase()
+                                        //         .split("")
+                                        //         .toSet()
+                                        //         .intersection(pattern
+                                        //             .toLowerCase()
+                                        //             .split("")
+                                        //             .toSet())
+                                        //         .length ==
+                                        //     pattern
+                                        //         .toLowerCase()
+                                        //         .split("")
+                                        //         .toSet()
+                                        //         .length);
                                         return hospitalsSelected;
                                       },
                                       transitionBuilder: (context,
@@ -921,22 +946,28 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                         suggestionsCallback: (pattern) {
                                           diseasesSelected.clear();
                                           diseasesSelected.addAll(diseases);
-                                          diseasesSelected.retainWhere((s) =>
-                                              s
+                                          diseasesSelected.where((element) =>
+                                              element
                                                   .toString()
-                                                  .toLowerCase()
-                                                  .split("")
-                                                  .toSet()
-                                                  .intersection(pattern
-                                                      .toLowerCase()
-                                                      .split("")
-                                                      .toSet())
-                                                  .length ==
-                                              pattern
-                                                  .toLowerCase()
-                                                  .split("")
-                                                  .toSet()
-                                                  .length);
+                                                  .toString()
+                                                  .startsWith(
+                                                      pattern.toLowerCase()));
+                                          //   diseasesSelected.retainWhere((s) =>
+                                          //       s
+                                          //           .toString()
+                                          //           .toLowerCase()
+                                          //           .split("")
+                                          //           .toSet()
+                                          //           .intersection(pattern
+                                          //               .toLowerCase()
+                                          //               .split("")
+                                          //               .toSet())
+                                          //           .length ==
+                                          //       pattern
+                                          //           .toLowerCase()
+                                          //           .split("")
+                                          //           .toSet()
+                                          //           .length);
 
                                           return diseasesSelected;
                                         },
@@ -1012,8 +1043,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                               bottom: 8,
                                               right: 20),
                                           child: TypeAheadField(
-                                            hideSuggestionsOnKeyboardHide:
-                                                true,
+                                            hideSuggestionsOnKeyboardHide: true,
                                             textFieldConfiguration:
                                                 TextFieldConfiguration(
                                               controller: townController,
@@ -1026,22 +1056,28 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                               townshipsSelected
                                                   .addAll(townships);
                                               townshipsSelected.retainWhere(
-                                                  (s) =>
-                                                      s
-                                                          .toString()
-                                                          .toLowerCase()
-                                                          .split("")
-                                                          .toSet()
-                                                          .intersection(pattern
-                                                              .toLowerCase()
-                                                              .split("")
-                                                              .toSet())
-                                                          .length ==
-                                                      pattern
-                                                          .toLowerCase()
-                                                          .split("")
-                                                          .toSet()
-                                                          .length);
+                                                  (element) => element
+                                                      .toString()
+                                                      .toString()
+                                                      .startsWith(pattern
+                                                          .toLowerCase()));
+                                              //   townshipsSelected.retainWhere(
+                                              //       (s) =>
+                                              //           s
+                                              //               .toString()
+                                              //               .toLowerCase()
+                                              //               .split("")
+                                              //               .toSet()
+                                              //               .intersection(pattern
+                                              //                   .toLowerCase()
+                                              //                   .split("")
+                                              //                   .toSet())
+                                              //               .length ==
+                                              //           pattern
+                                              //               .toLowerCase()
+                                              //               .split("")
+                                              //               .toSet()
+                                              //               .length);
                                               return townshipsSelected;
                                             },
                                             transitionBuilder: (context,

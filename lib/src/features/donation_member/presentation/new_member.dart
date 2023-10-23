@@ -242,22 +242,24 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                   ref.watch(membersProvider);
                                               List<Member>? filterdata = [];
                                               oldData.forEach((element) {
-                                                if (element.name
-                                                        .toString()
-                                                        .toLowerCase()
-                                                        .split("")
-                                                        .toSet()
-                                                        .intersection(
-                                                            nameController.text
-                                                                .toLowerCase()
-                                                                .split("")
-                                                                .toSet())
-                                                        .length ==
-                                                    nameController.text
-                                                        .toLowerCase()
-                                                        .split("")
-                                                        .toSet()
-                                                        .length) {
+                                                 if(element.name.toString().toLowerCase().startsWith(nameController.text.toString().toLowerCase()))
+                                                // if (element.name
+                                                //         .toString()
+                                                //         .toLowerCase()
+                                                //         .split("")
+                                                //         .toSet()
+                                                //         .intersection(
+                                                //             nameController.text
+                                                //                 .toLowerCase()
+                                                //                 .split("")
+                                                //                 .toSet())
+                                                //         .length ==
+                                                //     nameController.text
+                                                //         .toLowerCase()
+                                                //         .split("")
+                                                //         .toSet()
+                                                //         .length)
+                                                         {
                                                   setState(() {
                                                     filterdata.add(element);
                                                   });
@@ -788,23 +790,25 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                     List<Member>? filterdata =
                                                         [];
                                                     oldData.forEach((element) {
-                                                      if (element.name
-                                                              .toString()
-                                                              .toLowerCase()
-                                                              .split("")
-                                                              .toSet()
-                                                              .intersection(
-                                                                  nameController
-                                                                      .text
-                                                                      .toLowerCase()
-                                                                      .split("")
-                                                                      .toSet())
-                                                              .length ==
-                                                          nameController.text
-                                                              .toLowerCase()
-                                                              .split("")
-                                                              .toSet()
-                                                              .length) {
+                                                        if(element.name.toString().toLowerCase().startsWith(nameController.text.toString().toLowerCase()))
+                                                    //   if (element.name
+                                                    //           .toString()
+                                                    //           .toLowerCase()
+                                                    //           .split("")
+                                                    //           .toSet()
+                                                    //           .intersection(
+                                                    //               nameController
+                                                    //                   .text
+                                                    //                   .toLowerCase()
+                                                    //                   .split("")
+                                                    //                   .toSet())
+                                                    //           .length ==
+                                                    //       nameController.text
+                                                    //           .toLowerCase()
+                                                    //           .split("")
+                                                    //           .toSet()
+                                                    //           .length) 
+                                                              {
                                                         setState(() {
                                                           filterdata
                                                               .add(element);

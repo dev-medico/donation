@@ -26,6 +26,12 @@ class _DonationChartByHospitalState extends State<DonationChartByHospital> {
 
     //delete duplicate from hospitals
     hospitals = hospitals.toSet().toList();
+    //sort Hospitals by hospitals list count
+    hospitals.sort((a, b) => widget.data
+        .where((element) => element.hospital == b)
+        .length
+        .compareTo(
+            widget.data.where((element) => element.hospital == a).length));
   }
 
   @override
