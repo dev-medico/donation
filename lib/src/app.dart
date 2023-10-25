@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:donation/realm/realm_services.dart';
+import 'package:donation/src/features/donation/controller/donation_provider.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:donation/src/features/home/desktop_home.dart';
@@ -11,7 +14,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/dashboard/dashboard.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
-import 'package:donation/src/features/donation/blood_donation_list_new_style.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/home/home_with_drawer.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
@@ -34,6 +36,23 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+//   @override
+//   void initState() {
+//     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+//       var donations = ref.watch(donationProvider);
+//       log("ဆေးရုံကြီး - " +
+//           donations
+//               .where((element) => element.hospital.toString() == "ရတနာမွန်")
+//               .length
+//               .toString());
+//      donations
+//               .where((element) => element.hospital.toString() == "ရတနာမွန်").forEach((element) {
+//                 ref.watch(realmProvider)!.updateDonation(element,hospital: "ရတနာမွန်ဆေးရုံ");
+//               });
+//     });
+//     super.initState();
+//   }
+
   @override
   Widget build(BuildContext context) {
     var currentUser = ref.watch(realmProvider);

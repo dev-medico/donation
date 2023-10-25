@@ -18,6 +18,15 @@ final donationStreamProvider =
   return stream;
 });
 
+final donationProvider = StateProvider<RealmResults<Donation>>((ref) {
+  var realmService = ref.watch(realmProvider);
+
+  final stream = realmService!.realm
+      .query<Donation>("TRUEPREDICATE SORT(donationDate DESC)");
+
+  return stream;
+});
+
 final donationByMonthYearStreamProvider =
     StreamProvider.family<RealmResultsChanges<Donation>, DonationFilterModel>(
         (ref, filter) {

@@ -641,7 +641,7 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                           width: double.infinity,
                                           height: 50,
                                           margin: const EdgeInsets.only(
-                                              top: 16, bottom: 4, right: 20),
+                                              top: 0, bottom: 4, right: 20),
                                           child: NeumorphicButton(
                                             child: Text(
                                               donationDate,
@@ -665,6 +665,7 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                               ],
                             ),
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(
                                   flex: 3,
@@ -722,18 +723,14 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                     visible: switchNew,
                                     child: Container(
                                       margin: const EdgeInsets.only(
-                                          left: 20,
                                           top: 16,
+                                          left: 20,
                                           bottom: 8,
                                           right: 20),
                                       child: TextFormField(
-                                        controller: ageController,
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter.digitsOnly
-                                        ],
+                                        controller: nameController,
                                         decoration:
-                                            inputBoxDecoration("လူနာအသက်"),
+                                            inputBoxDecoration("လူနာအမည်"),
                                       ),
                                     ),
                                   ),
@@ -753,7 +750,7 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                     child: Container(
                                       margin: const EdgeInsets.only(
                                           left: 20,
-                                          top: 16,
+                                          top: 8,
                                           bottom: 8,
                                           right: 20),
                                       child: TypeAheadField(
@@ -800,7 +797,29 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                   ),
                                 ),
                                 Expanded(
-                                  flex: 5,
+                                  flex: 3,
+                                  child: Visibility(
+                                    visible: switchNew,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 8,
+                                          bottom: 8,
+                                          right: 20),
+                                      child: TextFormField(
+                                        controller: ageController,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        decoration:
+                                            inputBoxDecoration("လူနာအသက်"),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
                                   child: Container(),
                                 ),
                               ],
