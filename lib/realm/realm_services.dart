@@ -153,6 +153,7 @@ class RealmServices with ChangeNotifier {
       DateTime? lastDate,
       String? memberCount,
       String? memberId,
+      String? gender,
       String? note,
       String? nrc,
       String? phone,
@@ -175,6 +176,9 @@ class RealmServices with ChangeNotifier {
       }
       if (fatherName != null) {
         member.fatherName = fatherName;
+      }
+      if (gender != null) {
+        member.gender = gender;
       }
 
       if (lastDate != null) {

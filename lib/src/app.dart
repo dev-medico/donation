@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/donation/controller/donation_provider.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:donation/src/features/home/desktop_home.dart';
 import 'package:donation/src/features/home/home.dart';
@@ -36,22 +37,97 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
-//   @override
-//   void initState() {
-//     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-//       var donations = ref.watch(donationProvider);
-//       log("ဆေးရုံကြီး - " +
-//           donations
-//               .where((element) => element.hospital.toString() == "ရတနာမွန်")
-//               .length
-//               .toString());
-//      donations
-//               .where((element) => element.hospital.toString() == "ရတနာမွန်").forEach((element) {
-//                 ref.watch(realmProvider)!.updateDonation(element,hospital: "ရတနာမွန်ဆေးရုံ");
-//               });
-//     });
-//     super.initState();
-//   }
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      //   var members = ref.watch(membersDataProvider);
+      //   log("ကို - " +
+      //       members
+      //           .where((element) =>
+      //               element.name.toString().startsWith("ကို") ||
+      //               element.name.toString().startsWith(" ကို") ||
+      //               element.name.toString().startsWith("ဦး") ||
+      //               element.name.toString().startsWith(" ဦး") ||
+      //               element.name.toString().startsWith("စိုင်း") ||
+      //               element.name.toString().startsWith("ဦး") ||
+      //               element.name.toString().startsWith("နိုင်") ||
+      //               element.name.toString().startsWith("အရှင်") ||
+      //               element.name.toString().startsWith("စော"))
+      //           .length
+      //           .toString());
+
+      //   log("မ - " +
+      //       members
+      //           .where((element) =>
+      //               element.name.toString().startsWith("မ") ||
+      //               element.name.toString().startsWith("ဒေါ်") ||
+      //               element.name.toString().startsWith("နော်") ||
+      //               element.name.toString().startsWith("ဒေါ်"))
+      //           .length
+      //           .toString());
+      //   log("Other - " +
+      //       members
+      //           .where((element) =>
+      //               (!(element.name.toString().startsWith("ကို") ||
+      //                       element.name.toString().startsWith(" ကို") ||
+      //                       element.name.toString().startsWith("ဦး") ||
+      //                       element.name.toString().startsWith(" ဦး") ||
+      //                       element.name.toString().startsWith("အရှင်") ||
+      //                       element.name.toString().startsWith("စိုင်း") ||
+      //                       element.name.toString().startsWith("ဦး") ||
+      //                       element.name.toString().startsWith("နိုင်") ||
+      //                       element.name.toString().startsWith("စော")) &&
+      //                   !(element.name.toString().startsWith("မ") ||
+      //                       element.name.toString().startsWith("ဒေါ်") ||
+      //                       element.name.toString().startsWith("နော်") ||
+      //                       element.name.toString().startsWith("ဒေါ်"))))
+      //           .length
+      //           .toString());
+
+      //   members
+      //       .where((element) =>
+      //           element.name.toString().startsWith("ကို") ||
+      //           element.name.toString().startsWith(" ကို") ||
+      //           element.name.toString().startsWith("ဦး") ||
+      //           element.name.toString().startsWith(" ဦး") ||
+      //           element.name.toString().startsWith("စိုင်း") ||
+      //           element.name.toString().startsWith("ဦး") ||
+      //           element.name.toString().startsWith("နိုင်") ||
+      //           element.name.toString().startsWith("အရှင်") ||
+      //           element.name.toString().startsWith("စော"))
+      //       .forEach((element) {
+      //     ref.watch(realmProvider)!.updateMember(element, gender: "male");
+      //   });
+      //   members
+      //       .where((element) =>
+      //           element.name.toString().startsWith("မ") ||
+      //           element.name.toString().startsWith("ဒေါ်") ||
+      //           element.name.toString().startsWith("နော်") ||
+      //           element.name.toString().startsWith("ဒေါ်"))
+      //       .forEach((element) {
+      //     ref.watch(realmProvider)!.updateMember(element, gender: "female");
+      //   });
+      //   members
+      //       .where((element) => (!(element.name.toString().startsWith("ကို") ||
+      //               element.name.toString().startsWith(" ကို") ||
+      //               element.name.toString().startsWith("ဦး") ||
+      //               element.name.toString().startsWith(" ဦး") ||
+      //               element.name.toString().startsWith("အရှင်") ||
+      //               element.name.toString().startsWith("စိုင်း") ||
+      //               element.name.toString().startsWith("ဦး") ||
+      //               element.name.toString().startsWith("နိုင်") ||
+      //               element.name.toString().startsWith("စော")) &&
+      //           !(element.name.toString().startsWith("မ") ||
+      //               element.name.toString().startsWith("ဒေါ်") ||
+      //               element.name.toString().startsWith("နော်") ||
+      //               element.name.toString().startsWith("ဒေါ်"))))
+      //       .forEach((element) {
+      //     ref.watch(realmProvider)!.updateMember(element, gender: "female");
+      //   });
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

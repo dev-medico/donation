@@ -242,7 +242,13 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                   ref.watch(membersProvider);
                                               List<Member>? filterdata = [];
                                               oldData.forEach((element) {
-                                                 if(element.name.toString().toLowerCase().startsWith(nameController.text.toString().toLowerCase()))
+                                                if (element.name
+                                                    .toString()
+                                                    .toLowerCase()
+                                                    .startsWith(nameController
+                                                        .text
+                                                        .toString()
+                                                        .toLowerCase()))
                                                 // if (element.name
                                                 //         .toString()
                                                 //         .toLowerCase()
@@ -259,7 +265,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                 //         .split("")
                                                 //         .toSet()
                                                 //         .length)
-                                                         {
+                                                {
                                                   setState(() {
                                                     filterdata.add(element);
                                                   });
@@ -790,25 +796,32 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                     List<Member>? filterdata =
                                                         [];
                                                     oldData.forEach((element) {
-                                                        if(element.name.toString().toLowerCase().startsWith(nameController.text.toString().toLowerCase()))
-                                                    //   if (element.name
-                                                    //           .toString()
-                                                    //           .toLowerCase()
-                                                    //           .split("")
-                                                    //           .toSet()
-                                                    //           .intersection(
-                                                    //               nameController
-                                                    //                   .text
-                                                    //                   .toLowerCase()
-                                                    //                   .split("")
-                                                    //                   .toSet())
-                                                    //           .length ==
-                                                    //       nameController.text
-                                                    //           .toLowerCase()
-                                                    //           .split("")
-                                                    //           .toSet()
-                                                    //           .length) 
-                                                              {
+                                                      if (element.name
+                                                          .toString()
+                                                          .toLowerCase()
+                                                          .startsWith(
+                                                              nameController
+                                                                  .text
+                                                                  .toString()
+                                                                  .toLowerCase()))
+                                                      //   if (element.name
+                                                      //           .toString()
+                                                      //           .toLowerCase()
+                                                      //           .split("")
+                                                      //           .toSet()
+                                                      //           .intersection(
+                                                      //               nameController
+                                                      //                   .text
+                                                      //                   .toLowerCase()
+                                                      //                   .split("")
+                                                      //                   .toSet())
+                                                      //           .length ==
+                                                      //       nameController.text
+                                                      //           .toLowerCase()
+                                                      //           .split("")
+                                                      //           .toSet()
+                                                      //           .length)
+                                                      {
                                                         setState(() {
                                                           filterdata
                                                               .add(element);
@@ -1017,7 +1030,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                   margin: const EdgeInsets.only(
                                                       left: 12),
                                                   padding: const EdgeInsets
-                                                          .symmetric(
+                                                      .symmetric(
                                                       horizontal: 12),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
@@ -1391,7 +1404,9 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
 
   static YYDialog memberExistDialog(BuildContext context, Member data) {
     return YYDialog().build()
-      ..width = MediaQuery.of(context).size.width - 60
+      ..width = Responsive.isDesktop(context)
+          ? MediaQuery.of(context).size.width * 0.4
+          : MediaQuery.of(context).size.width - 60
       ..backgroundColor = Colors.white
       ..borderRadius = 20.0
       ..showCallBack = () {}
@@ -1561,7 +1576,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const <Widget>[
-                    Text("အသေးစိတ်ကြည့်မည်",
+                    Text("အိုကေ",
                         textScaleFactor: 1.0,
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 15, color: Colors.white))

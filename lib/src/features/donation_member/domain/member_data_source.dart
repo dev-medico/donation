@@ -24,8 +24,7 @@ class MemberDataSource extends DataGridSource {
                   value: "      ${e.bloodBankCard}    "),
               DataGridCell<String>(
                   columnName: 'သွေးလှူမှုကြိမ်ရေ',
-                  value:
-                      "       ${Utils.strToMM(e.totalCount.toString())} ကြိမ်       "),
+                  value: "       ${e.totalCount.toString()}        "),
             ]))
         .toList();
   }

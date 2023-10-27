@@ -1,5 +1,7 @@
 import 'package:donation/responsive.dart';
+import 'package:donation/responsive_two_column_layout.dart';
 import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
+import 'package:donation/src/features/finder/most_blood_donation_member.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -43,34 +45,46 @@ class _DonationByDiseaseScreenState
     //get only top 5 donations
     donations = donations!.length > 8 ? donations!.sublist(0, 8) : donations;
 
-    return Container(
-      margin: EdgeInsets.only(
-          left: Responsive.isMobile(context) ? 16 : 20,
-          top: Responsive.isMobile(context) ? 16 : 20,
-          bottom: Responsive.isMobile(context) ? 32 : 0,
-          right: Responsive.isMobile(context)
-              ? 20
-              : MediaQuery.of(context).size.width * 0.34),
-      child: NeumorphicButton(
-        style: NeumorphicStyle(
-          color: Colors.white,
-          boxShape: NeumorphicBoxShape.roundRect(
-              BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
-          depth: 4,
-          intensity: 0.8,
-          shadowDarkColor: Colors.black,
-          shadowLightColor: Colors.white,
-        ),
-        onPressed: () async {},
-        child: Row(
-          children: [
-            Expanded(child: BloodDonationPieChart(donations: donations!)),
-            Container(
-              width: 20,
-            )
-          ],
-        ),
-      ),
-    );
+    return ResponsiveTwoColumnLayout(
+        spacing: 20,
+        startContent: Container(
+            margin: EdgeInsets.only(
+                left: Responsive.isMobile(context) ? 16 : 20,
+                top: Responsive.isMobile(context) ? 16 : 20,
+                bottom: Responsive.isMobile(context) ? 32 : 20,
+                right: Responsive.isMobile(context) ? 20 : 0),
+            child: NeumorphicButton(
+                style: NeumorphicStyle(
+                  color: Colors.white,
+                  boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(
+                      Responsive.isMobile(context) ? 12 : 16)),
+                  depth: 4,
+                  intensity: 0.8,
+                  shadowDarkColor: Colors.black,
+                  shadowLightColor: Colors.white,
+                ),
+                onPressed: () async {},
+                child: BloodDonationPieChart(donations: donations!))),
+        endContent: Container(
+          // height: MediaQuery.of(context).size.height * 0.41,
+          margin: EdgeInsets.only(
+              left: Responsive.isMobile(context) ? 16 : 40,
+              top: Responsive.isMobile(context) ? 16 : 20,
+              bottom: Responsive.isMobile(context) ? 32 : 20,
+              right: Responsive.isMobile(context) ? 20 : 20),
+          child: NeumorphicButton(
+            style: NeumorphicStyle(
+              color: Colors.white,
+              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(
+                  Responsive.isMobile(context) ? 12 : 16)),
+              depth: 4,
+              intensity: 0.8,
+              shadowDarkColor: Colors.black,
+              shadowLightColor: Colors.white,
+            ),
+            onPressed: () async {},
+            child: MostBloodDonationMembers(),
+          ),
+        ));
   }
 }

@@ -19,6 +19,7 @@ class _Member {
   String? nrc;
   String? phone;
   String? address;
+  String? gender;
   String? profileUrl;
   DateTime? registerDate;
   String? totalCount;

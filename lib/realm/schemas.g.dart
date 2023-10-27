@@ -22,6 +22,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
     String? nrc,
     String? phone,
     String? address,
+    String? gender,
     String? profileUrl,
     DateTime? registerDate,
     String? totalCount,
@@ -40,6 +41,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
     RealmObjectBase.set(this, 'nrc', nrc);
     RealmObjectBase.set(this, 'phone', phone);
     RealmObjectBase.set(this, 'address', address);
+    RealmObjectBase.set(this, 'gender', gender);
     RealmObjectBase.set(this, 'profileUrl', profileUrl);
     RealmObjectBase.set(this, 'registerDate', registerDate);
     RealmObjectBase.set(this, 'totalCount', totalCount);
@@ -126,6 +128,11 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
   set address(String? value) => RealmObjectBase.set(this, 'address', value);
 
   @override
+  String? get gender => RealmObjectBase.get<String>(this, 'gender') as String?;
+  @override
+  set gender(String? value) => RealmObjectBase.set(this, 'gender', value);
+
+  @override
   String? get profileUrl =>
       RealmObjectBase.get<String>(this, 'profileUrl') as String?;
   @override
@@ -182,6 +189,7 @@ class Member extends _Member with RealmEntity, RealmObjectBase, RealmObject {
       SchemaProperty('nrc', RealmPropertyType.string, optional: true),
       SchemaProperty('phone', RealmPropertyType.string, optional: true),
       SchemaProperty('address', RealmPropertyType.string, optional: true),
+      SchemaProperty('gender', RealmPropertyType.string, optional: true),
       SchemaProperty('profileUrl', RealmPropertyType.string, optional: true),
       SchemaProperty('registerDate', RealmPropertyType.timestamp,
           optional: true),

@@ -50,6 +50,14 @@ final membersDataProvider = StateProvider<RealmResults<Member>>((ref) {
   return stream;
 });
 
+final membersDataByTotalCountProvider = StateProvider<RealmResults<Member>>((ref) {
+  var realmService = ref.watch(realmProvider);
+  final stream =
+      realmService!.realm.query<Member>("TRUEPREDICATE SORT(totalCount DESC)");
+
+  return stream;
+});
+
 final membersDataByPhoneProvider =
     StateProvider.family<Member?, String>((ref, phone) {
   var realmService = ref.watch(realmProvider);
