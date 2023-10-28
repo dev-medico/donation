@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 class MonthlyReportDialog extends StatelessWidget {
   final String title;
   final Widget child;
+  final bool isYearly;
   const MonthlyReportDialog(
-      {super.key, required this.title, required this.child});
+      {super.key,
+      required this.title,
+      required this.child,
+      required this.isYearly});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +18,9 @@ class MonthlyReportDialog extends StatelessWidget {
         title: title,
         width: Responsive.isMobile(context)
             ? MediaQuery.of(context).size.width
-            : MediaQuery.of(context).size.width * 0.5,
+            : isYearly
+                ? MediaQuery.of(context).size.width * 0.4
+                : MediaQuery.of(context).size.width * 0.5,
         child: child);
   }
 }

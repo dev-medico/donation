@@ -35,14 +35,14 @@ class CommonDialog extends StatelessWidget {
               height: 60,
             ),
             SizedBox(
-              height: 10,
+              height: Responsive.isMobile(context) ? 2 : 10,
             ),
             Flexible(
               flex: isExpand ? 1 : 0,
               child: Padding(
                 padding: Responsive.isMobile(context)
-                    ? EdgeInsets.fromLTRB(20, 4, 20, 30)
-                    : EdgeInsets.fromLTRB(30, 20, 30, 30),
+                    ? EdgeInsets.fromLTRB(20, 4, 20, 0)
+                    : EdgeInsets.fromLTRB(10, 20, 30, 30),
                 child: child,
               ),
             ),

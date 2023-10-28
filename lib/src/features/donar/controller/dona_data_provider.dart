@@ -21,16 +21,19 @@ final donarByMonthYearStreamProvider =
 });
 
 final donarByYearProvider =
-    StateProvider.family<RealmResults<DonarRecord>, int>((ref, year) {
+    StateProvider.family<List<DonarRecord>, int>((ref, year) {
   var realmService = ref.watch(realmProvider);
 
   final stream = realmService!.realm.query<DonarRecord>(
-      r"date > $0 AND date <= $1 AND TRUEPREDICATE SORT(date ASC)", [
-    DateTime(year, 1, 1),
-    DateTime(year + 1, 1, 1),
-  ]);
+    "TRUEPREDICATE SORT(date ASC)",
+  );
 
-  return stream;
+  List<DonarRecord> donars = [];
+  stream.forEach((element) {
+    if (element.date!.year == year) donars.add(element);
+  });
+
+  return donars;
 });
 
 final expenseByMonthYearStreamProvider = StreamProvider.family<
@@ -47,16 +50,19 @@ final expenseByMonthYearStreamProvider = StreamProvider.family<
 });
 
 final expenseByYearProvider =
-    StateProvider.family<RealmResults<ExpensesRecord>, int>((ref, year) {
+    StateProvider.family<List<ExpensesRecord>, int>((ref, year) {
   var realmService = ref.watch(realmProvider);
 
   final stream = realmService!.realm.query<ExpensesRecord>(
-      r"date > $0 AND date <= $1 AND TRUEPREDICATE SORT(date ASC)", [
-    DateTime(year, 1, 1),
-    DateTime(year + 1, 1, 1),
-  ]);
+    "TRUEPREDICATE SORT(date ASC)",
+  );
 
-  return stream;
+  List<ExpensesRecord> expenses = [];
+  stream.forEach((element) {
+    if (element.date!.year == year) expenses.add(element);
+  });
+
+  return expenses;
 });
 
 final donarsDataProvider = StateProvider<RealmResults<DonarRecord>>((ref) {

@@ -260,7 +260,11 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                             builder: (context) =>
                                                 MonthlyReportDialog(
                                                   title: "နှစ်ချုပ် ရှင်းတမ်း",
-                                                  child: YearlyReport(yearSelected: _yearSelected , year: years[_yearSelected],),
+                                                  isYearly: true,
+                                                  child: YearlyReport(
+                                                    yearSelected: _yearSelected,
+                                                    year: years[_yearSelected],
+                                                  ),
                                                 ));
                                       },
                                       child: Align(
@@ -315,6 +319,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                             builder: (context) =>
                                                 MonthlyReportDialog(
                                                   title: "လချုပ် ရှင်းတမ်း",
+                                                  isYearly: false,
                                                   child: monthlyReport(
                                                       leftBalance,
                                                       totalDonation,
@@ -899,15 +904,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
     }
   }
 
- 
-
   Widget monthlyReport(int leftBalance, int totalDonation, int totalExpense,
       int thisMonthLeftBalance) {
     if (Responsive.isMobile(context)) {
       return Container(
         decoration: shadowDecoration(Colors.white),
         // padding: const EdgeInsets.only(left: 8, right: 8, bottom: 20, top: 12),
-        margin: EdgeInsets.only(left: Responsive.isMobile(context) ? 0 : 30),
+        margin: EdgeInsets.only(
+            left: Responsive.isMobile(context) ? 0 : 30, bottom: 30),
         child: Column(
           children: [
             Text(
