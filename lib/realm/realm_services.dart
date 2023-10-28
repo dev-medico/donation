@@ -338,6 +338,26 @@ class RealmServices with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateExpense(
+    ExpensesRecord expensesRecord, {
+    int? amount,
+    DateTime? date,
+    String? name,
+  }) async {
+    realm.write(() {
+      if (date != null) {
+        expensesRecord.date = date;
+      }
+      if (amount != null) {
+        expensesRecord.amount = amount;
+      }
+      if (name != null) {
+        expensesRecord.name = name;
+      }
+    });
+    notifyListeners();
+  }
+
   void deleteDonar(DonarRecord donar) {
     realm.write(() => realm.delete(donar));
     notifyListeners();

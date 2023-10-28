@@ -40,7 +40,9 @@ class CommonDialog extends StatelessWidget {
             Flexible(
               flex: isExpand ? 1 : 0,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(30, 20, 30, 30),
+                padding: Responsive.isMobile(context)
+                    ? EdgeInsets.fromLTRB(20, 4, 20, 30)
+                    : EdgeInsets.fromLTRB(30, 20, 30, 30),
                 child: child,
               ),
             ),

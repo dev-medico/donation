@@ -3,6 +3,7 @@ import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
 import 'package:donation/src/features/donation/blood_request_give_chart.dart';
 import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
+import 'package:donation/src/features/donation/donation_chart_by_hospital.dart';
 import 'package:donation/src/features/finder/blood_donation_gender_pie_chart.dart';
 import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
 import 'package:donation/src/features/finder/most_blood_donation_member.dart';
@@ -254,28 +255,46 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
               ),
             ),
             ResponsiveRowColumnItem(
-                rowFlex: Responsive.isMobile(context) ? null : 3,
+              rowFlex: Responsive.isMobile(context) ? null : 3,
+              child: Container(
                 child: Container(
-                  margin: EdgeInsets.only(
-                      top: 20,
-                      left: 10,
-                      right: 10,
-                      bottom: Responsive.isMobile(context) ? 20 : 0),
-                  child: NeumorphicButton(
-                    style: NeumorphicStyle(
-                      color: Colors.white,
-                      boxShape: NeumorphicBoxShape.roundRect(
-                          BorderRadius.circular(
-                              Responsive.isMobile(context) ? 12 : 16)),
-                      depth: 4,
-                      intensity: 0.8,
-                      shadowDarkColor: Colors.black,
-                      shadowLightColor: Colors.white,
-                    ),
-                    onPressed: () async {},
-                    child: MostBloodDonationMembers(),
+                  margin: EdgeInsets.only(top: 20),
+                  height: Responsive.isMobile(context)
+                      ? MediaQuery.of(context).size.height * 0.65
+                      : MediaQuery.of(context).size.height * 0.52,
+                  width: Responsive.isMobile(context)
+                      ? MediaQuery.of(context).size.width * 0.9
+                      : MediaQuery.of(context).size.width * 0.43,
+                  child: DonationChartByHospital(
+                    data: donationList,
                   ),
-                )),
+                ),
+              ),
+            ),
+            // ResponsiveRowColumnItem(
+            //   rowFlex: Responsive.isMobile(context) ? null : 3,
+            //   child: Container(
+            //     margin: EdgeInsets.only(
+            //         top: 20,
+            //         left: 10,
+            //         right: 10,
+            //         bottom: Responsive.isMobile(context) ? 20 : 0),
+            //     child: NeumorphicButton(
+            //       style: NeumorphicStyle(
+            //         color: Colors.white,
+            //         boxShape: NeumorphicBoxShape.roundRect(
+            //             BorderRadius.circular(
+            //                 Responsive.isMobile(context) ? 12 : 16)),
+            //         depth: 4,
+            //         intensity: 0.8,
+            //         shadowDarkColor: Colors.black,
+            //         shadowLightColor: Colors.white,
+            //       ),
+            //       onPressed: () async {},
+            //       child: MostBloodDonationMembers(),
+            //     ),
+            //   ),
+            // ),
             ResponsiveRowColumnItem(
                 rowFlex: Responsive.isMobile(context) ? null : 3,
                 child: Container(

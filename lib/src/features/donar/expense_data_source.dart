@@ -6,31 +6,32 @@ import 'package:donation/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:intl/intl.dart';
 
-class DonarDataSource extends DataGridSource {
+class ExpenseDataSource extends DataGridSource {
   /// Creates the employee data source class with required details.
-  DonarDataSource({required List<DonarRecord> donarData}) {
-    for (int i = 0; i < donarData.length; i++) {
-      _donarData.add(DataGridRow(cells: [
+  ExpenseDataSource({required List<ExpensesRecord> expenseData}) {
+    for (int i = 0; i < expenseData.length; i++) {
+      _expenseData.add(DataGridRow(cells: [
         DataGridCell<String>(
             columnName: 'စဥ်',
             value: "   ${Utils.strToMM((i + 1).toString())}   "),
         DataGridCell<String>(
             columnName: 'ရက်စွဲ',
             value:
-                "        ${DateFormat('dd MMM yyyy').format(donarData[i].date!)}        "),
+                "        ${DateFormat('dd MMM yyyy').format(expenseData[i].date!)}        "),
         DataGridCell<String>(
-            columnName: 'အမည်', value: "  ${donarData[i].name}\t\t"),
+            columnName: 'အကြောင်းအရာ',
+            value: "      ${expenseData[i].name}\t\t\t"),
         DataGridCell<String>(
-            columnName: 'အလှူငွေ',
-            value: "    ${donarData[i].amount.toString()}\t\t"),
+            columnName: 'ကုန်ကျစရိတ်',
+            value: "    ${expenseData[i].amount.toString()}\t\t\t\t"),
       ]));
     }
   }
 
-  final List<DataGridRow> _donarData = [];
+  final List<DataGridRow> _expenseData = [];
 
   @override
-  List<DataGridRow> get rows => _donarData;
+  List<DataGridRow> get rows => _expenseData;
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {

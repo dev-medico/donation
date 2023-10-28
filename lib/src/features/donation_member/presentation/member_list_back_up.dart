@@ -27,12 +27,13 @@ class _MemberListBackupScreenState extends ConsumerState<MemberListBackupScreen>
   List<String> bloodTypes = [
     "A (Rh +)",
     "B (Rh +)",
-    "O (Rh +)",
     "AB (Rh +)",
+    "O (Rh +)",
     "A (Rh -)",
     "B (Rh -)",
-    "O (Rh -)",
     "AB (Rh -)"
+    "O (Rh -)",
+    
   ];
   String? selectedBloodType = "သွေးအုပ်စု အလိုက်ကြည့်မည်";
   String? selectedRange;

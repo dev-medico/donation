@@ -56,7 +56,7 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
               DashboardCard(
                 index: 1,
                 color: primaryDark,
-                title: "သွေးလှူမှု မှတ်တမ်း",
+                title: "သွေးလှူမှတ်တမ်း",
                 subtitle: "စုစုပေါင်း အကြိမ်ရေ",
                 amount: "${Utils.strToMM(totalDonations.toString())} ကြိမ်",
                 amountColor: Colors.blue,

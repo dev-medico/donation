@@ -34,11 +34,14 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
   @override
   Widget build(BuildContext context) {
     YYDialog.init(context);
-    var donations = ref.watch(donationsProvider);
-    donationDatas = donations
-        .where((element) =>
-            element.memberId.toString() == widget.data.memberId.toString())
-        .toList();
+    var donations = ref
+        .watch(donationsSortedByDateProvider(widget.data.memberId.toString()));
+    if (donationDatas.isEmpty) {
+      donations.forEach((element) {
+        donationDatas.add(element);
+      });
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: widget.isEditable

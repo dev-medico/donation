@@ -6,23 +6,25 @@ import 'package:donation/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:intl/intl.dart';
 
-class DonarMobileDataSource extends DataGridSource {
+class ExpenseMobileDataSource extends DataGridSource {
   /// Creates the employee data source class with required details.
-  DonarMobileDataSource({required List<DonarRecord> donarData}) {
-    for (int i = 0; i < donarData.length; i++) {
-      _donarData.add(DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'အမည်', value: "${donarData[i].name}"),
+  ExpenseMobileDataSource({required List<ExpensesRecord> expenseData}) {
+    for (int i = 0; i < expenseData.length; i++) {
+      _expenseData.add(DataGridRow(cells: [
         DataGridCell<String>(
-            columnName: 'အလှူငွေ',
-            value: "  ${donarData[i].amount.toString()}\t"),
+            columnName: 'အကြောင်းအရာ',
+            value: "      ${expenseData[i].name}\t\t"),
+        DataGridCell<String>(
+            columnName: 'ကုန်ကျစရိတ်',
+            value: "    ${expenseData[i].amount.toString()}\t\t"),
       ]));
     }
   }
 
-  final List<DataGridRow> _donarData = [];
+  final List<DataGridRow> _expenseData = [];
 
   @override
-  List<DataGridRow> get rows => _donarData;
+  List<DataGridRow> get rows => _expenseData;
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {

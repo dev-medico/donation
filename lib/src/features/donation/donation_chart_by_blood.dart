@@ -18,12 +18,12 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
   List<String> bloodTypes = [
     "A (Rh +)",
     "B (Rh +)",
-    "O (Rh +)",
     "AB (Rh +)",
+    "O (Rh +)",
     "A (Rh -)",
     "B (Rh -)",
+    "AB (Rh -)",
     "O (Rh -)",
-    "AB (Rh -)"
   ];
   String? donationYear;
 

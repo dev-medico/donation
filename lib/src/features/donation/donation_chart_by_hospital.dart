@@ -43,7 +43,7 @@ class _DonationChartByHospitalState extends State<DonationChartByHospital> {
       margin: const EdgeInsets.all(
         2,
       ),
-      decoration: shadowDecoration(Colors.white),
+      //decoration: shadowDecoration(Colors.white),
       child: NeumorphicButton(
         style: NeumorphicStyle(
           color: Colors.white,

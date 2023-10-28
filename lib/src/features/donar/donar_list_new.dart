@@ -9,8 +9,13 @@ import 'package:donation/src/features/donar/controller/donar_list_controller.dar
 import 'package:donation/src/features/donar/donar_data_source.dart';
 import 'package:donation/src/features/donar/donar_mobile_data_source.dart';
 import 'package:donation/src/features/donar/edit_donar.dart';
+import 'package:donation/src/features/donar/edit_expense.dart';
+import 'package:donation/src/features/donar/expense_data_source.dart';
+import 'package:donation/src/features/donar/expense_mobile_data_source.dart';
+import 'package:donation/src/features/donar/monthly_report_dialog.dart';
 import 'package:donation/src/features/donar/new_donar.dart';
 import 'package:donation/src/features/donar/new_expense_record.dart';
+import 'package:donation/src/features/donar/yearly_report.dart';
 import 'package:donation/src/features/donation/blood_donation_report.dart';
 import 'package:donation/src/features/donation/controller/donation_list_controller.dart';
 import 'package:donation/src/features/donation/controller/donation_provider.dart';
@@ -40,6 +45,11 @@ class DonarListNewScreen extends ConsumerStatefulWidget {
 
 class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
   int _yearSelected = 0;
+  int typeSelected = 0;
+  List<String> types = [
+    "ရရှိ ငွေစာရင်း",
+    "အသုံးစရိတ် ငွေစာရင်း",
+  ];
   int _monthSelected = DateTime.now().month - 1;
   List<String> years = [
     "2023",
@@ -134,6 +144,29 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                   color: Colors.white)),
         ),
       ),
+      floatingActionButton: Responsive.isMobile(context)
+          ? FloatingActionButton(
+              backgroundColor: Colors.red,
+              onPressed: () async {
+                if (typeSelected == 0) {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NewDonarScreen(),
+                    ),
+                  );
+                } else {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NewExpenseRecordScreen(),
+                    ),
+                  );
+                }
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: Container(
         margin: EdgeInsets.all(Responsive.isMobile(context) ? 8 : 24),
         child: Column(
@@ -198,148 +231,66 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                 ],
               ),
             ),
-            Expanded(
-              child: donarData.when(
-                data: (results) {
-                  if (results.isEmpty) {
-                    return Stack(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                                color: primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(12.0))),
-                            margin: const EdgeInsets.only(
-                              left: 15,
-                              top: 12,
-                            ),
-                            width: 164,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {
-                                var data = ref.watch(donationByYearProvider(
-                                    int.parse(years[_yearSelected])));
-                                List<Donation> yearData = [];
-                                data.forEach((element) {
-                                  yearData.add(element);
-                                });
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            BloodDonationReportScreen(
-                                              month: _monthSelected,
-                                              isYearly: true,
-                                              year: years[_yearSelected],
-                                              data: yearData,
-                                            )));
-                              },
-                              child: Align(
-                                  alignment: Alignment.center,
-                                  child: Row(
-                                    children: const [
-                                      SizedBox(
-                                        width: 12,
-                                      ),
-                                      Icon(Icons.list_alt_outlined,
-                                          color: Colors.white),
-                                      Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 12, bottom: 12, left: 12),
-                                          child: Text(
-                                            "နှစ်ချုပ် ရှင်းတမ်း",
-                                            textScaleFactor: 1.0,
-                                            style: TextStyle(
-                                                fontSize: 15.0,
-                                                color: Colors.white),
-                                          )),
-                                    ],
-                                  )),
-                            ),
-                          ),
-                        ),
-                        Center(
-                            child: Text(years[_yearSelected] +
-                                " " +
-                                months[_monthSelected] +
-                                " လ အတွက် အလှူရှင်ရှင်းတမ်း မရှိသေးပါ။")),
-                      ],
-                    );
-                  } else {
-                    return expenseData.when(
-                      data: (expenseResults) {
-                        return Column(
-                          children: [
-                            Align(
-                              alignment: Alignment.topLeft,
+            donarData.when(
+              data: (results) {
+                return expenseData.when(
+                  data: (expenseResults) {
+                    return Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Container(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Container(
-                                    decoration: BoxDecoration(
-                                        color: primaryColor,
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(12.0))),
-                                    margin: const EdgeInsets.only(
-                                      left: 15,
+                                    decoration: shadowDecorationWithBorder(
+                                        Colors.white, primaryColor),
+                                    margin: EdgeInsets.only(
                                       top: 12,
                                     ),
                                     width: 164,
                                     child: GestureDetector(
                                       behavior: HitTestBehavior.translucent,
                                       onTap: () {
-                                        var data = ref.watch(
-                                            donationByYearProvider(int.parse(
-                                                years[_yearSelected])));
-                                        List<Donation> yearData = [];
-                                        data.forEach((element) {
-                                          yearData.add(element);
-                                        });
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    BloodDonationReportScreen(
-                                                      month: _monthSelected,
-                                                      isYearly: true,
-                                                      year:
-                                                          years[_yearSelected],
-                                                      data: yearData,
-                                                    )));
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                MonthlyReportDialog(
+                                                  title: "နှစ်ချုပ် ရှင်းတမ်း",
+                                                  child: YearlyReport(yearSelected: _yearSelected , year: years[_yearSelected],),
+                                                ));
                                       },
                                       child: Align(
                                           alignment: Alignment.center,
                                           child: Row(
-                                            children: const [
+                                            children: [
                                               SizedBox(
                                                 width: 12,
                                               ),
                                               Icon(Icons.list_alt_outlined,
-                                                  color: Colors.white),
+                                                  color: primaryColor),
                                               Padding(
                                                   padding: EdgeInsets.only(
-                                                      top: 12,
-                                                      bottom: 12,
+                                                      top: 8,
+                                                      bottom: 8,
                                                       left: 12),
                                                   child: Text(
                                                     "နှစ်ချုပ် ရှင်းတမ်း",
                                                     textScaleFactor: 1.0,
                                                     style: TextStyle(
                                                         fontSize: 15.0,
-                                                        color: Colors.white),
+                                                        color: primaryColor),
                                                   )),
                                             ],
                                           )),
                                     ),
                                   ),
                                   Container(
-                                    decoration: BoxDecoration(
-                                        color: primaryColor,
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(12.0))),
+                                    decoration: shadowDecorationWithBorder(
+                                        Colors.white, primaryColor),
                                     margin: const EdgeInsets.only(
                                       left: 15,
                                       top: 12,
@@ -348,84 +299,220 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     child: GestureDetector(
                                       behavior: HitTestBehavior.translucent,
                                       onTap: () {
-                                        // Navigator.push(
-                                        //     context,
-                                        //     MaterialPageRoute(
-                                        //         builder: (context) =>
-                                        //             BloodDonationReportScreen(
-                                        //               isYearly: false,
-                                        //               month: _monthSelected,
-                                        //               year: years[_yearSelected],
-                                        //               data: results,
-                                        //             )));
+                                        int totalDonation = 0;
+                                        int longTextCount = 0;
+                                        int totalExpense = 0;
+
+                                        results.forEach((element) {
+                                          totalDonation += element.amount!;
+                                        });
+
+                                        expenseResults.forEach((element) {
+                                          totalExpense += element.amount!;
+                                        });
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                MonthlyReportDialog(
+                                                  title: "လချုပ် ရှင်းတမ်း",
+                                                  child: monthlyReport(
+                                                      leftBalance,
+                                                      totalDonation,
+                                                      totalExpense,
+                                                      currentleftBalance),
+                                                ));
                                       },
                                       child: Align(
                                           alignment: Alignment.center,
                                           child: Row(
-                                            children: const [
+                                            children: [
                                               SizedBox(
                                                 width: 12,
                                               ),
                                               Icon(Icons.list_alt_outlined,
-                                                  color: Colors.white),
+                                                  color: primaryColor),
                                               Padding(
                                                   padding: EdgeInsets.only(
-                                                      top: 12,
-                                                      bottom: 12,
+                                                      top: 8,
+                                                      bottom: 8,
                                                       left: 12),
                                                   child: Text(
                                                     "လချုပ် ရှင်းတမ်း",
                                                     textScaleFactor: 1.0,
                                                     style: TextStyle(
                                                         fontSize: 15.0,
-                                                        color: Colors.white),
+                                                        color: primaryColor),
                                                   )),
                                             ],
                                           )),
                                     ),
                                   ),
+                                  if (!Responsive.isMobile(context))
+                                    Row(
+                                      children: [
+                                        Container(
+                                          decoration:
+                                              shadowDecorationWithBorder(
+                                                  Colors.white, primaryColor),
+                                          margin: const EdgeInsets.only(
+                                            left: 15,
+                                            top: 12,
+                                          ),
+                                          width: 186,
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      NewDonarScreen(),
+                                                ),
+                                              );
+                                            },
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Icon(Icons.calculate_outlined,
+                                                    color: primaryColor),
+                                                Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 8,
+                                                        bottom: 8,
+                                                        left: 12),
+                                                    child: Text(
+                                                      "အလှူရှင် ထည့်မည်",
+                                                      textScaleFactor: 1.0,
+                                                      style: TextStyle(
+                                                          fontSize: 15.0,
+                                                          color: primaryColor),
+                                                    )),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 16,
+                                        ),
+                                        Container(
+                                          decoration:
+                                              shadowDecorationWithBorder(
+                                                  Colors.white, primaryColor),
+                                          margin: const EdgeInsets.only(
+                                            top: 12,
+                                          ),
+                                          width: 220,
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      NewExpenseRecordScreen(),
+                                                ),
+                                              );
+                                            },
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Icon(Icons.calculate_outlined,
+                                                    color: primaryColor),
+                                                Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 8,
+                                                        bottom: 8,
+                                                        left: 12),
+                                                    child: Text(
+                                                      "အသုံးစာရင်း ထည့်မည်",
+                                                      textScaleFactor: 1.0,
+                                                      style: TextStyle(
+                                                          fontSize: 15.0,
+                                                          color: primaryColor),
+                                                    )),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                 ],
                               ),
                             ),
-                            Expanded(
-                              child: Container(
-                                color: Colors.white,
-                                width: double.infinity,
-                                height: double.infinity,
-                                child: Container(
-                                  padding: EdgeInsets.only(
-                                      left:
-                                          Responsive.isMobile(context) ? 8 : 12,
-                                      top:
-                                          Responsive.isMobile(context) ? 8 : 12,
-                                      bottom: 12),
-                                  child: buildSimpleTable(
-                                      results,
-                                      expenseResults,
-                                      leftBalance,
-                                      currentleftBalance),
-                                ),
+                          ),
+                          if (Responsive.isMobile(context))
+                            Container(
+                              width: Responsive.isMobile(context)
+                                  ? MediaQuery.of(context).size.width * 0.84
+                                  : MediaQuery.of(context).size.width * 0.8,
+                              height: 40,
+                              margin: EdgeInsets.only(top: 20),
+                              child: CommonTabBar(
+                                underline: false,
+                                listWidget: [
+                                  for (int i = 0; i < types.length; i++)
+                                    CommonTabBarWidget(
+                                      underline: false,
+                                      name: types[i],
+                                      isSelected: typeSelected,
+                                      i: i,
+                                      onTap: () {
+                                        typeSelected = i;
+
+                                        setState(() {});
+                                      },
+                                    ),
+                                ],
                               ),
                             ),
-                          ],
-                        );
-                      },
-                      error: (Object error, StackTrace stackTrace) {
-                        return Center(child: Text(error.toString()));
-                      },
-                      loading: () {
-                        return Container();
-                      },
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    color: Colors.white,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                          left: Responsive.isMobile(context)
+                                              ? 8
+                                              : 12,
+                                          top: Responsive.isMobile(context)
+                                              ? 8
+                                              : 12,
+                                          bottom: 12),
+                                      child: buildSimpleTable(
+                                          results,
+                                          expenseResults,
+                                          leftBalance,
+                                          currentleftBalance),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     );
-                  }
-                },
-                error: (Object error, StackTrace stackTrace) {
-                  return Center(child: Text(error.toString()));
-                },
-                loading: () {
-                  return Container();
-                },
-              ),
+                  },
+                  error: (Object error, StackTrace stackTrace) {
+                    return Center(child: Text(error.toString()));
+                  },
+                  loading: () {
+                    return Container();
+                  },
+                );
+              },
+              error: (Object error, StackTrace stackTrace) {
+                return Center(child: Text(error.toString()));
+              },
+              loading: () {
+                return Container();
+              },
             ),
           ],
         ),
@@ -439,89 +526,168 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
     DonarMobileDataSource donarMobileDataSource =
         DonarMobileDataSource(donarData: data);
 
-    int totalDonation = 0;
-    int longTextCount = 0;
-    int totalExpense = 0;
-
-    data.forEach((element) {
-      totalDonation += element.amount!;
-    });
-
-    expenses.forEach((element) {
-      totalExpense += element.amount!;
-    });
+    ExpenseDataSource expenseDataSource =
+        ExpenseDataSource(expenseData: expenses);
+    ExpenseMobileDataSource expenseMobileDataSource =
+        ExpenseMobileDataSource(expenseData: expenses);
 
     if (Responsive.isMobile(context)) {
-      return Container(
-        margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
-        child: SfDataGrid(
-          source: Responsive.isMobile(context)
-              ? donarMobileDataSource
-              : donarDataSource,
-          onCellTap: (details) async {
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => EditDonarScreen(
-                          donar: data[details.rowColumnIndex.rowIndex - 1],
-                        )));
-
-            /// calculateLeftBalance();
-            // callAPI("");
-          },
-          gridLinesVisibility: GridLinesVisibility.both,
-          headerGridLinesVisibility: GridLinesVisibility.both,
-          columnWidthMode: Responsive.isMobile(context)
-              ? ColumnWidthMode.fitByCellValue
-              : ColumnWidthMode.fitByCellValue,
-          columns: <GridColumn>[
-            if (!Responsive.isMobile(context))
-              GridColumn(
-                  columnName: 'စဥ်',
-                  label: Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      color: primaryColor,
-                      padding: const EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'စဥ်',
-                        style: TextStyle(color: Colors.white),
-                      ))),
-            if (!Responsive.isMobile(context))
-              GridColumn(
-                  columnName: 'ရက်စွဲ',
-                  label: Container(
-                      color: primaryColor,
-                      padding: const EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'ရက်စွဲ',
-                        style: TextStyle(color: Colors.white),
-                      ))),
-            GridColumn(
-                columnName: 'အမည်',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'အမည်',
-                      style: TextStyle(color: Colors.white),
-                      overflow: TextOverflow.ellipsis,
-                    ))),
-            GridColumn(
-                columnName: 'အလှူငွေ',
-                label: Container(
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'အလှူငွေ',
-                      style: TextStyle(color: Colors.white),
-                    ))),
-          ],
-        ),
-      );
+      if (typeSelected == 0) {
+        if (data.isEmpty) {
+          return Center(
+              child: Text(years[_yearSelected] +
+                  " " +
+                  months[_monthSelected] +
+                  " လ အတွက် အလှူရှင်မှတ်တမ်း မရှိသေးပါ။"));
+        } else {
+          return Container(
+            margin:
+                EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
+            child: SfDataGrid(
+              source: Responsive.isMobile(context)
+                  ? donarMobileDataSource
+                  : donarDataSource,
+              onCellTap: (details) async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditDonarScreen(
+                              donar: data[details.rowColumnIndex.rowIndex - 1],
+                            )));
+              },
+              gridLinesVisibility: GridLinesVisibility.both,
+              headerGridLinesVisibility: GridLinesVisibility.both,
+              columnWidthMode: Responsive.isMobile(context)
+                  ? ColumnWidthMode.fitByCellValue
+                  : ColumnWidthMode.fitByCellValue,
+              columns: <GridColumn>[
+                if (!Responsive.isMobile(context))
+                  GridColumn(
+                      columnName: 'စဥ်',
+                      label: Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'စဥ်',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                if (!Responsive.isMobile(context))
+                  GridColumn(
+                      columnName: 'ရက်စွဲ',
+                      label: Container(
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'ရက်စွဲ',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                GridColumn(
+                    columnName: 'အမည်',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'အမည်',
+                          style: TextStyle(color: Colors.white),
+                          overflow: TextOverflow.ellipsis,
+                        ))),
+                GridColumn(
+                    columnName: 'အလှူငွေ',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'အလှူငွေ',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+              ],
+            ),
+          );
+        }
+      } else {
+        if (expenses.isEmpty) {
+          return Center(
+              child: Text(years[_yearSelected] +
+                  " " +
+                  months[_monthSelected] +
+                  " လ အတွက် အသုံးစရိတ်မှတ်တမ်း မရှိသေးပါ။"));
+        } else {
+          return Container(
+            margin:
+                EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
+            child: SfDataGrid(
+              source: Responsive.isMobile(context)
+                  ? expenseMobileDataSource
+                  : expenseDataSource,
+              onCellTap: (details) async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditExpenseScreen(
+                              expense:
+                                  expenses[details.rowColumnIndex.rowIndex - 1],
+                            )));
+              },
+              gridLinesVisibility: GridLinesVisibility.both,
+              headerGridLinesVisibility: GridLinesVisibility.both,
+              columnWidthMode: Responsive.isMobile(context)
+                  ? ColumnWidthMode.fill
+                  : ColumnWidthMode.auto,
+              columns: <GridColumn>[
+                if (!Responsive.isMobile(context))
+                  GridColumn(
+                      columnName: 'စဥ်',
+                      label: Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'စဥ်',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                if (!Responsive.isMobile(context))
+                  GridColumn(
+                      columnName: 'ရက်စွဲ',
+                      label: Container(
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'ရက်စွဲ',
+                            style: TextStyle(color: Colors.white),
+                          ))),
+                GridColumn(
+                    columnName: 'အကြောင်းအရာ',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'အကြောင်းအရာ',
+                          style: TextStyle(color: Colors.white),
+                          overflow: TextOverflow.ellipsis,
+                        ))),
+                GridColumn(
+                    columnName: 'ကုန်ကျစရိတ်',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'ကုန်ကျစရိတ်',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+              ],
+            ),
+          );
+        }
+      }
     } else {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,577 +695,803 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
         children: [
           Expanded(
               flex: 9,
-              child: Container(
-                margin: EdgeInsets.only(
-                    right: Responsive.isMobile(context) ? 20 : 20),
-                child: SfDataGrid(
-                  source: Responsive.isMobile(context)
-                      ? donarMobileDataSource
-                      : donarDataSource,
-                  onCellTap: (details) async {
-                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => EditDonarScreen(
-                                  donar:
-                                      data[details.rowColumnIndex.rowIndex - 1],
-                                )));
-                    // calculateLeftBalance();
-                    // callAPI("");
-                  },
-                  gridLinesVisibility: GridLinesVisibility.both,
-                  headerGridLinesVisibility: GridLinesVisibility.both,
-                  columnWidthMode: Responsive.isMobile(context)
-                      ? ColumnWidthMode.fitByCellValue
-                      : ColumnWidthMode.fitByCellValue,
-                  columns: <GridColumn>[
-                    if (!Responsive.isMobile(context))
-                      GridColumn(
-                          columnName: 'စဥ်',
-                          label: Container(
-                              width: MediaQuery.of(context).size.width * 0.3,
-                              color: primaryColor,
-                              padding: const EdgeInsets.all(8.0),
-                              alignment: Alignment.center,
-                              child: const Text(
-                                'စဥ်',
-                                style: TextStyle(color: Colors.white),
-                              ))),
-                    if (!Responsive.isMobile(context))
-                      GridColumn(
-                          columnName: 'ရက်စွဲ',
-                          label: Container(
-                              color: primaryColor,
-                              padding: const EdgeInsets.all(8.0),
-                              alignment: Alignment.center,
-                              child: const Text(
-                                'ရက်စွဲ',
-                                style: TextStyle(color: Colors.white),
-                              ))),
-                    GridColumn(
-                        columnName: 'အမည်',
-                        label: Container(
-                            color: primaryColor,
-                            padding: const EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            child: const Text(
-                              'အမည်',
-                              style: TextStyle(color: Colors.white),
-                              overflow: TextOverflow.ellipsis,
-                            ))),
-                    GridColumn(
-                        columnName: 'အလှူငွေ',
-                        label: Container(
-                            color: primaryColor,
-                            padding: const EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            child: const Text(
-                              'အလှူငွေ',
-                              style: TextStyle(color: Colors.white),
-                            ))),
-                  ],
-                ),
-              )),
+              child: (data.isEmpty)
+                  ? Center(
+                      child: Text(years[_yearSelected] +
+                          " " +
+                          months[_monthSelected] +
+                          " လ အတွက် အလှူရှင်မှတ်တမ်း မရှိသေးပါ။"))
+                  : Container(
+                      margin: EdgeInsets.only(
+                          right: Responsive.isMobile(context) ? 20 : 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            types[0],
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Expanded(
+                            child: SfDataGrid(
+                              source: Responsive.isMobile(context)
+                                  ? donarMobileDataSource
+                                  : donarDataSource,
+                              onCellTap: (details) async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => EditDonarScreen(
+                                              donar: data[details
+                                                      .rowColumnIndex.rowIndex -
+                                                  1],
+                                            )));
+                              },
+                              gridLinesVisibility: GridLinesVisibility.both,
+                              headerGridLinesVisibility:
+                                  GridLinesVisibility.both,
+                              columnWidthMode: Responsive.isMobile(context)
+                                  ? ColumnWidthMode.fitByCellValue
+                                  : ColumnWidthMode.fitByCellValue,
+                              columns: <GridColumn>[
+                                if (!Responsive.isMobile(context))
+                                  GridColumn(
+                                      columnName: 'စဥ်',
+                                      label: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.3,
+                                          color: primaryColor,
+                                          padding: const EdgeInsets.all(8.0),
+                                          alignment: Alignment.center,
+                                          child: const Text(
+                                            'စဥ်',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ))),
+                                if (!Responsive.isMobile(context))
+                                  GridColumn(
+                                      columnName: 'ရက်စွဲ',
+                                      label: Container(
+                                          color: primaryColor,
+                                          padding: const EdgeInsets.all(8.0),
+                                          alignment: Alignment.center,
+                                          child: const Text(
+                                            'ရက်စွဲ',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ))),
+                                GridColumn(
+                                    columnName: 'အမည်',
+                                    label: Container(
+                                        color: primaryColor,
+                                        padding: const EdgeInsets.all(8.0),
+                                        alignment: Alignment.center,
+                                        child: const Text(
+                                          'အမည်',
+                                          style: TextStyle(color: Colors.white),
+                                          overflow: TextOverflow.ellipsis,
+                                        ))),
+                                GridColumn(
+                                    columnName: 'အလှူငွေ',
+                                    label: Container(
+                                        color: primaryColor,
+                                        padding: const EdgeInsets.all(8.0),
+                                        alignment: Alignment.center,
+                                        child: const Text(
+                                          'အလှူငွေ',
+                                          style: TextStyle(color: Colors.white),
+                                        ))),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
           Expanded(
-              flex: 10,
-              child: Container(
-                decoration: shadowDecoration(Colors.white),
-                padding: const EdgeInsets.only(
-                    left: 8, right: 8, bottom: 20, top: 12),
-                margin: const EdgeInsets.only(left: 30),
-                child: Column(
-                  children: [
-                    Text(
-                        "${"${Utils.strToMM(years[_yearSelected].toString())} ${convertToMMMonthName(_monthSelected)}"} လ စာရင်းရှင်းတမ်း",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: NeumorphicTheme.of(context)
-                                ?.current!
-                                .variantColor)),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    Table(
-                      border: TableBorder.all(),
-                      columnWidths: const <int, TableColumnWidth>{
-                        0: FlexColumnWidth(),
-                        1: FlexColumnWidth(),
-                      },
-                      defaultVerticalAlignment: TableCellVerticalAlignment.top,
-                      children: <TableRow>[
-                        TableRow(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.all(
-                                  Responsive.isMobile(context) ? 8 : 12),
-                              child: const Text(
-                                "ဝင်ငွေ",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(
-                                  Responsive.isMobile(context) ? 8 : 12),
-                              child: const Text(
-                                "အသုံးစရိတ်",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Table(
-                      border: TableBorder.all(),
-                      columnWidths: const <int, TableColumnWidth>{
-                        0: FlexColumnWidth(),
-                        1: FlexColumnWidth(),
-                      },
-                      defaultVerticalAlignment: TableCellVerticalAlignment.top,
-                      children: <TableRow>[
-                        TableRow(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.all(
-                                  Responsive.isMobile(context) ? 8 : 12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: 30,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "စာရင်းဖွင့်လက်ကျန်ငွေ",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
-                                        ),
-                                        Text(
-                                          "${Utils.strToMM(leftBalance.toString())} ကျပ်",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 4,
-                                  ),
-                                  SizedBox(
-                                    height: 30,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "ယခုလ အလှူငွေ စုစုပေါင်း",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
-                                        ),
-                                        Text(
-                                          "${Utils.strToMM(totalDonation.toString())} ကျပ်",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: Responsive.isMobile(context) ? 8 : 12,
-                                  top: Responsive.isMobile(context) ? 8 : 12,
-                                  bottom:
-                                      Responsive.isMobile(context) ? 8 : 12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: expenses.length * 30 +
-                                        (longTextCount * 30),
-                                    child: ListView.builder(
-                                        itemCount: expenses.length,
-                                        itemBuilder: ((context, index) {
-                                          return Container(
-                                            margin: const EdgeInsets.only(
-                                                bottom: 4),
-                                            height:
-                                                expenses[index].name!.length >
-                                                        22
-                                                    ? 60
-                                                    : 30,
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    expenses[index].name ?? "-",
-                                                    maxLines: 2,
-                                                    style: TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            NeumorphicTheme.of(
-                                                                    context)
-                                                                ?.current!
-                                                                .variantColor),
-                                                  ),
-                                                ),
-                                                Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "${Utils.strToMM(expenses[index].amount.toString())} ကျပ်",
-                                                      style: TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: NeumorphicTheme
-                                                                  .of(context)
-                                                              ?.current!
-                                                              .variantColor),
-                                                    ),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                          bottom: expenses[
-                                                                          index]
-                                                                      .name!
-                                                                      .length >
-                                                                  22
-                                                              ? 8
-                                                              : 0),
-                                                      child: IconButton(
-                                                          icon: const Icon(
-                                                            Icons.delete,
-                                                            size: 20,
-                                                            color: Colors.red,
-                                                          ),
-                                                          onPressed: () {
-                                                            ref
-                                                                .watch(
-                                                                    realmProvider)!
-                                                                .deleteExpenseRecord(
-                                                                    expenses[
-                                                                        index]);
-                                                            //  calculateLeftBalance();
-                                                            Utils.messageSuccessSinglePopDialog(
-                                                                "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-                                                                context,
-                                                                "အိုကေ",
-                                                                Colors.black);
-                                                            // XataRepository()
-                                                            //     .deleteExpenseByID(
-                                                            //         expenses[
-                                                            //                 index]
-                                                            //             .id
-                                                            //             .toString())
-                                                            //     .then((value) {
-                                                            //   if (value
-                                                            //       .statusCode
-                                                            //       .toString()
-                                                            //       .startsWith(
-                                                            //           "2")) {
-                                                            //     Utils.messageSuccessNoPopDialog(
-                                                            //         "အသုံးစရိတ် ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-                                                            //         context,
-                                                            //         "အိုကေ",
-                                                            //         Colors
-                                                            //             .black);
-                                                            //    //  calculateLeftBalance();
-                                                            //     // callAPI("");
-                                                            //   }
-                                                            // });
-                                                          }),
-                                                    ),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          );
-                                        })),
-                                  ),
-                                  Visibility(
-                                    visible: expenses.isNotEmpty,
-                                    child: const Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 12, bottom: 12),
-                                      child: Divider(
-                                        color: Colors.black,
-                                        height: 1.5,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.only(right: 12),
-                                    height: 30,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "စုစုပေါင်း ကုန်ကျငွေ",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
-                                        ),
-                                        Text(
-                                          "${Utils.strToMM(totalExpense.toString())} ကျပ်",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 4,
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.only(right: 12),
-                                    height: 30,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "စာရင်းပိတ် လက်ကျန်ငွေ",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
-                                        ),
-                                        Text(
-                                          "${Utils.strToMM((thisMonthLeftBalance).toString())} ကျပ်",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Table(
-                      border: TableBorder.all(),
-                      columnWidths: const <int, TableColumnWidth>{
-                        0: FlexColumnWidth(),
-                        1: FlexColumnWidth(),
-                      },
-                      defaultVerticalAlignment: TableCellVerticalAlignment.top,
-                      children: <TableRow>[
-                        TableRow(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.all(
-                                  Responsive.isMobile(context) ? 8 : 12),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "စုစုပေါင်း",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
-                                  ),
-                                  Text(
-                                    "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(
-                                  Responsive.isMobile(context) ? 8 : 12),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "စုစုပေါင်း",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
-                                  ),
-                                  Text(
-                                    "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            flex: 9,
+            child: (expenses.isEmpty)
+                ? Center(
+                    child: Text(years[_yearSelected] +
+                        " " +
+                        months[_monthSelected] +
+                        " လ အတွက် အသုံးစရိတ်မှတ်တမ်း မရှိသေးပါ။"))
+                : Container(
+                    margin: EdgeInsets.only(
+                        right: Responsive.isMobile(context) ? 20 : 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NewDonarScreen(),
-                                ),
-                              );
-                              // calculateLeftBalance();
-                              // callAPI("");
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(12.0))),
-                              child: Row(
-                                children: const [
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Icon(Icons.calculate_outlined,
-                                      color: Colors.white),
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 12, bottom: 12, left: 12),
-                                      child: Text(
-                                        "အလှူရှင် ထည့်မည်",
-                                        textScaleFactor: 1.0,
-                                        style: TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.white),
-                                      )),
-                                ],
-                              ),
-                            ),
+                        Text(
+                          types[1],
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(
-                          width: 20,
+                        SizedBox(
+                          height: 8,
                         ),
                         Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: () async {
+                          child: SfDataGrid(
+                            source: Responsive.isMobile(context)
+                                ? expenseMobileDataSource
+                                : expenseDataSource,
+                            onCellTap: (details) async {
                               await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      NewExpenseRecordScreen(),
-                                ),
-                              );
-                              //  calculateLeftBalance();
-                              // callAPI("");
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => EditExpenseScreen(
+                                            expense: expenses[details
+                                                    .rowColumnIndex.rowIndex -
+                                                1],
+                                          )));
                             },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(12.0))),
-                              child: Row(
-                                children: const [
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Icon(Icons.calculate_outlined,
-                                      color: Colors.white),
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 12, bottom: 12, left: 12),
-                                      child: Text(
-                                        "အသုံးစာရင်း ထည့်မည်",
-                                        textScaleFactor: 1.0,
-                                        style: TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.white),
-                                      )),
-                                ],
-                              ),
-                            ),
+                            gridLinesVisibility: GridLinesVisibility.both,
+                            headerGridLinesVisibility: GridLinesVisibility.both,
+                            columnWidthMode: Responsive.isMobile(context)
+                                ? ColumnWidthMode.fill
+                                : ColumnWidthMode.auto,
+                            columns: <GridColumn>[
+                              if (!Responsive.isMobile(context))
+                                GridColumn(
+                                    columnName: 'စဥ်',
+                                    label: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.3,
+                                        color: primaryColor,
+                                        padding: const EdgeInsets.all(8.0),
+                                        alignment: Alignment.center,
+                                        child: const Text(
+                                          'စဥ်',
+                                          style: TextStyle(color: Colors.white),
+                                        ))),
+                              if (!Responsive.isMobile(context))
+                                GridColumn(
+                                    columnName: 'ရက်စွဲ',
+                                    label: Container(
+                                        color: primaryColor,
+                                        padding: const EdgeInsets.all(8.0),
+                                        alignment: Alignment.center,
+                                        child: const Text(
+                                          'ရက်စွဲ',
+                                          style: TextStyle(color: Colors.white),
+                                        ))),
+                              GridColumn(
+                                  columnName: 'အကြောင်းအရာ',
+                                  label: Container(
+                                      color: primaryColor,
+                                      padding: const EdgeInsets.all(8.0),
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        'အကြောင်းအရာ',
+                                        style: TextStyle(color: Colors.white),
+                                        overflow: TextOverflow.ellipsis,
+                                      ))),
+                              GridColumn(
+                                  columnName: 'ကုန်ကျစရိတ်',
+                                  label: Container(
+                                      color: primaryColor,
+                                      padding: const EdgeInsets.all(8.0),
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        'ကုန်ကျစရိတ်',
+                                        style: TextStyle(color: Colors.white),
+                                      ))),
+                            ],
                           ),
                         ),
                       ],
+                    ),
+                  ),
+          ),
+        ],
+      );
+    }
+  }
+
+ 
+
+  Widget monthlyReport(int leftBalance, int totalDonation, int totalExpense,
+      int thisMonthLeftBalance) {
+    if (Responsive.isMobile(context)) {
+      return Container(
+        decoration: shadowDecoration(Colors.white),
+        // padding: const EdgeInsets.only(left: 8, right: 8, bottom: 20, top: 12),
+        margin: EdgeInsets.only(left: Responsive.isMobile(context) ? 0 : 30),
+        child: Column(
+          children: [
+            Text(
+                "${"${Utils.strToMM(years[_yearSelected].toString())} ${convertToMMMonthName(_monthSelected)}"} လ စာရင်းရှင်းတမ်း",
+                style: TextStyle(
+                    fontSize: Responsive.isMobile(context) ? 18 : 20,
+                    fontWeight: FontWeight.bold,
+                    color: NeumorphicTheme.of(context)?.current!.variantColor)),
+            const SizedBox(
+              height: 12,
+            ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: const Text(
+                        "ဝင်ငွေ",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ))
-        ],
+              ],
+            ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "စာရင်းဖွင့်လက်ကျန်ငွေ",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM(leftBalance.toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          SizedBox(
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "ယခုလ အလှူငွေ စုစုပေါင်း",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM(totalDonation.toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+                1: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "စုစုပေါင်း",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: NeumorphicTheme.of(context)
+                                    ?.current!
+                                    .variantColor),
+                          ),
+                          Text(
+                            "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: NeumorphicTheme.of(context)
+                                    ?.current!
+                                    .variantColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: const Text(
+                        "အသုံးစရိတ်",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: Responsive.isMobile(context) ? 8 : 12,
+                          top: Responsive.isMobile(context) ? 8 : 12,
+                          bottom: Responsive.isMobile(context) ? 8 : 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(right: 12),
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "စုစုပေါင်း ကုန်ကျငွေ",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM(totalExpense.toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(right: 12),
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "စာရင်းပိတ် လက်ကျန်ငွေ",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM((thisMonthLeftBalance).toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+                1: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "စုစုပေါင်း",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: NeumorphicTheme.of(context)
+                                    ?.current!
+                                    .variantColor),
+                          ),
+                          Text(
+                            "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: NeumorphicTheme.of(context)
+                                    ?.current!
+                                    .variantColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        decoration: shadowDecoration(Colors.white),
+        padding: const EdgeInsets.only(left: 8, right: 8, bottom: 20, top: 12),
+        margin: EdgeInsets.only(left: Responsive.isMobile(context) ? 0 : 30),
+        child: Column(
+          children: [
+            Text(
+                "${"${Utils.strToMM(years[_yearSelected].toString())} ${convertToMMMonthName(_monthSelected)}"} လ စာရင်းရှင်းတမ်း",
+                style: TextStyle(
+                    fontSize: Responsive.isMobile(context) ? 18 : 20,
+                    fontWeight: FontWeight.bold,
+                    color: NeumorphicTheme.of(context)?.current!.variantColor)),
+            const SizedBox(
+              height: 40,
+            ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+                1: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: const Text(
+                        "ဝင်ငွေ",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: const Text(
+                        "အသုံးစရိတ်",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+                1: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "စာရင်းဖွင့်လက်ကျန်ငွေ",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM(leftBalance.toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          SizedBox(
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "ယခုလ အလှူငွေ စုစုပေါင်း",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM(totalDonation.toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: Responsive.isMobile(context) ? 8 : 12,
+                          top: Responsive.isMobile(context) ? 8 : 12,
+                          bottom: Responsive.isMobile(context) ? 8 : 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(right: 12),
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "စုစုပေါင်း ကုန်ကျငွေ",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM(totalExpense.toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(right: 12),
+                            height: 30,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "စာရင်းပိတ် လက်ကျန်ငွေ",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                                Text(
+                                  "${Utils.strToMM((thisMonthLeftBalance).toString())} ကျပ်",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: NeumorphicTheme.of(context)
+                                          ?.current!
+                                          .variantColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+                1: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "စုစုပေါင်း",
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: NeumorphicTheme.of(context)
+                                    ?.current!
+                                    .variantColor),
+                          ),
+                          Text(
+                            "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: NeumorphicTheme.of(context)
+                                    ?.current!
+                                    .variantColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "စုစုပေါင်း",
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: NeumorphicTheme.of(context)
+                                    ?.current!
+                                    .variantColor),
+                          ),
+                          Text(
+                            "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: NeumorphicTheme.of(context)
+                                    ?.current!
+                                    .variantColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+          ],
+        ),
       );
     }
   }
