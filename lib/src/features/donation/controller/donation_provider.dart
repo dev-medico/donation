@@ -33,7 +33,7 @@ final donationByMonthYearStreamProvider =
   var realmService = ref.watch(realmProvider);
 
   final stream = realmService!.realm.query<Donation>(
-      r"donationDate >= $0 AND donationDate < $1 AND TRUEPREDICATE SORT(donationDate ASC)",
+      r"donationDate > $0 AND donationDate <= $1 AND TRUEPREDICATE SORT(donationDate ASC)",
       [
         DateTime(filter.year!, filter.month!, 1),
         DateTime(filter.year!, filter.month! + 1, 1),
@@ -47,7 +47,7 @@ final donationByYearProvider =
   var realmService = ref.watch(realmProvider);
 
   final stream = realmService!.realm.query<Donation>(
-      r"donationDate >= $0 AND donationDate < $1 AND TRUEPREDICATE SORT(donationDate ASC)",
+      r"donationDate > $0 AND donationDate <= $1 AND TRUEPREDICATE SORT(donationDate ASC)",
       [
         DateTime(year, 1, 1),
         DateTime(year + 1, 1, 1),

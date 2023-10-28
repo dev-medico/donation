@@ -1,10 +1,11 @@
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
+import 'package:donation/src/features/donar/donar_list_new.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/donation_member/presentation/search_member.dart';
 import 'package:donation/src/features/feed/feed_admin.dart';
-import 'package:donation/src/features/finder/report.dart';
+import 'package:donation/src/features/finder/report_new.dart';
 import 'package:donation/src/features/home/mobile_home/home_menu.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
@@ -33,7 +34,7 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
   ];
 
   List<Widget> widgets = [
-    ReportScreen(),
+    ReportNewScreen(),
     SearchMemberListScreen(
       fromHome: true,
     ),
@@ -46,7 +47,7 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
     SpecialEventListScreen(
       fromHome: true,
     ),
-    DonarList(
+    DonarListNewScreen(
       fromHome: true,
     ),
     FeedAdminScreen(

@@ -10,28 +10,27 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class DonationModel {
-  String? disease;
+  String? gender;
   double? quantity;
+  double? total;
 
-  DonationModel({
-    this.disease,
-    this.quantity,
-  });
+  DonationModel({this.gender, this.quantity, this.total});
 }
 
-class BloodDonationPieChart extends ConsumerStatefulWidget {
-  BloodDonationPieChart({
+class BloodDonationGenderPieChart extends ConsumerStatefulWidget {
+  BloodDonationGenderPieChart({
     super.key,
   });
 
   @override
-  ConsumerState<BloodDonationPieChart> createState() =>
-      _BloodDonationPieChartState();
+  ConsumerState<BloodDonationGenderPieChart> createState() =>
+      _BloodDonationGenderPieChartState();
 }
 
-class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
-  _BloodDonationPieChartState();
-  List<DonationModel>? donations;
+class _BloodDonationGenderPieChartState
+    extends ConsumerState<BloodDonationGenderPieChart> {
+  _BloodDonationGenderPieChartState();
+  List<DonationModel> donations = [];
   List<String>? _positionList;
   List<String>? _connectorLineList;
   late String _selectedPosition;
@@ -54,31 +53,26 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
 
   @override
   Widget build(BuildContext context) {
-    var donationsData = ref.watch(donationsProvider);
+    var maleData = ref.watch(donationsProviderByGender("male")).length;
+    var femaleData = ref.watch(donationsProviderByGender("female")).length;
 
-    //get top 5 donations by grouping same disease
-    donations = donationsData
-        .fold<List<DonationModel>>([], (previousValue, element) {
-          var index = previousValue.indexWhere(
-              (e) => (e.disease == element.patientDisease) && e.disease != "");
-          if (index == -1) {
-            var product = DonationModel(
-              disease: element.patientDisease.toString(),
-              quantity: 1,
-            );
-            previousValue.add(product);
-          } else {
-            previousValue[index].quantity = previousValue[index].quantity! + 1;
-          }
-          return previousValue;
-        })
-        .where((element) => element.quantity != 0)
-        .toList();
+    //calculate male Percent from maleData and femaleData Lenght Total
+    double malePercent = (maleData / (maleData + femaleData)) * 100;
+    double femalePercent = (femaleData / (maleData + femaleData)) * 100;
+
+    if (donations.isEmpty) {
+      donations.add(DonationModel(
+          gender: "male", quantity: malePercent, total: maleData.toDouble()));
+      donations.add(DonationModel(
+          gender: "female",
+          quantity: femalePercent,
+          total: femaleData.toDouble()));
+    }
 
     // sort donations list by quantity
-    donations!.sort((a, b) => b.quantity!.compareTo(a.quantity!));
+    donations.sort((a, b) => b.quantity!.compareTo(a.quantity!));
     //get only top 5 donations
-    donations = donations!.length > 8 ? donations!.sublist(0, 8) : donations;
+    donations = donations.length > 8 ? donations.sublist(0, 2) : donations;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -87,7 +81,7 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
         ),
         Padding(
           padding: const EdgeInsets.only(left: 30),
-          child: Text("လှူဒါန်းမှု အများဆုံး ရောဂါများ"),
+          child: Text("ကျား/မ အလိုက် လှူဒါန်းမှုများ"),
         ),
         Row(
           children: [
@@ -111,7 +105,9 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
         0, (previousValue, element) => previousValue + element.quantity!);
     donations!.forEach((element) {
       dataList.add(ChartData(
-        x: element.disease,
+        x: (element.gender == "male" ? "ကျား" : "မ     ") +
+            " -   " +
+            element.total!.truncate().toString(),
         y: calculatePercentage(element.quantity!, totalAmount),
       ));
     });
@@ -134,7 +130,8 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
               labelPosition: ChartDataLabelPosition.outside,
               connectorLineSettings:
                   ConnectorLineSettings(type: ConnectorType.line)),
-          pointColorMapper: (datum, index) => generateRandomColor(),
+          pointColorMapper: (datum, index) =>
+              index.isEven ? Colors.blue : Colors.pink,
 
           // dataLabelSettings: const DataLabelSettings(
           //     isVisible: true,

@@ -2,8 +2,62 @@ import 'dart:developer';
 
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/donar/controller/donar_list_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:realm/realm.dart';
+
+final donarByMonthYearStreamProvider =
+    StreamProvider.family<RealmResultsChanges<DonarRecord>, DonarFilterModel>(
+        (ref, filter) {
+  var realmService = ref.watch(realmProvider);
+
+  final stream = realmService!.realm.query<DonarRecord>(
+      r"date > $0 AND date <= $1 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(filter.year!, filter.month!, 1),
+    DateTime(filter.year!, filter.month! + 1, 1),
+  ]).changes;
+
+  return stream;
+});
+
+final donarByYearProvider =
+    StateProvider.family<RealmResults<DonarRecord>, int>((ref, year) {
+  var realmService = ref.watch(realmProvider);
+
+  final stream = realmService!.realm.query<DonarRecord>(
+      r"date > $0 AND date <= $1 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(year, 1, 1),
+    DateTime(year + 1, 1, 1),
+  ]);
+
+  return stream;
+});
+
+final expenseByMonthYearStreamProvider = StreamProvider.family<
+    RealmResultsChanges<ExpensesRecord>, DonarFilterModel>((ref, filter) {
+  var realmService = ref.watch(realmProvider);
+
+  final stream = realmService!.realm.query<ExpensesRecord>(
+      r"date > $0 AND date <= $1 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(filter.year!, filter.month!, 1),
+    DateTime(filter.year!, filter.month! + 1, 1),
+  ]).changes;
+
+  return stream;
+});
+
+final expenseByYearProvider =
+    StateProvider.family<RealmResults<ExpensesRecord>, int>((ref, year) {
+  var realmService = ref.watch(realmProvider);
+
+  final stream = realmService!.realm.query<ExpensesRecord>(
+      r"date > $0 AND date <= $1 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(year, 1, 1),
+    DateTime(year + 1, 1, 1),
+  ]);
+
+  return stream;
+});
 
 final donarsDataProvider = StateProvider<RealmResults<DonarRecord>>((ref) {
   var realmService = ref.watch(realmProvider);
@@ -24,32 +78,25 @@ final expensesDataProvider = StateProvider<RealmResults<ExpensesRecord>>((ref) {
 typedef ClosingParams = ({int? month, int? year});
 
 final closingBalanceDataProvider =
-    StateProvider.family<int, ClosingParams>((ref, param) {
-  var donars = ref.watch(donarsDataProvider);
-  var expenses = ref.watch(expensesDataProvider);
-
+    StateProvider.family<int, ClosingParams>((ref, filter) {
   int totalDonation = 0;
   int totalExpenses = 0;
   int closingBalance = 0;
-  log("Year - " + param.month.toString() + " - " + param.year.toString());
-  donars
-      .where((element) => element.date!.isBefore(DateTime(
-            param.year!,
-            param.month!,
-            31
-
-          )))
-      .forEach((element) {
+  log("Year - " + filter.month.toString() + " - " + filter.year.toString());
+  var realmService = ref.watch(realmProvider);
+  final donars = realmService!.realm
+      .query<DonarRecord>(r"date <= $0 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(filter.year!, filter.month!, 1),
+  ]);
+  donars.forEach((element) {
     totalDonation += element.amount!;
   });
 
-  expenses
-      .where((element2) => element2.date!.isBefore(DateTime(
-            param.year!,
-            param.month!,
-            31
-          )))
-      .forEach((data) {
+  final expenses = realmService.realm
+      .query<ExpensesRecord>(r"date <= $0 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(filter.year!, filter.month!, 1),
+  ]);
+  expenses.forEach((data) {
     totalExpenses += data.amount!;
   });
 

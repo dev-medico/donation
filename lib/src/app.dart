@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:donation/realm/realm_services.dart';
+import 'package:donation/src/features/donar/donar_list_new.dart';
 import 'package:donation/src/features/donation/controller/donation_provider.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
@@ -183,8 +184,8 @@ class _MyAppState extends ConsumerState<MyApp> {
               // case EventListScreen.routeName:
               //   return EventListScreen();
 
-              case DonarList.routeName:
-                return DonarList();
+              case DonarListNewScreen.routeName:
+                return DonarListNewScreen();
               default:
                 return SplashScreen();
             }

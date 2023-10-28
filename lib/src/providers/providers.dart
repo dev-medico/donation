@@ -13,6 +13,13 @@ final donationsProvider = StateProvider<RealmResults<Donation>>((ref) {
   return realmService!.realm.query<Donation>("TRUEPREDICATE SORT(_id ASC)");
 });
 
+final donationsProviderByGender = StateProvider.family<RealmResults<Donation>,String>((ref,gender) {
+  var realmService = ref.watch(realmProvider);
+  return realmService!.realm.query<Donation>(r"memberObj.gender == $0 AND TRUEPREDICATE SORT(_id ASC)",[
+     gender
+  ]);
+});
+
 final totalMembersProvider = StateProvider<int>((ref) {
   var realmService = ref.watch(realmProvider);
   return realmService!.realm

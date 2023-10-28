@@ -141,7 +141,7 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                     width: Responsive.isMobile(context)
                         ? MediaQuery.of(context).size.width * 1.8
                         : MediaQuery.of(context).size.width * 0.8,
-                    height: 60,
+                    height: Responsive.isMobile(context) ? 40 : 60,
                     child: CommonTabBar(
                       underline: false,
                       listWidget: [
@@ -168,7 +168,7 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
               width: Responsive.isMobile(context)
                   ? MediaQuery.of(context).size.width * 1.8
                   : MediaQuery.of(context).size.width * 0.8,
-              height: 60,
+              height: Responsive.isMobile(context) ? 40 : 60,
               child: CommonTabBar(
                 underline: false,
                 listWidget: [

@@ -37,10 +37,12 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      //padding: EdgeInsets.all(Responsive.isMobile(context) ? 18 : 20),
-      margin: const EdgeInsets.all(
-        2,
-      ),
+      height: Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.height * 0.65
+          : MediaQuery.of(context).size.height * 0.52,
+      width: Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width * 0.9
+          : MediaQuery.of(context).size.width * 0.43,
       child: NeumorphicButton(
         style: NeumorphicStyle(
           color: Colors.white,
