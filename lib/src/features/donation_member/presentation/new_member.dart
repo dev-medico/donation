@@ -1360,7 +1360,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                       child: Container(
                                         height: 60,
                                         padding: const EdgeInsets.only(
-                                            left: 20, top: 30),
+                                            left: 20, top: 34),
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
