@@ -1,38 +1,41 @@
+import 'package:donation/realm/schemas.dart';
 import 'package:donation/responsive.dart';
+import 'package:donation/src/features/finder/provider/request_give_provider.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class BloodRequestGiveChartScreen extends StatefulWidget {
+class BloodRequestGiveChartScreen extends ConsumerStatefulWidget {
   const BloodRequestGiveChartScreen({super.key});
 
   @override
-  State<BloodRequestGiveChartScreen> createState() =>
+  ConsumerState<BloodRequestGiveChartScreen> createState() =>
       _BloodRequestGiveChartScreenState();
 }
 
 class _BloodRequestGiveChartScreenState
-    extends State<BloodRequestGiveChartScreen> {
+    extends ConsumerState<BloodRequestGiveChartScreen> {
   late List<ChartData> data;
   late TooltipBehavior _tooltip;
+  List<RequestGive> requestGives = [];
 
   @override
   Widget build(BuildContext context) {
-    final List<ChartData> chartData = <ChartData>[
-      ChartData('Jan', 128, 90),
-      ChartData('Feb', 123, 92),
-      ChartData('Mar', 107, 45),
-      ChartData('Apr', 87, 60),
-      ChartData('May', 120, 80),
-      ChartData('June', 95, 70),
-      ChartData('July', 80, 55),
-      ChartData('Aug', 110, 75),
-      ChartData('Sept', 135, 90),
-      ChartData('Oct', 150, 100),
-      ChartData('Nov', 120, 80),
-      ChartData('Dec', 100, 70),
-    ];
+    var requestGivesData = ref.watch(requestGiveProvider);
+    requestGivesData.forEach((element) {
+      requestGives.add(element);
+    });
+    requestGives.sort((a, b) => a.date!.compareTo(b.date!));
+
+    final List<ChartData> chartData = <ChartData>[];
+    requestGives.forEach((element) {
+      chartData.add(ChartData(
+          "${element.date!.toLocal().month.toString()}/${element.date!.toLocal().year.toString()}",
+          element.request!.toDouble(),
+          element.give!.toDouble()));
+    });
     return Container(
       height: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.height * 0.6
@@ -51,7 +54,7 @@ class _BloodRequestGiveChartScreenState
             child: Text(
               "သွေးတောင်းခံ/လှူဒါန်းမှု အခြေအနေ",
               style: TextStyle(
-                  fontSize: Responsive.isMobile(context) ? 16.5 : 17.5,
+                  fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
                   color: primaryColor,
                   fontWeight: FontWeight.bold),
             ),

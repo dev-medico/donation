@@ -50,6 +50,8 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   bool isSwitched = false;
   String operatorImg = "";
   int id = 0;
+  int genderValue = 0;
+  int nrcValue = 0;
 
   String region1 = " ";
   String town1 = " ";
@@ -74,7 +76,6 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
       const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
       const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
       const DropdownMenuItem(value: "O (Rh -)", child: Text("O (Rh -)")),
-      
     ];
     return menuItems;
   }
@@ -83,12 +84,13 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   String? nrc_initial_options_Value;
   List<DropdownMenuItem<String>>? nrc_region_state_options_dropDownMenuItems;
   String? nrc_region_state_options_Value;
-  List nrc_type_options = ["နိုင်", "ဧည့်", "ပြု"];
+  List nrc_type_options = ["နိုင်", "ဧည့်", "ပြု", "သ"];
   List<DropdownMenuItem<String>>? nrc_type_options_dropDownMenuItems;
   String? nrc_type_options_Value;
   bool nameChecked = false;
   bool editable = true;
   DateTime? selected;
+  List<String> phoneList = [];
 
   @override
   void initState() {
@@ -335,11 +337,53 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    margin: const EdgeInsets.only(
-                                        top: 12, left: 22),
-                                    child: const Text(
-                                      "မှတ်ပုံတင်အမှတ်",
-                                      style: TextStyle(fontSize: 15),
+                                    height: 60,
+                                    padding: const EdgeInsets.only(
+                                        left: 20, top: 30),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Radio(
+                                            value: 0,
+                                            fillColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.red),
+                                            groupValue: nrcValue,
+                                            onChanged: (int? value) {
+                                              setState(() {
+                                                nrcValue = value!;
+                                              });
+                                            }),
+                                        InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                nrcValue = 0;
+                                              });
+                                            },
+                                            child: Text("မှတ်ပုံတင်အမှတ်")),
+                                        SizedBox(
+                                          width: 12,
+                                        ),
+                                        Radio(
+                                            value: 1,
+                                            fillColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.red),
+                                            groupValue: nrcValue,
+                                            onChanged: (int? value) {
+                                              setState(() {
+                                                nrcValue = value!;
+                                              });
+                                            }),
+                                        InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                nrcValue = 1;
+                                              });
+                                            },
+                                            child: Text("MME"))
+                                      ],
                                     ),
                                   ),
                                   Container(
@@ -350,76 +394,111 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                           MainAxisAlignment.spaceEvenly,
                                       mainAxisSize: MainAxisSize.max,
                                       children: <Widget>[
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          decoration:
-                                              shadowDecoration(Colors.white),
-                                          child: DropdownButton(
-                                            dropdownColor: Colors.white,
-                                            value: nrc_initial_options_Value,
-                                            items:
-                                                nrc_initial_options_dropDownMenuItems,
-                                            icon: const Icon(
-                                                Icons.keyboard_arrow_down),
-                                            iconSize: 0,
-                                            elevation: 16,
-                                            underline: const SizedBox(),
-                                            onChanged:
-                                                nrcInitialOptionschangedDropDownItem,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 8, right: 8),
-                                          child: const Text(
-                                            "/",
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          decoration:
-                                              shadowDecoration(Colors.white),
-                                          child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8, right: 8),
-                                              child: DropdownButton(
-                                                dropdownColor: Colors.white,
-                                                value:
-                                                    nrc_region_state_options_Value,
-                                                icon: const Icon(
-                                                    Icons.keyboard_arrow_down),
-                                                iconSize: 0,
-                                                elevation: 16,
-                                                underline: const SizedBox(),
-                                                items:
-                                                    nrc_region_state_options_dropDownMenuItems,
-                                                onChanged:
-                                                    nrcInitialRegionStateOptionschangedDropDownItem,
-                                              )),
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          margin:
-                                              const EdgeInsets.only(left: 8),
-                                          decoration:
-                                              shadowDecoration(Colors.white),
-                                          child: DropdownButton(
-                                            dropdownColor: Colors.white,
-                                            value: nrc_type_options_Value,
-                                            items:
-                                                nrc_type_options_dropDownMenuItems,
-                                            icon: const Icon(
-                                                Icons.keyboard_arrow_down),
-                                            iconSize: 0,
-                                            elevation: 16,
-                                            underline: const SizedBox(),
-                                            onChanged:
-                                                nrcTypeOptionschangedDropDownItem,
-                                          ),
-                                        ),
+                                        nrcValue == 0
+                                            ? Row(
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10),
+                                                    decoration:
+                                                        shadowDecoration(
+                                                            Colors.white),
+                                                    child: DropdownButton(
+                                                      dropdownColor:
+                                                          Colors.white,
+                                                      value:
+                                                          nrc_initial_options_Value,
+                                                      items:
+                                                          nrc_initial_options_dropDownMenuItems,
+                                                      icon: const Icon(Icons
+                                                          .keyboard_arrow_down),
+                                                      iconSize: 0,
+                                                      elevation: 16,
+                                                      underline:
+                                                          const SizedBox(),
+                                                      onChanged:
+                                                          nrcInitialOptionschangedDropDownItem,
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            left: 8, right: 8),
+                                                    child: const Text(
+                                                      "/",
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10),
+                                                    decoration:
+                                                        shadowDecoration(
+                                                            Colors.white),
+                                                    child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                left: 8,
+                                                                right: 8),
+                                                        child: DropdownButton(
+                                                          dropdownColor:
+                                                              Colors.white,
+                                                          value:
+                                                              nrc_region_state_options_Value,
+                                                          icon: const Icon(Icons
+                                                              .keyboard_arrow_down),
+                                                          iconSize: 0,
+                                                          elevation: 16,
+                                                          underline:
+                                                              const SizedBox(),
+                                                          items:
+                                                              nrc_region_state_options_dropDownMenuItems,
+                                                          onChanged:
+                                                              nrcInitialRegionStateOptionschangedDropDownItem,
+                                                        )),
+                                                  ),
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10),
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            left: 8),
+                                                    decoration:
+                                                        shadowDecoration(
+                                                            Colors.white),
+                                                    child: DropdownButton(
+                                                      dropdownColor:
+                                                          Colors.white,
+                                                      value:
+                                                          nrc_type_options_Value,
+                                                      items:
+                                                          nrc_type_options_dropDownMenuItems,
+                                                      icon: const Icon(Icons
+                                                          .keyboard_arrow_down),
+                                                      iconSize: 0,
+                                                      elevation: 16,
+                                                      underline:
+                                                          const SizedBox(),
+                                                      onChanged:
+                                                          nrcTypeOptionschangedDropDownItem,
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            : Container(
+                                                margin: EdgeInsets.only(
+                                                    left: 40, right: 40),
+                                                child: Text(
+                                                  "MME - ",
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
                                         Expanded(
                                           child: Container(
                                             height: 48,
@@ -447,9 +526,58 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   ),
                                 ],
                               ),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  height: 60,
+                                  padding:
+                                      const EdgeInsets.only(left: 20, top: 20),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Radio(
+                                          value: 0,
+                                          fillColor: MaterialStateProperty.all(
+                                              Colors.red),
+                                          groupValue: genderValue,
+                                          onChanged: (int? value) {
+                                            setState(() {
+                                              genderValue = value!;
+                                            });
+                                          }),
+                                      InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              genderValue = 0;
+                                            });
+                                          },
+                                          child: Text("အမျိုးသား")),
+                                      SizedBox(
+                                        width: 12,
+                                      ),
+                                      Radio(
+                                          value: 1,
+                                          fillColor: MaterialStateProperty.all(
+                                              Colors.red),
+                                          groupValue: genderValue,
+                                          onChanged: (int? value) {
+                                            setState(() {
+                                              genderValue = value!;
+                                            });
+                                          }),
+                                      InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              genderValue = 1;
+                                            });
+                                          },
+                                          child: Text("အမျိုးသမီး"))
+                                    ],
+                                  ),
+                                ),
+                              ),
                               Container(
-                                margin: EdgeInsets.only(
-                                    left: 24, top: 12, bottom: 12),
+                                margin: EdgeInsets.only(top: 12, bottom: 12),
                                 child: Container(
                                   child: Container(
                                     width: double.infinity,
@@ -475,23 +603,103 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                               Container(
                                 margin: const EdgeInsets.only(
                                     left: 20, top: 16, bottom: 8, right: 20),
-                                child: Stack(
+                                child: Row(
                                   children: [
-                                    TextFormField(
-                                      keyboardType: TextInputType.number,
-                                      controller: phoneController,
-                                      decoration:
-                                          inputBoxDecoration("ဖုန်းနံပါတ်"),
+                                    Expanded(
+                                      child: Stack(
+                                        children: [
+                                          TextFormField(
+                                            keyboardType: TextInputType.number,
+                                            controller: phoneController,
+                                            decoration: inputBoxDecoration(
+                                                "ဖုန်းနံပါတ်"),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 8, right: 20),
+                                            child: Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: buildOperator()),
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 8, right: 20),
-                                      child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: buildOperator()),
+                                    InkWell(
+                                      onTap: () {
+                                        var newPhone =
+                                            phoneController.text.toString();
+                                        if (checkPhone(newPhone) !=
+                                                "Not_Valid" &&
+                                            !phoneList.contains(newPhone)) {
+                                          setState(() {
+                                            phoneList.add(phoneController.text
+                                                .toString());
+                                            phoneController.clear();
+                                          });
+                                        }
+                                      },
+                                      child: Container(
+                                          margin: EdgeInsets.only(left: 8),
+                                          width: 46,
+                                          height: 46,
+                                          decoration:
+                                              shadowDecorationWithBorder(
+                                                  Colors.white, primaryColor),
+                                          child: Icon(
+                                            Icons.add,
+                                            size: 24,
+                                          )),
                                     )
                                   ],
                                 ),
+                              ),
+                              SizedBox(
+                                //  height: context.heightPx / 30,
+                                child: ListView.separated(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    separatorBuilder: (context, index) =>
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                    shrinkWrap: true,
+                                    //   scrollDirection: Axis.horizontal,
+                                    itemCount: phoneList.length ?? 0,
+                                    itemBuilder: (context, index) {
+                                      var data = phoneList[index];
+                                      return Material(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        elevation: 3,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(data ?? ''),
+                                              ),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    phoneList.removeAt(index);
+                                                  });
+                                                },
+                                                child: Icon(
+                                                  Icons.delete,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                              // Text(data),
+                                              // Text(" ,"),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }),
                               ),
                               Container(
                                 margin: const EdgeInsets.only(
@@ -650,9 +858,13 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                           child: GestureDetector(
                             behavior: HitTestBehavior.translucent,
                             onTap: () {
+                              if (phoneController.text.isNotEmpty &&
+                                  !phoneList.contains(phoneController.text)) {
+                                phoneList.add(phoneController.text.toString());
+                              }
                               if (nameController.text.isNotEmpty &&
                                   fatherNameController.text.isNotEmpty &&
-                                  phoneController.text.isNotEmpty &&
+                                  phoneList.isNotEmpty &&
                                   selectedBloodType != "သွေးအုပ်စု") {
                                 var members = ref.watch(membersProvider);
                                 //check member exist by name, father name and nrc
@@ -933,11 +1145,54 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Container(
-                                          margin: const EdgeInsets.only(
-                                              top: 12, left: 22),
-                                          child: const Text(
-                                            "မှတ်ပုံတင်အမှတ်",
-                                            style: TextStyle(fontSize: 15),
+                                          height: 60,
+                                          padding: const EdgeInsets.only(
+                                              left: 20, top: 30),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Radio(
+                                                  value: 0,
+                                                  fillColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.red),
+                                                  groupValue: nrcValue,
+                                                  onChanged: (int? value) {
+                                                    setState(() {
+                                                      nrcValue = value!;
+                                                    });
+                                                  }),
+                                              InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      nrcValue = 0;
+                                                    });
+                                                  },
+                                                  child:
+                                                      Text("မှတ်ပုံတင်အမှတ်")),
+                                              SizedBox(
+                                                width: 12,
+                                              ),
+                                              Radio(
+                                                  value: 1,
+                                                  fillColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.red),
+                                                  groupValue: nrcValue,
+                                                  onChanged: (int? value) {
+                                                    setState(() {
+                                                      nrcValue = value!;
+                                                    });
+                                                  }),
+                                              InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      nrcValue = 1;
+                                                    });
+                                                  },
+                                                  child: Text("MME"))
+                                            ],
                                           ),
                                         ),
                                         Container(
@@ -948,83 +1203,124 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                 MainAxisAlignment.spaceEvenly,
                                             mainAxisSize: MainAxisSize.max,
                                             children: <Widget>[
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                decoration: shadowDecoration(
-                                                    Colors.white),
-                                                child: DropdownButton(
-                                                  dropdownColor: Colors.white,
-                                                  value:
-                                                      nrc_initial_options_Value,
-                                                  items:
-                                                      nrc_initial_options_dropDownMenuItems,
-                                                  icon: const Icon(Icons
-                                                      .keyboard_arrow_down),
-                                                  iconSize: 0,
-                                                  elevation: 16,
-                                                  underline: const SizedBox(),
-                                                  onChanged:
-                                                      nrcInitialOptionschangedDropDownItem,
-                                                ),
-                                              ),
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                    left: 8, right: 8),
-                                                child: const Text(
-                                                  "/",
-                                                ),
-                                              ),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                decoration: shadowDecoration(
-                                                    Colors.white),
-                                                child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 8, right: 8),
-                                                    child: DropdownButton(
-                                                      dropdownColor:
-                                                          Colors.white,
-                                                      value:
-                                                          nrc_region_state_options_Value,
-                                                      icon: const Icon(Icons
-                                                          .keyboard_arrow_down),
-                                                      iconSize: 0,
-                                                      elevation: 16,
-                                                      underline:
-                                                          const SizedBox(),
-                                                      items:
-                                                          nrc_region_state_options_dropDownMenuItems,
-                                                      onChanged:
-                                                          nrcInitialRegionStateOptionschangedDropDownItem,
-                                                    )),
-                                              ),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                margin: const EdgeInsets.only(
-                                                    left: 8),
-                                                decoration: shadowDecoration(
-                                                    Colors.white),
-                                                child: DropdownButton(
-                                                  dropdownColor: Colors.white,
-                                                  value: nrc_type_options_Value,
-                                                  items:
-                                                      nrc_type_options_dropDownMenuItems,
-                                                  icon: const Icon(Icons
-                                                      .keyboard_arrow_down),
-                                                  iconSize: 0,
-                                                  elevation: 16,
-                                                  underline: const SizedBox(),
-                                                  onChanged:
-                                                      nrcTypeOptionschangedDropDownItem,
-                                                ),
-                                              ),
+                                              nrcValue == 0
+                                                  ? Row(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                          decoration:
+                                                              shadowDecoration(
+                                                                  Colors.white),
+                                                          child: DropdownButton(
+                                                            dropdownColor:
+                                                                Colors.white,
+                                                            value:
+                                                                nrc_initial_options_Value,
+                                                            items:
+                                                                nrc_initial_options_dropDownMenuItems,
+                                                            icon: const Icon(Icons
+                                                                .keyboard_arrow_down),
+                                                            iconSize: 0,
+                                                            elevation: 16,
+                                                            underline:
+                                                                const SizedBox(),
+                                                            onChanged:
+                                                                nrcInitialOptionschangedDropDownItem,
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          margin:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 8,
+                                                                  right: 8),
+                                                          child: const Text(
+                                                            "/",
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                          decoration:
+                                                              shadowDecoration(
+                                                                  Colors.white),
+                                                          child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      left: 8,
+                                                                      right: 8),
+                                                              child:
+                                                                  DropdownButton(
+                                                                dropdownColor:
+                                                                    Colors
+                                                                        .white,
+                                                                value:
+                                                                    nrc_region_state_options_Value,
+                                                                icon: const Icon(
+                                                                    Icons
+                                                                        .keyboard_arrow_down),
+                                                                iconSize: 0,
+                                                                elevation: 16,
+                                                                underline:
+                                                                    const SizedBox(),
+                                                                items:
+                                                                    nrc_region_state_options_dropDownMenuItems,
+                                                                onChanged:
+                                                                    nrcInitialRegionStateOptionschangedDropDownItem,
+                                                              )),
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                          margin:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 8),
+                                                          decoration:
+                                                              shadowDecoration(
+                                                                  Colors.white),
+                                                          child: DropdownButton(
+                                                            dropdownColor:
+                                                                Colors.white,
+                                                            value:
+                                                                nrc_type_options_Value,
+                                                            items:
+                                                                nrc_type_options_dropDownMenuItems,
+                                                            icon: const Icon(Icons
+                                                                .keyboard_arrow_down),
+                                                            iconSize: 0,
+                                                            elevation: 16,
+                                                            underline:
+                                                                const SizedBox(),
+                                                            onChanged:
+                                                                nrcTypeOptionschangedDropDownItem,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 40, right: 40),
+                                                      child: Text(
+                                                        "MME - ",
+                                                        style: TextStyle(
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ),
                                               Expanded(
                                                 child: Container(
                                                   height: 48,
@@ -1059,11 +1355,64 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   ),
                                   Expanded(
                                     flex: 5,
-                                    child: Container(),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        height: 60,
+                                        padding: const EdgeInsets.only(
+                                            left: 20, top: 30),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Radio(
+                                                value: 0,
+                                                fillColor:
+                                                    MaterialStateProperty.all(
+                                                        Colors.red),
+                                                groupValue: genderValue,
+                                                onChanged: (int? value) {
+                                                  setState(() {
+                                                    genderValue = value!;
+                                                  });
+                                                }),
+                                            InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    genderValue = 0;
+                                                  });
+                                                },
+                                                child: Text("အမျိုးသား")),
+                                            SizedBox(
+                                              width: 12,
+                                            ),
+                                            Radio(
+                                                value: 1,
+                                                fillColor:
+                                                    MaterialStateProperty.all(
+                                                        Colors.red),
+                                                groupValue: genderValue,
+                                                onChanged: (int? value) {
+                                                  setState(() {
+                                                    genderValue = value!;
+                                                  });
+                                                }),
+                                            InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    genderValue = 1;
+                                                  });
+                                                },
+                                                child: Text("အမျိုးသမီး"))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Expanded(
                                     flex: 3,
@@ -1090,30 +1439,140 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   ),
                                   Expanded(
                                     flex: 3,
-                                    child: Container(
-                                      margin: const EdgeInsets.only(
-                                          left: 20,
-                                          top: 16,
-                                          bottom: 8,
-                                          right: 20),
-                                      child: Stack(
-                                        children: [
-                                          TextFormField(
-                                            keyboardType: TextInputType.number,
-                                            controller: phoneController,
-                                            decoration: inputBoxDecoration(
-                                                "ဖုန်းနံပါတ်"),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              left: 20,
+                                              top: 16,
+                                              bottom: 8,
+                                              right: 20),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Stack(
+                                                  children: [
+                                                    TextFormField(
+                                                      keyboardType:
+                                                          TextInputType.number,
+                                                      controller:
+                                                          phoneController,
+                                                      decoration:
+                                                          inputBoxDecoration(
+                                                              "ဖုန်းနံပါတ်"),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 8,
+                                                              right: 20),
+                                                      child: Align(
+                                                          alignment: Alignment
+                                                              .centerRight,
+                                                          child:
+                                                              buildOperator()),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  var newPhone = phoneController
+                                                      .text
+                                                      .toString();
+                                                  if (checkPhone(newPhone) !=
+                                                          "Not_Valid" &&
+                                                      !phoneList
+                                                          .contains(newPhone)) {
+                                                    setState(() {
+                                                      phoneList.add(
+                                                          phoneController.text
+                                                              .toString());
+                                                      phoneController.clear();
+                                                    });
+                                                  }
+                                                },
+                                                child: Container(
+                                                    margin: EdgeInsets.only(
+                                                        left: 8),
+                                                    width: 46,
+                                                    height: 46,
+                                                    decoration:
+                                                        shadowDecorationWithBorder(
+                                                            Colors.white,
+                                                            primaryColor),
+                                                    child: Icon(
+                                                      Icons.add,
+                                                      size: 24,
+                                                    )),
+                                              )
+                                            ],
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 8, right: 20),
-                                            child: Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: buildOperator()),
-                                          )
-                                        ],
-                                      ),
+                                        ),
+                                        GridView.count(
+                                          childAspectRatio: 5,
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                          ),
+                                          shrinkWrap: true,
+                                          crossAxisCount: 2,
+                                          //   scrollDirection: Axis.horizontal,
+                                          // itemCount: phoneList.length ?? 0,
+                                          children: List.generate(
+                                            phoneList.length,
+                                            (index) {
+                                              var data = phoneList[index];
+                                              return Container(
+                                                height: 40,
+                                                margin:
+                                                    EdgeInsets.only(right: 8),
+                                                child: Material(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  elevation: 3,
+                                                  child: Container(
+                                                    height: 50,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child:
+                                                              Text(data ?? ''),
+                                                        ),
+                                                        SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        InkWell(
+                                                          onTap: () {
+                                                            setState(() {
+                                                              phoneList
+                                                                  .removeAt(
+                                                                      index);
+                                                            });
+                                                          },
+                                                          child: Icon(
+                                                            Icons.delete,
+                                                            color: Colors.red,
+                                                          ),
+                                                        ),
+                                                        // Text(data),
+                                                        // Text(" ,"),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
                                   Expanded(
@@ -1343,9 +1802,13 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: () {
+                            if (phoneController.text.isNotEmpty &&
+                                !phoneList.contains(phoneController.text)) {
+                              phoneList.add(phoneController.text.toString());
+                            }
                             if (nameController.text.isNotEmpty &&
                                 fatherNameController.text.isNotEmpty &&
-                                phoneController.text.isNotEmpty &&
+                                phoneList.isNotEmpty &&
                                 selectedBloodType != "သွေးအုပ်စု") {
                               var members = ref.watch(membersProvider);
                               //check member exist by name, father name and nrc
@@ -1674,6 +2137,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
               memberId: memberIDController.text.toString(),
               name: nameController.text.toString(),
               fatherName: fatherNameController.text.toString(),
+              gender: genderValue == 0 ? "male" : "female",
               birthDate: birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
               nrc: _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
               phone: phoneController.text.toString(),
@@ -1906,7 +2370,11 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   }
 
   _getCompletNrcInfo() {
-    return "$nrc_initial_options_Value/$nrc_region_state_options_Value($nrc_type_options_Value)${Utils.strToMM(nrcController.text.toString())}";
+    if (nrcValue == 0) {
+      return "$nrc_initial_options_Value/$nrc_region_state_options_Value($nrc_type_options_Value)${Utils.strToMM(nrcController.text.toString())}";
+    } else {
+      return "MME-${nrcController.text.toString()}";
+    }
   }
 
   List<DropdownMenuItem<String>> getNrcNationalOptionDropDownMenuItems() {

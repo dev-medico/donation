@@ -23,6 +23,7 @@ class RealmServices with ChangeNotifier {
   static const String queryAllNotification = "queryAllNotification";
   static const String queryAllReaction = "queryAllReaction";
   static const String queryAllComment = "queryAllComment";
+  static const String queryAllRequestGive = "queryAllRequestGive";
 
   bool offlineModeOn = false;
   bool isWaiting = false;
@@ -46,6 +47,7 @@ class RealmServices with ChangeNotifier {
             Noti.schema,
             Reaction.schema,
             Comment.schema,
+            RequestGive.schema
           ],
         ),
       );
@@ -70,6 +72,8 @@ class RealmServices with ChangeNotifier {
       mutableSubscriptions.add(realm.all<Noti>(), name: queryAllNotification);
       mutableSubscriptions.add(realm.all<Reaction>(), name: queryAllReaction);
       mutableSubscriptions.add(realm.all<Comment>(), name: queryAllComment);
+      mutableSubscriptions.add(realm.all<RequestGive>(),
+          name: queryAllRequestGive);
     });
     await realm.subscriptions.waitForSynchronization();
   }
@@ -118,6 +122,7 @@ class RealmServices with ChangeNotifier {
       String? nrc,
       String? phone,
       String? status,
+      String? gender,
       DateTime? registerDate,
       String? totalCount,
       String? address}) {
@@ -133,6 +138,7 @@ class RealmServices with ChangeNotifier {
       memberCount: memberCount,
       memberId: memberId,
       note: note,
+      gender: gender,
       nrc: nrc,
       phone: phone,
       status: status,
@@ -406,6 +412,31 @@ class RealmServices with ChangeNotifier {
 
   void deletePost(Post post) {
     realm.write(() => realm.delete(post));
+    notifyListeners();
+  }
+
+  void createRequestGive(RequestGive newRequestGive) {
+    realm.write<RequestGive>(() => realm.add<RequestGive>(newRequestGive));
+    notifyListeners();
+  }
+
+  Future<void> updateRequestGive(
+    RequestGive requestGive, {
+    int? request,
+    DateTime? date,
+    int? give,
+  }) async {
+    realm.write(() {
+      if (date != null) {
+        requestGive.date = date;
+      }
+      if (give != null) {
+        requestGive.give = give;
+      }
+      if (request != null) {
+        requestGive.request = request;
+      }
+    });
     notifyListeners();
   }
 

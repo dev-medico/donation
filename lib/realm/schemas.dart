@@ -84,6 +84,16 @@ class _ExpensesRecord {
 }
 
 @RealmModel()
+class _RequestGive {
+  @MapTo('_id')
+  @PrimaryKey()
+  late ObjectId id;
+  int? request;
+  int? give;
+  DateTime? date;
+}
+
+@RealmModel()
 class _Noti {
   @MapTo('_id')
   @PrimaryKey()

@@ -566,6 +566,65 @@ class ExpensesRecord extends _ExpensesRecord
   }
 }
 
+class RequestGive extends _RequestGive
+    with RealmEntity, RealmObjectBase, RealmObject {
+  RequestGive(
+    ObjectId id, {
+    int? request,
+    int? give,
+    DateTime? date,
+  }) {
+    RealmObjectBase.set(this, '_id', id);
+    RealmObjectBase.set(this, 'request', request);
+    RealmObjectBase.set(this, 'give', give);
+    RealmObjectBase.set(this, 'date', date);
+  }
+
+  RequestGive._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, '_id', value);
+
+  @override
+  int? get request => RealmObjectBase.get<int>(this, 'request') as int?;
+  @override
+  set request(int? value) => RealmObjectBase.set(this, 'request', value);
+
+  @override
+  int? get give => RealmObjectBase.get<int>(this, 'give') as int?;
+  @override
+  set give(int? value) => RealmObjectBase.set(this, 'give', value);
+
+  @override
+  DateTime? get date =>
+      RealmObjectBase.get<DateTime>(this, 'date') as DateTime?;
+  @override
+  set date(DateTime? value) => RealmObjectBase.set(this, 'date', value);
+
+  @override
+  Stream<RealmObjectChanges<RequestGive>> get changes =>
+      RealmObjectBase.getChanges<RequestGive>(this);
+
+  @override
+  RequestGive freeze() => RealmObjectBase.freezeObject<RequestGive>(this);
+
+  static SchemaObject get schema => _schema ??= _initSchema();
+  static SchemaObject? _schema;
+  static SchemaObject _initSchema() {
+    RealmObjectBase.registerFactory(RequestGive._);
+    return const SchemaObject(
+        ObjectType.realmObject, RequestGive, 'RequestGive', [
+      SchemaProperty('id', RealmPropertyType.objectid,
+          mapTo: '_id', primaryKey: true),
+      SchemaProperty('request', RealmPropertyType.int, optional: true),
+      SchemaProperty('give', RealmPropertyType.int, optional: true),
+      SchemaProperty('date', RealmPropertyType.timestamp, optional: true),
+    ]);
+  }
+}
+
 class Noti extends _Noti with RealmEntity, RealmObjectBase, RealmObject {
   Noti(
     ObjectId id, {

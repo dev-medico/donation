@@ -67,7 +67,7 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                     ? "သွေးအုပ်စုအလိုက် လှူဒါန်းမှု မှတ်တမ်း"
                     : "သွေးအုပ်စုအလိုက် မှတ်တမ်း",
                 style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 16.5 : 17.5,
+                    fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
                     color: primaryColor,
                     fontWeight: FontWeight.bold),
               ),

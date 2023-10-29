@@ -43,7 +43,9 @@ class ExpenseDataSource extends DataGridSource {
             ? Alignment.centerRight
             : Alignment.centerLeft,
         padding: const EdgeInsets.all(8.0),
-        child: Text(e.value.toString()),
+        child: Text(
+          e.value.toString(),
+        ),
       );
     }).toList());
   }

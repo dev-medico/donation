@@ -44,6 +44,15 @@ class Utils {
   }
 
   static bool isNumeric(String? s) {
+    bool exist = false;
+    List<String> match = ["၀", "၁", "၂", "၃", "၄", "၅", "၆", "၇", "၈", "၉"];
+    for (int i = 0; i < match.length; i++) {
+      if (s!.contains(match[i])) {
+        exist = true;
+        break;
+      }
+    }
+    if (exist) return true;
     if (s == null) {
       return false;
     }

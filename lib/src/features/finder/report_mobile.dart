@@ -6,6 +6,7 @@ import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
 import 'package:donation/src/features/finder/blood_donation_gender_pie_chart.dart';
 import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
 import 'package:donation/src/features/finder/most_blood_donation_member.dart';
+import 'package:donation/src/features/finder/new_request_give.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
@@ -47,7 +48,7 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
                     ? "အဖွဲ့၀င် စာရင်း"
                     : "အဖွဲ့၀င် စာရင်း",
                 subtitle: "စုစုပေါင်း",
-                amount: "${Utils.strToMM(totalMember.toString())} ဦး",
+                amount: totalMember.toString(),
                 amountColor: Colors.black,
               ),
               SizedBox(
@@ -58,7 +59,7 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
                 color: primaryDark,
                 title: "သွေးလှူမှတ်တမ်း",
                 subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                amount: "${Utils.strToMM(totalDonations.toString())} ကြိမ်",
+                amount: totalDonations.toString(),
                 amountColor: Colors.blue,
               ),
             ],
@@ -167,7 +168,14 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
               shadowDarkColor: Colors.black,
               shadowLightColor: Colors.white,
             ),
-            onPressed: () async {},
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NewRequestGiveScreen(),
+                ),
+              );
+            },
             child: BloodRequestGiveChartScreen(),
           ),
         )

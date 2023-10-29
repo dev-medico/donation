@@ -373,7 +373,7 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              "${Utils.strToMM(data.memberCount.toString())} ကြိမ်",
+                              data.memberCount.toString(),
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -404,7 +404,7 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                           Expanded(
                             flex: 4,
                             child: Text(
-                              "${Utils.strToMM(data.totalCount.toString())} ကြိမ်",
+                              data.totalCount.toString(),
                               style: const TextStyle(
                                   fontSize: 14, color: Colors.black),
                             ),
@@ -862,7 +862,7 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                             Expanded(
                               flex: 4,
                               child: Text(
-                                "${Utils.strToMM(data.memberCount.toString())} ကြိမ်",
+                                data.memberCount.toString(),
                                 style: const TextStyle(
                                     fontSize: 14, color: Colors.black),
                               ),
@@ -894,7 +894,7 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                             Expanded(
                               flex: 4,
                               child: Text(
-                                "${Utils.strToMM(data.totalCount.toString())} ကြိမ်",
+                                data.totalCount.toString(),
                                 style: const TextStyle(
                                     fontSize: 14, color: Colors.black),
                               ),
@@ -1067,16 +1067,18 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height * 0.8,
                       decoration: shadowDecoration(Colors.white),
+                      padding: EdgeInsets.only(top: 4, left: 18, bottom: 12),
                       margin: const EdgeInsets.only(
                         left: 20,
                         top: 30,
                         bottom: 20,
                       ),
-                      child: ListView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding:
-                            const EdgeInsets.only(top: 4, left: 18, bottom: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        // shrinkWrap: true,
+                        // physics: const NeverScrollableScrollPhysics(),
+                        // padding:
+                        //     const EdgeInsets.only(top: 4, left: 18, bottom: 12),
                         children: [
                           Padding(
                             padding: EdgeInsets.only(top: 8),
@@ -1089,7 +1091,9 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                           const SizedBox(
                             height: 12,
                           ),
-                          buildSimpleTable(donationDatas)
+                          Expanded(
+                            child: buildSimpleTable(donationDatas),
+                          )
                         ],
                       ),
                     ))

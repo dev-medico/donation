@@ -89,10 +89,10 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
                     (route) => false);
               },
               icon: CustomIcon(
-                icon: icons[5],
+                icon: icons[6],
               ),
               title: Text(
-                titles[5],
+                titles[6],
                 style: smallTextStyle(context),
               ),
               body: const Text(

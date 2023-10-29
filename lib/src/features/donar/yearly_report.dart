@@ -349,9 +349,8 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                                           data[index].totalDonation == 0
                                               ? "-"
                                               : Utils.strToMM(data[index]
-                                                      .totalDonation
-                                                      .toString()) +
-                                                  " ကျပ်",
+                                                  .totalDonation
+                                                  .toString()),
                                           textAlign: TextAlign.end,
                                           style: TextStyle(
                                             color: Colors.black,
@@ -373,9 +372,8 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                                           data[index].totalExpenses == 0
                                               ? "-"
                                               : Utils.strToMM(data[index]
-                                                      .totalExpenses
-                                                      .toString()) +
-                                                  " ကျပ်",
+                                                  .totalExpenses
+                                                  .toString()),
                                           textAlign: TextAlign.end,
                                           style: TextStyle(
                                             color: Colors.black,
@@ -423,8 +421,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                         child: Text(
                           totalDonation == 0
                               ? "-"
-                              : Utils.strToMM(totalDonation.toString()) +
-                                  " ကျပ်",
+                              : Utils.strToMM(totalDonation.toString()),
                           textAlign: TextAlign.end,
                           style: TextStyle(
                               fontSize: 15,
@@ -440,8 +437,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                         child: Text(
                           totalExpense == 0
                               ? "-"
-                              : Utils.strToMM(totalExpense.toString()) +
-                                  " ကျပ်",
+                              : Utils.strToMM(totalExpense.toString()),
                           textAlign: TextAlign.end,
                           style: TextStyle(
                               fontSize: 15,

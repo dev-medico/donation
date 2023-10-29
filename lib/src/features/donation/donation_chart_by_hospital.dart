@@ -64,7 +64,7 @@ class _DonationChartByHospitalState extends State<DonationChartByHospital> {
             Text(
               "လှူဒါန်းသည့်နေရာအလိုက် မှတ်တမ်း",
               style: TextStyle(
-                fontSize: Responsive.isMobile(context) ? 16.5 : 17.5,
+                fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
                 color: Colors.blue,
                 fontWeight: FontWeight.bold,
               ),

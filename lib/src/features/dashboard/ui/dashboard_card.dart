@@ -77,7 +77,7 @@ class DashboardCard extends ConsumerWidget {
                 Text(
                   title,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 17,
+                      fontSize: Responsive.isMobile(context) ? 15 : 16,
                       fontWeight: FontWeight.bold,
                       color:
                           NeumorphicTheme.of(context)?.current!.variantColor),
@@ -88,7 +88,7 @@ class DashboardCard extends ConsumerWidget {
                     : Text(
                         subtitle,
                         style: TextStyle(
-                            fontSize: Responsive.isMobile(context) ? 13 : 15,
+                            fontSize: Responsive.isMobile(context) ? 13 : 14,
                             color: NeumorphicTheme.of(context)
                                 ?.current!
                                 .variantColor),
@@ -100,7 +100,7 @@ class DashboardCard extends ConsumerWidget {
                     ? Text(
                         amount,
                         style: TextStyle(
-                            fontSize: Responsive.isMobile(context) ? 17 : 18,
+                            fontSize: Responsive.isMobile(context) ? 16 : 17,
                             fontWeight: FontWeight.bold,
                             color: NeumorphicTheme.of(context)
                                 ?.current!

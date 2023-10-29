@@ -235,6 +235,17 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
               data: (results) {
                 return expenseData.when(
                   data: (expenseResults) {
+                    int totalDonation = 0;
+                    int longTextCount = 0;
+                    int totalExpense = 0;
+
+                    results.forEach((element) {
+                      totalDonation += element.amount!;
+                    });
+
+                    expenseResults.forEach((element) {
+                      totalExpense += element.amount!;
+                    });
                     return Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,17 +314,6 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     child: GestureDetector(
                                       behavior: HitTestBehavior.translucent,
                                       onTap: () {
-                                        int totalDonation = 0;
-                                        int longTextCount = 0;
-                                        int totalExpense = 0;
-
-                                        results.forEach((element) {
-                                          totalDonation += element.amount!;
-                                        });
-
-                                        expenseResults.forEach((element) {
-                                          totalExpense += element.amount!;
-                                        });
                                         showDialog(
                                             context: context,
                                             builder: (context) =>
@@ -493,7 +493,9 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           results,
                                           expenseResults,
                                           leftBalance,
-                                          currentleftBalance),
+                                          currentleftBalance,
+                                          totalDonation,
+                                          totalExpense),
                                     ),
                                   ),
                                 ),
@@ -525,8 +527,13 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
     );
   }
 
-  buildSimpleTable(List<DonarRecord> data, List<ExpensesRecord> expenses,
-      int leftBalance, int thisMonthLeftBalance) {
+  buildSimpleTable(
+      List<DonarRecord> data,
+      List<ExpensesRecord> expenses,
+      int leftBalance,
+      int thisMonthLeftBalance,
+      int totalDonation,
+      int totalExpense) {
     DonarDataSource donarDataSource = DonarDataSource(donarData: data);
     DonarMobileDataSource donarMobileDataSource =
         DonarMobileDataSource(donarData: data);
@@ -713,7 +720,10 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            types[0],
+                            types[0] +
+                                " ( စုစုပေါင်း  - " +
+                                totalDonation.toString() +
+                                " )",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 17,
@@ -815,7 +825,10 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          types[1],
+                          types[1] +
+                              " ( စုစုပေါင်း  - " +
+                              totalExpense.toString() +
+                              " )",
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 17,
@@ -979,7 +992,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM(leftBalance.toString())} ကျပ်",
+                                  "${Utils.strToMM(leftBalance.toString())}",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
@@ -1008,7 +1021,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM(totalDonation.toString())} ကျပ်",
+                                  "${Utils.strToMM(totalDonation.toString())}",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
@@ -1052,7 +1065,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     .variantColor),
                           ),
                           Text(
-                            "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
+                            "${Utils.strToMM((totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -1129,7 +1142,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM(totalExpense.toString())} ကျပ်",
+                                  "${Utils.strToMM(totalExpense.toString())}",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
@@ -1159,7 +1172,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM((thisMonthLeftBalance).toString())} ကျပ်",
+                                  "${Utils.strToMM((thisMonthLeftBalance).toString())}",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
@@ -1203,7 +1216,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     .variantColor),
                           ),
                           Text(
-                            "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
+                            "${Utils.strToMM((totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -1308,7 +1321,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM(leftBalance.toString())} ကျပ်",
+                                  "${Utils.strToMM(leftBalance.toString())}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -1337,7 +1350,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM(totalDonation.toString())} ကျပ်",
+                                  "${Utils.strToMM(totalDonation.toString())}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -1375,7 +1388,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM(totalExpense.toString())} ကျပ်",
+                                  "${Utils.strToMM(totalExpense.toString())}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -1405,7 +1418,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM((thisMonthLeftBalance).toString())} ကျပ်",
+                                  "${Utils.strToMM((thisMonthLeftBalance).toString())}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -1449,7 +1462,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     .variantColor),
                           ),
                           Text(
-                            "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
+                            "${Utils.strToMM((totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -1476,7 +1489,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     .variantColor),
                           ),
                           Text(
-                            "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
+                            "${Utils.strToMM((totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,

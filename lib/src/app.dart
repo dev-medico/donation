@@ -41,7 +41,22 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      //   var members = ref.watch(membersDataProvider);
+    //   var donations = ref.watch(donationProvider);
+    //   var members = ref.watch(membersDataProvider);
+    //   int totalUpdate = 0;
+    //   members.forEach(
+    //     (element) {
+    //       ref.watch(realmProvider)!.updateMember(element,
+    //           memberCount: donations
+    //               .where((member) =>
+    //                   element.memberId.toString() == member.memberId.toString())
+    //               .length
+    //               .toString());
+    //       totalUpdate++;
+    //     },
+    //   );
+    //   log("Total Updated - " + totalUpdate.toString());
+
       //   log("ကို - " +
       //       members
       //           .where((element) =>

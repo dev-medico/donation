@@ -83,7 +83,7 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 8,
+          height: 4,
         ),
         Padding(
           padding: const EdgeInsets.only(left: 30),

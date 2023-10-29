@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation/realm/realm_services.dart';
@@ -41,6 +42,8 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
   final noteController = TextEditingController();
   final townController = TextEditingController();
   final totalDonationController = TextEditingController();
+  final memberDonationController = TextEditingController();
+  int genderValue = 0;
   String birthDate = "မွေးသက္ကရာဇ်";
   bool isSwitched = false;
   String operatorImg = "";
@@ -70,7 +73,6 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
       const DropdownMenuItem(value: "B (Rh -)", child: Text("B (Rh -)")),
       const DropdownMenuItem(value: "AB (Rh -)", child: Text("AB (Rh -)")),
       const DropdownMenuItem(value: "O (Rh -)", child: Text("O (Rh -)")),
-      
     ];
     return menuItems;
   }
@@ -95,6 +97,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     selectedBloodType = data.bloodType ?? "";
     bloodBankNoController.text = data.bloodBankCard ?? "";
     totalDonationController.text = data.totalCount.toString();
+    memberDonationController.text = data.memberCount.toString();
     birthDate = data.birthDate ?? "";
     if (data.address!.contains('၊') && !(data.address!.contains(','))) {
       homeNoController.text =
@@ -104,8 +107,8 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
       quarterController.text =
           data.address != null ? data.address!.split('၊')[2] : "";
       townController.text =
-          data.address != null ? data.address!.split('၊')[3] : "";
-      setRegion(townController.text.toString());
+          (data.address != null ? data.address!.split('၊')[3] : "")
+              .replaceAll(" ", "");
     } else if (data.address!.contains(',')) {
       homeNoController.text =
           data.address != null ? data.address!.split(',')[0] : "";
@@ -114,8 +117,8 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
       quarterController.text =
           data.address != null ? data.address!.split(',')[2] : "";
       townController.text =
-          data.address != null ? data.address!.split(',')[3] : "";
-      setRegion(townController.text.toString());
+          (data.address != null ? data.address!.split(',')[3] : "")
+              .replaceAll(" ", "");
     }
 
     final String response =
@@ -125,6 +128,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
       datas.add(element);
       townships.add(element.township!);
     }
+    setRegion(townController.text.toString());
 
     phoneController.addListener(() {
       if (checkPhone(phoneController.text.toString()) == "Ooredoo") {
@@ -243,6 +247,59 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                     controller: nrcController,
                                     decoration:
                                         inputBoxDecoration("မှတ်ပုံတင်အမှတ်"),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    height: 60,
+                                    padding: const EdgeInsets.only(
+                                        left: 20, top: 20),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Radio(
+                                            value: 0,
+                                            fillColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.red),
+                                            groupValue: genderValue,
+                                            onChanged: (int? value) {
+                                              setState(() {
+                                                genderValue = value!;
+                                              });
+                                            }),
+                                        InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                genderValue = 0;
+                                              });
+                                            },
+                                            child: Text("အမျိုးသား")),
+                                        SizedBox(
+                                          width: 12,
+                                        ),
+                                        Radio(
+                                            value: 1,
+                                            fillColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.red),
+                                            groupValue: genderValue,
+                                            onChanged: (int? value) {
+                                              setState(() {
+                                                genderValue = value!;
+                                              });
+                                            }),
+                                        InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                genderValue = 1;
+                                              });
+                                            },
+                                            child: Text("အမျိုးသမီး"))
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Container(
@@ -395,6 +452,19 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                     ],
                                     decoration: inputBoxDecoration(
                                         "သွေးလှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 20, top: 16, bottom: 8, right: 20),
+                                  child: TextFormField(
+                                    controller: memberDonationController,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    decoration: inputBoxDecoration(
+                                        "အဖွဲ့နှင့် လှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
                                   ),
                                 ),
                                 Container(
@@ -561,6 +631,12 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                               child: GestureDetector(
                                 behavior: HitTestBehavior.translucent,
                                 onTap: () {
+                                  if (phoneController.text.isNotEmpty &&
+                                      !phoneList
+                                          .contains(phoneController.text)) {
+                                    phoneList
+                                        .add(phoneController.text.toString());
+                                  }
                                   if (nameController.text.isNotEmpty &&
                                       fatherNameController.text.isNotEmpty &&
                                       nrcController.text.isNotEmpty &&
@@ -718,7 +794,59 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                     ),
                                     Expanded(
                                       flex: 5,
-                                      child: Container(),
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          height: 60,
+                                          padding: const EdgeInsets.only(
+                                              left: 20, top: 12),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Radio(
+                                                  value: 0,
+                                                  fillColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.red),
+                                                  groupValue: genderValue,
+                                                  onChanged: (int? value) {
+                                                    setState(() {
+                                                      genderValue = value!;
+                                                    });
+                                                  }),
+                                              InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      genderValue = 0;
+                                                    });
+                                                  },
+                                                  child: Text("အမျိုးသား")),
+                                              SizedBox(
+                                                width: 12,
+                                              ),
+                                              Radio(
+                                                  value: 1,
+                                                  fillColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.red),
+                                                  groupValue: genderValue,
+                                                  onChanged: (int? value) {
+                                                    setState(() {
+                                                      genderValue = value!;
+                                                    });
+                                                  }),
+                                              InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      genderValue = 1;
+                                                    });
+                                                  },
+                                                  child: Text("အမျိုးသမီး"))
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -900,12 +1028,12 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                   ],
                                 ),
                                 SizedBox(
-                                  height: 12,
+                                  height: 24,
                                 ),
                                 Row(
                                   children: [
                                     Expanded(
-                                      flex: 3,
+                                      flex: 2,
                                       child: Container(
                                         margin: const EdgeInsets.only(
                                             left: 20,
@@ -920,7 +1048,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                       ),
                                     ),
                                     Expanded(
-                                      flex: 3,
+                                      flex: 2,
                                       child: Container(
                                         margin: const EdgeInsets.only(
                                             left: 20,
@@ -941,9 +1069,29 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                     ),
                                     Expanded(
                                       flex: 2,
-                                      child: Container(),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 20,
+                                            top: 16,
+                                            bottom: 8,
+                                            right: 20),
+                                        child: TextFormField(
+                                          controller: memberDonationController,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: <TextInputFormatter>[
+                                            FilteringTextInputFormatter
+                                                .digitsOnly
+                                          ],
+                                          decoration: inputBoxDecoration(
+                                              "အဖွဲ့နှင့် လှူခဲ့သည့် ကြိမ်ရေစုစုပေါင်း"),
+                                        ),
+                                      ),
                                     ),
+                                    Expanded(flex: 2, child: Container())
                                   ],
+                                ),
+                                SizedBox(
+                                  height: 8,
                                 ),
                                 Row(
                                   children: [
@@ -1127,6 +1275,11 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
+                                if (phoneController.text.isNotEmpty &&
+                                    !phoneList.contains(phoneController.text)) {
+                                  phoneList
+                                      .add(phoneController.text.toString());
+                                }
                                 if (nameController.text.isNotEmpty &&
                                     fatherNameController.text.isNotEmpty &&
                                     nrcController.text.isNotEmpty &&
@@ -1177,10 +1330,14 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
               : "-",
           bloodType: selectedBloodType,
           fatherName: fatherNameController.text.toString(),
+          gender: genderValue == 0 ? "male" : "female",
           //lastDate: now,
           //memberCount: memberCount.toString(),
           totalCount: totalDonationController.text.toString() != ""
               ? totalDonationController.text.toString()
+              : "0",
+          memberCount: memberDonationController.text.toString() != ""
+              ? memberDonationController.text.toString()
               : "0",
           memberId: memberId,
           note: noteController.text.toString() != ""
@@ -1202,6 +1359,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     selectedBloodType = "သွေးအုပ်စု";
     bloodBankNoController.clear();
     totalDonationController.clear();
+    memberDonationController.clear();
     homeNoController.clear();
     streetController.clear();
     quarterController.clear();
@@ -1224,9 +1382,11 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
   }
 
   void setRegion(String township) {
-    townController.text = township;
+    // townController.text = township;
+    print(township.toString());
 
     for (var element in datas) {
+      log(township.toString());
       if (element.township == township) {
         setState(() {
           regional = "${element.town!}, ${element.region!}";
