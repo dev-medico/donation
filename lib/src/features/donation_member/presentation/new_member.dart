@@ -34,6 +34,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   final birthDateController = TextEditingController();
   final nrcController = TextEditingController();
   final phoneController = TextEditingController();
+  final extraPhoneController = TextEditingController();
   final bloodBankNoController = TextEditingController();
   final homeNoController = TextEditingController();
   final streetController = TextEditingController();
@@ -47,8 +48,10 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
   String INIT_DATETIME = '2019-05-17';
 
   String birthDate = "မွေးသက္ကရာဇ်";
+  bool extraPhone = false;
   bool isSwitched = false;
   String operatorImg = "";
+  String operatorExtraImg = "";
   int id = 0;
   int genderValue = 0;
   int nrcValue = 0;
@@ -143,6 +146,35 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
       } else {
         setState(() {
           operatorImg = "";
+        });
+      }
+    });
+
+    extraPhoneController.addListener(() {
+      if (checkPhone(extraPhoneController.text.toString()) == "Ooredoo") {
+        setState(() {
+          operatorExtraImg = "assets/images/ooredoo_logo.svg";
+        });
+      } else if (checkPhone(extraPhoneController.text.toString()) ==
+          "Telenor") {
+        setState(() {
+          operatorExtraImg = "assets/images/telenor_logo.svg";
+        });
+      } else if (checkPhone(extraPhoneController.text.toString()) == "Mytel") {
+        setState(() {
+          operatorExtraImg = "assets/images/mytel_logo.svg";
+        });
+      } else if (checkPhone(extraPhoneController.text.toString()) == "MEC") {
+        setState(() {
+          operatorExtraImg = "assets/images/mec.svg";
+        });
+      } else if (checkPhone(extraPhoneController.text.toString()) == "MPT") {
+        setState(() {
+          operatorExtraImg = "assets/images/mpt_logo.svg";
+        });
+      } else {
+        setState(() {
+          operatorExtraImg = "";
         });
       }
     });
@@ -245,14 +277,14 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                   ref.watch(membersProvider);
                                               List<Member>? filterdata = [];
                                               oldData.forEach((element) {
-                                                if (element.name
+                                                if (nameController.text
                                                     .toString()
                                                     .toLowerCase()
                                                     .startsWith(nameController
                                                         .text
                                                         .toString()
                                                         .toLowerCase()))
-                                                // if (element.name
+                                                // if (nameController.text
                                                 //         .toString()
                                                 //         .toLowerCase()
                                                 //         .split("")
@@ -627,17 +659,9 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                     ),
                                     InkWell(
                                       onTap: () {
-                                        var newPhone =
-                                            phoneController.text.toString();
-                                        if (checkPhone(newPhone) !=
-                                                "Not_Valid" &&
-                                            !phoneList.contains(newPhone)) {
-                                          setState(() {
-                                            phoneList.add(phoneController.text
-                                                .toString());
-                                            phoneController.clear();
-                                          });
-                                        }
+                                        setState(() {
+                                          extraPhone = !extraPhone;
+                                        });
                                       },
                                       child: Container(
                                           margin: EdgeInsets.only(left: 8),
@@ -654,52 +678,42 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   ],
                                 ),
                               ),
-                              SizedBox(
-                                //  height: context.heightPx / 30,
-                                child: ListView.separated(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 20),
-                                    separatorBuilder: (context, index) =>
-                                        SizedBox(
-                                          height: 10,
+                              Visibility(
+                                visible: extraPhone,
+                                child: Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 20, top: 16, bottom: 8, right: 20),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Stack(
+                                          children: [
+                                            TextFormField(
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              controller: extraPhoneController,
+                                              decoration: inputBoxDecoration(
+                                                  "ဖုန်းနံပါတ်"),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, right: 20),
+                                              child: Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: buildOperatorExtra()),
+                                            )
+                                          ],
                                         ),
-                                    shrinkWrap: true,
-                                    //   scrollDirection: Axis.horizontal,
-                                    itemCount: phoneList.length ?? 0,
-                                    itemBuilder: (context, index) {
-                                      var data = phoneList[index];
-                                      return Material(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        elevation: 3,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(data ?? ''),
-                                              ),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    phoneList.removeAt(index);
-                                                  });
-                                                },
-                                                child: Icon(
-                                                  Icons.delete,
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                              // Text(data),
-                                              // Text(" ,"),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(left: 8),
+                                        width: 46,
+                                        height: 46,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                               Container(
                                 margin: const EdgeInsets.only(
@@ -858,9 +872,13 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                           child: GestureDetector(
                             behavior: HitTestBehavior.translucent,
                             onTap: () {
-                              if (phoneController.text.isNotEmpty &&
-                                  !phoneList.contains(phoneController.text)) {
+                              if (phoneController.text.isNotEmpty) {
                                 phoneList.add(phoneController.text.toString());
+                              }
+                              if (extraPhone &&
+                                  extraPhoneController.text.isNotEmpty) {
+                                phoneList
+                                    .add(extraPhoneController.text.toString());
                               }
                               if (nameController.text.isNotEmpty &&
                                   fatherNameController.text.isNotEmpty &&
@@ -870,7 +888,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                 //check member exist by name, father name and nrc
                                 var exist = members
                                     .where((element) =>
-                                        element.name ==
+                                        nameController.text ==
                                             nameController.text.toString() &&
                                         element.fatherName ==
                                             fatherNameController.text
@@ -884,7 +902,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                 } else {
                                   var data = members
                                       .where((element) =>
-                                          element.name ==
+                                          nameController.text ==
                                               nameController.text.toString() &&
                                           element.fatherName ==
                                               fatherNameController.text
@@ -1009,7 +1027,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                     List<Member>? filterdata =
                                                         [];
                                                     oldData.forEach((element) {
-                                                      if (element.name
+                                                      if (nameController.text
                                                           .toString()
                                                           .toLowerCase()
                                                           .startsWith(
@@ -1017,7 +1035,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                                   .text
                                                                   .toString()
                                                                   .toLowerCase()))
-                                                      //   if (element.name
+                                                      //   if (nameController.text
                                                       //           .toString()
                                                       //           .toLowerCase()
                                                       //           .split("")
@@ -1481,20 +1499,9 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                               ),
                                               InkWell(
                                                 onTap: () {
-                                                  var newPhone = phoneController
-                                                      .text
-                                                      .toString();
-                                                  if (checkPhone(newPhone) !=
-                                                          "Not_Valid" &&
-                                                      !phoneList
-                                                          .contains(newPhone)) {
-                                                    setState(() {
-                                                      phoneList.add(
-                                                          phoneController.text
-                                                              .toString());
-                                                      phoneController.clear();
-                                                    });
-                                                  }
+                                                  setState(() {
+                                                    extraPhone = !extraPhone;
+                                                  });
                                                 },
                                                 child: Container(
                                                     margin: EdgeInsets.only(
@@ -1513,65 +1520,45 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                             ],
                                           ),
                                         ),
-                                        GridView.count(
-                                          childAspectRatio: 5,
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 20,
-                                          ),
-                                          shrinkWrap: true,
-                                          crossAxisCount: 2,
-                                          //   scrollDirection: Axis.horizontal,
-                                          // itemCount: phoneList.length ?? 0,
-                                          children: List.generate(
-                                            phoneList.length,
-                                            (index) {
-                                              var data = phoneList[index];
-                                              return Container(
-                                                height: 40,
-                                                margin:
-                                                    EdgeInsets.only(right: 8),
-                                                child: Material(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  elevation: 3,
-                                                  child: Container(
-                                                    height: 50,
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                          child:
-                                                              Text(data ?? ''),
-                                                        ),
-                                                        SizedBox(
-                                                          width: 10,
-                                                        ),
-                                                        InkWell(
-                                                          onTap: () {
-                                                            setState(() {
-                                                              phoneList
-                                                                  .removeAt(
-                                                                      index);
-                                                            });
-                                                          },
-                                                          child: Icon(
-                                                            Icons.delete,
-                                                            color: Colors.red,
-                                                          ),
-                                                        ),
-                                                        // Text(data),
-                                                        // Text(" ,"),
-                                                      ],
+                                        Visibility(
+                                          visible: extraPhone,
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Stack(
+                                                  children: [
+                                                    TextFormField(
+                                                      keyboardType:
+                                                          TextInputType.number,
+                                                      controller:
+                                                          extraPhoneController,
+                                                      decoration:
+                                                          inputBoxDecoration(
+                                                              "ဖုန်းနံပါတ်"),
                                                     ),
-                                                  ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 8,
+                                                              right: 20),
+                                                      child: Align(
+                                                          alignment: Alignment
+                                                              .centerRight,
+                                                          child:
+                                                              buildOperatorExtra()),
+                                                    )
+                                                  ],
                                                 ),
-                                              );
-                                            },
+                                              ),
+                                              Container(
+                                                margin:
+                                                    EdgeInsets.only(left: 8),
+                                                width: 46,
+                                                height: 46,
+                                              ),
+                                            ],
                                           ),
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -1802,9 +1789,13 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: () {
-                            if (phoneController.text.isNotEmpty &&
-                                !phoneList.contains(phoneController.text)) {
+                            if (phoneController.text.isNotEmpty) {
                               phoneList.add(phoneController.text.toString());
+                            }
+                            if (extraPhone &&
+                                extraPhoneController.text.isNotEmpty) {
+                              phoneList
+                                  .add(extraPhoneController.text.toString());
                             }
                             if (nameController.text.isNotEmpty &&
                                 fatherNameController.text.isNotEmpty &&
@@ -1814,7 +1805,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                               //check member exist by name, father name and nrc
                               var exist = members
                                   .where((element) =>
-                                      element.name ==
+                                      nameController.text ==
                                           nameController.text.toString() &&
                                       element.fatherName ==
                                           fatherNameController.text
@@ -1828,7 +1819,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                               } else {
                                 var data = members
                                     .where((element) =>
-                                        element.name ==
+                                        nameController.text ==
                                             nameController.text.toString() &&
                                         element.fatherName ==
                                             fatherNameController.text
@@ -2132,6 +2123,18 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
     if (editable && memberIDController.text.toString().isNotEmpty) {
       if (memberIDController.text.toString().contains("-") &&
           memberIDController.text.toString().length == 6) {
+        if (nameController.text.toString().startsWith(" ကို") ||
+            nameController.text.toString().startsWith("ဦး") ||
+            nameController.text.toString().startsWith(" ဦး") ||
+            nameController.text.toString().startsWith("စိုင်း") ||
+            nameController.text.toString().startsWith("ဦး") ||
+            nameController.text.toString().startsWith("နိုင်") ||
+            nameController.text.toString().startsWith("အရှင်") ||
+            nameController.text.toString().startsWith("စော")) {
+          genderValue = 0;
+        } else {
+          genderValue = 1;
+        }
         DateTime dt = DateTime.parse('2010-01-01 12:00:00');
         ref.watch(realmProvider)!.createMember(
               memberId: memberIDController.text.toString(),
@@ -2140,7 +2143,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
               gender: genderValue == 0 ? "male" : "female",
               birthDate: birthDate != "မွေးသက္ကရာဇ်" ? birthDate : "-",
               nrc: _getCompletNrcInfo() != "" ? _getCompletNrcInfo() : "-",
-              phone: phoneController.text.toString(),
+              phone: phoneList.join(","),
               lastDate: dt,
               bloodType: selectedBloodType,
               bloodBankCard: bloodBankNoController.text.toString() != ""
@@ -2317,6 +2320,20 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
         opacity: 0.6,
         child: SvgPicture.asset(
           operatorImg,
+          height: 34,
+        ),
+      );
+    }
+  }
+
+  Widget buildOperatorExtra() {
+    if (operatorExtraImg == "") {
+      return Container(child: null);
+    } else {
+      return Opacity(
+        opacity: 0.6,
+        child: SvgPicture.asset(
+          operatorExtraImg,
           height: 34,
         ),
       );

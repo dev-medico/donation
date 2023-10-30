@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:donation/realm/realm_services.dart';
+import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donar/donar_list_new.dart';
 import 'package:donation/src/features/donation/controller/donation_provider.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
@@ -41,21 +42,27 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    //   var donations = ref.watch(donationProvider);
-    //   var members = ref.watch(membersDataProvider);
-    //   int totalUpdate = 0;
-    //   members.forEach(
-    //     (element) {
-    //       ref.watch(realmProvider)!.updateMember(element,
-    //           memberCount: donations
-    //               .where((member) =>
-    //                   element.memberId.toString() == member.memberId.toString())
-    //               .length
-    //               .toString());
-    //       totalUpdate++;
-    //     },
-    //   );
-    //   log("Total Updated - " + totalUpdate.toString());
+    //   final realm = ref.read(realmProvider)!.realm;
+    //   realm.write(() {
+    //     realm.deleteAll<ExpensesRecord>();
+    //     realm.deleteAll<DonarRecord>();
+    //   });
+
+      //   var donations = ref.watch(donationProvider);
+      //   var members = ref.watch(membersDataProvider);
+      //   int totalUpdate = 0;
+      //   members.forEach(
+      //     (element) {
+      //       ref.watch(realmProvider)!.updateMember(element,
+      //           memberCount: donations
+      //               .where((member) =>
+      //                   element.memberId.toString() == member.memberId.toString())
+      //               .length
+      //               .toString());
+      //       totalUpdate++;
+      //     },
+      //   );
+      //   log("Total Updated - " + totalUpdate.toString());
 
       //   log("ကို - " +
       //       members

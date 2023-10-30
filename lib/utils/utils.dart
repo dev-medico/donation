@@ -126,7 +126,7 @@ class Utils {
       builder: (_) => AlertDialog(
         insetPadding: EdgeInsets.symmetric(
           horizontal: 0,
-          vertical: MediaQuery.of(context).size.height * 0.2,
+          vertical: MediaQuery.of(context).size.height * 0.14,
         ),
         actions: [
           Padding(

@@ -23,9 +23,9 @@ class AppServices with ChangeNotifier {
         await app.logIn(Credentials.emailPassword(email, password));
     currentUser = loggedInUser;
     log("Custom User Data - ${currentUser!.customData}");
-    notifyListeners();
+   
     final customUserData = await currentUser!.refreshCustomData();
-    log("Custom User Data -  $customUserData");
+     notifyListeners();
     return loggedInUser;
   }
 
