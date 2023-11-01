@@ -362,6 +362,35 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                       setState(() {
                                         selectedBloodType = val.toString();
                                       });
+                                      var members = ref.watch(membersProvider);
+                                      //check member exist by name, father name and nrc
+                                      var exist = members
+                                          .where((element) =>
+                                              nameController.text ==
+                                                  nameController.text
+                                                      .toString() &&
+                                              element.fatherName ==
+                                                  fatherNameController.text
+                                                      .toString() &&
+                                              element.bloodType ==
+                                                  selectedBloodType)
+                                          .toList()
+                                          .isNotEmpty;
+                                      if (exist) {
+                                        var data = members
+                                            .where((element) =>
+                                                nameController.text ==
+                                                    nameController.text
+                                                        .toString() &&
+                                                element.fatherName ==
+                                                    fatherNameController.text
+                                                        .toString() &&
+                                                element.bloodType ==
+                                                    selectedBloodType)
+                                            .toList()
+                                            .first;
+                                        memberExistDialog(context, data);
+                                      }
                                     },
                                     items: dropdownItems),
                               ),
@@ -1144,6 +1173,38 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                               selectedBloodType =
                                                   val.toString();
                                             });
+                                            var members =
+                                                ref.watch(membersProvider);
+                                            //check member exist by name, father name and nrc
+                                            var exist = members
+                                                .where((element) =>
+                                                    nameController.text ==
+                                                        nameController.text
+                                                            .toString() &&
+                                                    element.fatherName ==
+                                                        fatherNameController
+                                                            .text
+                                                            .toString() &&
+                                                    element.bloodType ==
+                                                        selectedBloodType)
+                                                .toList()
+                                                .isNotEmpty;
+                                            if (exist) {
+                                              var data = members
+                                                  .where((element) =>
+                                                      nameController.text ==
+                                                          nameController.text
+                                                              .toString() &&
+                                                      element.fatherName ==
+                                                          fatherNameController
+                                                              .text
+                                                              .toString() &&
+                                                      element.bloodType ==
+                                                          selectedBloodType)
+                                                  .toList()
+                                                  .first;
+                                              memberExistDialog(context, data);
+                                            }
                                           },
                                           items: dropdownItems),
                                     ),
