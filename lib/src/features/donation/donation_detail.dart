@@ -437,7 +437,7 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                             height: 8,
                           ),
                           Row(
-                            children: const [
+                            children: [
                               SizedBox(
                                 width: 12,
                               ),
@@ -458,7 +458,7 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                               Expanded(
                                 flex: 4,
                                 child: Text(
-                                  "father_name",
+                                  data.memberObj!.fatherName.toString(),
                                   style: TextStyle(
                                       fontSize: 14, color: Colors.black),
                                 ),
@@ -469,7 +469,7 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                             height: 8,
                           ),
                           Row(
-                            children: const [
+                            children: [
                               SizedBox(
                                 width: 12,
                               ),
@@ -490,7 +490,7 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                               Expanded(
                                 flex: 4,
                                 child: Text(
-                                  "bolood type",
+                                  data.memberObj!.bloodType.toString(),
                                   style: TextStyle(
                                       fontSize: 14, color: Colors.black),
                                 ),

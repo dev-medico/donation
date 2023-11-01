@@ -47,7 +47,7 @@ android {
         applicationId "com.red.juniors"
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 44
+        versionCode 45
         versionName "1.2.9"
         multiDexEnabled true
     }

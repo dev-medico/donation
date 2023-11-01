@@ -13,7 +13,7 @@ class DonationByMemberDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'ရက်စွဲ',
             value: DateFormat('dd-MM-yyyy')
-                .format(DateTime.parse(e.donationDate.toString()))),
+                .format(DateTime.parse(e.donationDate.toString()).toLocal())),
         DataGridCell<String>(
             columnName: 'လှူဒါန်းသည့်နေရာ',
             value: e.hospital!.isEmpty
