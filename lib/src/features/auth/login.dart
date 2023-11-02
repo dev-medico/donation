@@ -91,55 +91,55 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: primaryColor),
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        height: 60,
-                        padding: const EdgeInsets.only(left: 30, top: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Radio(
-                                value: 0,
-                                fillColor:
-                                    MaterialStateProperty.all(Colors.red),
-                                groupValue: groupValue,
-                                onChanged: (int? value) {
-                                  setState(() {
-                                    groupValue = value!;
-                                  });
-                                }),
-                            InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    groupValue = 0;
-                                  });
-                                },
-                                child: Text("Admin")),
-                            SizedBox(
-                              width: 12,
-                            ),
-                            Radio(
-                                value: 1,
-                                fillColor:
-                                    MaterialStateProperty.all(Colors.red),
-                                groupValue: groupValue,
-                                onChanged: (int? value) {
-                                  setState(() {
-                                    groupValue = value!;
-                                  });
-                                }),
-                            InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    groupValue = 1;
-                                  });
-                                },
-                                child: Text("Member"))
-                          ],
-                        ),
-                      ),
-                    ),
+                    // Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: Container(
+                    //     height: 60,
+                    //     padding: const EdgeInsets.only(left: 30, top: 20),
+                    //     child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment.center,
+                    //       children: [
+                    //         Radio(
+                    //             value: 0,
+                    //             fillColor:
+                    //                 MaterialStateProperty.all(Colors.red),
+                    //             groupValue: groupValue,
+                    //             onChanged: (int? value) {
+                    //               setState(() {
+                    //                 groupValue = value!;
+                    //               });
+                    //             }),
+                    //         InkWell(
+                    //             onTap: () {
+                    //               setState(() {
+                    //                 groupValue = 0;
+                    //               });
+                    //             },
+                    //             child: Text("Admin")),
+                    //         SizedBox(
+                    //           width: 12,
+                    //         ),
+                    //         Radio(
+                    //             value: 1,
+                    //             fillColor:
+                    //                 MaterialStateProperty.all(Colors.red),
+                    //             groupValue: groupValue,
+                    //             onChanged: (int? value) {
+                    //               setState(() {
+                    //                 groupValue = value!;
+                    //               });
+                    //             }),
+                    //         InkWell(
+                    //             onTap: () {
+                    //               setState(() {
+                    //                 groupValue = 1;
+                    //               });
+                    //             },
+                    //             child: Text("Member"))
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                     Container(
                       decoration: shadowDecoration(const Color(0xfff1f1f1)),
                       margin: EdgeInsets.only(
