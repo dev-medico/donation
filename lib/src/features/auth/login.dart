@@ -2,6 +2,7 @@
 import 'dart:developer';
 
 import 'package:donation/realm/app_services.dart';
+import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/auth/otp.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/home/home.dart';
@@ -389,7 +390,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       //   },
       //   codeAutoRetrievalTimeout: (String verificationId) {},
       // );
-    
     } else {
       setState(() {
         _isLoading = false;
@@ -457,6 +457,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _isLoading = false;
       });
       prefs.setString("name", email.text.toString());
+      var realmServices = ref.watch(realmProvider);
+      await realmServices!.sessionSwitch();
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
             context, HomeScreen.routeName, (Route<dynamic> route) => false);

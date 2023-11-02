@@ -57,8 +57,16 @@ class _BloodDonationGenderPieChartState
     var femaleData = ref.watch(donationsProviderByGender("female")).length;
 
     //calculate male Percent from maleData and femaleData Lenght Total
-    double malePercent = (maleData / (maleData + femaleData)) * 100;
-    double femalePercent = (femaleData / (maleData + femaleData)) * 100;
+    double malePercent = 0;
+
+    double femalePercent = 0;
+    if (maleData != 0) {
+      malePercent = (maleData / (maleData + femaleData)) * 100;
+    }
+
+    if (femaleData != 0) {
+      femalePercent = (femaleData / (maleData + femaleData)) * 100;
+    }
 
     if (donations.isEmpty) {
       donations.add(DonationModel(
