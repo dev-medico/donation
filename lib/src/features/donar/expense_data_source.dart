@@ -17,7 +17,7 @@ class ExpenseDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'ရက်စွဲ',
             value:
-                "        ${DateFormat('dd MMM yyyy').format(expenseData[i].date!)}        "),
+                "        ${DateFormat('dd MMM yyyy').format(expenseData[i].date!.toLocal())}        "),
         DataGridCell<String>(
             columnName: 'အကြောင်းအရာ',
             value: "      ${expenseData[i].name}\t\t\t"),

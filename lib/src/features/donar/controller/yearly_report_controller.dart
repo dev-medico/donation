@@ -19,7 +19,7 @@ class YearlyReportController
     log('${donars.length}         year');
     for (var i in donars) {
       listMapDonors.update(
-          DateFormat.LLLL().format(i.date!),
+          DateFormat.LLLL().format(i.date!.toLocal()),
           (value) => DonarRecord(
                 i.id,
                 amount: ((i.amount ?? 0) + (value.amount ?? 0)),
@@ -30,13 +30,13 @@ class YearlyReportController
                 i.id,
                 amount: i.amount ?? 0,
                 name: i.name!,
-                date: i.date,
+                date: i.date!.toLocal(),
               ));
     }
 
     for (var i in expenses) {
       listMapExpense.update(
-          DateFormat.LLLL().format(i.date!),
+          DateFormat.LLLL().format(i.date!.toLocal()),
           (value) => ExpensesRecord(
                 i.id,
                 amount: ((i.amount ?? 0) + (value.amount ?? 0)),
@@ -47,7 +47,7 @@ class YearlyReportController
                 i.id,
                 amount: i.amount!,
                 name: i.name!,
-                date: i.date,
+                date: i.date!.toLocal(),
               ));
     }
 
@@ -55,13 +55,13 @@ class YearlyReportController
       for (int i = 0; i < listMapDonors.entries.length; i++)
         YearReportData(
             month: DateFormat.LLLL()
-                .format(listMapDonors.entries.elementAt(i).value.date!),
+                .format(listMapDonors.entries.elementAt(i).value.date!.toLocal()),
             totalDonation: listMapDonors.entries.elementAt(i).value.amount,
             totalExpenses: listMapExpense.entries
                     .where((element) =>
-                        DateFormat.LLLL().format(element.value.date!) ==
+                        DateFormat.LLLL().format(element.value.date!.toLocal()) ==
                         DateFormat.LLLL().format(
-                            listMapDonors.entries.elementAt(i).value.date!))
+                            listMapDonors.entries.elementAt(i).value.date!.toLocal()))
                     .firstOrNull
                     ?.value
                     .amount ??
