@@ -366,7 +366,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                       //check member exist by name, father name and nrc
                                       var exist = members
                                           .where((element) =>
-                                              nameController.text ==
+                                              element.name ==
                                                   nameController.text
                                                       .toString() &&
                                               element.fatherName ==
@@ -379,7 +379,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                       if (exist) {
                                         var data = members
                                             .where((element) =>
-                                                nameController.text ==
+                                                element.name ==
                                                     nameController.text
                                                         .toString() &&
                                                 element.fatherName ==
@@ -917,7 +917,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                 //check member exist by name, father name and nrc
                                 var exist = members
                                     .where((element) =>
-                                        nameController.text ==
+                                        element.name ==
                                             nameController.text.toString() &&
                                         element.fatherName ==
                                             fatherNameController.text
@@ -931,7 +931,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                 } else {
                                   var data = members
                                       .where((element) =>
-                                          nameController.text ==
+                                          element.name ==
                                               nameController.text.toString() &&
                                           element.fatherName ==
                                               fatherNameController.text
@@ -1178,7 +1178,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                             //check member exist by name, father name and nrc
                                             var exist = members
                                                 .where((element) =>
-                                                    nameController.text ==
+                                                    element.name ==
                                                         nameController.text
                                                             .toString() &&
                                                     element.fatherName ==
@@ -1192,7 +1192,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                             if (exist) {
                                               var data = members
                                                   .where((element) =>
-                                                      nameController.text ==
+                                                      element.name ==
                                                           nameController.text
                                                               .toString() &&
                                                       element.fatherName ==
@@ -1866,7 +1866,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                               //check member exist by name, father name and nrc
                               var exist = members
                                   .where((element) =>
-                                      nameController.text ==
+                                      element.name ==
                                           nameController.text.toString() &&
                                       element.fatherName ==
                                           fatherNameController.text
@@ -1880,7 +1880,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                               } else {
                                 var data = members
                                     .where((element) =>
-                                        nameController.text ==
+                                        element.name ==
                                             nameController.text.toString() &&
                                         element.fatherName ==
                                             fatherNameController.text

@@ -103,6 +103,11 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     bloodBankNoController.text = data.bloodBankCard ?? "";
     totalDonationController.text = data.totalCount.toString();
     memberDonationController.text = data.memberCount.toString();
+    if (data.gender.toString().toLowerCase() == "male") {
+      genderValue = 0;
+    } else {
+      genderValue = 1;
+    }
     birthDate = data.birthDate ?? "";
     if (data.address!.contains('၊') && !(data.address!.contains(','))) {
       homeNoController.text =

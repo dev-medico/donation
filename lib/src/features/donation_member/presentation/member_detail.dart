@@ -349,6 +349,34 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                       const SizedBox(
                         height: 12,
                       ),
+                      Row(
+                        children: [
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          const Expanded(
+                            flex: 4,
+                            child: Text("လိင်အမျိုးအစား",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color.fromARGB(255, 116, 112, 112))),
+                          ),
+                          const Text("-",
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.black)),
+                          const SizedBox(
+                            width: 24,
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: Text(
+                              data.gender.toString().toUpperCase(),
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(
                         height: 12,
                       ),
@@ -836,6 +864,35 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                         ),
                         const SizedBox(
                           height: 12,
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Expanded(
+                              flex: 4,
+                              child: Text("လိင်အမျိုးအစား",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                data.gender.toString().toUpperCase(),
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(
                           height: 12,
