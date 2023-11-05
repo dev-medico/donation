@@ -12,7 +12,7 @@ final donarByMonthYearStreamProvider =
   var realmService = ref.watch(realmProvider);
 
   final stream = realmService!.realm.query<DonarRecord>(
-      r"date >= $0 AND date <= $1 AND TRUEPREDICATE SORT(date ASC)", [
+      r"date >= $0 AND date < $1 AND TRUEPREDICATE SORT(date ASC)", [
     DateTime(filter.year!, filter.month!, 1),
     DateTime(filter.year!, filter.month! + 1, 1),
   ]).changes;
@@ -41,7 +41,7 @@ final expenseByMonthYearStreamProvider = StreamProvider.family<
   var realmService = ref.watch(realmProvider);
 
   final stream = realmService!.realm.query<ExpensesRecord>(
-      r"date >= $0 AND date <= $1 AND TRUEPREDICATE SORT(date ASC)", [
+      r"date >= $0 AND date < $1 AND TRUEPREDICATE SORT(date ASC)", [
     DateTime(filter.year!, filter.month!, 1),
     DateTime(filter.year!, filter.month! + 1, 1),
   ]).changes;
