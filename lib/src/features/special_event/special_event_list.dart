@@ -143,7 +143,7 @@ class _SpecialEventListScreenState
                 titles[index],
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 11 : 14,
+                    fontSize: Responsive.isMobile(context) ? 11 : 12,
                     height: 1.4,
                     color: Colors.white),
               ),
@@ -243,31 +243,47 @@ class _SpecialEventListScreenState
                             margin: const EdgeInsets.all(1),
                             child: Padding(
                               padding:
-                                  const EdgeInsets.only(left: 20.0, top: 14),
+                                  const EdgeInsets.only(left: 4.0, top: 14),
                               child: Text(
                                 columnIndex == 0
-                                    ? Utils.strToMM(
-                                        data[rowIndex].retroTest.toString())
+                                    ? data[rowIndex].retroTest == 0
+                                        ? "-"
+                                        : Utils.strToMM(
+                                            data[rowIndex].retroTest.toString())
                                     : columnIndex == 1
-                                        ? Utils.strToMM(
-                                            data[rowIndex].hbsAg.toString())
+                                        ? data[rowIndex].hbsAg == 0
+                                            ? "-"
+                                            : Utils.strToMM(
+                                                data[rowIndex].hbsAg.toString())
                                         : columnIndex == 2
-                                            ? Utils.strToMM(
-                                                data[rowIndex].hcvAb.toString())
-                                            : columnIndex == 3
-                                                ? Utils.strToMM(data[rowIndex]
-                                                    .vdrlTest
+                                            ? data[rowIndex].hcvAb == 0
+                                                ? "-"
+                                                : Utils.strToMM(data[rowIndex]
+                                                    .hcvAb
                                                     .toString())
-                                                : columnIndex == 4
-                                                    ? Utils.strToMM(
+                                            : columnIndex == 3
+                                                ? data[rowIndex].vdrlTest == 0
+                                                    ? "-"
+                                                    : Utils.strToMM(
                                                         data[rowIndex]
-                                                            .mpIct
+                                                            .vdrlTest
                                                             .toString())
-                                                    : columnIndex == 5
-                                                        ? Utils.strToMM(
+                                                : columnIndex == 4
+                                                    ? data[rowIndex].mpIct == 0
+                                                        ? "-"
+                                                        : Utils.strToMM(
                                                             data[rowIndex]
-                                                                .haemoglobin
+                                                                .mpIct
                                                                 .toString())
+                                                    : columnIndex == 5
+                                                        ? data[rowIndex]
+                                                                    .haemoglobin ==
+                                                                0
+                                                            ? "-"
+                                                            : Utils.strToMM(
+                                                                data[rowIndex]
+                                                                    .haemoglobin
+                                                                    .toString())
                                                         : columnIndex == 6
                                                             ? data[rowIndex]
                                                                         .labName !=
@@ -280,10 +296,10 @@ class _SpecialEventListScreenState
                                                                 ? data[rowIndex]
                                                                             .total !=
                                                                         null
-                                                                    ? Utils.strToMM(data[
-                                                                            rowIndex]
-                                                                        .total
-                                                                        .toString())
+                                                                    ? Utils.strToMM(
+                                                                        data[rowIndex]
+                                                                            .total
+                                                                            .toString())
                                                                     : "-"
                                                                 : "",
                                 textAlign: TextAlign.center,
@@ -319,7 +335,7 @@ class _SpecialEventListScreenState
         headers: header,
         defaultsColumnWidth: Responsive.isMobile(context)
             ? MediaQuery.of(context).size.width * 0.23
-            : MediaQuery.of(context).size.width * 0.135,
+            : MediaQuery.of(context).size.width * 0.09,
         defaultsRowHeight: 48,
         headerHeight: 74,
         firstColumnWidth: Responsive.isMobile(context) ? 94 : 200,
