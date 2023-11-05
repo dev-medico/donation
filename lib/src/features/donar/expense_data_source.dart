@@ -14,10 +14,10 @@ class ExpenseDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'စဥ်',
             value: "   ${Utils.strToMM((i + 1).toString())}   "),
-        DataGridCell<String>(
-            columnName: 'ရက်စွဲ',
-            value:
-                "        ${DateFormat('dd MMM yyyy').format(expenseData[i].date!.toLocal())}        "),
+        // DataGridCell<String>(
+        //     columnName: 'ရက်စွဲ',
+        //     value:
+        //         "        ${DateFormat('dd MMM yyyy').format(expenseData[i].date!.toLocal())}        "),
         DataGridCell<String>(
             columnName: 'အကြောင်းအရာ',
             value: "      ${expenseData[i].name}\t\t\t"),

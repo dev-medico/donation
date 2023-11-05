@@ -14,10 +14,10 @@ class DonarDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'စဥ်',
             value: "   ${Utils.strToMM((i + 1).toString())}   "),
-        DataGridCell<String>(
-            columnName: 'ရက်စွဲ',
-            value:
-                "        ${DateFormat('dd MMM yyyy').format(donarData[i].date!.toLocal())}        "),
+        // DataGridCell<String>(
+        //     columnName: 'ရက်စွဲ',
+        //     value:
+        //         "        ${DateFormat('dd MMM yyyy').format(donarData[i].date!.toLocal())}        "),
         DataGridCell<String>(
             columnName: 'အမည်', value: "  ${donarData[i].name}\t\t"),
         DataGridCell<String>(
