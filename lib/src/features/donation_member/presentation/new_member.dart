@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation/realm/realm_services.dart';
@@ -367,7 +368,8 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
 
                                       var memberExist = checkExistMember();
                                       if (memberExist != null) {
-                                        memberExistDialog(context, memberExist);
+                                        memberExistDialog(
+                                            context, memberExist, false);
                                       }
                                     },
                                     items: dropdownItems),
@@ -893,7 +895,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   selectedBloodType != "သွေးအုပ်စု") {
                                 var memberExist = checkExistMember();
                                 if (memberExist != null) {
-                                  memberExistDialog(context, memberExist);
+                                  memberExistDialog(context, memberExist, true);
                                 } else {
                                   bool result =
                                       await InternetConnectionChecker()
@@ -1143,7 +1145,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                 checkExistMember();
                                             if (memberExist != null) {
                                               memberExistDialog(
-                                                  context, memberExist);
+                                                  context, memberExist, false);
                                             }
                                           },
                                           items: dropdownItems),
@@ -1804,7 +1806,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                 selectedBloodType != "သွေးအုပ်စု") {
                               var memberExist = checkExistMember();
                               if (memberExist != null) {
-                                memberExistDialog(context, memberExist);
+                                memberExistDialog(context, memberExist, true);
                               } else {
                                 bool result = await InternetConnectionChecker()
                                     .hasConnection;
@@ -1846,7 +1848,9 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
     );
   }
 
-  static YYDialog memberExistDialog(BuildContext context, Member data) {
+  YYDialog memberExistDialog(
+      BuildContext context, Member data, bool byForceAvailable) {
+    log("By Force  " + byForceAvailable.toString());
     return YYDialog().build()
       ..width = Responsive.isDesktop(context)
           ? MediaQuery.of(context).size.width * 0.4
@@ -2024,8 +2028,8 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
         ],
       ))
       ..widget(Padding(
-        padding:
-            const EdgeInsets.only(top: 24, left: 20, right: 20, bottom: 30),
+        padding: EdgeInsets.only(
+            top: 24, left: 20, right: 20, bottom: byForceAvailable ? 12 : 30),
         child: MaterialButton(
             padding: const EdgeInsets.all(12.0),
             textColor: Colors.white,
@@ -2048,14 +2052,51 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
             child: Center(
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const <Widget>[
-                    Text("အိုကေ",
+                  children: <Widget>[
+                    Text(byForceAvailable ? "မထည့်သွင်းတော့ပါ" : "အိုကေ",
                         textScaleFactor: 1.0,
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 15, color: Colors.white))
                   ]),
             )),
       ))
+      ..widget(byForceAvailable
+          ? Padding(
+              padding: const EdgeInsets.only(
+                  top: 4, left: 20, right: 20, bottom: 30),
+              child: MaterialButton(
+                  padding: const EdgeInsets.all(12.0),
+                  textColor: primaryColor,
+                  splashColor: primaryColor,
+                  color: Colors.white,
+                  elevation: 2.0,
+                  minWidth: 155,
+                  onPressed: () {
+                    getAutoIncrementKey();
+                    Navigator.of(context, rootNavigator: true).pop('dialog');
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => MemberDetailScreen(data: data),
+                    //   ),
+                    // );
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Center(
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text("အဖွဲ့ဝင်အသစ်ဖြစ်ကြောင်း အတည်ပြုမည်",
+                              textScaleFactor: 1.0,
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(fontSize: 15, color: primaryColor))
+                        ]),
+                  )),
+            )
+          : Container())
       ..animatedFunc = (child, animation) {
         return ScaleTransition(
           scale: Tween(begin: 0.0, end: 1.0).animate(animation),
