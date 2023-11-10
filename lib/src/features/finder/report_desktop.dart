@@ -25,6 +25,7 @@ class ReportDesktopScreen extends ConsumerStatefulWidget {
 }
 
 class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
+    
   @override
   Widget build(BuildContext context) {
     var totalMember = ref.watch(totalMembersProvider);

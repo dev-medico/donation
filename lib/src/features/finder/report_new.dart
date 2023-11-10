@@ -14,8 +14,10 @@ import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
+import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:responsive_framework/responsive_row_column.dart';
 
 class ReportNewScreen extends ConsumerStatefulWidget {
@@ -29,7 +31,25 @@ class ReportNewScreen extends ConsumerStatefulWidget {
 
 class _ReportNewScreenState extends ConsumerState<ReportNewScreen> {
   @override
+  void initState() {
+    checkInternetConnection();
+    super.initState();
+  }
+
+  checkInternetConnection() async {
+    bool result = await InternetConnectionChecker().hasConnection;
+    if (result == false) {
+      Utils.messageDialog(
+          "Poor Internet Connection! Please check with your Internet",
+          context,
+          "အိုကေ",
+          Colors.black);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    YYDialog.init(context);
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(
