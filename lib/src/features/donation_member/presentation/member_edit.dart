@@ -110,25 +110,33 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     }
     birthDate = data.birthDate ?? "";
     if (data.address!.contains('၊') && !(data.address!.contains(','))) {
-      homeNoController.text =
-          data.address != null ? data.address!.split('၊')[0] : "";
-      streetController.text =
-          data.address != null ? data.address!.split('၊')[1] : "";
-      quarterController.text =
-          data.address != null ? data.address!.split('၊')[2] : "";
-      townController.text =
-          (data.address != null ? data.address!.split('၊')[3] : "")
-              .replaceAll(" ", "");
+      homeNoController.text = data.address != null
+          ? data.address.toString().replaceAll(" ", "").split('၊')[0]
+          : "";
+      streetController.text = data.address != null
+          ? data.address.toString().replaceAll(" ", "").split('၊')[1]
+          : "";
+      quarterController.text = data.address != null
+          ? data.address.toString().replaceAll(" ", "").split('၊')[2]
+          : "";
+      townController.text = (data.address != null
+              ? data.address.toString().replaceAll(" ", "").split('၊')[3]
+              : "")
+          .replaceAll(" ", "");
     } else if (data.address!.contains(',')) {
-      homeNoController.text =
-          data.address != null ? data.address!.split(',')[0] : "";
-      streetController.text =
-          data.address != null ? data.address!.split(',')[1] : "";
-      quarterController.text =
-          data.address != null ? data.address!.split(',')[2] : "";
-      townController.text =
-          (data.address != null ? data.address!.split(',')[3] : "")
-              .replaceAll(" ", "");
+      homeNoController.text = data.address != null
+          ? data.address.toString().replaceAll(" ", "").split(',')[0]
+          : "";
+      streetController.text = data.address != null
+          ? data.address.toString().replaceAll(" ", "").split(',')[1]
+          : "";
+      quarterController.text = data.address != null
+          ? data.address.toString().replaceAll(" ", "").split(',')[2]
+          : "";
+      townController.text = (data.address != null
+              ? data.address.toString().replaceAll(" ", "").split(',')[3]
+              : "")
+          .replaceAll(" ", "");
     }
 
     final String response =

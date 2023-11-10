@@ -1014,7 +1014,7 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                             Expanded(
                               flex: 4,
                               child: Text(
-                                "${data.address}",
+                                "${data.address.toString().replaceAll(" ", "")}",
                                 style: const TextStyle(
                                     fontSize: 14, color: Colors.black),
                               ),
