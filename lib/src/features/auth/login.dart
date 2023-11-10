@@ -6,6 +6,7 @@ import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/auth/otp.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/home/home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
@@ -36,7 +37,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   late SharedPreferences prefs;
   bool _isLoading = false;
-  int groupValue = 0;
+  int groupValue = 1;
 
   @override
   void initState() {
@@ -92,55 +93,57 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: primaryColor),
                       ),
                     ),
-                    // Align(
-                    //   alignment: Alignment.centerLeft,
-                    //   child: Container(
-                    //     height: 60,
-                    //     padding: const EdgeInsets.only(left: 30, top: 20),
-                    //     child: Row(
-                    //       mainAxisAlignment: MainAxisAlignment.center,
-                    //       children: [
-                    //         Radio(
-                    //             value: 0,
-                    //             fillColor:
-                    //                 MaterialStateProperty.all(Colors.red),
-                    //             groupValue: groupValue,
-                    //             onChanged: (int? value) {
-                    //               setState(() {
-                    //                 groupValue = value!;
-                    //               });
-                    //             }),
-                    //         InkWell(
-                    //             onTap: () {
-                    //               setState(() {
-                    //                 groupValue = 0;
-                    //               });
-                    //             },
-                    //             child: Text("Admin")),
-                    //         SizedBox(
-                    //           width: 12,
-                    //         ),
-                    //         Radio(
-                    //             value: 1,
-                    //             fillColor:
-                    //                 MaterialStateProperty.all(Colors.red),
-                    //             groupValue: groupValue,
-                    //             onChanged: (int? value) {
-                    //               setState(() {
-                    //                 groupValue = value!;
-                    //               });
-                    //             }),
-                    //         InkWell(
-                    //             onTap: () {
-                    //               setState(() {
-                    //                 groupValue = 1;
-                    //               });
-                    //             },
-                    //             child: Text("Member"))
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        height: 60,
+                        padding: EdgeInsets.only(
+                            left: Responsive.isMobile(context) ? 0 : 30,
+                            top: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Radio(
+                                value: 0,
+                                fillColor:
+                                    MaterialStateProperty.all(Colors.red),
+                                groupValue: groupValue,
+                                onChanged: (int? value) {
+                                  setState(() {
+                                    groupValue = value!;
+                                  });
+                                }),
+                            InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    groupValue = 0;
+                                  });
+                                },
+                                child: Text("Admin")),
+                            SizedBox(
+                              width: 12,
+                            ),
+                            Radio(
+                                value: 1,
+                                fillColor:
+                                    MaterialStateProperty.all(Colors.red),
+                                groupValue: groupValue,
+                                onChanged: (int? value) {
+                                  setState(() {
+                                    groupValue = value!;
+                                  });
+                                }),
+                            InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    groupValue = 1;
+                                  });
+                                },
+                                child: Text("Member"))
+                          ],
+                        ),
+                      ),
+                    ),
                     Container(
                       decoration: shadowDecoration(const Color(0xfff1f1f1)),
                       margin: EdgeInsets.only(
@@ -354,42 +357,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (member != null) {
       log("+95" + email.text.toString().replaceAll(" ", "").substring(1));
 
-      // FirebaseAuth auth = FirebaseAuth.instance;
-      // await auth.verifyPhoneNumber(
-      //   phoneNumber:
-      //       "+95" + email.text.toString().replaceAll(" ", "").substring(1),
-      //   verificationCompleted: (PhoneAuthCredential credential) async {
-      //     var user = await auth.signInWithCredential(credential);
-      //     user.user!.getIdToken(true).toString();
-      //   },
-      //   timeout: const Duration(seconds: 120),
-      //   verificationFailed: (FirebaseAuthException e) {
-      //     setState(() {
-      //       _isLoading = false;
-      //     });
-      //     if (e.code == 'invalid-phone-number') {
-      //       Utils.messageDialog("The Provided Phone No. is not valid!", context,
-      //           "ပြင်ဆင်မည်", Colors.black);
-      //     } else {
-      //       Utils.messageDialog(
-      //           e.message.toString(), context, "OK", Colors.black);
-      //     }
-      //   },
-      //   codeSent: (String verificationId, int? resendToken) async {
-      //     setState(() {
-      //       _isLoading = false;
-      //     });
-      //     Navigator.pushReplacement(
-      //         context,
-      //         MaterialPageRoute(
-      //             builder: (context) => OTPScreen(
-      //                   phone: email.text.toString(),
-      //                   member: member,
-      //                   verificationId: verificationId,
-      //                 )));
-      //   },
-      //   codeAutoRetrievalTimeout: (String verificationId) {},
-      // );
+      FirebaseAuth auth = FirebaseAuth.instance;
+      await auth.verifyPhoneNumber(
+        phoneNumber:
+            "+95" + email.text.toString().replaceAll(" ", "").substring(1),
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          var user = await auth.signInWithCredential(credential);
+          user.user!.getIdToken(true).toString();
+        },
+        timeout: const Duration(seconds: 120),
+        verificationFailed: (FirebaseAuthException e) {
+          setState(() {
+            _isLoading = false;
+          });
+          if (e.code == 'invalid-phone-number') {
+            Utils.messageDialog("The Provided Phone No. is not valid!", context,
+                "ပြင်ဆင်မည်", Colors.black);
+          } else {
+            Utils.messageDialog(
+                e.message.toString(), context, "OK", Colors.black);
+          }
+        },
+        codeSent: (String verificationId, int? resendToken) async {
+          setState(() {
+            _isLoading = false;
+          });
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => OTPScreen(
+                        phone: email.text.toString(),
+                        member: member,
+                        verificationId: verificationId,
+                      )));
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
     } else {
       setState(() {
         _isLoading = false;

@@ -14,6 +14,38 @@
       },
       "oauth_client": [
         {
+          "client_id": "1000702292405-2q66coi26d2t9j331uf0uea33a145v7r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.red.juniors",
+            "certificate_hash": "51a52af4c8bf42238c8894178dad7d5ba75ba414"
+          }
+        },
+        {
+          "client_id": "1000702292405-7p12n9ev10qpvhfptec5g29154kj6p2q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.red.juniors",
+            "certificate_hash": "712ace613ebfaf8af1348c22dd268f001dc1d79e"
+          }
+        },
+        {
+          "client_id": "1000702292405-9qaai3fo4au0ctrbbkrc213aiemdob1a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.red.juniors",
+            "certificate_hash": "855f8ad728506e3498fb9ad2061d93bf9f09bf2d"
+          }
+        },
+        {
+          "client_id": "1000702292405-kjhsl95o5v958hullm0mmsb6cfa22m88.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.red.juniors",
+            "certificate_hash": "d55f1df58b76d80ebd91ff3ab83b015f9680981e"
+          }
+        },
+        {
           "client_id": "1000702292405-s572v83hi6sg0fgpf8mieat5taeltkru.apps.googleusercontent.com",
           "client_type": 3
         }

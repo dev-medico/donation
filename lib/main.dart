@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:donation/firebase_options.dart';
 import 'package:donation/src/features/home/home.dart';
+import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -71,9 +72,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   // final messaging = FirebaseMessaging.instance;
 
