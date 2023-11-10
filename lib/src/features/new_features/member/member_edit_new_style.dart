@@ -13,6 +13,7 @@ import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
@@ -430,7 +431,7 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
                             width: double.infinity,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
-                              onTap: () {
+                              onTap: () async {
                                 if (nameController.text.isNotEmpty &&
                                     fatherNameController.text.isNotEmpty &&
                                     nrcController.text.isNotEmpty &&
@@ -439,7 +440,18 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  getAutoIncrementKey(data.memberId!);
+                                  bool result =
+                                      await InternetConnectionChecker()
+                                          .hasConnection;
+                                  if (result == true) {
+                                    getAutoIncrementKey(data.memberId!);
+                                  } else {
+                                    Utils.messageDialog(
+                                        "Poor Internet Connection! Please check with your Internet",
+                                        context,
+                                        "အိုကေ",
+                                        Colors.black);
+                                  }
                                 } else {
                                   Utils.messageDialog(
                                       "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",
@@ -873,7 +885,7 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
                                 left: 54, bottom: 16, right: 8),
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
-                              onTap: () {
+                              onTap: () async {
                                 if (nameController.text.isNotEmpty &&
                                     fatherNameController.text.isNotEmpty &&
                                     nrcController.text.isNotEmpty &&
@@ -882,7 +894,18 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  getAutoIncrementKey(data.memberId!);
+                                  bool result =
+                                      await InternetConnectionChecker()
+                                          .hasConnection;
+                                  if (result == true) {
+                                    getAutoIncrementKey(data.memberId!);
+                                  } else {
+                                    Utils.messageDialog(
+                                        "Poor Internet Connection! Please check with your Internet",
+                                        context,
+                                        "အိုကေ",
+                                        Colors.black);
+                                  }
                                 } else {
                                   Utils.messageDialog(
                                       "အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ",

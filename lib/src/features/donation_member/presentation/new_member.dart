@@ -18,6 +18,7 @@ import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 
 class NewMemberScreen extends ConsumerStatefulWidget {
@@ -877,7 +878,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                           width: double.infinity,
                           child: GestureDetector(
                             behavior: HitTestBehavior.translucent,
-                            onTap: () {
+                            onTap: () async {
                               if (phoneController.text.isNotEmpty) {
                                 phoneList.add(phoneController.text.toString());
                               }
@@ -890,108 +891,22 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   fatherNameController.text.isNotEmpty &&
                                   phoneList.isNotEmpty &&
                                   selectedBloodType != "သွေးအုပ်စု") {
-                                var members = ref.watch(membersProvider);
-                                //check member exist by name, father name and nrc
-                                var exist = members
-                                    .where((element) =>
-                                        (element.name
-                                                .toString()
-                                                .replaceAll(" ", "")
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .intersection(nameController
-                                                    .text
-                                                    .toString()
-                                                    .replaceAll(" ", "")
-                                                    .toLowerCase()
-                                                    .split("")
-                                                    .toSet())
-                                                .length ==
-                                            nameController.text
-                                                .toString()
-                                                .replaceAll(" ", "")
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .length) &&
-                                        (element.fatherName
-                                                .toString()
-                                                .replaceAll(" ", "")
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .intersection(
-                                                    fatherNameController.text
-                                                        .toString()
-                                                        .replaceAll(" ", "")
-                                                        .toLowerCase()
-                                                        .split("")
-                                                        .toSet())
-                                                .length ==
-                                            fatherNameController.text
-                                                .toString()
-                                                .replaceAll(" ", "")
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .length) &&
-                                        element.bloodType == selectedBloodType)
-                                    .toList()
-                                    .isNotEmpty;
-
-                                if (!exist) {
-                                  getAutoIncrementKey();
+                                var memberExist = checkExistMember();
+                                if (memberExist != null) {
+                                  memberExistDialog(context, memberExist);
                                 } else {
-                                  var data = members
-                                      .where((element) =>
-                                          (element.name
-                                                  .toString()
-                                                  .replaceAll(" ", "")
-                                                  .toLowerCase()
-                                                  .split("")
-                                                  .toSet()
-                                                  .intersection(nameController
-                                                      .text
-                                                      .toString()
-                                                      .replaceAll(" ", "")
-                                                      .toLowerCase()
-                                                      .split("")
-                                                      .toSet())
-                                                  .length ==
-                                              nameController.text
-                                                  .toString()
-                                                  .replaceAll(" ", "")
-                                                  .toLowerCase()
-                                                  .split("")
-                                                  .toSet()
-                                                  .length) &&
-                                          (element.fatherName
-                                                  .toString()
-                                                  .replaceAll(" ", "")
-                                                  .toLowerCase()
-                                                  .split("")
-                                                  .toSet()
-                                                  .intersection(
-                                                      fatherNameController.text
-                                                          .toString()
-                                                          .replaceAll(" ", "")
-                                                          .toLowerCase()
-                                                          .split("")
-                                                          .toSet())
-                                                  .length ==
-                                              fatherNameController.text
-                                                  .toString()
-                                                  .replaceAll(" ", "")
-                                                  .toLowerCase()
-                                                  .split("")
-                                                  .toSet()
-                                                  .length) &&
-                                          element.bloodType ==
-                                              selectedBloodType)
-                                      .toList()
-                                      .first;
-                                  memberExistDialog(context, data);
+                                  bool result =
+                                      await InternetConnectionChecker()
+                                          .hasConnection;
+                                  if (result == true) {
+                                    getAutoIncrementKey();
+                                  } else {
+                                    Utils.messageDialog(
+                                        "Poor Internet Connection! Please check with your Internet",
+                                        context,
+                                        "အိုကေ",
+                                        Colors.black);
+                                  }
                                 }
                               } else {
                                 Utils.messageDialog(
@@ -1224,116 +1139,11 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                               selectedBloodType =
                                                   val.toString();
                                             });
-                                            var members =
-                                                ref.watch(membersProvider);
-                                            //check member exist by name, father name and nrc
-                                            var exist = members
-                                                .where((element) =>
-                                                    (element.name
-                                                            .toString()
-                                                            .replaceAll(" ", "")
-                                                            .toLowerCase()
-                                                            .split("")
-                                                            .toSet()
-                                                            .intersection(
-                                                                nameController.text
-                                                                    .toString()
-                                                                    .replaceAll(
-                                                                        " ", "")
-                                                                    .toLowerCase()
-                                                                    .split("")
-                                                                    .toSet())
-                                                            .length ==
-                                                        nameController.text
-                                                            .toString()
-                                                            .replaceAll(" ", "")
-                                                            .toLowerCase()
-                                                            .split("")
-                                                            .toSet()
-                                                            .length) &&
-                                                    (element.fatherName
-                                                            .toString()
-                                                            .replaceAll(" ", "")
-                                                            .toLowerCase()
-                                                            .split("")
-                                                            .toSet()
-                                                            .intersection(
-                                                                fatherNameController
-                                                                    .text
-                                                                    .toString()
-                                                                    .replaceAll(
-                                                                        " ", "")
-                                                                    .toLowerCase()
-                                                                    .split("")
-                                                                    .toSet())
-                                                            .length ==
-                                                        fatherNameController
-                                                            .text
-                                                            .toString()
-                                                            .replaceAll(" ", "")
-                                                            .toLowerCase()
-                                                            .split("")
-                                                            .toSet()
-                                                            .length) &&
-                                                    element.bloodType ==
-                                                        selectedBloodType)
-                                                .toList()
-                                                .isNotEmpty;
-                                            if (exist) {
-                                              var data = members
-                                                  .where((element) =>
-                                                      (element.name
-                                                              .toString()
-                                                              .replaceAll(
-                                                                  " ", "")
-                                                              .toLowerCase()
-                                                              .split("")
-                                                              .toSet()
-                                                              .intersection(nameController
-                                                                  .text
-                                                                  .toString()
-                                                                  .replaceAll(
-                                                                      " ", "")
-                                                                  .toLowerCase()
-                                                                  .split("")
-                                                                  .toSet())
-                                                              .length ==
-                                                          nameController.text
-                                                              .toString()
-                                                              .replaceAll(
-                                                                  " ", "")
-                                                              .toLowerCase()
-                                                              .split("")
-                                                              .toSet()
-                                                              .length) &&
-                                                      (element.fatherName
-                                                              .toString()
-                                                              .replaceAll(
-                                                                  " ", "")
-                                                              .toLowerCase()
-                                                              .split("")
-                                                              .toSet()
-                                                              .intersection(fatherNameController
-                                                                  .text
-                                                                  .toString()
-                                                                  .replaceAll(
-                                                                      " ", "")
-                                                                  .toLowerCase()
-                                                                  .split("")
-                                                                  .toSet())
-                                                              .length ==
-                                                          fatherNameController
-                                                              .text
-                                                              .toString()
-                                                              .replaceAll(" ", "")
-                                                              .toLowerCase()
-                                                              .split("")
-                                                              .toSet()
-                                                              .length) &&
-                                                      element.bloodType == selectedBloodType)
-                                                  .toList()
-                                                  .first;
-                                              memberExistDialog(context, data);
+                                            var memberExist =
+                                                checkExistMember();
+                                            if (memberExist != null) {
+                                              memberExistDialog(
+                                                  context, memberExist);
                                             }
                                           },
                                           items: dropdownItems),
@@ -1979,7 +1789,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                             left: 54, bottom: 16, right: 8),
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
-                          onTap: () {
+                          onTap: () async {
                             if (phoneController.text.isNotEmpty) {
                               phoneList.add(phoneController.text.toString());
                             }
@@ -1992,117 +1802,21 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                 fatherNameController.text.isNotEmpty &&
                                 phoneList.isNotEmpty &&
                                 selectedBloodType != "သွေးအုပ်စု") {
-                              var members = ref.watch(membersProvider);
-                              //check member exist by name, father name and nrc
-                              var exist = members
-                                  .where((element) =>
-                                      (element.name
-                                              .toString()
-                                              .replaceAll(" ", "")
-                                              .toLowerCase()
-                                              .split("")
-                                              .toSet()
-                                              .intersection(nameController.text
-                                                  .toString()
-                                                  .replaceAll(" ", "")
-                                                  .toLowerCase()
-                                                  .split("")
-                                                  .toSet())
-                                              .length ==
-                                          nameController.text
-                                              .toString()
-                                              .replaceAll(" ", "")
-                                              .toLowerCase()
-                                              .split("")
-                                              .toSet()
-                                              .length) &&
-                                      (element.fatherName
-                                              .toString()
-                                              .replaceAll(" ", "")
-                                              .toLowerCase()
-                                              .split("")
-                                              .toSet()
-                                              .intersection(fatherNameController
-                                                  .text
-                                                  .toString()
-                                                  .replaceAll(" ", "")
-                                                  .toLowerCase()
-                                                  .split("")
-                                                  .toSet())
-                                              .length ==
-                                          fatherNameController.text
-                                              .toString()
-                                              .replaceAll(" ", "")
-                                              .toLowerCase()
-                                              .split("")
-                                              .toSet()
-                                              .length) &&
-                                      element.bloodType == selectedBloodType)
-                                  .toList()
-                                  .isNotEmpty;
-
-                              if (!exist) {
-                                getAutoIncrementKey();
+                              var memberExist = checkExistMember();
+                              if (memberExist != null) {
+                                memberExistDialog(context, memberExist);
                               } else {
-                                // var data = members
-                                //     .where((element) =>
-                                //         element.name ==
-                                //             nameController.text.toString() &&
-                                //         element.fatherName ==
-                                //             fatherNameController.text
-                                //                 .toString() &&
-                                //         element.bloodType == selectedBloodType)
-                                //     .toList()
-                                //     .first;
-                                var data = members
-                                    .where((element) =>
-                                        (element.name
-                                                .toString()
-                                                .replaceAll(" ", "")
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .intersection(nameController
-                                                    .text
-                                                    .toString()
-                                                    .replaceAll(" ", "")
-                                                    .toLowerCase()
-                                                    .split("")
-                                                    .toSet())
-                                                .length ==
-                                            nameController.text
-                                                .toString()
-                                                .replaceAll(" ", "")
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .length) &&
-                                        (element.fatherName
-                                                .toString()
-                                                .replaceAll(" ", "")
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .intersection(
-                                                    fatherNameController.text
-                                                        .toString()
-                                                        .replaceAll(" ", "")
-                                                        .toLowerCase()
-                                                        .split("")
-                                                        .toSet())
-                                                .length ==
-                                            fatherNameController.text
-                                                .toString()
-                                                .replaceAll(" ", "")
-                                                .toLowerCase()
-                                                .split("")
-                                                .toSet()
-                                                .length) &&
-                                        element.bloodType == selectedBloodType)
-                                    .toList()
-                                    .first;
-
-                                memberExistDialog(context, data);
+                                bool result = await InternetConnectionChecker()
+                                    .hasConnection;
+                                if (result == true) {
+                                  getAutoIncrementKey();
+                                } else {
+                                  Utils.messageDialog(
+                                      "Poor Internet Connection! Please check with your Internet",
+                                      context,
+                                      "အိုကေ",
+                                      Colors.black);
+                                }
                               }
                             } else {
                               Utils.messageDialog(

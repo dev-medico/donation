@@ -19,6 +19,7 @@ import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class NewBloodDonationScreen extends ConsumerStatefulWidget {
   NewBloodDonationScreen({Key? key}) : super(key: key);
@@ -582,17 +583,27 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                           width: double.infinity,
                           child: GestureDetector(
                             behavior: HitTestBehavior.translucent,
-                            onTap: () {
+                            onTap: () async {
                               if (selectedMember != null &&
                                   donationDate !=
                                       "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
-                                addDonation(
-                                    nameController.text.toString(),
-                                    ageController.text.toString(),
-                                    hospitalController.text.toString(),
-                                    diseaseController.text.toString(),
-                                    quarterController.text.toString(),
-                                    townController.text.toString());
+                                bool result = await InternetConnectionChecker()
+                                    .hasConnection;
+                                if (result == true) {
+                                  addDonation(
+                                      nameController.text.toString(),
+                                      ageController.text.toString(),
+                                      hospitalController.text.toString(),
+                                      diseaseController.text.toString(),
+                                      quarterController.text.toString(),
+                                      townController.text.toString());
+                                } else {
+                                  Utils.messageDialog(
+                                      "Poor Internet Connection! Please check with your Internet",
+                                      context,
+                                      "အိုကေ",
+                                      Colors.black);
+                                }
                               } else if (selectedMember == null) {
                                 Utils.messageDialog(
                                     "လှူဒါန်းသူ ရွေးချယ်ပေးရပါမည်",
@@ -1147,17 +1158,27 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                               left: 54, bottom: 16, right: 8),
                           child: GestureDetector(
                             behavior: HitTestBehavior.translucent,
-                            onTap: () {
+                            onTap: () async {
                               if (selectedMember != null &&
                                   donationDate !=
                                       "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်") {
-                                addDonation(
-                                    nameController.text.toString(),
-                                    ageController.text.toString(),
-                                    hospitalController.text.toString(),
-                                    diseaseController.text.toString(),
-                                    quarterController.text.toString(),
-                                    townController.text.toString());
+                                bool result = await InternetConnectionChecker()
+                                    .hasConnection;
+                                if (result == true) {
+                                  addDonation(
+                                      nameController.text.toString(),
+                                      ageController.text.toString(),
+                                      hospitalController.text.toString(),
+                                      diseaseController.text.toString(),
+                                      quarterController.text.toString(),
+                                      townController.text.toString());
+                                } else {
+                                  Utils.messageDialog(
+                                      "Poor Internet Connection! Please check with your Internet",
+                                      context,
+                                      "အိုကေ",
+                                      Colors.black);
+                                }
                               } else if (selectedMember == null) {
                                 Utils.messageDialog(
                                     "လှူဒါန်းသူ ရွေးချယ်ပေးရပါမည်",
