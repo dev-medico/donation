@@ -90,10 +90,12 @@ class NewDonarState extends ConsumerState<EditDonarScreen> {
   void initial() async {
     if (widget.donar!.date != null) {
       donationDateDetail = widget.donar!.date!;
-      donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
+      donationDate =
+          DateFormat('dd MMM yyyy').format(donationDateDetail!.toLocal());
     } else {
       donationDateDetail = DateTime.now().toLocal();
-      donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
+      donationDate =
+          DateFormat('dd MMM yyyy').format(donationDateDetail!.toLocal());
     }
 
     nameController.text = widget.donar!.name!;

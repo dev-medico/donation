@@ -89,11 +89,13 @@ class NewExpenseState extends ConsumerState<EditExpenseScreen> {
 
   void initial() async {
     if (widget.expense!.date != null) {
-      donationDateDetail = widget.expense!.date!;
-      donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
+      donationDateDetail = widget.expense!.date!.toLocal();
+      donationDate =
+          DateFormat('dd MMM yyyy').format(donationDateDetail!.toLocal());
     } else {
       donationDateDetail = DateTime.now().toLocal();
-      donationDate = DateFormat('dd MMM yyyy').format(donationDateDetail!);
+      donationDate =
+          DateFormat('dd MMM yyyy').format(donationDateDetail!.toLocal());
     }
 
     nameController.text = widget.expense!.name!;
