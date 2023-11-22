@@ -44,18 +44,16 @@ class _MyAppState extends ConsumerState<MyApp> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       var realmService = ref.watch(realmProvider);
 
-      final donations = realmService!.realm
-          .query<Donation>(r"TRUEPREDICATE SORT(date ASC)", []);
-      log("Total Donors - " +
-          donations
-              .where((element) => element.hospital == "မေတ္တရိပ်ဆေးခန်း")
-              .length
-              .toString());
-      donations
-          .where((element) => element.hospital == "မေတ္တရိပ်ဆေးခန်း")
-          .forEach((element) {
-        realmService.updateDonation(element, hospital: "မေတ္တာရိပ်ဆေးခန်း");
-      });
+      // final request = realmService!.realm.query<RequestGive>(
+      //   r"TRUEPREDICATE SORT(_id ASC)",
+      // );
+
+      // request.forEach((element) {
+      //   realmService.realm.write(() {
+      //     realmService.realm.delete(element);
+      //   });
+
+      // });
 
       // final expenses = realmService!.realm.query<ExpensesRecord>(
       //     r"date > $0 AND TRUEPREDICATE SORT(date ASC)", [

@@ -11,3 +11,15 @@ final requestGiveProvider = StateProvider<RealmResults<RequestGive>>((ref) {
 
   return stream;
 });
+
+final requestGiveByYearProvider =
+    StateProvider.family<List<RequestGive>, int>((ref, year) {
+  var realmService = ref.watch(realmProvider);
+
+  final stream =
+      realmService!.realm.query<RequestGive>("TRUEPREDICATE SORT(date ASC)");
+
+  return stream
+      .where((element) => element.date!.toLocal().year == year)
+      .toList();
+});

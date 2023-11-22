@@ -35,7 +35,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'ထူးခြားဖြစ်စဥ်',
     'ရ/သုံး ငွေစာရင်း',
     'ပို့စ်/အသိပေးချက်များ',
-    'Log Out(V 1.3.1)'
+    'Log Out(V 1.3.2)'
   ];
   List<NavigationPaneItem> items = [];
   List<String> icons = [

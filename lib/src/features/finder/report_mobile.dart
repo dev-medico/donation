@@ -8,6 +8,7 @@ import 'package:donation/src/features/finder/blood_donation_gender_pie_chart.dar
 import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
 import 'package:donation/src/features/finder/most_blood_donation_member.dart';
 import 'package:donation/src/features/finder/new_request_give.dart';
+import 'package:donation/src/features/finder/request_give_report.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
@@ -170,7 +171,7 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => NewRequestGiveScreen(),
+                  builder: (context) => RequestGiveReportScreen(),
                 ),
               );
             },
