@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
@@ -31,6 +33,9 @@ class _DonationChartByDiseaseState extends State<DonationChartByDisease> {
         .compareTo(widget.data
             .where((element) => element.patientDisease == a)
             .length));
+    diseases.forEach((element) {
+      log(element);
+    });
   }
 
   @override

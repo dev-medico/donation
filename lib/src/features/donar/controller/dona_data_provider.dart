@@ -85,25 +85,27 @@ typedef ClosingParams = ({int? month, int? year});
 
 final closingBalanceDataProvider =
     StateProvider.family<int, ClosingParams>((ref, filter) {
-  int totalDonation = 0;
-  int totalExpenses = 0;
-  int closingBalance = 0;
+  double totalDonation = 0;
+  double totalExpenses = 0;
+  double closingBalance = 0;
   log("Year - " + filter.month.toString() + " - " + filter.year.toString());
   var realmService = ref.watch(realmProvider);
   final donars = realmService!.realm
-      .query<DonarRecord>(r"date <= $0 AND TRUEPREDICATE SORT(date ASC)", [
-    DateTime(filter.year!, filter.month!, 1),
+      .query<DonarRecord>(r"date < $0 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(filter.year ?? 2022, filter.month!, 1),
   ]);
+  log("Total Donation - " + totalDonation.toString());
   donars.forEach((element) {
-    totalDonation += element.amount!;
+    totalDonation += element.amount ?? 0;
   });
 
   final expenses = realmService.realm
-      .query<ExpensesRecord>(r"date <= $0 AND TRUEPREDICATE SORT(date ASC)", [
-    DateTime(filter.year!, filter.month!, 1),
+      .query<ExpensesRecord>(r"date < $0 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(filter.year ?? 2022, filter.month!, 1),
   ]);
+   log("Total Expanse - " + totalExpenses.toString());
   expenses.forEach((data) {
-    totalExpenses += data.amount!;
+    totalExpenses += data.amount ?? 0;
   });
 
   closingBalance = totalDonation - totalExpenses;
@@ -116,5 +118,46 @@ final closingBalanceDataProvider =
   log("Closing Balance  - " + closingBalance.toString());
   log("-------------------------------------------");
 
-  return closingBalance;
+  return closingBalance.truncate();
+});
+
+final closingCurrentBalanceDataProvider =
+    StateProvider.family<int, ClosingParams>((ref, filter) {
+  double totalDonation = 0;
+  double totalExpenses = 0;
+  double closingBalance = 0;
+  log("Closing Year - " +
+      filter.month.toString() +
+      " - " +
+      filter.year.toString());
+  var realmService = ref.watch(realmProvider);
+  final donars = realmService!.realm
+      .query<DonarRecord>(r"date < $0 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(filter.year ?? 2022, filter.month!, 1),
+  ]);
+  log("Total Donation - " + totalDonation.toString());
+  donars.forEach((element) {
+    totalDonation += element.amount ?? 0;
+  });
+
+  final expenses = realmService.realm
+      .query<ExpensesRecord>(r"date < $0 AND TRUEPREDICATE SORT(date ASC)", [
+    DateTime(filter.year ?? 2022, filter.month!, 1),
+  ]);
+  log("Total Expense - " + totalExpenses.toString());
+  expenses.forEach((data) {
+    totalExpenses += data.amount ?? 0;
+  });
+
+  closingBalance = totalDonation - totalExpenses;
+
+  log("Total Donation - " +
+      totalDonation.toString() +
+      " - " +
+      totalExpenses.toString());
+
+  log("Closing Balance  - " + closingBalance.toString());
+  log("-------------------------------------------");
+
+  return closingBalance.truncate();
 });

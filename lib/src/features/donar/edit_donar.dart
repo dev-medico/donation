@@ -268,19 +268,7 @@ class NewDonarState extends ConsumerState<EditDonarScreen> {
                             ref.watch(realmProvider)!.deleteDonar(
                                   widget.donar!,
                                 );
-                            Utils.messageSuccessSinglePopDialog(
-                                "အလှူရှင်မှတ်တမ်း ပယ်ဖျက်ခြင်း \nအောင်မြင်ပါသည်။",
-                                context,
-                                "အိုကေ",
-                                Colors.black);
-
-                            // XataRepository()
-                            //     .deleteExpenseByID(widget.donar!.id.toString())
-                            //     .then((value) {
-                            //   if (value.statusCode.toString().startsWith("2")) {
-
-                            //   }
-                            // });
+                           Navigator.pop(context);
                           });
                         },
                         child: Align(

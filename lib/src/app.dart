@@ -42,11 +42,36 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    //   final realm = ref.read(realmProvider)!.realm;
-    //   realm.write(() {
-    //     realm.deleteAll<ExpensesRecord>();
-    //     realm.deleteAll<DonarRecord>();
-    //   });
+      var realmService = ref.watch(realmProvider);
+
+      final donations = realmService!.realm
+          .query<Donation>(r"TRUEPREDICATE SORT(date ASC)", []);
+      log("Total Donors - " +
+          donations
+              .where((element) => element.hospital == "မေတ္တရိပ်ဆေးခန်း")
+              .length
+              .toString());
+      donations
+          .where((element) => element.hospital == "မေတ္တရိပ်ဆေးခန်း")
+          .forEach((element) {
+        realmService.updateDonation(element, hospital: "မေတ္တာရိပ်ဆေးခန်း");
+      });
+
+      // final expenses = realmService!.realm.query<ExpensesRecord>(
+      //     r"date > $0 AND TRUEPREDICATE SORT(date ASC)", [
+      //   DateTime(2022, 10, 1),
+      // ]);
+      // log("Total Expenses - " + expenses.length.toString());
+      // expenses.forEach((element) {
+      //    realmService.realm.write(() {
+      //     realmService.realm.delete(element);
+      //   });
+      // });
+      //   final realm = ref.read(realmProvider)!.realm;
+      //   realm.write(() {
+      //     realm.deleteAll<ExpensesRecord>();
+      //     realm.deleteAll<DonarRecord>();
+      //   });
 
       //   var donations = ref.watch(donationProvider);
       //   var members = ref.watch(membersDataProvider);

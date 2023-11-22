@@ -103,8 +103,10 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
         year: int.parse(years[_yearSelected]), month: _monthSelected + 1)));
     var leftBalance = ref.read(closingBalanceDataProvider(
         (year: int.parse(years[_yearSelected]), month: _monthSelected + 1)));
-    var currentleftBalance = ref.read(closingBalanceDataProvider(
+    var currentleftBalance = ref.read(closingCurrentBalanceDataProvider(
         (year: int.parse(years[_yearSelected]), month: _monthSelected + 2)));
+
+    log(currentleftBalance.toString() + " currentleftBalance");
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -873,17 +875,17 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           'စဥ်',
                                           style: TextStyle(color: Colors.white),
                                         ))),
-                            //   if (!Responsive.isMobile(context))
-                            //     GridColumn(
-                            //         columnName: 'ရက်စွဲ',
-                            //         label: Container(
-                            //             color: primaryColor,
-                            //             padding: const EdgeInsets.all(8.0),
-                            //             alignment: Alignment.center,
-                            //             child: const Text(
-                            //               'ရက်စွဲ',
-                            //               style: TextStyle(color: Colors.white),
-                            //             ))),
+                              //   if (!Responsive.isMobile(context))
+                              //     GridColumn(
+                              //         columnName: 'ရက်စွဲ',
+                              //         label: Container(
+                              //             color: primaryColor,
+                              //             padding: const EdgeInsets.all(8.0),
+                              //             alignment: Alignment.center,
+                              //             child: const Text(
+                              //               'ရက်စွဲ',
+                              //               style: TextStyle(color: Colors.white),
+                              //             ))),
                               GridColumn(
                                   columnName: 'အကြောင်းအရာ',
                                   label: Container(
