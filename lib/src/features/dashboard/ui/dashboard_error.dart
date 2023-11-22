@@ -64,7 +64,7 @@ class DashboardError extends StatelessWidget {
                       decoration: shadowDecoration(secondColor),
                       child: const Center(
                         child: Text(
-                          "ပြန်လည်၀င်ရောက်မည်",
+                          "ပြန်လည်ဝင်ရောက်မည်",
                           textAlign: TextAlign.center,
                         ),
                       ),

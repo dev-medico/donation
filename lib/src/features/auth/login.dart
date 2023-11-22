@@ -85,7 +85,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 36),
                       child: Text(
-                        "အကောင့်သို့ ၀င်ရောက်မည်",
+                        "အကောင့်သို့ ဝင်ရောက်မည်",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             height: 1.1,
@@ -319,7 +319,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             decoration: shadowDecoration(secondColor),
                             child: Center(
                               child: Text(
-                                "၀င််ရောက်မည်",
+                                "၀င်ရောက်မည်",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize:
