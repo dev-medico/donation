@@ -98,7 +98,7 @@ class _SpecialEventChartScreenState
           : MediaQuery.of(context).size.height * 0.7,
       width: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width * 0.9
-          : MediaQuery.of(context).size.width * 0.43,
+          : MediaQuery.of(context).size.width * 0.38,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -148,7 +148,7 @@ class _SpecialEventChartScreenState
           : MediaQuery.of(context).size.height * 0.7,
       width: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width * 0.9
-          : MediaQuery.of(context).size.width * 0.43,
+          : MediaQuery.of(context).size.width * 0.38,
       child: ListView(
         padding: EdgeInsets.only(left: 30, top: 30),
         physics: Responsive.isMobile(context)

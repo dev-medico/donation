@@ -131,7 +131,7 @@ class _RequestGiveYearlyReportState
                 TableRow(
                   children: <Widget>[
                     Container(
-                        height: data.length * 42,
+                        height: data.length * 40,
                         // padding: EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
                         child: ListView.builder(
                             itemCount: data.length,
