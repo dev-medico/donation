@@ -6,7 +6,7 @@ import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/auth/otp.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/home/home.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
@@ -330,7 +330,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           onPressed: () async {
                             if (groupValue == 1) {
-                              firebaseLogin();
+                             // firebaseLogin();
                             } else {
                               if (_formKey.currentState!.validate()) {
                                 realmLogin();
@@ -347,106 +347,60 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  firebaseLogin() async {
-    prefs.remove('name');
-    setState(() {
-      _isLoading = true;
-    });
+  // firebaseLogin() async {
+  //   prefs.remove('name');
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
 
-    var member = ref.read(membersDataByPhoneProvider(email.text.toString()));
-    if (member != null) {
-      log("+95" + email.text.toString().replaceAll(" ", "").substring(1));
+  //   var member = ref.read(membersDataByPhoneProvider(email.text.toString()));
+  //   if (member != null) {
+  //     log("+95" + email.text.toString().replaceAll(" ", "").substring(1));
 
-      FirebaseAuth auth = FirebaseAuth.instance;
-      await auth.verifyPhoneNumber(
-        phoneNumber:
-            "+95" + email.text.toString().replaceAll(" ", "").substring(1),
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          var user = await auth.signInWithCredential(credential);
-          user.user!.getIdToken(true).toString();
-        },
-        timeout: const Duration(seconds: 120),
-        verificationFailed: (FirebaseAuthException e) {
-          setState(() {
-            _isLoading = false;
-          });
-          if (e.code == 'invalid-phone-number') {
-            Utils.messageDialog("The Provided Phone No. is not valid!", context,
-                "ပြင်ဆင်မည်", Colors.black);
-          } else {
-            Utils.messageDialog(
-                e.message.toString(), context, "OK", Colors.black);
-          }
-        },
-        codeSent: (String verificationId, int? resendToken) async {
-          setState(() {
-            _isLoading = false;
-          });
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => OTPScreen(
-                        phone: email.text.toString(),
-                        member: member,
-                        verificationId: verificationId,
-                      )));
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-    } else {
-      setState(() {
-        _isLoading = false;
-      });
-      Utils.messageDialog(
-          "ဖုန်းနံပါတ်မှားနေပါသည်", context, "ပြင်ဆင်မည်", Colors.black);
-    }
-
-    // try {
-    //   //Signed in with temporary account.
-    //   final userCredential = await FirebaseAuth.instance.signInAnonymously();
-    // } on FirebaseAuthException catch (e) {
-    //   switch (e.code) {
-    //     case "operation-not-allowed":
-    //       print("Anonymous auth hasn't been enabled for this project.");
-    //       break;
-    //     default:
-    //       print("Unknown error.");
-    //   }
-    // }
-    // CollectionReference admins = FirebaseFirestore.instance.collection('admin');
-    // bool auth = false;
-    // admins.get().then((value) {
-    //   for (var element in value.docs) {
-    //     log(element.data().toString());
-    //     final data = element.data() as Map<String, dynamic>;
-    //     log(data["email"]);
-    //     log(data["password"]);
-    //     if (data["email"] == email.text.toString() &&
-    //         data["password"] == password.text.toString()) {
-    //       prefs.setString("name", data["name"]);
-    //       prefs.setString("email", data["email"]);
-    //       prefs.setString("role", data["role"]);
-    //       setState(() {
-    //         auth = true;
-    //       });
-    //     }
-    //   }
-
-    //   if (auth) {
-    //     setState(() {
-    //       _isLoading = false;
-    //     });
-    //     Navigator.pushNamedAndRemoveUntil(context, MobileHomeScreen.routeName,
-    //         (Route<dynamic> route) => false);
-    //   } else {
-    //     setState(() {
-    //       _isLoading = false;
-    //     });
-    //     Utils.messageDialog(
-    //         "အချက်အလက်မှားယွင်းနေပါသည်", context, "ပြင်ဆင်မည်", Colors.black);
-    //   }
-    // });
-  }
+  //     FirebaseAuth auth = FirebaseAuth.instance;
+  //     await auth.verifyPhoneNumber(
+  //       phoneNumber:
+  //           "+95" + email.text.toString().replaceAll(" ", "").substring(1),
+  //       verificationCompleted: (PhoneAuthCredential credential) async {
+  //         var user = await auth.signInWithCredential(credential);
+  //         user.user!.getIdToken(true).toString();
+  //       },
+  //       timeout: const Duration(seconds: 120),
+  //       verificationFailed: (FirebaseAuthException e) {
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //         if (e.code == 'invalid-phone-number') {
+  //           Utils.messageDialog("The Provided Phone No. is not valid!", context,
+  //               "ပြင်ဆင်မည်", Colors.black);
+  //         } else {
+  //           Utils.messageDialog(
+  //               e.message.toString(), context, "OK", Colors.black);
+  //         }
+  //       },
+  //       codeSent: (String verificationId, int? resendToken) async {
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //         Navigator.pushReplacement(
+  //             context,
+  //             MaterialPageRoute(
+  //                 builder: (context) => OTPScreen(
+  //                       phone: email.text.toString(),
+  //                       member: member,
+  //                       verificationId: verificationId,
+  //                     )));
+  //       },
+  //       codeAutoRetrievalTimeout: (String verificationId) {},
+  //     );
+  //   } else {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     Utils.messageDialog(
+  //         "ဖုန်းနံပါတ်မှားနေပါသည်", context, "ပြင်ဆင်မည်", Colors.black);
+  //   }
+  // }
 
   realmLogin() async {
     setState(() {

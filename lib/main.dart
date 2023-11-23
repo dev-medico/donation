@@ -4,9 +4,7 @@ import 'dart:io';
 
 import 'package:donation/firebase_options.dart';
 import 'package:donation/src/features/home/home.dart';
-import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -72,66 +70,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  // final messaging = FirebaseMessaging.instance;
-
-  // if (Platform.isAndroid || Platform.isIOS) {
-  //   final settings = await messaging.requestPermission(
-  //     alert: true,
-  //     announcement: false,
-  //     badge: true,
-  //     carPlay: false,
-  //     criticalAlert: false,
-  //     provisional: false,
-  //     sound: true,
-  //   );
-
-  //   const topic = 'notifications';
-  //   await messaging.subscribeToTopic(topic);
-  //   if (kDebugMode) {
-  //     print('Permission granted: ${settings.authorizationStatus}');
-  //   }
-
-  //   const AndroidInitializationSettings initializationSettingsAndroid =
-  //       AndroidInitializationSettings('@drawable/blood');
-
-  //   final InitializationSettings initializationSettings =
-  //       InitializationSettings(
-  //     android: initializationSettingsAndroid,
-  //   );
-  //   await flutterLocalNotificationsPlugin.initialize(
-  //     initializationSettings,
-  //     onDidReceiveNotificationResponse:
-  //         (NotificationResponse notificationResponse) {
-  //       switch (notificationResponse.notificationResponseType) {
-  //         case NotificationResponseType.selectedNotification:
-  //           selectNotificationStream.add(notificationResponse.payload);
-  //           break;
-  //         case NotificationResponseType.selectedNotificationAction:
-  //           if (notificationResponse.actionId == "navigationActionId") {
-  //             selectNotificationStream.add(notificationResponse.payload);
-  //           }
-  //           break;
-  //       }
-  //     },
-  //     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
-  //   );
-  // }
-
-  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  //   print('Got a message whilst in the foreground!');
-  //   if (message.notification != null) {
-  //     print('Notification Title: ${message.notification!.title}');
-  //     print('Notification Body: ${message.notification!.body}');
-  //   }
-
-  //   print('Data Title: ${message.data['title']}');
-  //   print('Data Body: ${message.data['body']}');
-  //   _showNotification(message.data['title'] ?? '', message.data['body'] ?? '');
-  // });
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
 
   FlutterError.demangleStackTrace = (StackTrace stack) {
     if (stack is stack_trace.Trace) return stack.vmTrace;
