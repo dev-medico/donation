@@ -44,16 +44,22 @@ class _MyAppState extends ConsumerState<MyApp> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       var realmService = ref.watch(realmProvider);
 
-      // final request = realmService!.realm.query<RequestGive>(
+      // final donations = realmService!.realm.query<Donation>(
       //   r"TRUEPREDICATE SORT(_id ASC)",
       // );
 
-      // request.forEach((element) {
-      //   realmService.realm.write(() {
-      //     realmService.realm.delete(element);
-      //   });
+      // int affectCount = 0;
 
+      // donations
+      //     .where((element) =>
+      //         !diseases.contains(element.patientDisease.toString()))
+      //     .forEach((element) {
+      //   affectCount++;
+      //   realmService.updateDonation(element,
+      //       patientDisease: "အစာအိမ်နှင့်အူလမ်းကြောင်းဆိုင်ရာရောဂါ");
       // });
+
+      // log("Affect Count - " + affectCount.toString());
 
       // final expenses = realmService!.realm.query<ExpensesRecord>(
       //     r"date > $0 AND TRUEPREDICATE SORT(date ASC)", [
