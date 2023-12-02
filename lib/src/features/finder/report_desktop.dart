@@ -26,12 +26,12 @@ class ReportDesktopScreen extends ConsumerStatefulWidget {
 }
 
 class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
-    
   @override
   Widget build(BuildContext context) {
     var totalMember = ref.watch(totalMembersProvider);
     var totalDonations = ref.watch(totalDonationsProvider);
     var donations = ref.watch(donationsProvider);
+    var totalPatient = ref.watch(totalPatientProvider);
 
     List<Donation> donationList = [];
     donations.forEach((element) {
@@ -106,9 +106,11 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                           DashboardCard(
                             index: 2,
                             color: primaryDark,
-                            title: "ထူးခြားဖြစ်စဉ်",
-                            subtitle: "",
-                            amount: "",
+                            title: Responsive.isMobile(context)
+                                ? "လူနာ \nစာရင်း"
+                                : "လူနာ စာရင်း",
+                            subtitle: "စုစုပေါင်း",
+                            amount: totalPatient.toString(),
                             amountColor: Colors.black,
                           ),
                         ],
@@ -130,9 +132,11 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                           DashboardCard(
                             index: 2,
                             color: primaryDark,
-                            title: "ထူးခြားဖြစ်စဉ်",
-                            subtitle: "",
-                            amount: "",
+                            title: Responsive.isMobile(context)
+                                ? "လူနာ \nစာရင်း"
+                                : "လူနာ စာရင်း",
+                            subtitle: "စုစုပေါင်း",
+                            amount: totalPatient.toString(),
                             amountColor: Colors.black,
                           ),
                           SizedBox(
@@ -142,7 +146,7 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                             index: 3,
                             color: primaryDark,
                             title: "ရ/သုံး ငွေစာရင်း",
-                            subtitle: "",
+                            subtitle: "အသေးစိတ်",
                             amount: "",
                             amountColor: Colors.black,
                           ),
@@ -168,8 +172,8 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                             index: 3,
                             color: primaryDark,
                             title: "ရ/သုံး ငွေစာရင်း",
-                            subtitle: "",
-                            amount: "",
+                            subtitle: "-",
+                            amount: "-",
                             amountColor: Colors.black,
                           ),
                         ],

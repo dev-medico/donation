@@ -465,11 +465,66 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                               child: Container(
                                 margin: const EdgeInsets.only(
                                     left: 20, top: 16, bottom: 8, right: 20),
-                                child: TextFormField(
-                                  controller: diseaseController,
-                                  keyboardType: TextInputType.text,
-                                  decoration:
-                                      inputBoxDecoration("ဖြစ်ပွားသည့်ရောဂါ"),
+                                child: TypeAheadField(
+                                  hideSuggestionsOnKeyboardHide: true,
+                                  textFieldConfiguration:
+                                      TextFieldConfiguration(
+                                    controller: diseaseController,
+                                    autofocus: false,
+                                    decoration:
+                                        inputBoxDecoration("ဖြစ်ပွားသည့်ရောဂါ"),
+                                  ),
+                                  suggestionsCallback: (pattern) {
+                                    diseasesSelected.clear();
+                                    diseasesSelected.addAll(diseases);
+                                    diseasesSelected.where((element) => element
+                                        .toString()
+                                        .toString()
+                                        .startsWith(pattern.toLowerCase()));
+                                    //   diseasesSelected.retainWhere((s) =>
+                                    //       s
+                                    //           .toString()
+                                    //           .toLowerCase()
+                                    //           .split("")
+                                    //           .toSet()
+                                    //           .intersection(pattern
+                                    //               .toLowerCase()
+                                    //               .split("")
+                                    //               .toSet())
+                                    //           .length ==
+                                    //       pattern
+                                    //           .toLowerCase()
+                                    //           .split("")
+                                    //           .toSet()
+                                    //           .length);
+
+                                    return diseasesSelected;
+                                  },
+                                  transitionBuilder:
+                                      (context, suggestionsBox, controller) {
+                                    return suggestionsBox;
+                                  },
+                                  itemBuilder: (context, suggestion) {
+                                    return Container(
+                                      color: Colors.white,
+                                      child: ListTile(
+                                        title: Text(
+                                          suggestion.toString(),
+                                          textScaleFactor: 1.0,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (BuildContext context,
+                                          Object? error) =>
+                                      Text('$error',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .errorColor)),
+                                  onSuggestionSelected: (suggestion) {
+                                    diseaseController.text =
+                                        suggestion.toString();
+                                  },
                                 ),
                               ),
                             ),

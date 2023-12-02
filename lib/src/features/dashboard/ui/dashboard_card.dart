@@ -1,6 +1,7 @@
 import 'package:donation/src/features/donar/donar_list_new.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
+import 'package:donation/src/features/patient/patient_list.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:donation/responsive.dart';
@@ -63,7 +64,7 @@ class DashboardCard extends ConsumerWidget {
               await Navigator.pushNamed(context, DonationListScreen.routeName);
             } else if (index == 2) {
               await Navigator.pushNamed(
-                  context, SpecialEventListScreen.routeName);
+                  context, PatientList.routeName);
             } else if (index == 3) {
               await Navigator.pushNamed(context, DonarListNewScreen.routeName);
             }

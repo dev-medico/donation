@@ -138,21 +138,34 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                           const EdgeInsets.only(left: 12.0, top: 8, bottom: 12),
                       child: Row(
                         children: [
-                          DashboardCard(
-                            index: 2,
-                            color: primaryDark,
-                            title: "ထူးခြားဖြစ်စဉ်",
-                            subtitle: "",
-                            amount: "",
-                            amountColor: Colors.black,
+                          Column(
+                            children: [
+                              DashboardCard(
+                                index: 2,
+                                color: primaryDark,
+                                title: "ထူးခြားဖြစ်စဉ်",
+                                subtitle: "",
+                                amount: "",
+                                amountColor: Colors.black,
+                              ),
+                              DashboardCard(
+                                index: 3,
+                                color: primaryDark,
+                                title: "ရ/သုံး ငွေစာရင်း",
+                                subtitle: "",
+                                amount: "",
+                                amountColor: Colors.black,
+                              ),
+                            ],
                           ),
                           DashboardCard(
-                            index: 3,
+                            index: 4,
                             color: primaryDark,
-                            title: "ရ/သုံး ငွေစာရင်း",
-                            subtitle: "",
-                            amount: "",
-                            amountColor: Colors.black,
+                            title: "သွေးလှူမှု မှတ်တမ်း",
+                            subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                            amount:
+                                "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                            amountColor: Colors.blue,
                           ),
                         ],
                       ),

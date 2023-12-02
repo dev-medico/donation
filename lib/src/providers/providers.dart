@@ -34,9 +34,57 @@ final totalMembersProvider = StateProvider<int>((ref) {
       .length;
 });
 
+final totalPatientProvider = StateProvider<int>((ref) {
+  var patients = ref.watch(patientProvider);
+  return patients.length;
+});
+
+final patientProvider = StateProvider<List<Patient>>((ref) {
+  var donations = ref.watch(donationsProvider);
+  List<Patient> patients = [];
+  donations.forEach((donation) {
+    if (patients
+        .where((element) => donation.patientName == element.patientName)
+        .isEmpty) {
+      var patient = Patient(
+          patientAddress: donation.patientAddress,
+          patientAge: donation.patientAge,
+          patientDisease: donation.patientDisease,
+          patientName: donation.patientName,
+          hospital: donation.hospital,
+          donatedCount: 1);
+      patients.add(patient);
+    } else {
+      var patient = patients
+          .firstWhere((element) => donation.patientName == element.patientName);
+      patient.donatedCount = patient.donatedCount! + 1;
+    }
+  });
+  //sort patients by donated count
+  patients.sort((a, b) => b.donatedCount!.compareTo(a.donatedCount!));
+  return patients;
+});
+
 final totalDonationsProvider = StateProvider<int>((ref) {
   var realmService = ref.watch(realmProvider);
   return realmService!.realm
       .query<Donation>("TRUEPREDICATE SORT(_id ASC)")
       .length;
 });
+
+class Patient {
+  String? patientAddress;
+  String? patientAge;
+  String? patientDisease;
+  String? patientName;
+  String? hospital;
+  int? donatedCount;
+
+  Patient(
+      {this.patientAddress,
+      this.patientAge,
+      this.patientDisease,
+      this.patientName,
+      this.hospital,
+      this.donatedCount});
+}

@@ -9,6 +9,7 @@ import 'package:donation/src/features/donation_member/presentation/controller/me
 import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:donation/src/features/home/desktop_home.dart';
 import 'package:donation/src/features/home/home.dart';
+import 'package:donation/src/features/patient/patient_list.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -197,8 +198,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         Locale('en', ''),
       ],
       theme: FluentThemeData(
-        fontFamily: "MyanUni",
-      ),
+          fontFamily: "MyanUni", inactiveColor: Color(0xff000000)),
       themeMode: ThemeMode.light,
       home: SplashScreen(),
       onGenerateRoute: (RouteSettings routeSettings) {
@@ -228,6 +228,9 @@ class _MyAppState extends ConsumerState<MyApp> {
 
               case DonationListScreen.routeName:
                 return const DonationListScreen();
+
+              case PatientList.routeName:
+                return const PatientList();
 
               case SpecialEventListScreen.routeName:
                 return const SpecialEventListScreen();
