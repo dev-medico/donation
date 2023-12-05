@@ -91,7 +91,9 @@ class _PatientListState extends ConsumerState<PatientList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: MediaQuery.of(context).size.width / 5,
+                width: Responsive.isMobile(context)
+                    ? MediaQuery.of(context).size.width - 40
+                    : MediaQuery.of(context).size.width / 5,
                 margin: const EdgeInsets.only(right: 40, bottom: 12),
                 padding: const EdgeInsets.only(top: 8, bottom: 8),
                 child: TextFormField(
@@ -169,18 +171,17 @@ class _PatientListState extends ConsumerState<PatientList> {
             ? ColumnWidthMode.fitByCellValue
             : ColumnWidthMode.fitByCellValue,
         columns: <GridColumn>[
-          if (!Responsive.isMobile(context))
-            GridColumn(
-                columnName: 'စဥ်',
-                label: Container(
-                    width: MediaQuery.of(context).size.width * 0.3,
-                    color: primaryColor,
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'စဥ်',
-                      style: TextStyle(color: Colors.white),
-                    ))),
+          GridColumn(
+              columnName: 'စဥ်',
+              label: Container(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'စဥ်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
           GridColumn(
               columnName: 'အမည်',
               label: Container(

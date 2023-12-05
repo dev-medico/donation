@@ -30,6 +30,7 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
     var totalMember = ref.watch(totalMembersProvider);
     var totalDonations = ref.watch(totalDonationsProvider);
     var donations = ref.watch(donationsProvider);
+    var totalPatient = ref.watch(totalPatientProvider);
 
     List<Donation> donationList = [];
     donations.forEach((element) {
@@ -74,9 +75,11 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
               DashboardCard(
                 index: 2,
                 color: primaryDark,
-                title: "ထူးခြားဖြစ်စဉ်",
-                subtitle: "",
-                amount: "",
+                title: Responsive.isMobile(context)
+                    ? "လူနာ \nစာရင်း"
+                    : "လူနာ စာရင်း",
+                subtitle: "စုစုပေါင်း",
+                amount: totalPatient.toString(),
                 amountColor: Colors.black,
               ),
               SizedBox(
@@ -86,8 +89,8 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
                 index: 3,
                 color: primaryDark,
                 title: "ရ/သုံး ငွေစာရင်း",
-                subtitle: "",
-                amount: "",
+                subtitle: "-",
+                amount: "-",
                 amountColor: Colors.black,
               ),
             ],

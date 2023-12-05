@@ -79,7 +79,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       //   });
 
       //   var donations = ref.watch(donationProvider);
-      //   var members = ref.watch(membersDataProvider);
+        var members = ref.watch(membersDataProvider);
       //   int totalUpdate = 0;
       //   members.forEach(
       //     (element) {
@@ -94,20 +94,20 @@ class _MyAppState extends ConsumerState<MyApp> {
       //   );
       //   log("Total Updated - " + totalUpdate.toString());
 
-      //   log("ကို - " +
-      //       members
-      //           .where((element) =>
-      //               element.name.toString().startsWith("ကို") ||
-      //               element.name.toString().startsWith(" ကို") ||
-      //               element.name.toString().startsWith("ဦး") ||
-      //               element.name.toString().startsWith(" ဦး") ||
-      //               element.name.toString().startsWith("စိုင်း") ||
-      //               element.name.toString().startsWith("ဦး") ||
-      //               element.name.toString().startsWith("နိုင်") ||
-      //               element.name.toString().startsWith("အရှင်") ||
-      //               element.name.toString().startsWith("စော"))
-      //           .length
-      //           .toString());
+        log("ကို - " +
+            members
+                .where((element) =>
+                    element.name.toString().startsWith("ကို") ||
+                    element.name.toString().startsWith(" ကို") ||
+                    element.name.toString().startsWith("ဦး") ||
+                    element.name.toString().startsWith(" ဦး") ||
+                    element.name.toString().startsWith("စိုင်း") ||
+                    element.name.toString().startsWith("ဦး") ||
+                    element.name.toString().startsWith("နိုင်") ||
+                    element.name.toString().startsWith("အရှင်") ||
+                    element.name.toString().startsWith("စော"))
+                .length
+                .toString());
 
       //   log("မ - " +
       //       members
@@ -137,20 +137,20 @@ class _MyAppState extends ConsumerState<MyApp> {
       //           .length
       //           .toString());
 
-      //   members
-      //       .where((element) =>
-      //           element.name.toString().startsWith("ကို") ||
-      //           element.name.toString().startsWith(" ကို") ||
-      //           element.name.toString().startsWith("ဦး") ||
-      //           element.name.toString().startsWith(" ဦး") ||
-      //           element.name.toString().startsWith("စိုင်း") ||
-      //           element.name.toString().startsWith("ဦး") ||
-      //           element.name.toString().startsWith("နိုင်") ||
-      //           element.name.toString().startsWith("အရှင်") ||
-      //           element.name.toString().startsWith("စော"))
-      //       .forEach((element) {
-      //     ref.watch(realmProvider)!.updateMember(element, gender: "male");
-      //   });
+        members
+            .where((element) =>
+                element.name.toString().startsWith("ကို") ||
+                element.name.toString().startsWith(" ကို") ||
+                element.name.toString().startsWith("ဦး") ||
+                element.name.toString().startsWith(" ဦး") ||
+                element.name.toString().startsWith("စိုင်း") ||
+                element.name.toString().startsWith("ဦး") ||
+                element.name.toString().startsWith("နိုင်") ||
+                element.name.toString().startsWith("အရှင်") ||
+                element.name.toString().startsWith("စော"))
+            .forEach((element) {
+          ref.watch(realmProvider)!.updateMember(element, gender: "male");
+        });
       //   members
       //       .where((element) =>
       //           element.name.toString().startsWith("မ") ||

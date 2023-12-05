@@ -781,21 +781,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                     cursorColor: Colors.white,
                                     controller: townController,
                                     autofocus: false,
-
                                     decoration: inputBoxDecoration("မြို့နယ်"),
-
-                                    // decoration:  InputDecoration(
-                                    //   hintText: "မြို့",
-                                    //   border: InputBorder.none,
-                                    //   focusedBorder: InputBorder.none,
-                                    //   enabledBorder: InputBorder.none,
-                                    //   errorBorder: InputBorder.none,
-                                    //   disabledBorder: InputBorder.none,
-                                    //   contentPadding:  EdgeInsets.only(
-                                    //       left: 15, bottom: 8, top: 8, right: 15),
-                                    //   hintStyle:  TextStyle(
-                                    //       fontSize: 15.0, color: Colors.grey),
-                                    // ),
                                   ),
                                   suggestionsCallback: (pattern) {
                                     townshipsSelected.clear();
@@ -2239,7 +2225,8 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
     if (editable && memberIDController.text.toString().isNotEmpty) {
       if (memberIDController.text.toString().contains("-") &&
           memberIDController.text.toString().length == 6) {
-        if (nameController.text.toString().startsWith(" ကို") ||
+        if (nameController.text.toString().startsWith("ကို") ||
+            nameController.text.toString().startsWith(" ကို") ||
             nameController.text.toString().startsWith("ဦး") ||
             nameController.text.toString().startsWith(" ဦး") ||
             nameController.text.toString().startsWith("စိုင်း") ||

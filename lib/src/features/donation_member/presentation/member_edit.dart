@@ -1312,7 +1312,8 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     if (extraPhone && extraPhoneController.text.isNotEmpty) {
       phoneList.add(extraPhoneController.text.toString());
     }
-    if (nameController.text.toString().startsWith(" ကို") ||
+    if (nameController.text.toString().startsWith("ကို") ||
+        nameController.text.toString().startsWith(" ကို") ||
         nameController.text.toString().startsWith("ဦး") ||
         nameController.text.toString().startsWith(" ဦး") ||
         nameController.text.toString().startsWith("စိုင်း") ||

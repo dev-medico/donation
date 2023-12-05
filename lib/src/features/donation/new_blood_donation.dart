@@ -546,9 +546,10 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                 margin: const EdgeInsets.only(
                                     left: 20, top: 16, bottom: 8, right: 20),
                                 child: TypeAheadField(
-                                  hideSuggestionsOnKeyboardHide: true,
+                                  hideSuggestionsOnKeyboardHide: false,
                                   textFieldConfiguration:
                                       TextFieldConfiguration(
+                                    cursorColor: Colors.white,
                                     controller: townController,
                                     autofocus: false,
                                     decoration: inputBoxDecoration("မြို့နယ်"),
@@ -556,26 +557,9 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                   suggestionsCallback: (pattern) {
                                     townshipsSelected.clear();
                                     townshipsSelected.addAll(townships);
-                                    townshipsSelected.where((element) => element
-                                        .toString()
-                                        .toString()
-                                        .startsWith(pattern.toLowerCase()));
-                                    // townshipsSelected.retainWhere((s) =>
-                                    //     s
-                                    //         .toString()
-                                    //         .toLowerCase()
-                                    //         .split("")
-                                    //         .toSet()
-                                    //         .intersection(pattern
-                                    //             .toLowerCase()
-                                    //             .split("")
-                                    //             .toSet())
-                                    //         .length ==
-                                    //     pattern
-                                    //         .toLowerCase()
-                                    //         .split("")
-                                    //         .toSet()
-                                    //      .length);
+                                    townshipsSelected.retainWhere((s) => s
+                                        .toLowerCase()
+                                        .contains(pattern.toLowerCase()));
                                     return townshipsSelected;
                                   },
                                   transitionBuilder:
@@ -583,13 +567,11 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                     return suggestionsBox;
                                   },
                                   itemBuilder: (context, suggestion) {
-                                    return Container(
-                                      color: Colors.white,
-                                      child: ListTile(
-                                        title: Text(
-                                          suggestion.toString(),
-                                          textScaleFactor: 1.0,
-                                        ),
+                                    return ListTile(
+                                      hoverColor: Colors.white,
+                                      title: Text(
+                                        suggestion.toString(),
+                                        textScaleFactor: 1.0,
                                       ),
                                     );
                                   },
@@ -1105,9 +1087,11 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                               bottom: 8,
                                               right: 20),
                                           child: TypeAheadField(
-                                            hideSuggestionsOnKeyboardHide: true,
+                                            hideSuggestionsOnKeyboardHide:
+                                                false,
                                             textFieldConfiguration:
                                                 TextFieldConfiguration(
+                                              cursorColor: Colors.white,
                                               controller: townController,
                                               autofocus: false,
                                               decoration: inputBoxDecoration(
@@ -1118,28 +1102,10 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                               townshipsSelected
                                                   .addAll(townships);
                                               townshipsSelected.retainWhere(
-                                                  (element) => element
-                                                      .toString()
-                                                      .toString()
-                                                      .startsWith(pattern
+                                                  (s) => s
+                                                      .toLowerCase()
+                                                      .contains(pattern
                                                           .toLowerCase()));
-                                              //   townshipsSelected.retainWhere(
-                                              //       (s) =>
-                                              //           s
-                                              //               .toString()
-                                              //               .toLowerCase()
-                                              //               .split("")
-                                              //               .toSet()
-                                              //               .intersection(pattern
-                                              //                   .toLowerCase()
-                                              //                   .split("")
-                                              //                   .toSet())
-                                              //               .length ==
-                                              //           pattern
-                                              //               .toLowerCase()
-                                              //               .split("")
-                                              //               .toSet()
-                                              //               .length);
                                               return townshipsSelected;
                                             },
                                             transitionBuilder: (context,
@@ -1147,13 +1113,11 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                               return suggestionsBox;
                                             },
                                             itemBuilder: (context, suggestion) {
-                                              return Container(
-                                                color: Colors.white,
-                                                child: ListTile(
-                                                  title: Text(
-                                                    suggestion.toString(),
-                                                    textScaleFactor: 1.0,
-                                                  ),
+                                              return ListTile(
+                                                hoverColor: Colors.white,
+                                                title: Text(
+                                                  suggestion.toString(),
+                                                  textScaleFactor: 1.0,
                                                 ),
                                               );
                                             },
