@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,16 +17,17 @@ class AppServices with ChangeNotifier {
   App app;
   User? currentUser;
   AppServices(this.id, this.baseUrl)
-      : app = App(AppConfiguration(id, baseUrl: baseUrl));
+      : app = App(
+            AppConfiguration(id, baseUrl: baseUrl, httpClient: HttpClient()));
 
   Future<User> logInUserEmailPassword(String email, String password) async {
     User loggedInUser =
         await app.logIn(Credentials.emailPassword(email, password));
     currentUser = loggedInUser;
     log("Custom User Data - ${currentUser!.customData}");
-   
+
     final customUserData = await currentUser!.refreshCustomData();
-     notifyListeners();
+    notifyListeners();
     return loggedInUser;
   }
 
