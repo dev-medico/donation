@@ -979,32 +979,35 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            height: 30,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "စာရင်းဖွင့်လက်ကျန်ငွေ",
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
-                                ),
-                                Text(
-                                  "${Utils.strToMM(leftBalance.toString())}",
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
-                                ),
-                              ],
-                            ),
-                          ),
+                          !leftBalance.isNegative
+                              ? SizedBox(
+                                  height: 30,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "စာရင်းဖွင့်လက်ကျန်ငွေ",
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                            color: NeumorphicTheme.of(context)
+                                                ?.current!
+                                                .variantColor),
+                                      ),
+                                      Text(
+                                        "${Utils.strToMM(leftBalance.toString())}",
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                            color: NeumorphicTheme.of(context)
+                                                ?.current!
+                                                .variantColor),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Container(),
                           const SizedBox(
                             height: 4,
                           ),
@@ -1067,7 +1070,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     .variantColor),
                           ),
                           Text(
-                            "${Utils.strToMM((totalDonation + leftBalance).toString())}",
+                            "${Utils.strToMM((leftBalance.isNegative ? totalDonation : totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -1128,6 +1131,37 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          leftBalance.isNegative
+                              ? SizedBox(
+                                  height: 30,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        convertToMMMonthName(_monthSelected == 0
+                                                ? 11
+                                                : _monthSelected - 1) +
+                                            "လ စာရင်းပိတ်စိုက်ရငွေ",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.red),
+                                      ),
+                                      Text(
+                                        "${Utils.strToMM(leftBalance.toString())}"
+                                            .substring(1),
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Container(),
+                          leftBalance.isNegative ? Divider() : Container(),
                           Container(
                             padding: const EdgeInsets.only(right: 12),
                             height: 30,
@@ -1144,7 +1178,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM(totalExpense.toString())}",
+                                  "${Utils.strToMM((leftBalance.isNegative ? (totalExpense + leftBalance.abs()) : totalExpense).toString())}",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
@@ -1165,16 +1199,20 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "စာရင်းပိတ် လက်ကျန်ငွေ",
+                                  thisMonthLeftBalance.isNegative
+                                      ? "စာရင်းပိတ် စိုက်ရငွေ"
+                                      : "စာရင်းပိတ် လက်ကျန်ငွေ",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: thisMonthLeftBalance.isNegative
+                                          ? Colors.red
+                                          : NeumorphicTheme.of(context)
+                                              ?.current!
+                                              .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM((thisMonthLeftBalance).toString())}",
+                                  "${Utils.strToMM(thisMonthLeftBalance.isNegative ? (thisMonthLeftBalance).toString().substring(1) : (thisMonthLeftBalance).toString())}",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
@@ -1218,7 +1256,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     .variantColor),
                           ),
                           Text(
-                            "${Utils.strToMM((totalDonation + leftBalance).toString())}",
+                            "${Utils.strToMM((leftBalance.isNegative ? totalDonation : totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -1308,32 +1346,35 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            height: 30,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "စာရင်းဖွင့်လက်ကျန်ငွေ",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
-                                ),
-                                Text(
-                                  "${Utils.strToMM(leftBalance.toString())}",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
-                                ),
-                              ],
-                            ),
-                          ),
+                          !leftBalance.isNegative
+                              ? SizedBox(
+                                  height: 30,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "စာရင်းဖွင့်လက်ကျန်ငွေ",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: NeumorphicTheme.of(context)
+                                                ?.current!
+                                                .variantColor),
+                                      ),
+                                      Text(
+                                        "${Utils.strToMM(leftBalance.toString())}",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: NeumorphicTheme.of(context)
+                                                ?.current!
+                                                .variantColor),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Container(),
                           const SizedBox(
                             height: 4,
                           ),
@@ -1374,6 +1415,42 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          leftBalance.isNegative
+                              ? Container(
+                                  margin: EdgeInsets.only(right: 12),
+                                  height: 30,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        convertToMMMonthName(_monthSelected == 0
+                                                ? 11
+                                                : _monthSelected - 1) +
+                                            "လ စာရင်းပိတ်စိုက်ရငွေ",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.red),
+                                      ),
+                                      Text(
+                                        "${Utils.strToMM(leftBalance.toString())}"
+                                            .substring(1),
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Container(),
+                          leftBalance.isNegative
+                              ? Divider(
+                                  color: Colors.black,
+                                )
+                              : Container(),
                           Container(
                             padding: const EdgeInsets.only(right: 12),
                             height: 30,
@@ -1390,7 +1467,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                           .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM(totalExpense.toString())}",
+                                  "${Utils.strToMM((leftBalance.isNegative ? (totalExpense + leftBalance.abs()) : totalExpense).toString())}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -1411,22 +1488,28 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "စာရင်းပိတ် လက်ကျန်ငွေ",
+                                  thisMonthLeftBalance.isNegative
+                                      ? "စာရင်းပိတ် စိုက်ရငွေ"
+                                      : "စာရင်းပိတ် လက်ကျန်ငွေ",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: thisMonthLeftBalance.isNegative
+                                          ? Colors.red
+                                          : NeumorphicTheme.of(context)
+                                              ?.current!
+                                              .variantColor),
                                 ),
                                 Text(
-                                  "${Utils.strToMM((thisMonthLeftBalance).toString())}",
+                                  "${Utils.strToMM(thisMonthLeftBalance.isNegative ? (thisMonthLeftBalance).toString().substring(1) : (thisMonthLeftBalance).toString())}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: thisMonthLeftBalance.isNegative
+                                          ? Colors.red
+                                          : NeumorphicTheme.of(context)
+                                              ?.current!
+                                              .variantColor),
                                 ),
                               ],
                             ),
@@ -1464,7 +1547,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     .variantColor),
                           ),
                           Text(
-                            "${Utils.strToMM((totalDonation + leftBalance).toString())}",
+                            "${Utils.strToMM((leftBalance.isNegative ? totalDonation : totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -1491,7 +1574,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                     .variantColor),
                           ),
                           Text(
-                            "${Utils.strToMM((totalDonation + leftBalance).toString())}",
+                            "${Utils.strToMM((leftBalance.isNegative ? totalDonation : totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
