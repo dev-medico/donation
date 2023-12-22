@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:donation/src/common_widgets/common_tab_bar.dart';
+import 'package:donation/src/features/donation/controller/donation_list_controller.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/features/patient/patient_data_source.dart';
@@ -25,6 +27,51 @@ class _PatientListState extends ConsumerState<PatientList> {
   bool notloaded = true;
   Timer? _debounceTimer;
   String searchKey = "";
+  int _yearSelected = 0;
+  int _monthSelected = DateTime.now().month - 1;
+  List<String> years = [
+    "2023",
+    "2022",
+    "2021",
+    "2020",
+    "2019",
+    "2018",
+    "2017",
+    "2016",
+    "2015",
+    "2014",
+    "2013",
+    "2012",
+  ];
+  List<String> months = [
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC",
+  ];
+
+  List<String> monthsMobile = [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+  ];
 
   @override
   void dispose() {
@@ -40,7 +87,8 @@ class _PatientListState extends ConsumerState<PatientList> {
 
   @override
   Widget build(BuildContext context) {
-    final results = ref.watch(patientProvider);
+    var donationData = ref.watch(donationListProvider(DonationFilterModel(
+        year: int.parse(years[_yearSelected]), month: _monthSelected + 1)));
     YYDialog.init(context);
     if (notloaded) {
       //
@@ -90,6 +138,65 @@ class _PatientListState extends ConsumerState<PatientList> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 60,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    Container(
+                      width: Responsive.isMobile(context)
+                          ? MediaQuery.of(context).size.width * 1.8
+                          : MediaQuery.of(context).size.width * 0.8,
+                      height: Responsive.isMobile(context) ? 40 : 60,
+                      child: CommonTabBar(
+                        underline: false,
+                        listWidget: [
+                          for (int i = 0; i < years.length; i++)
+                            CommonTabBarWidget(
+                              underline: false,
+                              name: years[i],
+                              isSelected: _yearSelected,
+                              i: i,
+                              onTap: () {
+                                _yearSelected = i;
+
+                                setState(() {});
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 8),
+                width: Responsive.isMobile(context)
+                    ? MediaQuery.of(context).size.width * 1.8
+                    : MediaQuery.of(context).size.width * 0.8,
+                height: Responsive.isMobile(context) ? 40 : 60,
+                child: CommonTabBar(
+                  underline: false,
+                  listWidget: [
+                    for (int i = 0; i < months.length; i++)
+                      CommonTabBarWidget(
+                        color: primaryColor,
+                        underline: false,
+                        name: Responsive.isMobile(context)
+                            ? monthsMobile[i]
+                            : months[i],
+                        isSelected: _monthSelected,
+                        i: i,
+                        onTap: () {
+                          _monthSelected = i;
+
+                          setState(() {});
+                        },
+                      ),
+                  ],
+                ),
+              ),
               Container(
                 width: Responsive.isMobile(context)
                     ? MediaQuery.of(context).size.width - 40
@@ -144,14 +251,25 @@ class _PatientListState extends ConsumerState<PatientList> {
                   keyboardType: TextInputType.text,
                 ),
               ),
-              Expanded(
-                child: buildSimpleTable(searchKey == ""
-                    ? results
-                    : results
-                        .where((element) =>
-                            element.patientName!.contains(searchKey))
-                        .toList()),
-              ),
+              donationData.when(
+                  data: (donations) {
+                    var results =
+                        ref.watch(patientByDonationsProvider(donations));
+                    return Expanded(
+                      child: buildSimpleTable(searchKey == ""
+                          ? results
+                          : results
+                              .where((element) =>
+                                  element.patientName!.contains(searchKey))
+                              .toList()),
+                    );
+                  },
+                  loading: () => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                  error: (error, stack) => Center(
+                        child: Text(error.toString()),
+                      )),
             ],
           )),
     );

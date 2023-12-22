@@ -1,5 +1,6 @@
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
+import 'package:donation/src/features/donation/controller/donation_list_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:realm/realm.dart';
 
@@ -41,6 +42,32 @@ final totalPatientProvider = StateProvider<int>((ref) {
 
 final patientProvider = StateProvider<List<Patient>>((ref) {
   var donations = ref.watch(donationsProvider);
+  List<Patient> patients = [];
+  donations.forEach((donation) {
+    if (patients
+        .where((element) => donation.patientName == element.patientName)
+        .isEmpty) {
+      var patient = Patient(
+          patientAddress: donation.patientAddress,
+          patientAge: donation.patientAge,
+          patientDisease: donation.patientDisease,
+          patientName: donation.patientName,
+          hospital: donation.hospital,
+          donatedCount: 1);
+      patients.add(patient);
+    } else {
+      var patient = patients
+          .firstWhere((element) => donation.patientName == element.patientName);
+      patient.donatedCount = patient.donatedCount! + 1;
+    }
+  });
+  //sort patients by donated count
+  patients.sort((a, b) => b.donatedCount!.compareTo(a.donatedCount!));
+  return patients;
+});
+
+final patientByDonationsProvider =
+    StateProvider.family<List<Patient>, List<Donation>>((ref, donations) {
   List<Patient> patients = [];
   donations.forEach((donation) {
     if (patients
