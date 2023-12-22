@@ -2058,8 +2058,9 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                   elevation: 2.0,
                   minWidth: 155,
                   onPressed: () {
-                    getAutoIncrementKey();
                     Navigator.of(context, rootNavigator: true).pop('dialog');
+                    getAutoIncrementKey();
+
                     // Navigator.pushReplacement(
                     //   context,
                     //   MaterialPageRoute(

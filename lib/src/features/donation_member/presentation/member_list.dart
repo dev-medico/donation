@@ -36,9 +36,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
     "O (Rh +)",
     "A (Rh -)",
     "B (Rh -)",
-    "AB (Rh -)"
+    "AB (Rh -)",
     "O (Rh -)",
-    
   ];
   String? selectedBloodType = "သွေးအုပ်စု အလိုက်ကြည့်မည်";
   String? selectedRange;
@@ -257,6 +256,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                                             value: item,
                                             child: Text(
                                               item,
+                                              textAlign: TextAlign.end,
                                               style: const TextStyle(
                                                 fontSize: 14,
                                               ),
@@ -511,6 +511,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                                     value: item,
                                     child: Text(
                                       item,
+                                      textAlign: TextAlign.end,
                                       style: const TextStyle(
                                         fontSize: 14,
                                       ),
@@ -833,6 +834,36 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen>
                   alignment: Alignment.center,
                   child: const Text(
                     'သွေးလှူမှုကြိမ်ရေ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'မွေးသက္ကရာဇ်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'မွေးသက္ကရာဇ်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'ဖုန်းနံပါတ်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'ဖုန်းနံပါတ်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'နေရပ်လိပ်စာ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'နေရပ်လိပ်စာ',
                     style: TextStyle(color: Colors.white),
                   ))),
         ],
