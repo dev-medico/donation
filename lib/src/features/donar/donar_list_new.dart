@@ -650,8 +650,8 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
               gridLinesVisibility: GridLinesVisibility.both,
               headerGridLinesVisibility: GridLinesVisibility.both,
               columnWidthMode: Responsive.isMobile(context)
-                  ? ColumnWidthMode.fill
-                  : ColumnWidthMode.auto,
+                  ? ColumnWidthMode.fitByCellValue
+                  : ColumnWidthMode.fitByCellValue,
               columns: <GridColumn>[
                 if (!Responsive.isMobile(context))
                   GridColumn(
@@ -859,7 +859,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                             headerGridLinesVisibility: GridLinesVisibility.both,
                             columnWidthMode: Responsive.isMobile(context)
                                 ? ColumnWidthMode.fill
-                                : ColumnWidthMode.auto,
+                                : ColumnWidthMode.fitByCellValue,
                             columns: <GridColumn>[
                               if (!Responsive.isMobile(context))
                                 GridColumn(

@@ -1312,19 +1312,19 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
     if (extraPhone && extraPhoneController.text.isNotEmpty) {
       phoneList.add(extraPhoneController.text.toString());
     }
-    if (nameController.text.toString().startsWith("ကို") ||
-        nameController.text.toString().startsWith(" ကို") ||
-        nameController.text.toString().startsWith("ဦး") ||
-        nameController.text.toString().startsWith(" ဦး") ||
-        nameController.text.toString().startsWith("စိုင်း") ||
-        nameController.text.toString().startsWith("ဦး") ||
-        nameController.text.toString().startsWith("နိုင်") ||
-        nameController.text.toString().startsWith("အရှင်") ||
-        nameController.text.toString().startsWith("စော")) {
-      genderValue = 0;
-    } else {
-      genderValue = 1;
-    }
+    // if (nameController.text.toString().startsWith("ကို") ||
+    //     nameController.text.toString().startsWith(" ကို") ||
+    //     nameController.text.toString().startsWith("ဦး") ||
+    //     nameController.text.toString().startsWith(" ဦး") ||
+    //     nameController.text.toString().startsWith("စိုင်း") ||
+    //     nameController.text.toString().startsWith("ဦး") ||
+    //     nameController.text.toString().startsWith("နိုင်") ||
+    //     nameController.text.toString().startsWith("အရှင်") ||
+    //     nameController.text.toString().startsWith("စော")) {
+    //   genderValue = 0;
+    // } else {
+    //   genderValue = 1;
+    // }
     ref.watch(realmProvider)!.updateMember(
           widget.data,
           name: nameController.text.toString(),

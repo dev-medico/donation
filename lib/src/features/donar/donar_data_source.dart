@@ -19,7 +19,9 @@ class DonarDataSource extends DataGridSource {
         //     value:
         //         "        ${DateFormat('dd MMM yyyy').format(donarData[i].date!.toLocal())}        "),
         DataGridCell<String>(
-            columnName: 'အမည်', value: "  ${donarData[i].name}\t\t"),
+            columnName: 'အမည်',
+            value:
+                "   ${donarData[i].name}                                                   "),
         DataGridCell<String>(
             columnName: 'အလှူငွေ',
             value: "    ${donarData[i].amount.toString()}\t\t"),
