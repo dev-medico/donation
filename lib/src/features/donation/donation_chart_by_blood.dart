@@ -112,11 +112,16 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            bloodTypes[index],
-                            style: TextStyle(
-                              fontSize: Responsive.isMobile(context) ? 15 : 16,
-                              color: Colors.black,
+                          Container(
+                            width: 80,
+                            child: Text(
+                              bloodTypes[index],
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                fontSize:
+                                    Responsive.isMobile(context) ? 15 : 16,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                           Text(
