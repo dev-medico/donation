@@ -74,6 +74,8 @@ void main() async {
 
   if ((Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
     await DesktopWindow.setFullScreen(true);
+    await DesktopWindow.setMinWindowSize(const Size(1280, 800));
+    await DesktopWindow.setMaxWindowSize(const Size(6000, 6000));
   }
   // await Firebase.initializeApp(
   //   options: DefaultFirebaseOptions.currentPlatform,
