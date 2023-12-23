@@ -37,7 +37,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   late SharedPreferences prefs;
   bool _isLoading = false;
-  int groupValue = 1;
+  int groupValue = 0;
 
   @override
   void initState() {
@@ -144,7 +144,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     //     ),
                     //   ),
                     // ),
-                    
+
                     Container(
                       decoration: shadowDecoration(const Color(0xfff1f1f1)),
                       margin: EdgeInsets.only(
@@ -331,7 +331,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           onPressed: () async {
                             if (groupValue == 1) {
-                             // firebaseLogin();
+                              // firebaseLogin();
                             } else {
                               if (_formKey.currentState!.validate()) {
                                 realmLogin();
