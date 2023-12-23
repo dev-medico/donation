@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:desktop_window/desktop_window.dart';
 import 'package:donation/firebase_options.dart';
 import 'package:donation/src/features/home/home.dart';
 // import 'package:firebase_core/firebase_core.dart';
@@ -70,6 +71,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
+
+  if ((Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+    await DesktopWindow.setFullScreen(true);
+  }
   // await Firebase.initializeApp(
   //   options: DefaultFirebaseOptions.currentPlatform,
   // );
@@ -97,4 +102,3 @@ class ReceivedNotification {
   final String? body;
   final String? payload;
 }
-

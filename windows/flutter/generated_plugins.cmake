@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  desktop_window
   file_selector_windows
   modal_progress_hud_nsn
   realm
