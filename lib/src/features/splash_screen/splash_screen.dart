@@ -45,7 +45,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         if (name == "") {
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         } else {
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Navigator.pushReplacementNamed(context, HomeScreen.routeName);
         }
       } else {
         var appServices = ref.read(appServiceProvider);
