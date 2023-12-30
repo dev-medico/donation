@@ -97,13 +97,17 @@ class _PatientListByYearState extends ConsumerState<PatientListByYear> {
                     Text(
                       widget.year.toString() +
                           " ခုနှစ်အတွင်း လူနာများစာရင်း - " +
-                          results.length.toString(),
+                          results.length.toString() +
+                          " ဦး",
                       style: TextStyle(
                           fontSize: Responsive.isMobile(context) ? 15 : 16,
                           fontWeight: FontWeight.bold,
                           color: NeumorphicTheme.of(context)
                               ?.current!
                               .variantColor),
+                    ),
+                    SizedBox(
+                      height: 24,
                     ),
                     Expanded(
                       child: buildSimpleTable(searchKey == ""
@@ -129,7 +133,8 @@ class _PatientListByYearState extends ConsumerState<PatientListByYear> {
     PatientDataSource patientDataSource = PatientDataSource(patient: data);
 
     return Container(
-      margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
+      margin: EdgeInsets.only(
+          right: Responsive.isMobile(context) ? 20 : 20, bottom: 20),
       child: SfDataGrid(
         source: patientDataSource,
         onCellTap: (details) async {},
