@@ -320,7 +320,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             decoration: shadowDecoration(secondColor),
                             child: Center(
                               child: Text(
-                                "၀င်ရောက်မည်",
+                                "ဝင်ရောက်မည်",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize:
