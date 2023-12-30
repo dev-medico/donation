@@ -23,7 +23,7 @@ import 'package:donation/src/features/home/home_with_drawer.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/splash_screen/splash_screen.dart';
 import 'package:donation/utils/custom_scroll.dart';
-
+import 'package:intl/intl.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
@@ -78,8 +78,24 @@ class _MyAppState extends ConsumerState<MyApp> {
       //     realm.deleteAll<DonarRecord>();
       //   });
 
-      //   var donations = ref.watch(donationProvider);
-        var members = ref.watch(membersDataProvider);
+      // var donations = ref.watch(donationProvider);
+      // int totalUpdate = 0;
+      // donations.forEach((element) {
+      //   var lastDate = element.memberObj!.lastDate;
+      //   if (lastDate == null ||
+      //       DateFormat('dd MMM yyyy').format(lastDate).toString() !=
+      //           "01 Jan 2010" ||
+      //       element.donationDate!.isAfter(lastDate)) {
+      //     lastDate = element.donationDate!;
+      //   }
+
+      //   ref
+      //       .watch(realmProvider)!
+      //       .updateMember(element.memberObj!, lastDate: lastDate);
+      //   totalUpdate++;
+      // });
+      // log("Total Updated - " + totalUpdate.toString());
+      // var members = ref.watch(membersDataProvider);
       //   int totalUpdate = 0;
       //   members.forEach(
       //     (element) {
@@ -94,20 +110,20 @@ class _MyAppState extends ConsumerState<MyApp> {
       //   );
       //   log("Total Updated - " + totalUpdate.toString());
 
-        log("ကို - " +
-            members
-                .where((element) =>
-                    element.name.toString().startsWith("ကို") ||
-                    element.name.toString().startsWith(" ကို") ||
-                    element.name.toString().startsWith("ဦး") ||
-                    element.name.toString().startsWith(" ဦး") ||
-                    element.name.toString().startsWith("စိုင်း") ||
-                    element.name.toString().startsWith("ဦး") ||
-                    element.name.toString().startsWith("နိုင်") ||
-                    element.name.toString().startsWith("အရှင်") ||
-                    element.name.toString().startsWith("စော"))
-                .length
-                .toString());
+      // log("ကို - " +
+      //     members
+      //         .where((element) =>
+      //             element.name.toString().startsWith("ကို") ||
+      //             element.name.toString().startsWith(" ကို") ||
+      //             element.name.toString().startsWith("ဦး") ||
+      //             element.name.toString().startsWith(" ဦး") ||
+      //             element.name.toString().startsWith("စိုင်း") ||
+      //             element.name.toString().startsWith("ဦး") ||
+      //             element.name.toString().startsWith("နိုင်") ||
+      //             element.name.toString().startsWith("အရှင်") ||
+      //             element.name.toString().startsWith("စော"))
+      //         .length
+      //         .toString());
 
       //   log("မ - " +
       //       members
@@ -137,20 +153,20 @@ class _MyAppState extends ConsumerState<MyApp> {
       //           .length
       //           .toString());
 
-        members
-            .where((element) =>
-                element.name.toString().startsWith("ကို") ||
-                element.name.toString().startsWith(" ကို") ||
-                element.name.toString().startsWith("ဦး") ||
-                element.name.toString().startsWith(" ဦး") ||
-                element.name.toString().startsWith("စိုင်း") ||
-                element.name.toString().startsWith("ဦး") ||
-                element.name.toString().startsWith("နိုင်") ||
-                element.name.toString().startsWith("အရှင်") ||
-                element.name.toString().startsWith("စော"))
-            .forEach((element) {
-          ref.watch(realmProvider)!.updateMember(element, gender: "male");
-        });
+      // members
+      //     .where((element) =>
+      //         element.name.toString().startsWith("ကို") ||
+      //         element.name.toString().startsWith(" ကို") ||
+      //         element.name.toString().startsWith("ဦး") ||
+      //         element.name.toString().startsWith(" ဦး") ||
+      //         element.name.toString().startsWith("စိုင်း") ||
+      //         element.name.toString().startsWith("ဦး") ||
+      //         element.name.toString().startsWith("နိုင်") ||
+      //         element.name.toString().startsWith("အရှင်") ||
+      //         element.name.toString().startsWith("စော"))
+      //     .forEach((element) {
+      //   ref.watch(realmProvider)!.updateMember(element, gender: "male");
+      // });
       //   members
       //       .where((element) =>
       //           element.name.toString().startsWith("မ") ||

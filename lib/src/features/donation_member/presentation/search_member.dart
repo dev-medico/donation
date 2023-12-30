@@ -60,7 +60,8 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final results = ref.watch(membersDataProvider);
+    final results = ref.watch(searchMemberStreamProvider(
+        (search: searchKey, bloodType: selectedBloodType)));
 
     log("Data " + results.length.toString());
     if (firstTime) {
@@ -115,20 +116,188 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
         ),
       ),
       body: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            Responsive.isMobile(context)
-                ? Container(
-                    margin: EdgeInsets.only(left: 20, right: 20),
-                    child: Column(
+          backgroundColor: Colors.white,
+          body: Stack(
+            children: [
+              Responsive.isMobile(context)
+                  ? Container(
+                      margin: EdgeInsets.only(left: 20, right: 20),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            margin: const EdgeInsets.only(
+                              top: 20,
+                              left: 6,
+                            ),
+                            child: DropdownButtonFormField(
+                              dropdownColor: Colors.white,
+                              focusColor: Colors.white,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding: EdgeInsets.only(
+                                    top: 16, left: 20, bottom: 16, right: 12),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              isExpanded: true,
+                              hint: Text(
+                                selectedBloodType!,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                              icon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.black45,
+                              ),
+                              iconSize: 30,
+                              items: bloodTypes
+                                  .map((item) => DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Text(
+                                          item,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ))
+                                  .toList(),
+                              validator: (value) {
+                                if (value == null) {
+                                  return "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
+                                }
+                                return null;
+                              },
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedBloodType = value.toString();
+                                });
+                                log(selectedBloodType.toString());
+                                log(dataSegments.length.toString());
+                                List<Member>? filterdata = [];
+                                for (int i = 0; i < oldData.length; i++) {
+                                  //get memberdata from data only where bloodtype is equal to value
+                                  if (searchController.text.isNotEmpty) {
+                                    if (oldData[i].name!.toLowerCase().contains(
+                                            searchController.text
+                                                .toString()
+                                                .toLowerCase()) &&
+                                        oldData[i].bloodType ==
+                                            selectedBloodType) {
+                                      filterdata.add(oldData[i]);
+                                    }
+                                  } else {
+                                    if (oldData[i].bloodType ==
+                                        selectedBloodType) {
+                                      filterdata.add(oldData[i]);
+                                    }
+                                  }
+                                }
+                                setState(() {
+                                  dataSegments = filterdata.sublist(0);
+                                });
+                              },
+                              onSaved: (value) {},
+                            ),
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            margin: const EdgeInsets.only(
+                              top: 20,
+                              left: 6,
+                            ),
+                            child: TextFormField(
+                              autofocus: false,
+                              controller: searchController,
+                              textAlign: TextAlign.start,
+                              style: const TextStyle(
+                                  fontSize: 15, color: Colors.black),
+                              onChanged: (val) {
+                                if (_debounceTimer?.isActive ?? false) {
+                                  _debounceTimer?.cancel();
+                                }
+
+                                _debounceTimer = Timer(
+                                    const Duration(milliseconds: 500), () {
+                                  setState(() {
+                                    searchKey = val;
+                                  });
+                                  List<Member>? filterdata = [];
+                                  oldData.forEach((element) {
+                                    if (element.name
+                                        .toString()
+                                        .toLowerCase()
+                                        .startsWith(
+                                            searchKey.toString().toLowerCase()))
+                                    //   if (element.name
+                                    //           .toString()
+                                    //           .toLowerCase()
+                                    //           .split("")
+                                    //           .toSet()
+                                    //           .intersection(searchKey
+                                    //               .toLowerCase()
+                                    //               .split("")
+                                    //               .toSet())
+                                    //           .length ==
+                                    //       searchKey
+                                    //           .toLowerCase()
+                                    //           .split("")
+                                    //           .toSet()
+                                    //           .length)
+                                    {
+                                      setState(() {
+                                        filterdata.add(element);
+                                      });
+                                    }
+                                  });
+                                  setState(() {
+                                    dataSegments = filterdata.sublist(0);
+                                  });
+                                });
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
+                                hintStyle: const TextStyle(
+                                    color: Colors.black, fontSize: 15.0),
+                                fillColor: Colors.white.withOpacity(0.2),
+                                filled: true,
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.search,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.only(
+                                    left: 20, right: 20, top: 4, bottom: 4),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        const BorderSide(color: Colors.grey)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        const BorderSide(color: Colors.grey)),
+                                disabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        const BorderSide(color: Colors.grey)),
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        const BorderSide(color: Colors.grey)),
+                              ),
+                              keyboardType: TextInputType.text,
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  : Row(
                       children: [
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          margin: const EdgeInsets.only(
-                            top: 20,
-                            left: 6,
-                          ),
+                          width: MediaQuery.of(context).size.width / 5,
+                          margin: const EdgeInsets.only(top: 28, left: 20),
                           child: DropdownButtonFormField(
                             dropdownColor: Colors.white,
                             focusColor: Colors.white,
@@ -143,7 +312,7 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                             isExpanded: true,
                             hint: Text(
                               selectedBloodType!,
-                              style: const TextStyle(fontSize: 13),
+                              style: const TextStyle(fontSize: 14),
                             ),
                             icon: const Icon(
                               Icons.arrow_drop_down,
@@ -200,11 +369,10 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                           ),
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
+                          width: MediaQuery.of(context).size.width / 5,
                           margin: const EdgeInsets.only(
-                            top: 20,
-                            left: 6,
-                          ),
+                              right: 40, top: 28, left: 20),
+                          padding: const EdgeInsets.only(top: 8, bottom: 8),
                           child: TextFormField(
                             autofocus: false,
                             controller: searchController,
@@ -228,21 +396,21 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                                       .toLowerCase()
                                       .startsWith(
                                           searchKey.toString().toLowerCase()))
-                                  //   if (element.name
-                                  //           .toString()
-                                  //           .toLowerCase()
-                                  //           .split("")
-                                  //           .toSet()
-                                  //           .intersection(searchKey
-                                  //               .toLowerCase()
-                                  //               .split("")
-                                  //               .toSet())
-                                  //           .length ==
-                                  //       searchKey
-                                  //           .toLowerCase()
-                                  //           .split("")
-                                  //           .toSet()
-                                  //           .length)
+                                  // if (element.name
+                                  //         .toString()
+                                  //         .toLowerCase()
+                                  //         .split("")
+                                  //         .toSet()
+                                  //         .intersection(searchKey
+                                  //             .toLowerCase()
+                                  //             .split("")
+                                  //             .toSet())
+                                  //         .length ==
+                                  //     searchKey
+                                  //         .toLowerCase()
+                                  //         .split("")
+                                  //         .toSet()
+                                  //         .length)
                                   {
                                     setState(() {
                                       filterdata.add(element);
@@ -288,184 +456,19 @@ class _SearchMemberListScreenState extends ConsumerState<SearchMemberListScreen>
                             ),
                             keyboardType: TextInputType.text,
                           ),
-                        )
+                        ),
                       ],
                     ),
-                  )
-                : Row(
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width / 5,
-                        margin: const EdgeInsets.only(top: 28, left: 20),
-                        child: DropdownButtonFormField(
-                          dropdownColor: Colors.white,
-                          focusColor: Colors.white,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding: EdgeInsets.only(
-                                top: 16, left: 20, bottom: 16, right: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          isExpanded: true,
-                          hint: Text(
-                            selectedBloodType!,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          icon: const Icon(
-                            Icons.arrow_drop_down,
-                            color: Colors.black45,
-                          ),
-                          iconSize: 30,
-                          items: bloodTypes
-                              .map((item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Text(
-                                      item,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ))
-                              .toList(),
-                          validator: (value) {
-                            if (value == null) {
-                              return "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {
-                            setState(() {
-                              selectedBloodType = value.toString();
-                            });
-                            log(selectedBloodType.toString());
-                            log(dataSegments.length.toString());
-                            List<Member>? filterdata = [];
-                            for (int i = 0; i < oldData.length; i++) {
-                              //get memberdata from data only where bloodtype is equal to value
-                              if (searchController.text.isNotEmpty) {
-                                if (oldData[i].name!.toLowerCase().contains(
-                                        searchController.text
-                                            .toString()
-                                            .toLowerCase()) &&
-                                    oldData[i].bloodType == selectedBloodType) {
-                                  filterdata.add(oldData[i]);
-                                }
-                              } else {
-                                if (oldData[i].bloodType == selectedBloodType) {
-                                  filterdata.add(oldData[i]);
-                                }
-                              }
-                            }
-                            setState(() {
-                              dataSegments = filterdata.sublist(0);
-                            });
-                          },
-                          onSaved: (value) {},
-                        ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width / 5,
-                        margin:
-                            const EdgeInsets.only(right: 40, top: 28, left: 20),
-                        padding: const EdgeInsets.only(top: 8, bottom: 8),
-                        child: TextFormField(
-                          autofocus: false,
-                          controller: searchController,
-                          textAlign: TextAlign.start,
-                          style: const TextStyle(
-                              fontSize: 15, color: Colors.black),
-                          onChanged: (val) {
-                            if (_debounceTimer?.isActive ?? false) {
-                              _debounceTimer?.cancel();
-                            }
-
-                            _debounceTimer =
-                                Timer(const Duration(milliseconds: 500), () {
-                              setState(() {
-                                searchKey = val;
-                              });
-                              List<Member>? filterdata = [];
-                              oldData.forEach((element) {
-                                if (element.name
-                                    .toString()
-                                    .toLowerCase()
-                                    .startsWith(
-                                        searchKey.toString().toLowerCase()))
-                                // if (element.name
-                                //         .toString()
-                                //         .toLowerCase()
-                                //         .split("")
-                                //         .toSet()
-                                //         .intersection(searchKey
-                                //             .toLowerCase()
-                                //             .split("")
-                                //             .toSet())
-                                //         .length ==
-                                //     searchKey
-                                //         .toLowerCase()
-                                //         .split("")
-                                //         .toSet()
-                                //         .length)
-                                {
-                                  setState(() {
-                                    filterdata.add(element);
-                                  });
-                                }
-                              });
-                              setState(() {
-                                dataSegments = filterdata.sublist(0);
-                              });
-                            });
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-                            hintStyle: const TextStyle(
-                                color: Colors.black, fontSize: 15.0),
-                            fillColor: Colors.white.withOpacity(0.2),
-                            filled: true,
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.search,
-                                color: primaryColor,
-                              ),
-                            ),
-                            contentPadding: const EdgeInsets.only(
-                                left: 20, right: 20, top: 4, bottom: 4),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            disabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                          ),
-                          keyboardType: TextInputType.text,
-                        ),
-                      ),
-                    ],
-                  ),
-            Container(
-              margin: EdgeInsets.only(
-                  left: 20.0,
-                  top: Responsive.isMobile(context) ? 160 : 100,
-                  bottom: 12),
-              child: dataSegments.isNotEmpty ? buildSimpleTable() : Container(),
-            ),
-          ],
-        ),
-      ),
+              Container(
+                margin: EdgeInsets.only(
+                    left: 20.0,
+                    top: Responsive.isMobile(context) ? 160 : 100,
+                    bottom: 12),
+                child:
+                    dataSegments.isNotEmpty ? buildSimpleTable() : Container(),
+              ),
+            ],
+          )),
     );
   }
 

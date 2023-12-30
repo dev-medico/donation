@@ -4,6 +4,7 @@ import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:realm/realm.dart';
+import 'package:intl/intl.dart';
 
 typedef SearchParams = ({String? search, String? bloodType});
 
@@ -50,7 +51,34 @@ final membersDataProvider = StateProvider<RealmResults<Member>>((ref) {
   return stream;
 });
 
-final membersDataByTotalCountProvider = StateProvider<RealmResults<Member>>((ref) {
+final averageAgeOfMemberProvider = StateProvider<double>((ref) {
+  var realmService = ref.watch(realmProvider);
+  final members =
+      realmService!.realm.query<Member>("TRUEPREDICATE SORT(memberId ASC)");
+  double totalAge = 0;
+  members.forEach((element) {
+    if (element.birthDate != null && element.birthDate != "-") {
+      if (element.birthDate!.contains("/")) {
+        var birthDate = DateFormat('dd/MMM/yyyy').parse(element.birthDate!);
+
+        var age = DateTime.now().difference(birthDate).inDays / 365;
+
+        totalAge += age;
+      } else {
+        var birthDate = DateFormat('dd MMM yyyy').parse(element.birthDate!);
+
+        var age = DateTime.now().difference(birthDate).inDays / 365;
+
+        totalAge += age;
+      }
+    }
+  });
+
+  return totalAge / members.length;
+});
+
+final membersDataByTotalCountProvider =
+    StateProvider<RealmResults<Member>>((ref) {
   var realmService = ref.watch(realmProvider);
   final stream =
       realmService!.realm.query<Member>("TRUEPREDICATE SORT(totalCount DESC)");
@@ -67,25 +95,33 @@ final membersDataByPhoneProvider =
   return stream.isEmpty ? null : stream.first;
 });
 
-final loginMemberProvider = StateProvider<Member?>(
-    (ref) => null);
+final loginMemberProvider = StateProvider<Member?>((ref) => null);
 
 final searchMemberStreamProvider =
-    StreamProvider.family<RealmResultsChanges<Member>, SearchParams>(
+    StateProvider.family<RealmResults<Member>, SearchParams>(
         (ref, searchParam) {
   var realmService = ref.watch(realmProvider);
   log("Search " + searchParam.search.toString());
+  log("Search " + searchParam.bloodType.toString());
   //get Datetime of four month before
   var fourMonthBefore = DateTime.now().subtract(Duration(days: 120));
-  if (searchParam.search != "" &&
-      searchParam.bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
+  if (searchParam.search == "" &&
+      searchParam.bloodType == "သွေးအုပ်စုဖြင့် ရှာဖွေမည်") {
+    log("Call There");
+    final stream = realmService!.realm.query<Member>(
+        r"lastDate < $0 AND TRUEPREDICATE SORT(memberId ASC)",
+        [fourMonthBefore]);
+
+    return stream;
+  } else if (searchParam.search != "" &&
+      searchParam.bloodType != "သွေးအုပ်စုဖြင့် ရှာဖွေမည်") {
     final stream = realmService!.realm.query<Member>(
         r"name CONTAINS[c] $1 AND bloodType ==$2 AND lastDate < $0 SORT(memberId ASC)",
         [
           fourMonthBefore,
           searchParam.search.toString().toLowerCase(),
           searchParam.bloodType.toString()
-        ]).changes;
+        ]);
 
     return stream;
   } else if (searchParam.search != "") {
@@ -93,19 +129,20 @@ final searchMemberStreamProvider =
         r"name CONTAINS[c] $1 AND lastDate < $0 SORT(memberId ASC)", [
       fourMonthBefore,
       searchParam.search.toString().toLowerCase(),
-    ]).changes;
+    ]);
 
     return stream;
-  } else if (searchParam.bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
+  } else if (searchParam.bloodType != "သွေးအုပ်စုဖြင့် ရှာဖွေမည်") {
     final stream = realmService!.realm.query<Member>(
         r"bloodType ==$1 AND lastDate < $0 SORT(memberId ASC)",
-        [fourMonthBefore, searchParam.bloodType.toString()]).changes;
+        [fourMonthBefore, searchParam.bloodType.toString()]);
 
     return stream;
   } else {
+    log("Call Here");
     final stream = realmService!.realm.query<Member>(
-        r"lastDate < $0 TRUEPREDICATE SORT(memberId ASC)",
-        [fourMonthBefore]).changes;
+        r"lastDate < $0 AND TRUEPREDICATE SORT(memberId ASC)",
+        [fourMonthBefore]);
 
     return stream;
   }

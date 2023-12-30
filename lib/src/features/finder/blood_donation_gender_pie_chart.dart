@@ -1,6 +1,7 @@
 /// Package imports
 import 'dart:math';
 
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/finder/common_chart_data.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,7 @@ class _BloodDonationGenderPieChartState
   Widget build(BuildContext context) {
     var maleData = ref.watch(donationsProviderByGender("male")).length;
     var femaleData = ref.watch(donationsProviderByGender("female")).length;
+    var averageAge = ref.watch(averageAgeOfMemberProvider);
 
     //calculate male Percent from maleData and femaleData Lenght Total
     double malePercent = 0;
@@ -101,6 +103,20 @@ class _BloodDonationGenderPieChartState
                     Container(height: 200, child: _buildSmartLabelPieChart())),
           ],
         ),
+        SizedBox(
+          height: 4,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 30),
+          child: Text("ပျမ်းမျှ အသက်"),
+        ),
+        SizedBox(
+          height: 4,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 30),
+          child: Text(averageAge.toString()),
+        ),
       ],
     );
   }
@@ -109,9 +125,9 @@ class _BloodDonationGenderPieChartState
   SfCircularChart _buildSmartLabelPieChart() {
     List<ChartData> dataList = [];
     // get total of all products amount
-    double totalAmount = donations!.fold<double>(
+    double totalAmount = donations.fold<double>(
         0, (previousValue, element) => previousValue + element.quantity!);
-    donations!.forEach((element) {
+    donations.forEach((element) {
       dataList.add(ChartData(
         x: (element.gender == "male" ? "ကျား" : "မ     ") +
             " -   " +

@@ -18,6 +18,7 @@ import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
+import 'package:intl/intl.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
@@ -141,13 +142,20 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
         "အိုကေ",
         Colors.black);
 
-    ref.watch(realmProvider)!.updateMember(
-          selectedMember!,
-          memberCount:
-              ((int.parse(selectedMember!.memberCount ?? "0")) + 1).toString(),
-          totalCount:
-              ((int.parse(selectedMember!.totalCount ?? "0")) + 1).toString(),
-        );
+    var lastDate = selectedMember!.lastDate;
+    if (lastDate == null ||
+        DateFormat('dd MMM yyyy').format(lastDate).toString() !=
+            "01 Jan 2010" ||
+        donationDateDetail!.isAfter(lastDate)) {
+      lastDate = donationDateDetail;
+    }
+
+    ref.watch(realmProvider)!.updateMember(selectedMember!,
+        memberCount:
+            ((int.parse(selectedMember!.memberCount ?? "0")) + 1).toString(),
+        totalCount:
+            ((int.parse(selectedMember!.totalCount ?? "0")) + 1).toString(),
+        lastDate: lastDate);
   }
 
   void initial() async {

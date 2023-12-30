@@ -12,7 +12,7 @@ class SearchMemberDataSource extends DataGridSource {
       String date = "      -      ";
       if (DateFormat('dd MMM yyyy').format(e.lastDate!).toString() !=
           "01 Jan 2010") {
-        date = DateFormat('dd MMM yyyy').format(e.lastDate!);
+        date = DateFormat('dd MMM yyyy').format(e.lastDate!.toLocal());
       }
       return DataGridRow(cells: [
         DataGridCell<String>(

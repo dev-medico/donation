@@ -102,7 +102,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   child: const Padding(
                     padding: EdgeInsets.all(12.0),
                     child: Text(
-                      "Log Out(V 1.3.6)",
+                      "Log Out(V 1.3.7)",
                       style: TextStyle(fontSize: 16, color: Colors.black),
                     ),
                   ),
