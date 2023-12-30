@@ -51,13 +51,15 @@ final membersDataProvider = StateProvider<RealmResults<Member>>((ref) {
   return stream;
 });
 
-final averageAgeOfMemberProvider = StateProvider<double>((ref) {
+final averageAgeOfMemberProvider = StateProvider<int>((ref) {
   var realmService = ref.watch(realmProvider);
   final members =
       realmService!.realm.query<Member>("TRUEPREDICATE SORT(memberId ASC)");
   double totalAge = 0;
   members.forEach((element) {
-    if (element.birthDate != null && element.birthDate != "-") {
+    if (element.birthDate != null &&
+        element.birthDate != "-" &&
+        element.birthDate != "မွေးသက္ကရာဇ်") {
       if (element.birthDate!.contains("/")) {
         var birthDate = DateFormat('dd/MMM/yyyy').parse(element.birthDate!);
 
@@ -74,7 +76,7 @@ final averageAgeOfMemberProvider = StateProvider<double>((ref) {
     }
   });
 
-  return totalAge / members.length;
+  return (totalAge / members.length).round();
 });
 
 final membersDataByTotalCountProvider =

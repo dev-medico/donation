@@ -87,24 +87,7 @@ class _BloodDonationGenderPieChartState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 4,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 30),
-          child: Text("ကျား/မ အလိုက် လှူဒါန်းမှုများ"),
-        ),
-        Row(
-          children: [
-            Container(
-              width: 0,
-            ),
-            Expanded(
-                child:
-                    Container(height: 200, child: _buildSmartLabelPieChart())),
-          ],
-        ),
-        SizedBox(
-          height: 4,
+          height: 8,
         ),
         Padding(
           padding: const EdgeInsets.only(left: 30),
@@ -115,7 +98,27 @@ class _BloodDonationGenderPieChartState
         ),
         Padding(
           padding: const EdgeInsets.only(left: 30),
-          child: Text(averageAge.toString()),
+          child: Text(
+            averageAge.toString() + " နှစ်",
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(left: 30),
+        //   child: Text("ကျား/မ အလိုက် လှူဒါန်းမှုများ"),
+        // ),
+        Row(
+          children: [
+            Container(
+              width: 0,
+            ),
+            Expanded(
+                child:
+                    Container(height: 200, child: _buildSmartLabelPieChart())),
+          ],
         ),
       ],
     );
