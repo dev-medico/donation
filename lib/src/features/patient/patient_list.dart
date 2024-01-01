@@ -200,145 +200,298 @@ class _PatientListState extends ConsumerState<PatientList> {
                   ],
                 ),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: Responsive.isMobile(context)
-                        ? MediaQuery.of(context).size.width * 0.4
-                        : MediaQuery.of(context).size.width / 5,
-                    margin: const EdgeInsets.only(right: 20, bottom: 12),
-                    padding: const EdgeInsets.only(
-                      top: 12,
-                    ),
-                    child: TextFormField(
-                      autofocus: false,
-                      controller: searchController,
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(fontSize: 15, color: Colors.black),
-                      onChanged: (val) {
-                        if (_debounceTimer?.isActive ?? false) {
-                          _debounceTimer?.cancel();
-                        }
+              Responsive.isMobile(context)
+                  ? Column(
+                      children: [
+                        Container(
+                          width: Responsive.isMobile(context)
+                              ? MediaQuery.of(context).size.width * 0.4
+                              : MediaQuery.of(context).size.width / 5,
+                          margin: const EdgeInsets.only(right: 20, bottom: 12),
+                          padding: const EdgeInsets.only(
+                            top: 12,
+                          ),
+                          child: TextFormField(
+                            autofocus: false,
+                            controller: searchController,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.black),
+                            onChanged: (val) {
+                              if (_debounceTimer?.isActive ?? false) {
+                                _debounceTimer?.cancel();
+                              }
 
-                        _debounceTimer =
-                            Timer(const Duration(milliseconds: 700), () {
-                          setState(() {
-                            searchKey = val;
-                          });
-                        });
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-                        hintStyle: const TextStyle(
-                            color: Colors.black, fontSize: 15.0),
-                        fillColor: Colors.white.withOpacity(0.2),
-                        filled: true,
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.search,
-                            color: primaryColor,
+                              _debounceTimer =
+                                  Timer(const Duration(milliseconds: 700), () {
+                                setState(() {
+                                  searchKey = val;
+                                });
+                              });
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
+                              hintStyle: const TextStyle(
+                                  color: Colors.black, fontSize: 15.0),
+                              fillColor: Colors.white.withOpacity(0.2),
+                              filled: true,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.search,
+                                  color: primaryColor,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 4, bottom: 4),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                            ),
+                            keyboardType: TextInputType.text,
                           ),
                         ),
-                        contentPadding: const EdgeInsets.only(
-                            left: 20, right: 20, top: 4, bottom: 4),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                      ),
-                      keyboardType: TextInputType.text,
-                    ),
-                  ),
-                  Container(
-                    height: 48,
-                    decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(12.0))),
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: () {
-                        var year = int.parse(years[_yearSelected]);
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) {
-                            return PatientListByYear(
-                              year: year,
-                            );
-                          },
-                        ));
-                      },
-                      child: Align(
-                          alignment: Alignment.center,
-                          child: Row(
-                            children: const [
-                              SizedBox(
-                                width: 12,
+                        Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              var year = int.parse(years[_yearSelected]);
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return PatientListByYear(
+                                    year: year,
+                                  );
+                                },
+                              ));
+                            },
+                            child: Align(
+                                alignment: Alignment.center,
+                                child: Row(
+                                  children: const [
+                                    SizedBox(
+                                      width: 12,
+                                    ),
+                                    Icon(Icons.list_alt_outlined,
+                                        color: Colors.white),
+                                    Padding(
+                                        padding: EdgeInsets.all(12),
+                                        child: Text(
+                                          "နှစ်အလိုက် ကြည့်မည်",
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.white),
+                                        )),
+                                  ],
+                                )),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 12,
+                        ),
+                        Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return PatientListAll();
+                                },
+                              ));
+                            },
+                            child: Align(
+                                alignment: Alignment.center,
+                                child: Row(
+                                  children: const [
+                                    SizedBox(
+                                      width: 12,
+                                    ),
+                                    Icon(Icons.list_alt_outlined,
+                                        color: Colors.white),
+                                    Padding(
+                                        padding: EdgeInsets.all(12),
+                                        child: Text(
+                                          "အကုန်လုံး ကြည့်မည်",
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.white),
+                                        )),
+                                  ],
+                                )),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: Responsive.isMobile(context)
+                              ? MediaQuery.of(context).size.width * 0.4
+                              : MediaQuery.of(context).size.width / 5,
+                          margin: const EdgeInsets.only(right: 20, bottom: 12),
+                          padding: const EdgeInsets.only(
+                            top: 12,
+                          ),
+                          child: TextFormField(
+                            autofocus: false,
+                            controller: searchController,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.black),
+                            onChanged: (val) {
+                              if (_debounceTimer?.isActive ?? false) {
+                                _debounceTimer?.cancel();
+                              }
+
+                              _debounceTimer =
+                                  Timer(const Duration(milliseconds: 700), () {
+                                setState(() {
+                                  searchKey = val;
+                                });
+                              });
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
+                              hintStyle: const TextStyle(
+                                  color: Colors.black, fontSize: 15.0),
+                              fillColor: Colors.white.withOpacity(0.2),
+                              filled: true,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.search,
+                                  color: primaryColor,
+                                ),
                               ),
-                              Icon(Icons.list_alt_outlined,
-                                  color: Colors.white),
-                              Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Text(
-                                    "နှစ်အလိုက် ကြည့်မည်",
-                                    textScaleFactor: 1.0,
-                                    style: TextStyle(
-                                        fontSize: 15.0, color: Colors.white),
-                                  )),
-                            ],
-                          )),
+                              contentPadding: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 4, bottom: 4),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                            ),
+                            keyboardType: TextInputType.text,
+                          ),
+                        ),
+                        Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              var year = int.parse(years[_yearSelected]);
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return PatientListByYear(
+                                    year: year,
+                                  );
+                                },
+                              ));
+                            },
+                            child: Align(
+                                alignment: Alignment.center,
+                                child: Row(
+                                  children: const [
+                                    SizedBox(
+                                      width: 12,
+                                    ),
+                                    Icon(Icons.list_alt_outlined,
+                                        color: Colors.white),
+                                    Padding(
+                                        padding: EdgeInsets.all(12),
+                                        child: Text(
+                                          "နှစ်အလိုက် ကြည့်မည်",
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.white),
+                                        )),
+                                  ],
+                                )),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 12,
+                        ),
+                        Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(12.0))),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return PatientListAll();
+                                },
+                              ));
+                            },
+                            child: Align(
+                                alignment: Alignment.center,
+                                child: Row(
+                                  children: const [
+                                    SizedBox(
+                                      width: 12,
+                                    ),
+                                    Icon(Icons.list_alt_outlined,
+                                        color: Colors.white),
+                                    Padding(
+                                        padding: EdgeInsets.all(12),
+                                        child: Text(
+                                          "အကုန်လုံး ကြည့်မည်",
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.white),
+                                        )),
+                                  ],
+                                )),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Container(
-                    height: 48,
-                    decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(12.0))),
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: () {
-                        var year = int.parse(years[_yearSelected]);
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) {
-                            return PatientListAll(
-                             
-                            );
-                          },
-                        ));
-                      },
-                      child: Align(
-                          alignment: Alignment.center,
-                          child: Row(
-                            children: const [
-                              SizedBox(
-                                width: 12,
-                              ),
-                              Icon(Icons.list_alt_outlined,
-                                  color: Colors.white),
-                              Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Text(
-                                    "အကုန်လုံး ကြည့်မည်",
-                                    textScaleFactor: 1.0,
-                                    style: TextStyle(
-                                        fontSize: 15.0, color: Colors.white),
-                                  )),
-                            ],
-                          )),
-                    ),
-                  ),
-                ],
-              ),
               donationData.when(
                   data: (donations) {
                     var results =

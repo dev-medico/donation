@@ -29,7 +29,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'ထူးခြားဖြစ်စဥ်',
     'ရ/သုံး ငွေစာရင်း',
     'ပို့စ်/အသိပေးချက်များ',
-    'Log Out(V 1.3.7)'
+    'Log Out(V 1.3.8)'
   ];
   List<String> icons = [
     'assets/images/dashboard.png',

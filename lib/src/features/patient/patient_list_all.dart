@@ -92,6 +92,16 @@ class _PatientListAllState extends ConsumerState<PatientListAll> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                "လူနာများစာရင်း - " + patients.length.toString() + " ဦး",
+                style: TextStyle(
+                    fontSize: Responsive.isMobile(context) ? 15 : 16,
+                    fontWeight: FontWeight.bold,
+                    color: NeumorphicTheme.of(context)?.current!.variantColor),
+              ),
+              SizedBox(
+                height: 24,
+              ),
               Expanded(
                 child: buildSimpleTable(searchKey == ""
                     ? patients
