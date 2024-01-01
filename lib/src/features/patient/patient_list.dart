@@ -5,6 +5,7 @@ import 'package:donation/src/features/donation/controller/donation_list_controll
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/features/patient/patient_data_source.dart';
+import 'package:donation/src/features/patient/patient_list_all.dart';
 import 'package:donation/src/features/patient/patient_list_by_year.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
@@ -31,6 +32,7 @@ class _PatientListState extends ConsumerState<PatientList> {
   int _yearSelected = 0;
   int _monthSelected = DateTime.now().month - 1;
   List<String> years = [
+    "2024",
     "2023",
     "2022",
     "2021",
@@ -288,6 +290,45 @@ class _PatientListState extends ConsumerState<PatientList> {
                                   padding: EdgeInsets.all(12),
                                   child: Text(
                                     "နှစ်အလိုက် ကြည့်မည်",
+                                    textScaleFactor: 1.0,
+                                    style: TextStyle(
+                                        fontSize: 15.0, color: Colors.white),
+                                  )),
+                            ],
+                          )),
+                    ),
+                  ),
+                  Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(12.0))),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: () {
+                        var year = int.parse(years[_yearSelected]);
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) {
+                            return PatientListAll(
+                             
+                            );
+                          },
+                        ));
+                      },
+                      child: Align(
+                          alignment: Alignment.center,
+                          child: Row(
+                            children: const [
+                              SizedBox(
+                                width: 12,
+                              ),
+                              Icon(Icons.list_alt_outlined,
+                                  color: Colors.white),
+                              Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Text(
+                                    "အကုန်လုံး ကြည့်မည်",
                                     textScaleFactor: 1.0,
                                     style: TextStyle(
                                         fontSize: 15.0, color: Colors.white),

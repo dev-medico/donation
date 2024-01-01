@@ -38,6 +38,7 @@ class DonarList extends ConsumerStatefulWidget {
 class _DonarListState extends ConsumerState<DonarList> {
   bool firstTime = true;
   List<String> ranges = [
+    "2024",
     "2023",
     "2022",
     "2021",
@@ -68,8 +69,9 @@ class _DonarListState extends ConsumerState<DonarList> {
     false,
     false,
     false,
+    false
   ];
-  String selectedYear = "2023";
+  String selectedYear = "2024";
   List<String> months = [
     "JAN",
     "FEB",

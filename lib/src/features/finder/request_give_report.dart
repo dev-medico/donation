@@ -16,6 +16,7 @@ class RequestGiveReportScreen extends StatefulWidget {
 class _RequestGiveReportScreenState extends State<RequestGiveReportScreen> {
   int _yearSelected = 0;
   List<String> years = [
+    "2024",
     "2023",
     "2022",
     "2021",
