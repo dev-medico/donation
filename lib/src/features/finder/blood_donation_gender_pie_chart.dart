@@ -99,16 +99,34 @@ class _BloodDonationGenderPieChartState
         SizedBox(
           height: 4,
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 30),
-          child: Text(
-            averageAge.toString() + " နှစ်",
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 30),
+              child: Text(
+                averageAge.toString() + " နှစ်",
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Row(
+                children: [
+                  Text("ကျား - " + maleData.toString()),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text("မ - " + femaleData.toString()),
+                ],
+              ),
+            ),
+          ],
         ),
         SizedBox(
           height: 8,
         ),
+
         // Padding(
         //   padding: const EdgeInsets.only(left: 30),
         //   child: Text("ကျား/မ အလိုက် လှူဒါန်းမှုများ"),
@@ -143,13 +161,13 @@ class _BloodDonationGenderPieChartState
     double age4Percent = (age4 / totalCount) * 100;
 
     ageCounts.add(DonationModel(
-        gender: "18-25", quantity: age1Percent, total: totalCount.toDouble()));
+        gender: "18-25", quantity: age1Percent, total: age1.toDouble()));
     ageCounts.add(DonationModel(
-        gender: "26-35", quantity: age2Percent, total: totalCount.toDouble()));
+        gender: "26-35", quantity: age2Percent, total: age2.toDouble()));
     ageCounts.add(DonationModel(
-        gender: "36-45", quantity: age3Percent, total: totalCount.toDouble()));
+        gender: "36-45", quantity: age3Percent, total: age3.toDouble()));
     ageCounts.add(DonationModel(
-        gender: "46-60", quantity: age4Percent, total: totalCount.toDouble()));
+        gender: "46-60", quantity: age4Percent, total: age4.toDouble()));
 
     //get only top 5 donations
     ageCounts = ageCounts.sublist(0, 4);
@@ -159,7 +177,7 @@ class _BloodDonationGenderPieChartState
         x: (element.gender.toString()) +
             " -   " +
             element.total!.truncate().toString(),
-        y: calculatePercentage(element.quantity!, totalCount.toDouble()),
+        y: element.quantity!.truncate(),
       ));
     });
     return SfCircularChart(

@@ -2938,6 +2938,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
     "ကထန",
     "ပမန",
     "လမန",
+    "ခဇန"
   ];
 
   List rakhine = [
