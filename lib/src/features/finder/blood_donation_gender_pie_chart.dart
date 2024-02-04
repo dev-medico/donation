@@ -5,6 +5,7 @@ import 'package:donation/src/features/donation_member/presentation/controller/me
 import 'package:donation/src/features/finder/common_chart_data.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Chart import
@@ -32,6 +33,7 @@ class _BloodDonationGenderPieChartState
     extends ConsumerState<BloodDonationGenderPieChart> {
   _BloodDonationGenderPieChartState();
   List<DonationModel> donations = [];
+  List<DonationModel> ageCounts = [];
   List<String>? _positionList;
   List<String>? _connectorLineList;
   late String _selectedPosition;
@@ -83,6 +85,7 @@ class _BloodDonationGenderPieChartState
     donations.sort((a, b) => b.quantity!.compareTo(a.quantity!));
     //get only top 5 donations
     donations = donations.length > 8 ? donations.sublist(0, 2) : donations;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -116,10 +119,78 @@ class _BloodDonationGenderPieChartState
               width: 0,
             ),
             Expanded(
-                child:
-                    Container(height: 200, child: _buildSmartLabelPieChart())),
+                child: Container(height: 200, child: _buildAgeGroupPieChart())),
           ],
         ),
+      ],
+    );
+  }
+
+  SfCircularChart _buildAgeGroupPieChart() {
+    List<ChartData> dataList = [];
+    // get total of all products amount
+    int totalCount =
+        ref.watch(memberCountByAgeRangeProvider((start: 0, end: 100)));
+    developer.log("Total Count: $totalCount");
+
+    int age1 = ref.watch(memberCountByAgeRangeProvider((start: 18, end: 25)));
+    double age1Percent = (age1 / totalCount) * 100;
+    int age2 = ref.watch(memberCountByAgeRangeProvider((start: 26, end: 35)));
+    double age2Percent = (age2 / totalCount) * 100;
+    int age3 = ref.watch(memberCountByAgeRangeProvider((start: 36, end: 45)));
+    double age3Percent = (age3 / totalCount) * 100;
+    int age4 = ref.watch(memberCountByAgeRangeProvider((start: 46, end: 60)));
+    double age4Percent = (age4 / totalCount) * 100;
+
+    ageCounts.add(DonationModel(
+        gender: "18-25", quantity: age1Percent, total: totalCount.toDouble()));
+    ageCounts.add(DonationModel(
+        gender: "26-35", quantity: age2Percent, total: totalCount.toDouble()));
+    ageCounts.add(DonationModel(
+        gender: "36-45", quantity: age3Percent, total: totalCount.toDouble()));
+    ageCounts.add(DonationModel(
+        gender: "46-60", quantity: age4Percent, total: totalCount.toDouble()));
+
+    //get only top 5 donations
+    ageCounts = ageCounts.sublist(0, 4);
+
+    ageCounts.forEach((element) {
+      dataList.add(ChartData(
+        x: (element.gender.toString()) +
+            " -   " +
+            element.total!.truncate().toString(),
+        y: calculatePercentage(element.quantity!, totalCount.toDouble()),
+      ));
+    });
+    return SfCircularChart(
+      tooltipBehavior: _tooltipBehavior,
+      legend: Legend(
+        isVisible: true,
+        isResponsive: true,
+      ),
+      series: <CircularSeries<ChartData, String>>[
+        DoughnutSeries<ChartData, String>(
+          dataSource: dataList,
+          enableTooltip: true,
+          radius: '80%',
+          dataLabelSettings: DataLabelSettings(
+              isVisible: true,
+              labelIntersectAction: LabelIntersectAction.none,
+              overflowMode: _overflowMode,
+              showZeroValue: !isZeroVisible ? true : false,
+              labelPosition: ChartDataLabelPosition.outside,
+              connectorLineSettings:
+                  ConnectorLineSettings(type: ConnectorType.line)),
+          pointColorMapper: (datum, index) =>
+              index.isEven ? Colors.blue : Colors.pink,
+
+          // dataLabelSettings: const DataLabelSettings(
+          //     isVisible: true,
+          //     useSeriesColor: true,
+          //     labelPosition: ChartDataLabelPosition.inside),
+          xValueMapper: (ChartData data, _) => data.x,
+          yValueMapper: (ChartData data, _) => data.y,
+        )
       ],
     );
   }

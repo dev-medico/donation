@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 
 typedef SearchParams = ({String? search, String? bloodType});
 
+typedef AgeRangeParams = ({int? start, int? end});
+
 final memberStreamProvider =
     StreamProvider.family<RealmResultsChanges<Member>, SearchParams>(
         (ref, searchParam) {
@@ -79,6 +81,38 @@ final averageAgeOfMemberProvider = StateProvider<int>((ref) {
   return (totalAge / members.length).round();
 });
 
+final memberCountByAgeRangeProvider =
+    StateProvider.family<int, AgeRangeParams>((ref, ageRange) {
+  //ageRange is 18 - 25
+  var realmService = ref.watch(realmProvider);
+  final members =
+      realmService!.realm.query<Member>("TRUEPREDICATE SORT(memberId ASC)");
+  int count = 0;
+  members.forEach((element) {
+    if (element.birthDate != null &&
+        element.birthDate != "-" &&
+        element.birthDate != "မွေးသက္ကရာဇ်") {
+      if (element.birthDate!.contains("/")) {
+        var birthDate = DateFormat('dd/MMM/yyyy').parse(element.birthDate!);
+
+        var age = DateTime.now().difference(birthDate).inDays / 365;
+
+        if (age >= ageRange.start! && age <= ageRange.end!) {
+          count++;
+        }
+      } else {
+        var birthDate = DateFormat('dd MMM yyyy').parse(element.birthDate!);
+
+        var age = DateTime.now().difference(birthDate).inDays / 365;
+
+        if (age >= ageRange.start! && age <= ageRange.end!) {
+          count++;
+        }
+      }
+    }
+  });
+  return count;
+});
 final membersDataByTotalCountProvider =
     StateProvider<RealmResults<Member>>((ref) {
   var realmService = ref.watch(realmProvider);
