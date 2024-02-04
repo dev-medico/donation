@@ -73,7 +73,7 @@ class _ReportNewScreenState extends ConsumerState<ReportNewScreen> {
         centerTitle: true,
         title: Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Text("Red Junior Dashboard",
+          child: Text("RED Juniors Blood Care Unit",
               textScaleFactor: 1.0,
               style: TextStyle(
                   fontSize: Responsive.isMobile(context) ? 15 : 16,

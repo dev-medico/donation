@@ -40,7 +40,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     });
     log("Phone - " + memberPhone);
     log("name - " + memberPhone);
-    Future.delayed(const Duration(seconds: 3), () async {
+    Future.delayed(const Duration(seconds: 4), () async {
       if (memberPhone == "") {
         if (name == "") {
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
@@ -103,7 +103,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           ),
           SizedBox(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height / 4,
+            height: MediaQuery.of(context).size.height / 3,
             child: Center(
               child: DefaultTextStyle(
                 style: TextStyle(
@@ -117,7 +117,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   animatedTexts: [
                     TyperAnimatedText(
                       'Heart To Blood\nBlood To Heart\nနှလုံးသားဆီက လာတဲ့သွေး\nနှလုံးသားဆီကို အရောက်ပို့ပေး',
-                      speed: const Duration(milliseconds: 100),
+                      textAlign: TextAlign.center,
+                      speed: const Duration(milliseconds: 60),
                     ),
                   ],
                   onTap: () {
