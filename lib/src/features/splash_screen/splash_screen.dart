@@ -116,7 +116,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   isRepeatingAnimation: false,
                   animatedTexts: [
                     TyperAnimatedText(
-                      'Heart To Blood\nBlood To Heart',
+                      'Heart To Blood\nBlood To Heart\nနှလုံးသားဆီက လာတဲ့သွေး\nနှလုံးသားဆီကို အရောက်ပို့ပေး',
                       speed: const Duration(milliseconds: 100),
                     ),
                   ],

@@ -87,7 +87,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       appBar: AppBar(
         title: const Padding(
           padding: EdgeInsets.only(top: 4.0),
-          child: Text("Red Juniors Admin",
+          child: Text("RED Juniors Blood Care Unit",
               style: TextStyle(fontSize: 17, color: Colors.white)),
         ),
         centerTitle: true,

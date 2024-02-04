@@ -2696,6 +2696,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
     "ကဆက",
     "မဝတ",
     "ဖပန",
+    "ဘသဆ"
   ];
 
   List chin = [

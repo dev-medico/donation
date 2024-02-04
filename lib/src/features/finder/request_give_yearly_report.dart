@@ -47,7 +47,7 @@ class _RequestGiveYearlyReportState
         margin: EdgeInsets.only(left: 0, top: 30),
         child: Column(
           children: [
-            Text("${widget.year} နှစ် စာရင်းရှင်းတမ်း",
+            Text("${widget.year} နှစ် သွေး တောင်းခံ/လှူဒါန်းမှု",
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 16 : 18,
                     fontWeight: FontWeight.bold,
