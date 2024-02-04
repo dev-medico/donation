@@ -57,7 +57,9 @@ class _BloodDonationGenderPieChartState
   @override
   Widget build(BuildContext context) {
     var maleData = ref.watch(donationsProviderByGender("male")).length;
-    var femaleData = ref.watch(donationsProviderByGender("female")).length;
+    var totalCount = ref.watch(totalDonationsProvider);
+    var femaleData = totalCount - maleData;
+
     var averageAge = ref.watch(averageAgeOfMemberProvider);
 
     //calculate male Percent from maleData and femaleData Lenght Total
@@ -65,11 +67,11 @@ class _BloodDonationGenderPieChartState
 
     double femalePercent = 0;
     if (maleData != 0) {
-      malePercent = (maleData / (maleData + femaleData)) * 100;
+      malePercent = (maleData / totalCount) * 100;
     }
 
     if (femaleData != 0) {
-      femalePercent = (femaleData / (maleData + femaleData)) * 100;
+      femalePercent = (femaleData / totalCount) * 100;
     }
 
     if (donations.isEmpty) {
