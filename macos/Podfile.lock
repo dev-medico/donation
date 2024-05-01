@@ -8,9 +8,9 @@ PODS:
   - flutter_local_notifications (0.0.1):
     - FlutterMacOS
   - FlutterMacOS (1.0.0)
-  - FMDB (2.7.5):
-    - FMDB/standard (= 2.7.5)
-  - FMDB/standard (2.7.5)
+  - FMDB (2.7.10):
+    - FMDB/standard (= 2.7.10)
+  - FMDB/standard (2.7.10)
   - modal_progress_hud_nsn (0.4.0):
     - FlutterMacOS
   - path_provider_foundation (0.0.1):
@@ -74,7 +74,7 @@ SPEC CHECKSUMS:
   flutter_image_compress_macos: c26c3c13ea0f28ae6dea4e139b3292e7729f99f1
   flutter_local_notifications: 3805ca215b2fb7f397d78b66db91f6a747af52e4
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  FMDB: eae540775bf7d0c87a5af926ae37af69effe5a19
   modal_progress_hud_nsn: eff428e9fb32ddd232c5b66f8371b2150f36e989
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   realm: 8836c2263630ef217506fdd4d402294d14ad6c3c
@@ -84,4 +84,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 8d40c19d3cbdb380d870685c3a564c989f1efa52
 
-COCOAPODS: 1.14.2
+COCOAPODS: 1.15.2
