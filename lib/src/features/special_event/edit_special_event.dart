@@ -167,7 +167,7 @@ class _EditSpecialEventScreenState extends State<EditSpecialEventScreen> {
                       margin:
                           const EdgeInsets.only(left: 20, top: 16, right: 20),
                       child: TextFormField(
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.text,
                         controller: labNameController,
                         decoration:
                             inputBoxDecoration("Lab Name (ဓါတ်ခွဲခန်းအမည်)"),
@@ -324,7 +324,7 @@ class _EditSpecialEventScreenState extends State<EditSpecialEventScreen> {
                                   margin: const EdgeInsets.only(
                                       left: 20, top: 16, right: 20),
                                   child: TextFormField(
-                                    keyboardType: TextInputType.number,
+                                    keyboardType: TextInputType.text,
                                     controller: labNameController,
                                     decoration: inputBoxDecoration(
                                         "Lab Name (ဓါတ်ခွဲခန်းအမည်)"),
