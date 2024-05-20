@@ -571,12 +571,11 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                         ),
                                       );
                                     },
-                                    errorBuilder:
-                                        (BuildContext context, Object? error) =>
-                                            Text('$error',
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .errorColor)),
+                                    errorBuilder: (BuildContext context,
+                                            Object? error) =>
+                                        Text('$error',
+                                            style:
+                                                TextStyle(color: Colors.red)),
                                     onSuggestionSelected: (suggestion) {
                                       townController.text =
                                           suggestion.toString();
@@ -1198,9 +1197,7 @@ class MemberEditState extends ConsumerState<MemberEditScreen> {
                                                       Object? error) =>
                                                   Text('$error',
                                                       style: TextStyle(
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .errorColor)),
+                                                          color: Colors.red)),
                                               onSuggestionSelected:
                                                   (suggestion) {
                                                 townController.text =

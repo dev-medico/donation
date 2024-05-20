@@ -347,7 +347,7 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                     Text('$error',
                                         style: TextStyle(
                                             color:
-                                                Theme.of(context).errorColor)),
+                                                Colors.red)),
                                 onSuggestionSelected: (suggestion) {
                                   hospitalController.text =
                                       suggestion.toString();
@@ -392,8 +392,7 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                           Object? error) =>
                                       Text('$error',
                                           style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .errorColor)),
+                                              color: Colors.red)),
                                   onSuggestionSelected: (suggestion) {
                                     diseaseController.text =
                                         suggestion.toString();
@@ -450,8 +449,7 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                           Object? error) =>
                                       Text('$error',
                                           style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .errorColor)),
+                                              color: Colors.red)),
                                   onSuggestionSelected: (suggestion) {
                                     townController.text = suggestion.toString();
                                     setRegion(suggestion.toString());
@@ -706,8 +704,7 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                               Object? error) =>
                                           Text('$error',
                                               style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .errorColor)),
+                                                  color: Colors.red)),
                                       onSuggestionSelected: (suggestion) {
                                         hospitalController.text =
                                             suggestion.toString();
@@ -784,8 +781,7 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                                 Object? error) =>
                                             Text('$error',
                                                 style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .errorColor)),
+                                                    color: Colors.red)),
                                         onSuggestionSelected: (suggestion) {
                                           diseaseController.text =
                                               suggestion.toString();
@@ -895,8 +891,7 @@ class BloodDonationEditState extends ConsumerState<BloodDonationEditScreen> {
                                                     Object? error) =>
                                                 Text('$error',
                                                     style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .errorColor)),
+                                                        color: Colors.red)),
                                             onSuggestionSelected: (suggestion) {
                                               townController.text =
                                                   suggestion.toString();

@@ -807,9 +807,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                   errorBuilder: (BuildContext context,
                                           Object? error) =>
                                       Text('$error',
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .errorColor)),
+                                          style: TextStyle(color: Colors.red)),
                                   onSuggestionSelected: (suggestion) {
                                     townController.text = suggestion.toString();
                                     setRegion(suggestion.toString());
@@ -1707,8 +1705,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                                     Object? error) =>
                                                 Text('$error',
                                                     style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .errorColor)),
+                                                        color: Colors.red)),
                                             onSuggestionSelected: (suggestion) {
                                               townController.text =
                                                   suggestion.toString();
@@ -2688,16 +2685,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
     "ဖဆန",
   ];
 
-  List kayin = [
-    "ဘအန",
-    "လဘန",
-    "သတန",
-    "ကကရ",
-    "ကဆက",
-    "မဝတ",
-    "ဖပန",
-    "ဘသဆ"
-  ];
+  List kayin = ["ဘအန", "လဘန", "သတန", "ကကရ", "ကဆက", "မဝတ", "ဖပန", "ဘသဆ"];
 
   List chin = [
     "ဟခန",
