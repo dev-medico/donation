@@ -8,7 +8,8 @@ import 'package:donation/src/features/donar/controller/dona_data_provider.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/xata_closing_balance_response.dart';
 import 'package:donation/responsive.dart';
@@ -1345,9 +1346,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: NeumorphicTheme.of(context)
-                                ?.current!
-                                .variantColor)),
+                            color: Colors.black)),
                     const SizedBox(
                       height: 24,
                     ),
@@ -1418,18 +1417,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                         Text(
                                           "${Utils.strToMM(leftBalance.toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -1448,18 +1443,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                         Text(
                                           "${Utils.strToMM(totalDonation.toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -1505,11 +1496,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                                         fontSize: 12,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        color:
-                                                            NeumorphicTheme.of(
-                                                                    context)
-                                                                ?.current!
-                                                                .variantColor),
+                                                        color: Colors.black),
                                                   ),
                                                 ),
                                                 Row(
@@ -1524,10 +1511,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                                           fontSize: 12,
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          color: NeumorphicTheme
-                                                                  .of(context)
-                                                              ?.current!
-                                                              .variantColor),
+                                                          color: Colors.black),
                                                     ),
                                                     Padding(
                                                       padding: EdgeInsets.only(
@@ -1621,18 +1605,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                         Text(
                                           "${Utils.strToMM(totalExpense.toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -1652,18 +1632,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                         Text(
                                           "${Utils.strToMM(thisMonthLeftBalance.toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -1697,18 +1673,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                     style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
+                                        color: Colors.black),
                                   ),
                                   Text(
                                     "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
                                     style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
+                                        color: Colors.black),
                                   ),
                                 ],
                               ),
@@ -1725,18 +1697,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                     style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
+                                        color: Colors.black),
                                   ),
                                   Text(
                                     "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
                                     style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
+                                        color: Colors.black),
                                   ),
                                 ],
                               ),
@@ -1967,9 +1935,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: NeumorphicTheme.of(context)
-                                ?.current!
-                                .variantColor)),
+                            color: Colors.black)),
                     const SizedBox(
                       height: 24,
                     ),
@@ -2040,18 +2006,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                         Text(
                                           "${Utils.strToMM(leftBalance.toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -2070,18 +2032,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                         Text(
                                           "${Utils.strToMM(totalDonation.toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -2127,11 +2085,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                                         fontSize: 15,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        color:
-                                                            NeumorphicTheme.of(
-                                                                    context)
-                                                                ?.current!
-                                                                .variantColor),
+                                                        color: Colors.black),
                                                   ),
                                                 ),
                                                 Row(
@@ -2146,10 +2100,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                                                           fontSize: 15,
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          color: NeumorphicTheme
-                                                                  .of(context)
-                                                              ?.current!
-                                                              .variantColor),
+                                                          color: Colors.black),
                                                     ),
                                                     Padding(
                                                       padding: EdgeInsets.only(
@@ -2233,18 +2184,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                         Text(
                                           "${Utils.strToMM(totalExpense.toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -2264,18 +2211,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                         Text(
                                           "${Utils.strToMM(thisMonthLeftBalance.toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -2309,18 +2252,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
+                                        color: Colors.black),
                                   ),
                                   Text(
                                     "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
+                                        color: Colors.black),
                                   ),
                                 ],
                               ),
@@ -2337,18 +2276,14 @@ class _DonarListState extends ConsumerState<DonarList> {
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
+                                        color: Colors.black),
                                   ),
                                   Text(
                                     "${Utils.strToMM((totalDonation + leftBalance).toString())} ကျပ်",
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color: NeumorphicTheme.of(context)
-                                            ?.current!
-                                            .variantColor),
+                                        color: Colors.black),
                                   ),
                                 ],
                               ),

@@ -28,7 +28,8 @@ import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -935,7 +936,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 18 : 20,
                     fontWeight: FontWeight.bold,
-                    color: NeumorphicTheme.of(context)?.current!.variantColor)),
+                    color: Colors.black)),
             const SizedBox(
               height: 12,
             ),
@@ -992,18 +993,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                         style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.bold,
-                                            color: NeumorphicTheme.of(context)
-                                                ?.current!
-                                                .variantColor),
+                                            color: Colors.black),
                                       ),
                                       Text(
                                         "${Utils.strToMM(leftBalance.toString())}",
                                         style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.bold,
-                                            color: NeumorphicTheme.of(context)
-                                                ?.current!
-                                                .variantColor),
+                                            color: Colors.black),
                                       ),
                                     ],
                                   ),
@@ -1022,18 +1019,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                                 Text(
                                   "${Utils.strToMM(totalDonation.toString())}",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                               ],
                             ),
@@ -1066,18 +1059,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                           Text(
                             "${Utils.strToMM((leftBalance.isNegative ? totalDonation : totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                         ],
                       ),
@@ -1174,18 +1163,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                                 Text(
                                   "${Utils.strToMM((leftBalance.isNegative ? (totalExpense + leftBalance.abs()) : totalExpense).toString())}",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                               ],
                             ),
@@ -1208,18 +1193,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                       fontWeight: FontWeight.bold,
                                       color: thisMonthLeftBalance.isNegative
                                           ? Colors.red
-                                          : NeumorphicTheme.of(context)
-                                              ?.current!
-                                              .variantColor),
+                                          : Colors.black),
                                 ),
                                 Text(
                                   "${Utils.strToMM(thisMonthLeftBalance.isNegative ? (thisMonthLeftBalance).toString().substring(1) : (thisMonthLeftBalance).toString())}",
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                               ],
                             ),
@@ -1252,18 +1233,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                           Text(
                             "${Utils.strToMM((leftBalance.isNegative ? totalDonation : totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                         ],
                       ),
@@ -1287,7 +1264,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 18 : 20,
                     fontWeight: FontWeight.bold,
-                    color: NeumorphicTheme.of(context)?.current!.variantColor)),
+                    color: Colors.black)),
             const SizedBox(
               height: 40,
             ),
@@ -1359,18 +1336,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                         style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
-                                            color: NeumorphicTheme.of(context)
-                                                ?.current!
-                                                .variantColor),
+                                            color: Colors.black),
                                       ),
                                       Text(
                                         "${Utils.strToMM(leftBalance.toString())}",
                                         style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
-                                            color: NeumorphicTheme.of(context)
-                                                ?.current!
-                                                .variantColor),
+                                            color: Colors.black),
                                       ),
                                     ],
                                   ),
@@ -1389,18 +1362,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                                 Text(
                                   "${Utils.strToMM(totalDonation.toString())}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                               ],
                             ),
@@ -1463,18 +1432,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                                 Text(
                                   "${Utils.strToMM((leftBalance.isNegative ? (totalExpense + leftBalance.abs()) : totalExpense).toString())}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                               ],
                             ),
@@ -1497,9 +1462,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                       fontWeight: FontWeight.bold,
                                       color: thisMonthLeftBalance.isNegative
                                           ? Colors.red
-                                          : NeumorphicTheme.of(context)
-                                              ?.current!
-                                              .variantColor),
+                                          : Colors.black),
                                 ),
                                 Text(
                                   "${Utils.strToMM(thisMonthLeftBalance.isNegative ? (thisMonthLeftBalance).toString().substring(1) : (thisMonthLeftBalance).toString())}",
@@ -1508,9 +1471,7 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                                       fontWeight: FontWeight.bold,
                                       color: thisMonthLeftBalance.isNegative
                                           ? Colors.red
-                                          : NeumorphicTheme.of(context)
-                                              ?.current!
-                                              .variantColor),
+                                          : Colors.black),
                                 ),
                               ],
                             ),
@@ -1543,18 +1504,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                           Text(
                             "${Utils.strToMM((leftBalance.isNegative ? totalDonation : totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                         ],
                       ),
@@ -1570,18 +1527,14 @@ class _DonarListNewScreenState extends ConsumerState<DonarListNewScreen> {
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                           Text(
                             "${Utils.strToMM((leftBalance.isNegative ? totalDonation : totalDonation + leftBalance).toString())}",
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                         ],
                       ),

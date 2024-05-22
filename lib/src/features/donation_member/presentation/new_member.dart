@@ -9,7 +9,8 @@ import 'package:donation/src/providers/providers.dart';
 import 'package:donation/utils/extensions.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -628,7 +629,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                         top: 16,
                                         bottom: 4,
                                         right: 20),
-                                    child: NeumorphicButton(
+                                    child: fluent.Button(
                                       child: Text(
                                         birthDate,
                                         style: TextStyle(
@@ -1429,7 +1430,7 @@ class NewMemberState extends ConsumerState<NewMemberScreen> {
                                           top: 16,
                                           bottom: 4,
                                           right: 20),
-                                      child: NeumorphicButton(
+                                      child: fluent.Button(
                                         child: Text(
                                           birthDate,
                                           style: TextStyle(

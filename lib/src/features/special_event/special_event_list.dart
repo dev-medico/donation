@@ -10,7 +10,8 @@ import 'package:donation/src/features/special_event/special_event_list_table.dar
 import 'package:donation/src/features/special_event/special_event_provider.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_expandable_table/flutter_expandable_table.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/special_event_list_response.dart';
 import 'package:donation/responsive.dart';
@@ -115,16 +116,16 @@ class _SpecialEventListScreenState
               left: 10,
               right: 20,
               bottom: Responsive.isMobile(context) ? 20 : 0),
-          child: NeumorphicButton(
-            style: NeumorphicStyle(
-              color: Colors.white,
-              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(
-                  Responsive.isMobile(context) ? 12 : 16)),
-              depth: 4,
-              intensity: 0.8,
-              shadowDarkColor: Colors.black,
-              shadowLightColor: Colors.white,
-            ),
+          child: fluent.Button(
+            // style: NeumorphicStyle(
+            //   color: Colors.white,
+            //   boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(
+            //       Responsive.isMobile(context) ? 12 : 16)),
+            //   depth: 4,
+            //   intensity: 0.8,
+            //   shadowDarkColor: Colors.black,
+            //   shadowLightColor: Colors.white,
+            // ),
             onPressed: () async {
               Navigator.push(
                 context,

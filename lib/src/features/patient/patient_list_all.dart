@@ -6,7 +6,8 @@ import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/features/patient/patient_data_source.dart';
 import 'package:donation/src/providers/providers.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -97,7 +98,7 @@ class _PatientListAllState extends ConsumerState<PatientListAll> {
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 15 : 16,
                     fontWeight: FontWeight.bold,
-                    color: NeumorphicTheme.of(context)?.current!.variantColor),
+                    color: Colors.black),
               ),
               SizedBox(
                 height: 24,

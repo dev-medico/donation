@@ -3,7 +3,8 @@ import 'dart:developer';
 
 import 'package:donation/realm/schemas.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
@@ -90,7 +91,7 @@ class _EditSpecialEventScreenState extends State<EditSpecialEventScreen> {
                       height: 50,
                       margin: const EdgeInsets.only(
                           left: 20, top: 16, bottom: 4, right: 20),
-                      child: NeumorphicButton(
+                      child: fluent.Button(
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
@@ -212,7 +213,7 @@ class _EditSpecialEventScreenState extends State<EditSpecialEventScreen> {
                           height: 70,
                           margin: const EdgeInsets.only(
                               left: 20, top: 16, bottom: 4, right: 20),
-                          child: NeumorphicButton(
+                          child: fluent.Button(
                             child: Text(
                               dateFilter,
                               style:

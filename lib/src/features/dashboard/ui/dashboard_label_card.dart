@@ -1,4 +1,5 @@
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
@@ -38,7 +39,7 @@ class DashBoardLabelCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            color: NeumorphicTheme.of(context)?.current!.accentColor,
+            color: Colors.black,
           ),
           child: Material(
             type: MaterialType.transparency,
@@ -83,9 +84,7 @@ class DashBoardLabelCard extends StatelessWidget {
                       title,
                       style: TextStyle(
                           fontSize: Responsive.isMobile(context) ? 14 : 16,
-                          color: NeumorphicTheme.of(context)
-                              ?.current!
-                              .defaultTextColor),
+                          color: Colors.black),
                     ),
                     const Spacer(),
                   ],

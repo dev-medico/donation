@@ -2,7 +2,8 @@ import 'package:donation/responsive.dart';
 import 'package:donation/src/features/finder/provider/request_give_provider.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class RequestGiveYearlyReport extends ConsumerStatefulWidget {
@@ -51,7 +52,7 @@ class _RequestGiveYearlyReportState
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 16 : 18,
                     fontWeight: FontWeight.bold,
-                    color: NeumorphicTheme.of(context)?.current!.variantColor)),
+                    color: Colors.black)),
             const SizedBox(
               height: 20,
             ),
@@ -244,9 +245,7 @@ class _RequestGiveYearlyReportState
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: NeumorphicTheme.of(context)
-                                ?.current!
-                                .variantColor),
+                            color: Colors.black),
                       ),
                     ),
                     Padding(
@@ -260,9 +259,7 @@ class _RequestGiveYearlyReportState
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: NeumorphicTheme.of(context)
-                                ?.current!
-                                .variantColor),
+                            color: Colors.black),
                       ),
                     ),
                     Padding(
@@ -276,9 +273,7 @@ class _RequestGiveYearlyReportState
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: NeumorphicTheme.of(context)
-                                ?.current!
-                                .variantColor),
+                            color: Colors.black),
                       ),
                     ),
                     Padding(
@@ -290,9 +285,7 @@ class _RequestGiveYearlyReportState
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: NeumorphicTheme.of(context)
-                                ?.current!
-                                .variantColor),
+                            color: Colors.black),
                       ),
                     ),
                   ],

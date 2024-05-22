@@ -2,7 +2,8 @@ import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donar/controller/yearly_report_controller.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class YearlyReport extends ConsumerStatefulWidget {
@@ -40,8 +41,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color:
-                          NeumorphicTheme.of(context)?.current!.variantColor)),
+                      color: Colors.black)),
               const SizedBox(
                 height: 8,
               ),
@@ -190,9 +190,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: NeumorphicTheme.of(context)
-                                  ?.current!
-                                  .variantColor),
+                              color: Colors.black),
                         ),
                       ),
                       Padding(
@@ -205,9 +203,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: NeumorphicTheme.of(context)
-                                  ?.current!
-                                  .variantColor),
+                              color: Colors.black),
                         ),
                       ),
                       Padding(
@@ -220,9 +216,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: NeumorphicTheme.of(context)
-                                  ?.current!
-                                  .variantColor),
+                              color: Colors.black),
                         ),
                       ),
                     ],
@@ -247,8 +241,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                   style: TextStyle(
                       fontSize: Responsive.isMobile(context) ? 18 : 20,
                       fontWeight: FontWeight.bold,
-                      color:
-                          NeumorphicTheme.of(context)?.current!.variantColor)),
+                      color: Colors.black)),
               const SizedBox(
                 height: 8,
               ),
@@ -410,9 +403,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: NeumorphicTheme.of(context)
-                                  ?.current!
-                                  .variantColor),
+                              color: Colors.black),
                         ),
                       ),
                       Padding(
@@ -426,9 +417,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: NeumorphicTheme.of(context)
-                                  ?.current!
-                                  .variantColor),
+                              color: Colors.black),
                         ),
                       ),
                       Padding(
@@ -442,9 +431,7 @@ class _YearlyReportState extends ConsumerState<YearlyReport> {
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: NeumorphicTheme.of(context)
-                                  ?.current!
-                                  .variantColor),
+                              color: Colors.black),
                         ),
                       ),
                     ],

@@ -7,7 +7,7 @@ import 'package:realm/realm.dart';
 
 final appServiceProvider = ChangeNotifierProvider<AppServices>((ref) {
   String appId = "application-0-yjtha";
-  Uri baseUrl = Uri.parse("https://realm.mongodb.com");
+  Uri baseUrl = Uri.parse("https://services.cloud.mongodb.com.");
   return AppServices(appId, baseUrl);
 });
 

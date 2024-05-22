@@ -1,5 +1,6 @@
 import 'package:donation/realm/schemas.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:intl/intl.dart';
@@ -43,16 +44,16 @@ class _DonationChartByBloodState extends State<DonationChartByBlood> {
       width: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width * 0.9
           : MediaQuery.of(context).size.width * 0.43,
-      child: NeumorphicButton(
-        style: NeumorphicStyle(
-          color: Colors.white,
-          boxShape: NeumorphicBoxShape.roundRect(
-              BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
-          depth: 4,
-          intensity: 0.8,
-          shadowDarkColor: Colors.black,
-          shadowLightColor: Colors.white,
-        ),
+      child: fluent.Button(
+        // style: NeumorphicStyle(
+        //   color: Colors.white,
+        //   boxShape: NeumorphicBoxShape.roundRect(
+        //       BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
+        //   depth: 4,
+        //   intensity: 0.8,
+        //   shadowDarkColor: Colors.black,
+        //   shadowLightColor: Colors.white,
+        // ),
         onPressed: () async {},
         child: Padding(
           padding: const EdgeInsets.all(8.0),

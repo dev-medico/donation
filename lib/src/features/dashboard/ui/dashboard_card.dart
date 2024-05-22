@@ -2,8 +2,8 @@ import 'package:donation/src/features/donar/donar_list_new.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/patient/patient_list.dart';
-import 'package:donation/src/features/special_event/special_event_list.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -39,16 +39,16 @@ class DashboardCard extends ConsumerWidget {
                 ? MediaQuery.of(context).size.height * 0.11
                 : MediaQuery.of(context).size.height * 0.2,
         margin: const EdgeInsets.only(top: 12, right: 12),
-        child: NeumorphicButton(
-          style: NeumorphicStyle(
-            color: Colors.white,
-            boxShape: NeumorphicBoxShape.roundRect(
-                BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
-            depth: 4,
-            intensity: 0.8,
-            shadowDarkColor: Colors.black,
-            shadowLightColor: Colors.white,
-          ),
+        child: fluent.Button(
+          // style: NeumorphicStyle(
+          //   color: Colors.white,
+          //   boxShape: NeumorphicBoxShape.roundRect(
+          //       BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
+          //   depth: 4,
+          //   intensity: 0.8,
+          //   shadowDarkColor: Colors.black,
+          //   shadowLightColor: Colors.white,
+          // ),
           onPressed: () async {
             if (index == 0) {
               // ref.watch(membersProvider).forEach((element) {
@@ -63,8 +63,7 @@ class DashboardCard extends ConsumerWidget {
               // });
               await Navigator.pushNamed(context, DonationListScreen.routeName);
             } else if (index == 2) {
-              await Navigator.pushNamed(
-                  context, PatientList.routeName);
+              await Navigator.pushNamed(context, PatientList.routeName);
             } else if (index == 3) {
               await Navigator.pushNamed(context, DonarListNewScreen.routeName);
             }
@@ -78,10 +77,9 @@ class DashboardCard extends ConsumerWidget {
                 Text(
                   title,
                   style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 16,
-                      fontWeight: FontWeight.bold,
-                      color:
-                          NeumorphicTheme.of(context)?.current!.variantColor),
+                    fontSize: Responsive.isMobile(context) ? 15 : 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const Spacer(),
                 Responsive.isMobile(context)
@@ -89,10 +87,8 @@ class DashboardCard extends ConsumerWidget {
                     : Text(
                         subtitle,
                         style: TextStyle(
-                            fontSize: Responsive.isMobile(context) ? 13 : 14,
-                            color: NeumorphicTheme.of(context)
-                                ?.current!
-                                .variantColor),
+                          fontSize: Responsive.isMobile(context) ? 13 : 14,
+                        ),
                       ),
                 const SizedBox(
                   height: 4,
@@ -103,9 +99,7 @@ class DashboardCard extends ConsumerWidget {
                         style: TextStyle(
                             fontSize: Responsive.isMobile(context) ? 16 : 17,
                             fontWeight: FontWeight.bold,
-                            color: NeumorphicTheme.of(context)
-                                ?.current!
-                                .defaultTextColor),
+                            color: Colors.black),
                       )
                     : Container(),
                 const Spacer(),

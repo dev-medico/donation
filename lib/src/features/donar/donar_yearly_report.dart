@@ -1,4 +1,5 @@
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
@@ -64,7 +65,7 @@ class DonationYearlyReport extends StatelessWidget {
                     fontSize: 18,
                     height: 1.7,
                     fontWeight: FontWeight.bold,
-                    color: NeumorphicTheme.of(context)?.current!.variantColor)),
+                    color: Colors.black)),
             const SizedBox(
               height: 24,
             ),
@@ -142,18 +143,14 @@ class DonationYearlyReport extends StatelessWidget {
                                           ? 14
                                           : 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                                 Text(
                                   "${Utils.strToMM(openingBalance.toString())} ကျပ်",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                               ],
                             ),
@@ -188,20 +185,14 @@ class DonationYearlyReport extends StatelessWidget {
                                                 style: TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
-                                                    color: NeumorphicTheme.of(
-                                                            context)
-                                                        ?.current!
-                                                        .variantColor),
+                                                    color: Colors.black),
                                               ),
                                               Text(
                                                 "${Utils.strToMM(monthlyDonation![index].toString())} ကျပ်",
                                                 style: TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
-                                                    color: NeumorphicTheme.of(
-                                                            context)
-                                                        ?.current!
-                                                        .variantColor),
+                                                    color: Colors.black),
                                               ),
                                             ],
                                           ),
@@ -235,18 +226,14 @@ class DonationYearlyReport extends StatelessWidget {
                                                     ? 14
                                                     : 15,
                                             fontWeight: FontWeight.bold,
-                                            color: NeumorphicTheme.of(context)
-                                                ?.current!
-                                                .variantColor),
+                                            color: Colors.black),
                                       ),
                                       Text(
                                         "${Utils.strToMM(totalDonationAmount.toString())} ကျပ်",
                                         style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
-                                            color: NeumorphicTheme.of(context)
-                                                ?.current!
-                                                .variantColor),
+                                            color: Colors.black),
                                       ),
                                     ],
                                   ),
@@ -288,18 +275,14 @@ class DonationYearlyReport extends StatelessWidget {
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                         Text(
                                           "${Utils.strToMM(monthlyExpense![index].toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: NeumorphicTheme.of(context)
-                                                  ?.current!
-                                                  .variantColor),
+                                              color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -329,18 +312,14 @@ class DonationYearlyReport extends StatelessWidget {
                                           ? 14
                                           : 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                                 Text(
                                   "${Utils.strToMM(totalExpense.toString())} ကျပ်",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                               ],
                             ),
@@ -363,18 +342,14 @@ class DonationYearlyReport extends StatelessWidget {
                                           ? 14
                                           : 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                                 Text(
                                   "${Utils.strToMM(closingBalance.toString())} ကျပ်",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: NeumorphicTheme.of(context)
-                                          ?.current!
-                                          .variantColor),
+                                      color: Colors.black),
                                 ),
                               ],
                             ),
@@ -407,18 +382,14 @@ class DonationYearlyReport extends StatelessWidget {
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                           Text(
                             "${Utils.strToMM((totalDonationAmount! + openingBalance).toString())} ကျပ်",
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                         ],
                       ),
@@ -434,18 +405,14 @@ class DonationYearlyReport extends StatelessWidget {
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                           Text(
                             "${Utils.strToMM((totalDonationAmount! + openingBalance).toString())} ကျပ်",
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: NeumorphicTheme.of(context)
-                                    ?.current!
-                                    .variantColor),
+                                color: Colors.black),
                           ),
                         ],
                       ),

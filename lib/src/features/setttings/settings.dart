@@ -1,4 +1,5 @@
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:donation/utils/Colors.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -28,33 +29,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Row(
             children: [
-              NeumorphicButton(
+              fluent.Button(
                 child: Row(
                   children: [
                     Icon(
                       Icons.ac_unit_sharp,
-                      color: NeumorphicTheme.of(context)
-                          ?.current!
-                          .defaultTextColor,
+                      color: Colors.black,
                     ),
                     const SizedBox(
                       width: 12,
                     ),
                     Text(
                       "Change Theme",
-                      style: TextStyle(
-                          color: NeumorphicTheme.of(context)
-                              ?.current!
-                              .defaultTextColor),
+                      style: TextStyle(color: Colors.black),
                     )
                   ],
                 ),
                 onPressed: () {
-                  if (NeumorphicTheme.of(context)!.isUsingDark) {
-                    NeumorphicTheme.of(context)?.themeMode = ThemeMode.light;
-                  } else {
-                    NeumorphicTheme.of(context)?.themeMode = ThemeMode.dark;
-                  }
+                  // if (!.isUsingDark) {
+                  //   ?.themeMode = ThemeMode.light;
+                  // } else {
+                  //   ?.themeMode = ThemeMode.dark;
+                  // }
                 },
               ),
             ],

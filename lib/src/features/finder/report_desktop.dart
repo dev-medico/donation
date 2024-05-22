@@ -13,7 +13,8 @@ import 'package:donation/src/providers/providers.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_row_column.dart';
 
@@ -194,17 +195,17 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                       left: 10,
                       right: 10,
                       bottom: Responsive.isMobile(context) ? 20 : 0),
-                  child: NeumorphicButton(
-                      style: NeumorphicStyle(
-                        color: Colors.white,
-                        boxShape: NeumorphicBoxShape.roundRect(
-                            BorderRadius.circular(
-                                Responsive.isMobile(context) ? 12 : 16)),
-                        depth: 4,
-                        intensity: 0.8,
-                        shadowDarkColor: Colors.black,
-                        shadowLightColor: Colors.white,
-                      ),
+                  child: fluent.Button(
+                      // style: NeumorphicStyle(
+                      //   color: Colors.white,
+                      //   boxShape: NeumorphicBoxShape.roundRect(
+                      //       BorderRadius.circular(
+                      //           Responsive.isMobile(context) ? 12 : 16)),
+                      //   depth: 4,
+                      //   intensity: 0.8,
+                      //   shadowDarkColor: Colors.black,
+                      //   shadowLightColor: Colors.white,
+                      // ),
                       onPressed: () async {},
                       child: BloodDonationPieChart()),
                 )),
@@ -222,17 +223,17 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                       left: 10,
                       right: 20,
                       bottom: Responsive.isMobile(context) ? 20 : 0),
-                  child: NeumorphicButton(
-                      style: NeumorphicStyle(
-                        color: Colors.white,
-                        boxShape: NeumorphicBoxShape.roundRect(
-                            BorderRadius.circular(
-                                Responsive.isMobile(context) ? 12 : 16)),
-                        depth: 4,
-                        intensity: 0.8,
-                        shadowDarkColor: Colors.black,
-                        shadowLightColor: Colors.white,
-                      ),
+                  child: fluent.Button(
+                      // style: NeumorphicStyle(
+                      //   color: Colors.white,
+                      //   boxShape: NeumorphicBoxShape.roundRect(
+                      //       BorderRadius.circular(
+                      //           Responsive.isMobile(context) ? 12 : 16)),
+                      //   depth: 4,
+                      //   intensity: 0.8,
+                      //   shadowDarkColor: Colors.black,
+                      //   shadowLightColor: Colors.white,
+                      // ),
                       onPressed: () async {},
                       child: BloodDonationGenderPieChart()),
                 ))
@@ -282,7 +283,7 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
             //         left: 10,
             //         right: 10,
             //         bottom: Responsive.isMobile(context) ? 20 : 0),
-            //     child: NeumorphicButton(
+            //     child: fluent.Button(
             //       style: NeumorphicStyle(
             //         color: Colors.white,
             //         boxShape: NeumorphicBoxShape.roundRect(
@@ -306,17 +307,17 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                       left: 10,
                       right: 20,
                       bottom: Responsive.isMobile(context) ? 20 : 0),
-                  child: NeumorphicButton(
-                    style: NeumorphicStyle(
-                      color: Colors.white,
-                      boxShape: NeumorphicBoxShape.roundRect(
-                          BorderRadius.circular(
-                              Responsive.isMobile(context) ? 12 : 16)),
-                      depth: 4,
-                      intensity: 0.8,
-                      shadowDarkColor: Colors.black,
-                      shadowLightColor: Colors.white,
-                    ),
+                  child: fluent.Button(
+                    // style: NeumorphicStyle(
+                    //   color: Colors.white,
+                    //   boxShape: NeumorphicBoxShape.roundRect(
+                    //       BorderRadius.circular(
+                    //           Responsive.isMobile(context) ? 12 : 16)),
+                    //   depth: 4,
+                    //   intensity: 0.8,
+                    //   shadowDarkColor: Colors.black,
+                    //   shadowLightColor: Colors.white,
+                    // ),
                     onPressed: () async {
                       Navigator.push(
                         context,

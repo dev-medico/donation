@@ -4,7 +4,8 @@ import 'package:donation/realm/schemas.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 
 class DonationChartByDisease extends StatefulWidget {
   final List<Donation> data;
@@ -47,16 +48,16 @@ class _DonationChartByDiseaseState extends State<DonationChartByDisease> {
         2,
       ),
       decoration: shadowDecoration(Colors.white),
-      child: NeumorphicButton(
-        style: NeumorphicStyle(
-          color: Colors.white,
-          boxShape: NeumorphicBoxShape.roundRect(
-              BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
-          depth: 4,
-          intensity: 0.8,
-          shadowDarkColor: Colors.black,
-          shadowLightColor: Colors.white,
-        ),
+      child: fluent.Button(
+        // style: NeumorphicStyle(
+        //   color: Colors.white,
+        //   boxShape: NeumorphicBoxShape.roundRect(
+        //       BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
+        //   depth: 4,
+        //   intensity: 0.8,
+        //   shadowDarkColor: Colors.black,
+        //   shadowLightColor: Colors.white,
+        // ),
         onPressed: () async {},
         child: ListView(
           physics: Responsive.isMobile(context)

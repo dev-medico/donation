@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/material.dart';
 import 'package:donation/data/repository/repository.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
@@ -70,7 +71,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                       height: 50,
                       margin: const EdgeInsets.only(
                           left: 20, top: 16, bottom: 4, right: 20),
-                      child: NeumorphicButton(
+                      child: fluent.Button(
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
@@ -192,7 +193,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                           height: 70,
                           margin: const EdgeInsets.only(
                               left: 20, top: 16, bottom: 4, right: 20),
-                          child: NeumorphicButton(
+                          child: fluent.Button(
                             child: Text(
                               dateFilter,
                               style:
