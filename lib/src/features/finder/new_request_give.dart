@@ -237,9 +237,6 @@ class NewDonarState extends ConsumerState<NewRequestGiveScreen> {
   showDatePicker() async {
     showMonthPicker(
       context: context,
-      headerColor: primaryColor,
-      unselectedMonthTextColor: primaryColor,
-      selectedMonthBackgroundColor: primaryColor,
       initialDate: DateTime.now(),
     ).then((date) {
       if (date != null) {

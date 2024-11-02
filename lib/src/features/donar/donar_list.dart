@@ -146,7 +146,7 @@ class _DonarListState extends ConsumerState<DonarList> {
   int leftBalance11 = 0;
   int leftBalance12 = 0;
 
-  TabContainerController controller = TabContainerController(length: 12);
+  TabContainerController controller = TabContainerController(12);
 
   List<DonarRecord> data = [];
   List<ExpensesRecord> expensesData = [];
@@ -308,7 +308,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.81,
                   child: TabContainer(
-                    controller: controller,
+                    //controller: controller,
                     color: const Color(0xffe3e3e3),
                     radius: 8,
                     tabEdge: TabEdge.top,
@@ -333,7 +333,7 @@ class _DonarListState extends ConsumerState<DonarList> {
                         fontWeight: FontWeight.bold),
                     unselectedTextStyle:
                         const TextStyle(fontSize: 14, color: Colors.black),
-                    tabs: Responsive.isMobile(context) ? monthsMobile : months,
+                    tabs: List.generate(12, (index) => Text(months[index])),
                     children: [
                       Container(
                         color: Colors.white,

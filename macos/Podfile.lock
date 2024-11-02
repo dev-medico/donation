@@ -8,22 +8,17 @@ PODS:
   - flutter_local_notifications (0.0.1):
     - FlutterMacOS
   - FlutterMacOS (1.0.0)
-  - FMDB (2.7.10):
-    - FMDB/standard (= 2.7.10)
-  - FMDB/standard (2.7.10)
-  - modal_progress_hud_nsn (0.4.0):
-    - FlutterMacOS
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - realm (1.2.0):
+  - realm (1.9.0):
     - FlutterMacOS
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - sqflite (0.0.2):
+  - sqflite_darwin (0.0.4):
+    - Flutter
     - FlutterMacOS
-    - FMDB (>= 2.7.5)
   - url_launcher_macos (0.0.1):
     - FlutterMacOS
 
@@ -33,16 +28,11 @@ DEPENDENCIES:
   - flutter_image_compress_macos (from `Flutter/ephemeral/.symlinks/plugins/flutter_image_compress_macos/macos`)
   - flutter_local_notifications (from `Flutter/ephemeral/.symlinks/plugins/flutter_local_notifications/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
-  - modal_progress_hud_nsn (from `Flutter/ephemeral/.symlinks/plugins/modal_progress_hud_nsn/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - realm (from `Flutter/ephemeral/.symlinks/plugins/realm/macos`)
   - shared_preferences_foundation (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin`)
-  - sqflite (from `Flutter/ephemeral/.symlinks/plugins/sqflite/macos`)
+  - sqflite_darwin (from `Flutter/ephemeral/.symlinks/plugins/sqflite_darwin/darwin`)
   - url_launcher_macos (from `Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos`)
-
-SPEC REPOS:
-  trunk:
-    - FMDB
 
 EXTERNAL SOURCES:
   desktop_window:
@@ -55,16 +45,14 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_local_notifications/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
-  modal_progress_hud_nsn:
-    :path: Flutter/ephemeral/.symlinks/plugins/modal_progress_hud_nsn/macos
   path_provider_foundation:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
   realm:
     :path: Flutter/ephemeral/.symlinks/plugins/realm/macos
   shared_preferences_foundation:
     :path: Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin
-  sqflite:
-    :path: Flutter/ephemeral/.symlinks/plugins/sqflite/macos
+  sqflite_darwin:
+    :path: Flutter/ephemeral/.symlinks/plugins/sqflite_darwin/darwin
   url_launcher_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
 
@@ -74,12 +62,10 @@ SPEC CHECKSUMS:
   flutter_image_compress_macos: c26c3c13ea0f28ae6dea4e139b3292e7729f99f1
   flutter_local_notifications: 3805ca215b2fb7f397d78b66db91f6a747af52e4
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  FMDB: eae540775bf7d0c87a5af926ae37af69effe5a19
-  modal_progress_hud_nsn: eff428e9fb32ddd232c5b66f8371b2150f36e989
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
-  realm: 8836c2263630ef217506fdd4d402294d14ad6c3c
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  realm: 995b84ef7e9ef64e2611a75ecf5a0c3de45f48c9
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
-  sqflite: a5789cceda41d54d23f31d6de539d65bb14100ea
+  sqflite_darwin: a553b1fd6fe66f53bbb0fe5b4f5bab93f08d7a13
   url_launcher_macos: d2691c7dd33ed713bf3544850a623080ec693d95
 
 PODFILE CHECKSUM: 8d40c19d3cbdb380d870685c3a564c989f1efa52
