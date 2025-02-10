@@ -35,39 +35,28 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
 
   List<Widget> widgets = [
     ReportNewScreen(),
-    SearchMemberListScreen(
-      fromHome: true,
-    ),
-    MemberListScreen(
-      fromHome: true,
-    ),
-    DonationListScreen(
-      fromHome: true,
-    ),
-    SpecialEventListScreen(
-      fromHome: true,
-    ),
-    DonarListNewScreen(
-      fromHome: true,
-    ),
-    FeedAdminScreen(
-      fromHome: true,
-    ),
+    // Todo
+    // SearchMemberListScreen(
+    //   fromHome: true,
+    // ),
+    // MemberListScreen(
+    //   fromHome: true,
+    // ),
+    // DonationListScreen(
+    //   fromHome: true,
+    // ),
+    // SpecialEventListScreen(
+    //   fromHome: true,
+    // ),
+    // DonarListNewScreen(
+    //   fromHome: true,
+    // ),
+    // Todo
+    // FeedAdminScreen(
+    //   fromHome: true,
+    // ),
     Container(),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      switchUI();
-    });
-  }
-
-  switchUI() async {
-    var realmServices = ref.watch(realmProvider);
-    await realmServices!.sessionSwitch();
-  }
 
   @override
   Widget build(BuildContext context) {

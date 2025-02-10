@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -204,7 +203,7 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
                                     height: 50,
                                     margin: const EdgeInsets.only(
                                         left: 20, top: 8, bottom: 4, right: 20),
-                                    child: fluent.Button(
+                                    child: GestureDetector(
                                       child: Padding(
                                         padding: EdgeInsets.only(
                                             top: birthDate == "မွေးသက္ကရာဇ်"
@@ -217,7 +216,7 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
                                               color: Colors.black),
                                         ),
                                       ),
-                                      onPressed: () {
+                                      onTap: () {
                                         showDatePicker();
                                       },
                                     )),
@@ -617,14 +616,14 @@ class MemberEditState extends State<MemberEditNewStyleScreen> {
                                             top: 16,
                                             bottom: 4,
                                             right: 20),
-                                        child: fluent.Button(
+                                        child: GestureDetector(
                                           child: Text(
                                             birthDate,
                                             style: const TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.black),
                                           ),
-                                          onPressed: () {
+                                          onTap: () {
                                             showDatePicker();
                                           },
                                         ),

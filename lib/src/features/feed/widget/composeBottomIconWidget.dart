@@ -6,7 +6,6 @@ import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/app_icons.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ComposeBottomIconWidget extends StatefulWidget {
   final TextEditingController textEditingController;
@@ -118,30 +117,30 @@ class _ComposeBottomIconWidgetState extends State<ComposeBottomIconWidget> {
   }
 
   void setImageCamera() {
-    ImagePicker()
-        .pickImage(source: ImageSource.camera, imageQuality: 20)
-        .then((XFile? file) {
-      if (file != null) {
-        setState(() {
-          widget.onImageIconSelected([File(file.path)]);
-        });
-      }
-    });
+    // ImagePicker()
+    //     .pickImage(source: ImageSource.camera, imageQuality: 20)
+    //     .then((XFile? file) {
+    //   if (file != null) {
+    //     setState(() {
+    //       widget.onImageIconSelected([File(file.path)]);
+    //     });
+    //   }
+    // });
   }
 
   void setImageGallery() {
-    ImagePicker().pickMultiImage(imageQuality: 20).then((List<XFile>? files) {
-      log("message: " + files!.length.toString());
-      setState(() {
-        List<File> results = [];
-        if (files.isNotEmpty) {
-          files.forEach((element) {
-            results.add(File(element.path));
-          });
-        }
-        widget.onImageIconSelected(results);
-      });
-    });
+    // ImagePicker().pickMultiImage(imageQuality: 20).then((List<XFile>? files) {
+    //   log("message: " + files!.length.toString());
+    //   setState(() {
+    //     List<File> results = [];
+    //     if (files.isNotEmpty) {
+    //       files.forEach((element) {
+    //         results.add(File(element.path));
+    //       });
+    //     }
+    //     widget.onImageIconSelected(results);
+    //   });
+    // });
   }
 
   double getTweetLimit() {

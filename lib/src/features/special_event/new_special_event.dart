@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:donation/data/repository/repository.dart';
 import 'package:donation/responsive.dart';
@@ -71,7 +70,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                       height: 50,
                       margin: const EdgeInsets.only(
                           left: 20, top: 16, bottom: 4, right: 20),
-                      child: fluent.Button(
+                      child: GestureDetector(
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
@@ -79,7 +78,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                             style: TextStyle(fontSize: 14, color: primaryColor),
                           ),
                         ),
-                        onPressed: () {
+                        onTap: () {
                           showDatePicker();
                         },
                       ),
@@ -193,13 +192,13 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                           height: 70,
                           margin: const EdgeInsets.only(
                               left: 20, top: 16, bottom: 4, right: 20),
-                          child: fluent.Button(
+                          child: GestureDetector(
                             child: Text(
                               dateFilter,
                               style:
                                   TextStyle(fontSize: 14, color: primaryColor),
                             ),
-                            onPressed: () {
+                            onTap: () {
                               showDatePicker();
                             },
                           ),

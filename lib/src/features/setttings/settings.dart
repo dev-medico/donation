@@ -1,4 +1,3 @@
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:donation/utils/Colors.dart';
 
@@ -29,7 +28,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Row(
             children: [
-              fluent.Button(
+              GestureDetector(
                 child: Row(
                   children: [
                     Icon(
@@ -45,7 +44,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     )
                   ],
                 ),
-                onPressed: () {
+                onTap: () {
                   // if (!.isUsingDark) {
                   //   ?.themeMode = ThemeMode.light;
                   // } else {

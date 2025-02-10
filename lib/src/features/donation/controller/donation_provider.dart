@@ -1,57 +1,58 @@
-import 'package:donation/realm/realm_services.dart';
-import 'package:donation/realm/schemas.dart';
-import 'package:donation/src/features/donation/controller/donation_list_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:realm/realm.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:donation/src/features/services/donation_service.dart';
+import 'package:donation/src/features/donation/models/donation.dart';
 
-// typedef SearchParams = ({String? search, String? bloodType});
+typedef DonationFilterModel = ({int? month, int? year});
 
-final donationStreamProvider =
-    StreamProvider<RealmResultsChanges<Donation>>((ref) {
-  var realmService = ref.watch(realmProvider);
-
-  final stream = realmService!.realm
-      .query<Donation>("TRUEPREDICATE SORT(donationDate DESC)")
-      .changes;
-
-  return stream;
+final donationStreamProvider = StreamProvider<List<Donation>>((ref) async* {
+  final donationService = ref.read(donationServiceProvider);
+  while (true) {
+    final donationsJson = await donationService.getDonations();
+    final donations = donationsJson
+        .map((json) => Donation.fromJson(json as Map<String, dynamic>))
+        .toList();
+    yield donations;
+    await Future.delayed(
+        const Duration(seconds: 30)); // Refresh every 30 seconds
+  }
 });
 
-final donationProvider = StateProvider<RealmResults<Donation>>((ref) {
-  var realmService = ref.watch(realmProvider);
-
-  final stream = realmService!.realm
-      .query<Donation>("TRUEPREDICATE SORT(donationDate DESC)");
-
-  return stream;
+final donationProvider = FutureProvider<List<Donation>>((ref) async {
+  final donationService = ref.read(donationServiceProvider);
+  final donationsJson = await donationService.getDonations();
+  return donationsJson
+      .map((json) => Donation.fromJson(json as Map<String, dynamic>))
+      .toList();
 });
 
 final donationByMonthYearStreamProvider =
-    StreamProvider.family<RealmResultsChanges<Donation>, DonationFilterModel>(
-        (ref, filter) {
-  var realmService = ref.watch(realmProvider);
-
-  final stream = realmService!.realm.query<Donation>(
-      r"donationDate >= $0 AND donationDate < $1 AND TRUEPREDICATE SORT(donationDate ASC)",
-      [
-        DateTime(filter.year!, filter.month!, 1),
-        DateTime(filter.year!, filter.month! + 1, 1),
-      ]).changes;
-
-  return stream;
+    StreamProvider.family<List<Donation>, DonationFilterModel>(
+        (ref, filter) async* {
+  final donationService = ref.read(donationServiceProvider);
+  while (true) {
+    final donationsJson = await donationService.getDonationsByMonthYear(
+      filter.month!,
+      filter.year!,
+    );
+    final donations = donationsJson
+        .map((json) => Donation.fromJson(json as Map<String, dynamic>))
+        .toList();
+    yield donations;
+    await Future.delayed(
+        const Duration(seconds: 30)); // Refresh every 30 seconds
+  }
 });
 
 final donationByYearProvider =
-    StateProvider.family<RealmResults<Donation>, int>((ref, year) {
-  var realmService = ref.watch(realmProvider);
+    FutureProvider.family<List<Donation>, int>((ref, year) async {
+  final donationService = ref.read(donationServiceProvider);
+  final donationsJson = await donationService.getDonationsByYear(year);
+  return donationsJson
+      .map((json) => Donation.fromJson(json as Map<String, dynamic>))
+      .toList();
+});
 
-  final stream = realmService!.realm.query<Donation>(
-      r"donationDate > $0 AND donationDate <= $1 AND TRUEPREDICATE SORT(donationDate ASC)",
-      [
-        DateTime(year, 1, 1),
-        DateTime(year + 1, 1, 1),
-      ]);
-
-  return stream;
+final donationStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+  final donationService = ref.read(donationServiceProvider);
+  return donationService.getDonationStats();
 });

@@ -2,7 +2,6 @@ import 'package:donation/src/features/donar/donar_list_new.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/patient/patient_list.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -39,7 +38,7 @@ class DashboardCard extends ConsumerWidget {
                 ? MediaQuery.of(context).size.height * 0.11
                 : MediaQuery.of(context).size.height * 0.2,
         margin: const EdgeInsets.only(top: 12, right: 12),
-        child: fluent.Button(
+        child: GestureDetector(
           // style: NeumorphicStyle(
           //   color: Colors.white,
           //   boxShape: NeumorphicBoxShape.roundRect(
@@ -49,24 +48,25 @@ class DashboardCard extends ConsumerWidget {
           //   shadowDarkColor: Colors.black,
           //   shadowLightColor: Colors.white,
           // ),
-          onPressed: () async {
-            if (index == 0) {
-              // ref.watch(membersProvider).forEach((element) {
-              //   ref.watch(realmProvider)!.deleteMember(element);
-              // });
-              // await Navigator.pushNamed(
-              //     context, MemberListBackupScreen.routeName);
-              await Navigator.pushNamed(context, MemberListScreen.routeName);
-            } else if (index == 1) {
-              // ref.watch(donationsProvider).forEach((element) {
-              //   ref.watch(realmProvider)!.deleteDonation(element);
-              // });
-              await Navigator.pushNamed(context, DonationListScreen.routeName);
-            } else if (index == 2) {
-              await Navigator.pushNamed(context, PatientList.routeName);
-            } else if (index == 3) {
-              await Navigator.pushNamed(context, DonarListNewScreen.routeName);
-            }
+          onTap: () async {
+            // Todo
+            // if (index == 0) {
+            //   // ref.watch(membersProvider).forEach((element) {
+            //   //   ref.watch(realmProvider)!.deleteMember(element);
+            //   // });
+            //   // await Navigator.pushNamed(
+            //   //     context, MemberListBackupScreen.routeName);
+            //   await Navigator.pushNamed(context, MemberListScreen.routeName);
+            // } else if (index == 1) {
+            //   // ref.watch(donationsProvider).forEach((element) {
+            //   //   ref.watch(realmProvider)!.deleteDonation(element);
+            //   // });
+            //   await Navigator.pushNamed(context, DonationListScreen.routeName);
+            // } else if (index == 2) {
+            //   await Navigator.pushNamed(context, PatientList.routeName);
+            // } else if (index == 3) {
+            //   await Navigator.pushNamed(context, DonarListNewScreen.routeName);
+            // }
           },
           child: Padding(
             padding: const EdgeInsets.only(left: 8.0),

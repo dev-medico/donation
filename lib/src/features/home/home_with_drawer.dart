@@ -62,15 +62,15 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen>
           screenView = const DashBoardScreen();
         });
       } else if (drawerIndex == DrawerIndex.NEWMEMBER) {
-        setState(() {
-          screenView = const MemberListScreen();
-        });
+        // setState(() {
+        //   screenView = const MemberListScreen();
+        // });
       } else if (drawerIndex == DrawerIndex.RECORDS) {
-        setState(() {
-          animationController = AnimationController(
-              duration: const Duration(milliseconds: 600), vsync: this);
-          screenView = const DonationListScreen();
-        });
+        // setState(() {
+        //   animationController = AnimationController(
+        //       duration: const Duration(milliseconds: 600), vsync: this);
+        //   screenView = const DonationListScreen();
+        // });
       } else {
         setState(() {
           screenView = const SettingsScreen();

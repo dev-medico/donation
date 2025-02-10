@@ -21,6 +21,7 @@ import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:donation/src/features/auth/services/auth_service.dart';
 
 class LoginScreen extends StatefulHookConsumerWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -47,10 +48,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   initial() async {
     prefs = await SharedPreferences.getInstance();
-    var appServices = ref.read(appServiceProvider);
-    try {
-      await appServices.logInUserEmailPassword("member@gmail.com", "12345678");
-    } catch (err) {}
+    // var appServices = ref.read(appServiceProvider);
+    // try {
+    //   await appServices.logInUserEmailPassword("member@gmail.com", "12345678");
+    // } catch (err) {}
   }
 
   @override
@@ -407,19 +408,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() {
       _isLoading = true;
     });
-    var appServices = ref.read(appServiceProvider);
+
     try {
-      await appServices.logInUserEmailPassword(
-          email.text.toString(), password.text.toString());
+      final authService = ref.read(authServiceProvider);
+      final response = await authService.login(
+        email.text.toString(),
+        password.text.toString(),
+      );
+
       setState(() {
         _isLoading = false;
       });
-      prefs.setString("name", email.text.toString());
-      var realmServices = ref.watch(realmProvider);
-      await realmServices!.sessionSwitch();
+
+      await saveLogin(response);
+
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
-            context, HomeScreen.routeName, (Route<dynamic> route) => false);
+          context,
+          HomeScreen.routeName,
+          (Route<dynamic> route) => false,
+        );
       }
     } catch (err) {
       setState(() {

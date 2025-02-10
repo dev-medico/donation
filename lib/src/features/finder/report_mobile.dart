@@ -13,10 +13,33 @@ import 'package:donation/src/providers/providers.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
-import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_row_column.dart';
+import 'package:dio/dio.dart';
+import 'package:donation/core/api/api_response.dart';
+
+class DashboardStats {
+  final int totalMembers;
+  final int totalDonations;
+  final int totalPatients;
+  final List<dynamic> donations;
+
+  DashboardStats({
+    required this.totalMembers,
+    required this.totalDonations,
+    required this.totalPatients,
+    required this.donations,
+  });
+
+  factory DashboardStats.fromJson(Map<String, dynamic> json) {
+    return DashboardStats(
+      totalMembers: json['total_members'] ?? 0,
+      totalDonations: json['total_donations'] ?? 0,
+      totalPatients: json['total_patients'] ?? 0,
+      donations: json['donations'] ?? [],
+    );
+  }
+}
 
 class ReportMobileScreen extends ConsumerStatefulWidget {
   const ReportMobileScreen({super.key});
@@ -26,17 +49,89 @@ class ReportMobileScreen extends ConsumerStatefulWidget {
 }
 
 class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
+  int totalMembers = 0;
+  int totalDonations = 0;
+  int totalPatients = 0;
+  List<dynamic> donationList = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboardData();
+  }
+
+  Future<void> _loadDashboardData() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final dio = Dio();
+      final response = await dio.get(
+        'https://your-yii2-backend/api/v1/dashboard/stats',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization':
+                'Bearer YOUR_AUTH_TOKEN', // Get from your auth service
+          },
+        ),
+      );
+
+      final apiResponse = ApiResponse<DashboardStats>.fromJson(
+        response.data,
+        (json) => DashboardStats.fromJson(json),
+      );
+
+      if (apiResponse.success) {
+        setState(() {
+          totalMembers = apiResponse.data?.totalMembers ?? 0;
+          totalDonations = apiResponse.data?.totalDonations ?? 0;
+          totalPatients = apiResponse.data?.totalPatients ?? 0;
+          donationList = apiResponse.data?.donations ?? [];
+          isLoading = false;
+        });
+      } else {
+        print('Failed to load dashboard data: ${apiResponse.message}');
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading dashboard data: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Widget _buildChartButton({
+    required Widget child,
+    VoidCallback? onPressed,
+  }) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            Responsive.isMobile(context) ? 12 : 16,
+          ),
+        ),
+        elevation: 4,
+      ),
+      onPressed: onPressed ?? () {},
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    var totalMember = ref.watch(totalMembersProvider);
-    var totalDonations = ref.watch(totalDonationsProvider);
-    var donations = ref.watch(donationsProvider);
-    var totalPatient = ref.watch(totalPatientProvider);
-
-    List<Donation> donationList = [];
-    donations.forEach((element) {
-      donationList.add(element);
-    });
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
 
     return ListView(
       shrinkWrap: true,
@@ -52,12 +147,10 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
                     ? "အဖွဲ့၀င် စာရင်း"
                     : "အဖွဲ့၀င် စာရင်း",
                 subtitle: "စုစုပေါင်း",
-                amount: totalMember.toString(),
+                amount: totalMembers.toString(),
                 amountColor: Colors.black,
               ),
-              SizedBox(
-                width: 12,
-              ),
+              SizedBox(width: 12),
               DashboardCard(
                 index: 1,
                 color: primaryDark,
@@ -80,12 +173,10 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
                     ? "လူနာ \nစာရင်း"
                     : "လူနာ စာရင်း",
                 subtitle: "စုစုပေါင်း",
-                amount: totalPatient.toString(),
+                amount: totalPatients.toString(),
                 amountColor: Colors.black,
               ),
-              SizedBox(
-                width: 12,
-              ),
+              SizedBox(width: 12),
               DashboardCard(
                 index: 3,
                 color: primaryDark,
@@ -103,18 +194,9 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
             left: 20,
             right: 20,
           ),
-          child: fluent.Button(
-              // style: NeumorphicStyle(
-              //   color: Colors.white,
-              //   boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(
-              //       Responsive.isMobile(context) ? 12 : 16)),
-              //   depth: 4,
-              //   intensity: 0.8,
-              //   shadowDarkColor: Colors.black,
-              //   shadowLightColor: Colors.white,
-              // ),
-              onPressed: () async {},
-              child: BloodDonationPieChart()),
+          child: _buildChartButton(
+            child: Container(), // BloodDonationPieChart(),
+          ),
         ),
         Container(
           margin: EdgeInsets.only(
@@ -122,25 +204,13 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
             left: 20,
             right: 20,
           ),
-          child: fluent.Button(
-              // style: NeumorphicStyle(
-              //   color: Colors.white,
-              //   boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(
-              //       Responsive.isMobile(context) ? 12 : 16)),
-              //   depth: 4,
-              //   intensity: 0.8,
-              //   shadowDarkColor: Colors.black,
-              //   shadowLightColor: Colors.white,
-              // ),
-              onPressed: () async {},
-              child: BloodDonationGenderPieChart()),
+          child: _buildChartButton(
+            child: Container(), // BloodDonationGenderPieChart(),
+          ),
         ),
         Container(
           margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-          child: DonationChartByBlood(
-            data: donationList,
-            fromDashboard: true,
-          ),
+          child: Container(), // DonationChartByBlood(),
         ),
         Container(
           margin: EdgeInsets.only(
@@ -154,34 +224,15 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
             width: Responsive.isMobile(context)
                 ? MediaQuery.of(context).size.width * 0.9
                 : MediaQuery.of(context).size.width * 0.43,
-            child: DonationChartByHospital(
-              data: donationList,
-            ),
+            child: Container(), // DonationChartByHospital(),
           ),
         ),
         Container(
           margin: EdgeInsets.only(top: 4, left: 20, right: 20, bottom: 20),
-          child: fluent.Button(
-            // style: NeumorphicStyle(
-            //   color: Colors.white,
-            //   boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(
-            //       Responsive.isMobile(context) ? 12 : 16)),
-            //   depth: 4,
-            //   intensity: 0.8,
-            //   shadowDarkColor: Colors.black,
-            //   shadowLightColor: Colors.white,
-            // ),
-            onPressed: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RequestGiveReportScreen(),
-                ),
-              );
-            },
-            child: BloodRequestGiveChartScreen(),
+          child: _buildChartButton(
+            child: Container(), // BloodRequestGiveChartScreen(),
           ),
-        )
+        ),
       ],
     );
   }

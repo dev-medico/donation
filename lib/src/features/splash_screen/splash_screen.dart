@@ -2,9 +2,7 @@ import 'dart:developer';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animated_widgets/animated_widgets.dart';
-import 'package:donation/realm/app_services.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
-import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
 import 'package:donation/src/features/feed/feed_main.dart';
 import 'package:donation/src/features/home/home.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +11,7 @@ import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:donation/src/features/services/auth_service.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   SplashScreen({Key? key}) : super(key: key);
@@ -39,7 +38,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       memberPhone = prefs.getString("memberPhone") ?? "";
     });
     log("Phone - " + memberPhone);
-    log("name - " + memberPhone);
+    log("name - " + name);
+
     Future.delayed(const Duration(seconds: 5), () async {
       if (memberPhone == "") {
         if (name == "") {
@@ -48,25 +48,47 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           Navigator.pushReplacementNamed(context, HomeScreen.routeName);
         }
       } else {
-        var appServices = ref.read(appServiceProvider);
+        final authService = ref.read(authServiceProvider);
         try {
-          await appServices.logInUserEmailPassword(
-              "member@gmail.com", "12345678");
-        } catch (err) {}
-        var member = ref.read(membersDataByPhoneProvider(memberPhone));
-        ref.read(loginMemberProvider.notifier).state = member;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FeedMainScreen(
-              data: member!,
-              isEditable: false,
-            ),
-          ),
-        );
+          // Re-authenticate member
+          await authService.memberLogin(memberPhone);
+
+          // Get member data
+          final memberFuture =
+              ref.read(membersDataByPhoneProvider(memberPhone).future);
+          final member = await memberFuture;
+
+          if (member != null) {
+            ref.read(loginMemberProvider.notifier).state = member;
+            if (mounted) {
+              // Todo
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => FeedMainScreen(
+              //       data: member,
+              //       isEditable: false,
+              //     ),
+              //   ),
+              // );
+            }
+          } else {
+            // Member not found, logout and go to login screen
+            await authService.logout();
+            if (mounted) {
+              Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+            }
+          }
+        } catch (err) {
+          log("Login error: $err");
+          // Error in login, clear data and go to login screen
+          await authService.logout();
+          if (mounted) {
+            Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          }
+        }
       }
     });
-    print(name);
   }
 
   @override

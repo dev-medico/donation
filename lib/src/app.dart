@@ -11,9 +11,7 @@ import 'package:donation/src/features/home/desktop_home.dart';
 import 'package:donation/src/features/home/home.dart';
 import 'package:donation/src/features/patient/patient_list.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
-import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/auth/login.dart';
@@ -44,7 +42,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      var realmService = ref.watch(realmProvider);
+      //var realmService = ref.watch(realmProvider);
 
       // final donations = realmService!.realm.query<Donation>(
       //   r"TRUEPREDICATE SORT(_id ASC)",
@@ -201,9 +199,9 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    var currentUser = ref.watch(realmProvider);
+    // var currentUser = ref.watch(realmProvider);
 
-    return FluentApp(
+    return MaterialApp(
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
@@ -214,8 +212,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       supportedLocales: const [
         Locale('en', ''),
       ],
-      theme: FluentThemeData(
-          fontFamily: "MyanUni", inactiveColor: Color(0xff000000)),
+      theme: ThemeData(
+        fontFamily: "MyanUni",
+      ),
       themeMode: ThemeMode.light,
       home: SplashScreen(),
       onGenerateRoute: (RouteSettings routeSettings) {
@@ -237,26 +236,27 @@ class _MyAppState extends ConsumerState<MyApp> {
                 return const HomeScreen();
               case DesktopHomeScreen.routeName:
                 return const DesktopHomeScreen();
-              case MemberListScreen.routeName:
-                return const MemberListScreen();
+              // Todo
+              // case MemberListScreen.routeName:
+              //   return const MemberListScreen();
 
-              case MemberListBackupScreen.routeName:
-                return const MemberListBackupScreen();
+              // case MemberListBackupScreen.routeName:
+              //   return const MemberListBackupScreen();
 
-              case DonationListScreen.routeName:
-                return const DonationListScreen();
+              // case DonationListScreen.routeName:
+              //   return const DonationListScreen();
 
-              case PatientList.routeName:
-                return const PatientList();
+              // case PatientList.routeName:
+              //   return const PatientList();
 
-              case SpecialEventListScreen.routeName:
-                return const SpecialEventListScreen();
+              // case SpecialEventListScreen.routeName:
+              //   return const SpecialEventListScreen();
 
-              // case EventListScreen.routeName:
-              //   return EventListScreen();
+              // // case EventListScreen.routeName:
+              // //   return EventListScreen();
 
-              case DonarListNewScreen.routeName:
-                return DonarListNewScreen();
+              // case DonarListNewScreen.routeName:
+              //   return DonarListNewScreen();
               default:
                 return SplashScreen();
             }

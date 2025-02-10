@@ -11,7 +11,6 @@ import 'package:donation/src/features/feed/feed_admin.dart';
 import 'package:donation/src/features/feed/feed_main.dart';
 import 'package:donation/src/features/finder/report_new.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
-import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/utils/tool_widgets.dart';
@@ -27,7 +26,7 @@ class DesktopHomeScreen extends ConsumerStatefulWidget {
 }
 
 class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
-  int topIndex = 0;
+  int selectedIndex = 0;
   List<String> titles = [
     'သွေးလှူရှင် ရှာမည်',
     'အဖွဲ့ဝင် စာရင်း',
@@ -37,7 +36,6 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'ပို့စ်/အသိပေးချက်များ',
     'Log Out(V 1.3.8)'
   ];
-  List<NavigationPaneItem> items = [];
   List<String> icons = [
     'assets/images/search_list.png',
     'assets/images/members.png',
@@ -47,189 +45,58 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'assets/images/post.png',
     'assets/images/settings.png',
   ];
+
+  List<Widget> pages = [];
+
   @override
   void initState() {
     super.initState();
-    setDrawerListArray(titles);
-  }
-
-  switchUI() async {
-    var realmServices = ref.watch(realmProvider);
-    await realmServices!.sessionSwitch();
+    pages = [
+      ReportNewScreen(),
+      Container(), // SearchMemberListScreen(),
+      Container(), // MemberListScreen(),
+      Container(), // DonationListScreen(),
+      Container(), // SpecialEventListScreen(),
+      Container(), // DonarListNewScreen(),
+      Container(), // FeedAdminScreen(),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: true,
-      child: NavigationView(
-        onOpenSearch: () {
-          switchUI();
-          ref.read(openDrawerProvider.notifier).update((state) => true);
-        },
-        pane: NavigationPane(
-          size: NavigationPaneSize(
-              compactWidth: Responsive.isMobile(context) ? 80 : 64,
-              openWidth: Responsive.isMobile(context)
-                  ? MediaQuery.of(context).size.width * 0.7
-                  : 250),
-          selected: topIndex,
-          onChanged: (index) => setState(() {
-            topIndex = index;
-          }),
-          displayMode: PaneDisplayMode.compact,
-          items: items,
-          footerItems: [
-            PaneItem(
-              onTap: () {
-                ref.watch(realmProvider)!.close();
+    return Scaffold(
+      body: Row(
+        children: [
+          NavigationRail(
+            extended: !Responsive.isMobile(context),
+            minWidth: Responsive.isMobile(context) ? 80 : 64,
+            selectedIndex: selectedIndex,
+            onDestinationSelected: (index) {
+              if (index == titles.length - 1) {
                 Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                    (route) => false);
-              },
-              icon: CustomIcon(
-                icon: icons[6],
-              ),
-              title: Text(
-                titles[6],
-                style: smallTextStyle(context),
-              ),
-              body: const Text(
-                'အပြင်အဆင်',
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (route) => false,
+                );
+                return;
+              }
+              setState(() => selectedIndex = index);
+            },
+            destinations: List.generate(
+              titles.length,
+              (index) => NavigationRailDestination(
+                icon: CustomIcon(icon: icons[index]),
+                label: Text(titles[index], style: smallTextStyle(context)),
               ),
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: pages[selectedIndex],
+          ),
+        ],
       ),
     );
   }
-
-  setDrawerListArray(List<String> titles) {
-    items = [
-      PaneItem(
-        selectedTileColor: ButtonState.resolveWith((state) {
-          if (state.isPressing) return Color.fromARGB(39, 103, 103, 111);
-          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
-
-          return null;
-        }),
-        icon: CustomIcon(
-          icon: "assets/images/dashboard.png",
-        ),
-        title: Text(
-          "ပင်မစာမျက်နှာ",
-          style: smallTextStyle(context),
-        ),
-        body: ReportNewScreen(),
-      ),
-      PaneItemSeparator(),
-      PaneItem(
-        selectedTileColor: ButtonState.resolveWith((state) {
-          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
-          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
-
-          return null;
-        }),
-        icon: CustomIcon(
-          icon: icons[0],
-        ),
-        title: Text(
-          titles[0],
-          style: smallTextStyle(context),
-        ),
-        body: SearchMemberListScreen(),
-      ),
-      PaneItemSeparator(),
-      PaneItem(
-        selectedTileColor: ButtonState.resolveWith((state) {
-          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
-          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
-
-          return null;
-        }),
-        icon: CustomIcon(
-          icon: icons[1],
-        ),
-        //infoBadge: const InfoBadge(source: Text('8')),
-        title: Text(
-          titles[1],
-          style: smallTextStyle(context),
-        ),
-        body: MemberListScreen(),
-      ),
-      PaneItemSeparator(),
-      PaneItem(
-        selectedTileColor: ButtonState.resolveWith((state) {
-          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
-          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
-
-          return null;
-        }),
-        icon: CustomIcon(
-          icon: icons[2],
-        ),
-        title: Text(
-          titles[2],
-          style: smallTextStyle(context),
-        ),
-        body: DonationListScreen(),
-      ),
-      PaneItemSeparator(),
-      PaneItem(
-        selectedTileColor: ButtonState.resolveWith((state) {
-          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
-          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
-
-          return null;
-        }),
-        icon: CustomIcon(
-          icon: icons[3],
-        ),
-        title: Text(
-          titles[3],
-          style: smallTextStyle(context),
-        ),
-        body: SpecialEventListScreen(),
-      ),
-      PaneItemSeparator(),
-      PaneItem(
-        selectedTileColor: ButtonState.resolveWith((state) {
-          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
-          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
-
-          return null;
-        }),
-        icon: CustomIcon(
-          icon: icons[4],
-        ),
-        title: Text(
-          titles[4],
-          style: smallTextStyle(context),
-        ),
-        body: DonarListNewScreen(),
-      ),
-      PaneItemSeparator(),
-      PaneItem(
-        selectedTileColor: ButtonState.resolveWith((state) {
-          if (state.isPressing) return const Color.fromARGB(39, 52, 46, 226);
-          if (state.isHovering) return const Color.fromARGB(39, 52, 46, 226);
-
-          return null;
-        }),
-        icon: CustomIcon(
-          icon: icons[5],
-        ),
-        title: Text(
-          titles[5],
-          style: smallTextStyle(context),
-        ),
-        body: FeedAdminScreen(),
-      ),
-    ];
-  }
-
-// Return the NavigationView from `Widegt Build` function
 }
 
 class CustomIcon extends StatelessWidget {

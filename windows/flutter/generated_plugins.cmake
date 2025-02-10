@@ -4,8 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_window
-  file_selector_windows
-  realm
   url_launcher_windows
 )
 
