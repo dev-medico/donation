@@ -35,10 +35,10 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
 
   List<Widget> widgets = [
     ReportNewScreen(),
-    // Todo
-    // SearchMemberListScreen(
-    //   fromHome: true,
-    // ),
+    
+    SearchMemberListScreen(
+      fromHome: true,
+    ),
     // MemberListScreen(
     //   fromHome: true,
     // ),

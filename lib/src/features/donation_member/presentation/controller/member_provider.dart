@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/member_service.dart';
-import 'package:donation/src/features/donation_member/models/member.dart';
+import 'package:donation/src/features/donation_member/domain/member.dart';
 
 typedef SearchParams = ({String? search, String? bloodType});
 typedef AgeRangeParams = ({int? start, int? end});
+
+final memberServiceProvider = Provider<MemberService>((ref) => MemberService());
 
 final memberStreamProvider = StreamProvider.family<List<Member>, SearchParams>(
     (ref, searchParam) async* {
@@ -68,13 +70,12 @@ final membersDataByPhoneProvider =
 final loginMemberProvider = StateProvider<Member?>((ref) => null);
 
 final searchMemberProvider =
-    FutureProvider.family<List<Member>, SearchParams>((ref, searchParam) async {
-  final memberService = ref.read(memberServiceProvider);
-  final membersJson = await memberService.getMembers(
-    search: searchParam.search,
-    bloodType: searchParam.bloodType,
-  );
-  return membersJson
-      .map((json) => Member.fromJson(json as Map<String, dynamic>))
-      .toList();
-});
+    FutureProvider.family<List<Member>, ({String? search, String? bloodType})>(
+  (ref, params) async {
+    final memberService = ref.watch(memberServiceProvider);
+    return memberService.searchMembers(
+      query: params.search,
+      bloodType: params.bloodType,
+    );
+  },
+);

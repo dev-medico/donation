@@ -1,10 +1,43 @@
 import 'package:donation/src/features/services/base_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:donation/core/api/api_client.dart';
+import 'package:donation/src/features/donation_member/domain/member.dart';
 
 final memberServiceProvider = Provider<MemberService>((ref) => MemberService());
 
 class MemberService extends BaseService {
+  final ApiClient _apiClient = ApiClient();
+
+  Future<List<Member>> searchMembers({
+    String? query,
+    String? bloodType,
+    int page = 0,
+    int limit = 50,
+  }) async {
+    try {
+      final response = await _apiClient.get<Map<String, dynamic>>(
+        '/member/index',
+        queryParameters: {
+          'q': query ?? '',
+          'blood_type': bloodType,
+          'page': page,
+          'limit': limit,
+        },
+      );
+
+      if (response.data != null && response.data!['status'] == 'ok') {
+        final List<dynamic> memberData = response.data!['data'];
+        return memberData.map((json) => Member.fromJson(json)).toList();
+      }
+
+      return [];
+    } catch (e) {
+      print('Error searching members: $e');
+      return [];
+    }
+  }
+
   Future<List<dynamic>> getMembers({String? search, String? bloodType}) async {
     final headers = await getAuthHeaders();
 
