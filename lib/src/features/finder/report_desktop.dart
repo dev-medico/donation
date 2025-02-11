@@ -21,6 +21,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:donation/core/api/api_response.dart';
+import 'package:donation/core/api/api_client.dart';
 
 class DashboardStats {
   final int totalMembers;
@@ -72,32 +73,22 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
         isLoading = true;
       });
 
-      final dio = Dio();
-      final response = await dio.get(
-        'https://your-yii2-backend/api/v1/dashboard/stats',
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer YOUR_AUTH_TOKEN',
-          },
-        ),
+      final apiClient = ApiClient();
+      final response = await apiClient.get<Map<String, dynamic>>(
+        '/report/dashboard',
       );
 
-      final apiResponse = ApiResponse<DashboardStats>.fromJson(
-        response.data,
-        (json) => DashboardStats.fromJson(json),
-      );
-
-      if (apiResponse.success) {
+      if (response.data != null && response.data!['status'] == 'ok') {
+        final data = response.data!['data'];
         setState(() {
-          totalMembers = apiResponse.data?.totalMembers ?? 0;
-          totalDonations = apiResponse.data?.totalDonations ?? 0;
-          totalPatients = apiResponse.data?.totalPatients ?? 0;
-          donationList = apiResponse.data?.donations ?? [];
+          totalMembers = data['totalMember'] ?? 0;
+          totalDonations = data['totalDonations'] ?? 0;
+          totalPatients = data['totalPatient'] ?? 0;
+          donationList = data['donations'] ?? [];
           isLoading = false;
         });
       } else {
-        print('Failed to load dashboard data: ${apiResponse.message}');
+        print('Failed to load dashboard data: ${response.data?['message']}');
         setState(() {
           isLoading = false;
         });

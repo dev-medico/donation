@@ -38,72 +38,72 @@ class DashboardCard extends ConsumerWidget {
                 ? MediaQuery.of(context).size.height * 0.11
                 : MediaQuery.of(context).size.height * 0.2,
         margin: const EdgeInsets.only(top: 12, right: 12),
-        child: GestureDetector(
-          // style: NeumorphicStyle(
-          //   color: Colors.white,
-          //   boxShape: NeumorphicBoxShape.roundRect(
-          //       BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
-          //   depth: 4,
-          //   intensity: 0.8,
-          //   shadowDarkColor: Colors.black,
-          //   shadowLightColor: Colors.white,
-          // ),
-          onTap: () async {
-            // Todo
-            // if (index == 0) {
-            //   // ref.watch(membersProvider).forEach((element) {
-            //   //   ref.watch(realmProvider)!.deleteMember(element);
-            //   // });
-            //   // await Navigator.pushNamed(
-            //   //     context, MemberListBackupScreen.routeName);
-            //   await Navigator.pushNamed(context, MemberListScreen.routeName);
-            // } else if (index == 1) {
-            //   // ref.watch(donationsProvider).forEach((element) {
-            //   //   ref.watch(realmProvider)!.deleteDonation(element);
-            //   // });
-            //   await Navigator.pushNamed(context, DonationListScreen.routeName);
-            // } else if (index == 2) {
-            //   await Navigator.pushNamed(context, PatientList.routeName);
-            // } else if (index == 3) {
-            //   await Navigator.pushNamed(context, DonarListNewScreen.routeName);
-            // }
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Spacer(),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15 : 16,
-                    fontWeight: FontWeight.bold,
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16),
+          ),
+          child: InkWell(
+            borderRadius:
+                BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16),
+            onTap: () async {
+              // Todo
+              // if (index == 0) {
+              //   // ref.watch(membersProvider).forEach((element) {
+              //   //   ref.watch(realmProvider)!.deleteMember(element);
+              //   // });
+              //   // await Navigator.pushNamed(
+              //   //     context, MemberListBackupScreen.routeName);
+              //   await Navigator.pushNamed(context, MemberListScreen.routeName);
+              // } else if (index == 1) {
+              //   // ref.watch(donationsProvider).forEach((element) {
+              //   //   ref.watch(realmProvider)!.deleteDonation(element);
+              //   // });
+              //   await Navigator.pushNamed(context, DonationListScreen.routeName);
+              // } else if (index == 2) {
+              //   await Navigator.pushNamed(context, PatientList.routeName);
+              // } else if (index == 3) {
+              //   await Navigator.pushNamed(context, DonarListNewScreen.routeName);
+              // }
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Spacer(),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: Responsive.isMobile(context) ? 15 : 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const Spacer(),
-                Responsive.isMobile(context)
-                    ? Container()
-                    : Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: Responsive.isMobile(context) ? 13 : 14,
+                  const Spacer(),
+                  Responsive.isMobile(context)
+                      ? Container()
+                      : Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: Responsive.isMobile(context) ? 13 : 14,
+                          ),
                         ),
-                      ),
-                const SizedBox(
-                  height: 4,
-                ),
-                amount != ""
-                    ? Text(
-                        amount,
-                        style: TextStyle(
-                            fontSize: Responsive.isMobile(context) ? 16 : 17,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      )
-                    : Container(),
-                const Spacer(),
-              ],
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  amount != ""
+                      ? Text(
+                          amount,
+                          style: TextStyle(
+                              fontSize: Responsive.isMobile(context) ? 16 : 17,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        )
+                      : Container(),
+                  const Spacer(),
+                ],
+              ),
             ),
           ),
         ),
