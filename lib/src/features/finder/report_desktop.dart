@@ -27,21 +27,24 @@ class DashboardStats {
   final int totalMembers;
   final int totalDonations;
   final int totalPatients;
-  final List<dynamic> donations;
+  final int totalExpenses;
+  final int donations;
 
   DashboardStats({
     required this.totalMembers,
     required this.totalDonations,
     required this.totalPatients,
+    required this.totalExpenses,
     required this.donations,
   });
 
   factory DashboardStats.fromJson(Map<String, dynamic> json) {
     return DashboardStats(
-      totalMembers: json['total_members'] ?? 0,
-      totalDonations: json['total_donations'] ?? 0,
-      totalPatients: json['total_patients'] ?? 0,
-      donations: json['donations'] ?? [],
+      totalMembers: json['totalMember'] ?? 0,
+      totalDonations: json['totalDonations'] ?? 0,
+      totalPatients: json['totalPatient'] ?? 0,
+      totalExpenses: json['totalExpenses'] ?? 0,
+      donations: json['donations'] ?? 0,
     );
   }
 }
@@ -56,9 +59,11 @@ class ReportDesktopScreen extends ConsumerStatefulWidget {
 
 class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
   int totalMembers = 0;
+  int totalBloodDonations = 0;
   int totalDonations = 0;
   int totalPatients = 0;
-  List<dynamic> donationList = [];
+  int totalExpenses = 0;
+  int donationCount = 0;
   bool isLoading = true;
 
   @override
@@ -82,9 +87,11 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
         final data = response.data!['data'];
         setState(() {
           totalMembers = data['totalMember'] ?? 0;
+          totalBloodDonations = data['donations'] ?? 0;
           totalDonations = data['totalDonations'] ?? 0;
           totalPatients = data['totalPatient'] ?? 0;
-          donationList = data['donations'] ?? [];
+          totalExpenses = data['totalExpenses'] ?? 0;
+          donationCount = data['donations'] ?? 0;
           isLoading = false;
         });
       } else {
@@ -170,7 +177,7 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                             color: primaryDark,
                             title: "သွေးလှူမှု မှတ်တမ်း",
                             subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                            amount: totalDonations.toString(),
+                            amount: totalBloodDonations.toString(),
                             amountColor: Colors.blue,
                           ),
                         ],
@@ -237,7 +244,9 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                             color: primaryDark,
                             title: "ရ/သုံး ငွေစာရင်း",
                             subtitle: "အသေးစိတ်",
-                            amount: "",
+                            amount: totalDonations.toString() +
+                                '/' +
+                                totalExpenses.toString(),
                             amountColor: Colors.black,
                           ),
                         ],
@@ -252,7 +261,7 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                             color: primaryDark,
                             title: "သွေးလှူမှု မှတ်တမ်း",
                             subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                            amount: totalDonations.toString(),
+                            amount: totalBloodDonations.toString(),
                             amountColor: Colors.blue,
                           ),
                           SizedBox(
@@ -262,8 +271,8 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                             index: 3,
                             color: primaryDark,
                             title: "ရ/သုံး ငွေစာရင်း",
-                            subtitle: "-",
-                            amount: "-",
+                            subtitle: totalDonations.toString(),
+                            amount: totalExpenses.toString(),
                             amountColor: Colors.black,
                           ),
                         ],
@@ -285,7 +294,7 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                       right: 10,
                       bottom: Responsive.isMobile(context) ? 20 : 0),
                   child: _buildChartButton(
-                    child: Container(), // BloodDonationPieChart(),
+                    child: BloodDonationPieChart(),
                   ),
                 )),
             ResponsiveRowColumnItem(
@@ -303,7 +312,7 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                       right: 20,
                       bottom: Responsive.isMobile(context) ? 20 : 0),
                   child: _buildChartButton(
-                    child: Container(), // BloodDonationGenderPieChart(),
+                    child: BloodDonationGenderPieChart(),
                   ),
                 ))
           ],
@@ -321,12 +330,9 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                     top: 20,
                     left: Responsive.isMobile(context) ? 20 : 30,
                     right: 10),
-                // Todo
-                child: Container(),
-                //  child: DonationChartByBlood(
-                //   data: donationList,
-                //   fromDashboard: true,
-                // ),
+                child: DonationChartByBlood(
+                  fromDashboard: true,
+                ),
               ),
             ),
             ResponsiveRowColumnItem(
@@ -340,11 +346,9 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                   width: Responsive.isMobile(context)
                       ? MediaQuery.of(context).size.width * 0.9
                       : MediaQuery.of(context).size.width * 0.43,
-                  // Todo
-                  child: Container(),
-                  // child: DonationChartByHospital(
-                  //   data: donationList,
-                  // ),
+                 
+                  child: DonationChartByHospital(
+                  ),
                 ),
               ),
             ),
@@ -381,7 +385,7 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                       right: 20,
                       bottom: Responsive.isMobile(context) ? 20 : 0),
                   child: _buildChartButton(
-                    child: Container(), // BloodRequestGiveChartScreen(),
+                    child: BloodRequestGiveChartScreen(),
                   ),
                 ))
           ],

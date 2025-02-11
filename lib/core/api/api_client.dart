@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiClient {
   static final ApiClient _instance = ApiClient._internal();
@@ -24,15 +25,20 @@ class ApiClient {
 
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
+        onRequest: (options, handler) async {
           // Add auth token if available
-          // final token = await getAuthToken();
-          // if (token != null) {
-          //   options.headers['Authorization'] = 'Bearer $token';
-          // }
+          final prefs = await SharedPreferences.getInstance();
+          final token = prefs.getString('token');
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
           return handler.next(options);
         },
         onError: (DioException e, handler) {
+          if (e.response?.statusCode == 401) {
+            // Handle unauthorized error (e.g., token expired)
+            print('Unauthorized: ${e.response?.data?['message']}');
+          }
           return handler.next(e);
         },
       ),

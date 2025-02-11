@@ -35,7 +35,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       name = prefs.getString("name") ?? "";
-      memberPhone = prefs.getString("memberPhone") ?? "";
+      memberPhone = prefs.getString("phone") ?? "";
     });
     log("Phone - " + memberPhone);
     log("name - " + name);

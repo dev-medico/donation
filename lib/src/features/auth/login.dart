@@ -440,8 +440,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   saveLogin(LoginResponse response) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("token", response.data!.accessToken.toString());
-    prefs.setString("userName", response.data!.name!.toString());
-    prefs.setString("userPhone", response.data!.phone.toString());
+    prefs.setString("name", response.data!.name!.toString());
+    prefs.setString("phone", response.data!.phone.toString());
     Navigator.pushNamedAndRemoveUntil(
         context, HomeScreen.routeName, (Route<dynamic> route) => false);
   }

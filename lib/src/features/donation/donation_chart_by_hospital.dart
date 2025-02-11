@@ -1,170 +1,218 @@
-// import 'package:donation/realm/schemas.dart';
-// import 'package:donation/responsive.dart';
-// import 'package:donation/utils/Colors.dart';
-// import 'package:donation/utils/tool_widgets.dart';
-// import 'package:fluent_ui/fluent_ui.dart' as fluent;
-// import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:donation/src/features/services/report_service.dart';
 
-// class DonationChartByHospital extends StatefulWidget {
-//   final List<Donation> data;
-//   const DonationChartByHospital({Key? key, required this.data})
-//       : super(key: key);
+final hospitalStatsProvider =
+    FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
+  try {
+    final reportService = ref.read(reportServiceProvider);
+    return await reportService.getHospitalStats();
+  } catch (e) {
+    throw Exception('Failed to load hospital stats: $e');
+  }
+});
 
-//   @override
-//   State<DonationChartByHospital> createState() =>
-//       _DonationChartByHospitalState();
-// }
+class DonationChartByHospital extends ConsumerStatefulWidget {
+  DonationChartByHospital({
+    Key? key,
+  }) : super(key: key);
 
-// class _DonationChartByHospitalState extends State<DonationChartByHospital> {
-//   List<String> hospitals = [];
+  @override
+  ConsumerState<DonationChartByHospital> createState() =>
+      _DonationChartByHospitalState();
+}
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     for (var element in widget.data) {
-//       hospitals.add(element.hospital!);
-//     }
+class _DonationChartByHospitalState
+    extends ConsumerState<DonationChartByHospital> {
+  @override
+  Widget build(BuildContext context) {
+    final hospitalStats = ref.watch(hospitalStatsProvider);
 
-//     //delete duplicate from hospitals
-//     hospitals = hospitals.toSet().toList();
-//     //sort Hospitals by hospitals list count
-//     hospitals.sort((a, b) => widget.data
-//         .where((element) => element.hospital == b)
-//         .length
-//         .compareTo(
-//             widget.data.where((element) => element.hospital == a).length));
-//   }
+    return Container(
+      height: Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.height * 0.65
+          : MediaQuery.of(context).size.height * 0.52,
+      width: Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width * 0.9
+          : MediaQuery.of(context).size.width * 0.43,
+      child: Material(
+        elevation: 4,
+        borderRadius:
+            BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16),
+        color: Colors.white,
+        child: hospitalStats.when(
+          data: (data) {
+            final hospitalData = Map<String, int>.from(data['data']);
+            final totalDonations = data['totalDonations'] as int;
+            final sortedHospitals = hospitalData.entries.toList()
+              ..sort((a, b) => b.value.compareTo(a.value));
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: EdgeInsets.symmetric(
-//           horizontal: Responsive.isMobile(context) ? 0 : 8,
-//           vertical: Responsive.isMobile(context) ? 12 : 0),
-//       margin: const EdgeInsets.all(
-//         2,
-//       ),
-//       //decoration: shadowDecoration(Colors.white),
-//       child: fluent.Button(
-//         // style: NeumorphicStyle(
-//         //   color: Colors.white,
-//         //   boxShape: NeumorphicBoxShape.roundRect(
-//         //       BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
-//         //   depth: 4,
-//         //   intensity: 0.8,
-//         //   shadowDarkColor: Colors.black,
-//         //   shadowLightColor: Colors.white,
-//         // ),
-//         onPressed: () async {},
-//         child: ListView(
-//           physics: Responsive.isMobile(context)
-//               ? const NeverScrollableScrollPhysics()
-//               : const BouncingScrollPhysics(),
-//           shrinkWrap: true,
-//           children: [
-//             Text(
-//               "လှူဒါန်းသည့်နေရာအလိုက် မှတ်တမ်း",
-//               style: TextStyle(
-//                 fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                 color: Colors.blue,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             SizedBox(
-//               height: Responsive.isMobile(context) ? 10 : 20,
-//             ),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text(
-//                   "လှူဒါန်းသည့်နေရာ",
-//                   style: TextStyle(
-//                       fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                       color: Colors.black,
-//                       fontWeight: FontWeight.bold),
-//                 ),
-//                 Text(
-//                   "အရေအတွက်",
-//                   style: TextStyle(
-//                       fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                       color: Colors.black,
-//                       fontWeight: FontWeight.bold),
-//                 ),
-//               ],
-//             ),
-//             ListView.builder(
-//               shrinkWrap: true,
-//               physics: const BouncingScrollPhysics(),
-//               padding: const EdgeInsets.only(top: 12.0, right: 12, left: 8),
-//               itemCount: hospitals.length,
-//               itemBuilder: (BuildContext context, int index) {
-//                 return Visibility(
-//                   visible: widget.data
-//                       .where((element) => element.hospital == hospitals[index])
-//                       .isNotEmpty,
-//                   child: Padding(
-//                     padding: const EdgeInsets.all(8.0),
-//                     child: Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                       children: [
-//                         Text(
-//                           hospitals[index] == "" ? "-" : hospitals[index],
-//                           style: TextStyle(
-//                             fontSize: Responsive.isMobile(context) ? 15 : 16,
-//                             color: Colors.black,
-//                           ),
-//                         ),
-//                         Text(
-//                           widget.data
-//                               .where((element) =>
-//                                   element.hospital == hospitals[index])
-//                               .length
-//                               .toString(),
-//                           style: TextStyle(
-//                             fontSize: Responsive.isMobile(context) ? 15 : 16,
-//                             color: primaryColor,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 );
-//               },
-//             ),
-//             Container(
-//               margin:
-//                   const EdgeInsets.only(left: 12, right: 16, top: 8, bottom: 8),
-//               width: double.infinity,
-//               height: 1,
-//               color: Colors.grey,
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.only(
-//                   left: 12, top: 8, right: 20, bottom: 30),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   Text(
-//                     "စုစုပေါင်း အရေအတွက်",
-//                     style: TextStyle(
-//                       fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                       color: Colors.grey,
-//                     ),
-//                   ),
-//                   Text(
-//                     widget.data.length.toString(),
-//                     style: TextStyle(
-//                       fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                       color: Colors.grey,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "လှူဒါန်းသည့်နေရာအလိုက် မှတ်တမ်း",
+                    style: TextStyle(
+                      fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                      color: primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: Responsive.isMobile(context) ? 10 : 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "လှူဒါန်းသည့်နေရာ",
+                        style: TextStyle(
+                          fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "အရေအတွက်",
+                            style: TextStyle(
+                              fontSize:
+                                  Responsive.isMobile(context) ? 15.5 : 16.5,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 50),
+                          Text(
+                            "%",
+                            style: TextStyle(
+                              fontSize:
+                                  Responsive.isMobile(context) ? 15.5 : 16.5,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: Responsive.isMobile(context)
+                          ? const NeverScrollableScrollPhysics()
+                          : const BouncingScrollPhysics(),
+                      padding:
+                          const EdgeInsets.only(top: 12.0, right: 12, left: 8),
+                      itemCount: sortedHospitals.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final hospital = sortedHospitals[index];
+                        final count = hospital.value;
+                        // final percentage = totalDonations > 0
+                        //     ? (count / totalDonations * 100).toStringAsFixed(1)
+                        //     : '0.0';
+
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  hospital.key.isEmpty ? "-" : hospital.key,
+                                  style: TextStyle(
+                                    fontSize:
+                                        Responsive.isMobile(context) ? 15 : 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 60,
+                                    alignment: Alignment.centerRight,
+                                    child: Text(
+                                      count.toString(),
+                                      style: TextStyle(
+                                        fontSize: Responsive.isMobile(context)
+                                            ? 15
+                                            : 16,
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                  // Container(
+                                  //   width: 50,
+                                  //   alignment: Alignment.centerRight,
+                                  //   child: Text(
+                                  //     percentage,
+                                  //     style: TextStyle(
+                                  //       fontSize: Responsive.isMobile(context)
+                                  //           ? 15
+                                  //           : 16,
+                                  //       color: Colors.grey,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 12, right: 16),
+                    width: double.infinity,
+                    height: 1,
+                    color: Colors.grey,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, top: 8, right: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "စုစုပေါင်း အရေအတွက်",
+                          style: TextStyle(
+                            fontSize:
+                                Responsive.isMobile(context) ? 15.5 : 16.5,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          totalDonations.toString(),
+                          style: TextStyle(
+                            fontSize:
+                                Responsive.isMobile(context) ? 15.5 : 16.5,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+          loading: () => Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                error.toString().replaceAll('Exception: ', ''),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

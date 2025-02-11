@@ -1,97 +1,127 @@
-// import 'package:donation/realm/schemas.dart';
-// import 'package:donation/responsive.dart';
-// import 'package:donation/src/features/finder/provider/request_give_provider.dart';
-// import 'package:donation/utils/Colors.dart';
-// import 'package:flutter/material.dart';
-// import 'package:fluent_ui/fluent_ui.dart' as fluent;
-// import 'package:flutter/material.dart';
-// import 'package:hooks_riverpod/hooks_riverpod.dart';
-// import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:flutter/material.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:donation/src/features/services/report_service.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
-// class BloodRequestGiveChartScreen extends ConsumerStatefulWidget {
-//   const BloodRequestGiveChartScreen({super.key});
+final requestGiveStatsProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  try {
+    final reportService = ref.read(reportServiceProvider);
+    return await reportService.getRequestGiveStats();
+  } catch (e) {
+    throw Exception('Failed to load request/give stats: $e');
+  }
+});
 
-//   @override
-//   ConsumerState<BloodRequestGiveChartScreen> createState() =>
-//       _BloodRequestGiveChartScreenState();
-// }
+class ChartData {
+  ChartData(this.x, this.y, this.y1);
+  final String x;
+  final double? y;
+  final double? y1;
+}
 
-// class _BloodRequestGiveChartScreenState
-//     extends ConsumerState<BloodRequestGiveChartScreen> {
-//   late List<ChartData> data;
-//   late TooltipBehavior _tooltip;
-//   List<RequestGive> requestGives = [];
+class BloodRequestGiveChartScreen extends ConsumerStatefulWidget {
+  const BloodRequestGiveChartScreen({super.key});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     var requestGivesData = ref.watch(requestGiveProvider);
-//     requestGivesData.forEach((element) {
-//       requestGives.add(element);
-//     });
-//     requestGives.sort((a, b) => a.date!.compareTo(b.date!));
+  @override
+  ConsumerState<BloodRequestGiveChartScreen> createState() =>
+      _BloodRequestGiveChartScreenState();
+}
 
-//     final List<ChartData> chartData = <ChartData>[];
-//     requestGives.forEach((element) {
-//       chartData.add(ChartData(
-//           "${element.date!.toLocal().month.toString()}/${element.date!.toLocal().year.toString()}",
-//           element.request!.toDouble(),
-//           element.give!.toDouble()));
-//     });
-//     return Container(
-//       height: Responsive.isMobile(context)
-//           ? MediaQuery.of(context).size.height * 0.6
-//           : MediaQuery.of(context).size.height * 0.5,
-//       width: Responsive.isMobile(context)
-//           ? MediaQuery.of(context).size.width * 0.9
-//           : MediaQuery.of(context).size.width * 0.43,
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           SizedBox(
-//             height: 8,
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.only(left: 16),
-//             child: Text(
-//               "သွေးတောင်းခံ/လှူဒါန်းမှု အခြေအနေ",
-//               style: TextStyle(
-//                   fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                   color: primaryColor,
-//                   fontWeight: FontWeight.bold),
-//             ),
-//           ),
-//           SizedBox(
-//             height: Responsive.isMobile(context) ? 10 : 8,
-//           ),
-//           Expanded(
-//             child: SfCartesianChart(
-//                 primaryXAxis: CategoryAxis(),
-//                 series: <CartesianSeries>[
-//                   ColumnSeries<ChartData, String>(
-//                       color: Colors.green,
-//                       dataSource: chartData,
-//                       xValueMapper: (ChartData data, _) => data.x,
-//                       yValueMapper: (ChartData data, _) => data.y),
-//                   ColumnSeries<ChartData, String>(
-//                       color: Colors.red,
-//                       dataSource: chartData,
-//                       xValueMapper: (ChartData data, _) => data.x,
-//                       yValueMapper: (ChartData data, _) => data.y1),
-//                 ]),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+class _BloodRequestGiveChartScreenState
+    extends ConsumerState<BloodRequestGiveChartScreen> {
+  late TooltipBehavior _tooltip;
 
-// class ChartData {
-//   ChartData(
-//     this.x,
-//     this.y,
-//     this.y1,
-//   );
-//   final String x;
-//   final double? y;
-//   final double? y1;
-// }
+  @override
+  void initState() {
+    super.initState();
+    _tooltip = TooltipBehavior(enable: true, format: 'point.x : point.y');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final requestGiveStats = ref.watch(requestGiveStatsProvider);
+
+    return Container(
+      height: Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.height * 0.6
+          : MediaQuery.of(context).size.height * 0.5,
+      width: Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width * 0.9
+          : MediaQuery.of(context).size.width * 0.43,
+      child: Material(
+        elevation: 4,
+        borderRadius:
+            BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16),
+        color: Colors.white,
+        child: requestGiveStats.when(
+          data: (data) {
+            final chartData = data
+                .map((item) => ChartData(
+                      "${item['month']}/${item['year']}",
+                      (item['request'] as num).toDouble(),
+                      (item['give'] as num).toDouble(),
+                    ))
+                .toList();
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "သွေးတောင်းခံ/လှူဒါန်းမှု အခြေအနေ",
+                    style: TextStyle(
+                      fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                      color: primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: Responsive.isMobile(context) ? 10 : 8),
+                  Expanded(
+                    child: SfCartesianChart(
+                      primaryXAxis: CategoryAxis(),
+                      tooltipBehavior: _tooltip,
+                      legend: Legend(
+                        isVisible: true,
+                        position: LegendPosition.bottom,
+                      ),
+                      series: <CartesianSeries>[
+                        ColumnSeries<ChartData, String>(
+                          name: 'တောင်းခံ',
+                          color: Colors.red,
+                          dataSource: chartData,
+                          xValueMapper: (ChartData data, _) => data.x,
+                          yValueMapper: (ChartData data, _) => data.y,
+                        ),
+                        ColumnSeries<ChartData, String>(
+                          name: 'လှူဒါန်း',
+                          color: Colors.green,
+                          dataSource: chartData,
+                          xValueMapper: (ChartData data, _) => data.x,
+                          yValueMapper: (ChartData data, _) => data.y1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+          loading: () => Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                error.toString().replaceAll('Exception: ', ''),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

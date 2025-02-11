@@ -15,28 +15,33 @@ import 'package:donation/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_framework/responsive_row_column.dart';
-import 'package:dio/dio.dart';
+import 'package:donation/core/api/api_client.dart';
 import 'package:donation/core/api/api_response.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 
 class DashboardStats {
   final int totalMembers;
   final int totalDonations;
   final int totalPatients;
-  final List<dynamic> donations;
+  final int totalExpenses;
+  final int donations;
 
   DashboardStats({
     required this.totalMembers,
     required this.totalDonations,
     required this.totalPatients,
+    required this.totalExpenses,
     required this.donations,
   });
 
   factory DashboardStats.fromJson(Map<String, dynamic> json) {
     return DashboardStats(
-      totalMembers: json['total_members'] ?? 0,
-      totalDonations: json['total_donations'] ?? 0,
-      totalPatients: json['total_patients'] ?? 0,
-      donations: json['donations'] ?? [],
+      totalMembers: json['totalMember'] ?? 0,
+      totalDonations: json['totalDonations'] ?? 0,
+      totalPatients: json['totalPatient'] ?? 0,
+      totalExpenses: json['totalExpenses'] ?? 0,
+      donations: json['donations'] ?? 0,
     );
   }
 }
@@ -52,7 +57,8 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
   int totalMembers = 0;
   int totalDonations = 0;
   int totalPatients = 0;
-  List<dynamic> donationList = [];
+  int totalExpenses = 0;
+  int donationCount = 0;
   bool isLoading = true;
 
   @override
@@ -67,33 +73,23 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
         isLoading = true;
       });
 
-      final dio = Dio();
-      final response = await dio.get(
-        'https://your-yii2-backend/api/v1/dashboard/stats',
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization':
-                'Bearer YOUR_AUTH_TOKEN', // Get from your auth service
-          },
-        ),
+      final apiClient = ApiClient();
+      final response = await apiClient.get<Map<String, dynamic>>(
+        '/report/dashboard',
       );
 
-      final apiResponse = ApiResponse<DashboardStats>.fromJson(
-        response.data,
-        (json) => DashboardStats.fromJson(json),
-      );
-
-      if (apiResponse.success) {
+      if (response.data != null && response.data!['status'] == 'ok') {
+        final data = response.data!['data'];
         setState(() {
-          totalMembers = apiResponse.data?.totalMembers ?? 0;
-          totalDonations = apiResponse.data?.totalDonations ?? 0;
-          totalPatients = apiResponse.data?.totalPatients ?? 0;
-          donationList = apiResponse.data?.donations ?? [];
+          totalMembers = data['totalMember'] ?? 0;
+          totalDonations = data['totalDonations'] ?? 0;
+          totalPatients = data['totalPatient'] ?? 0;
+          totalExpenses = data['totalExpenses'] ?? 0;
+          donationCount = data['donations'] ?? 0;
           isLoading = false;
         });
       } else {
-        print('Failed to load dashboard data: ${apiResponse.message}');
+        print('Failed to load dashboard data: ${response.data?['message']}');
         setState(() {
           isLoading = false;
         });
@@ -195,7 +191,7 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
             right: 20,
           ),
           child: _buildChartButton(
-            child: Container(), // BloodDonationPieChart(),
+            child: BloodDonationPieChart(),
           ),
         ),
         Container(
@@ -205,12 +201,12 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
             right: 20,
           ),
           child: _buildChartButton(
-            child: Container(), // BloodDonationGenderPieChart(),
+            child: BloodDonationGenderPieChart(),
           ),
         ),
         Container(
           margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-          child: Container(), // DonationChartByBlood(),
+          child: DonationChartByBlood(),
         ),
         Container(
           margin: EdgeInsets.only(
@@ -224,13 +220,13 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
             width: Responsive.isMobile(context)
                 ? MediaQuery.of(context).size.width * 0.9
                 : MediaQuery.of(context).size.width * 0.43,
-            child: Container(), // DonationChartByHospital(),
+            child: DonationChartByHospital(),
           ),
         ),
         Container(
           margin: EdgeInsets.only(top: 4, left: 20, right: 20, bottom: 20),
           child: _buildChartButton(
-            child: Container(), // BloodRequestGiveChartScreen(),
+            child:  BloodRequestGiveChartScreen(),
           ),
         ),
       ],

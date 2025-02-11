@@ -40,6 +40,7 @@ class DashboardCard extends ConsumerWidget {
         margin: const EdgeInsets.only(top: 12, right: 12),
         child: Card(
           elevation: 4,
+          color: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius:
                 BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16),
@@ -68,7 +69,7 @@ class DashboardCard extends ConsumerWidget {
               // }
             },
             child: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
