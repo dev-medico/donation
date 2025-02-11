@@ -4,7 +4,7 @@ import 'package:donation/models/post.dart';
 
 class PostRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = '/api/posts';
+  static const String _baseUrl = 'posts';
 
   PostRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();

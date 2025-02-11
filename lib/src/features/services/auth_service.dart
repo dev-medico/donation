@@ -8,7 +8,7 @@ final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 class AuthService extends BaseService {
   Future<Map<String, dynamic>> login(String email, String password) async {
     final response = await apiClient.post<Map<String, dynamic>>(
-      '/api/auth/login',
+      '/auth/login',
       data: {
         'email': email,
         'password': password,
@@ -25,7 +25,7 @@ class AuthService extends BaseService {
 
   Future<Map<String, dynamic>> memberLogin(String phone) async {
     final response = await apiClient.post<Map<String, dynamic>>(
-      '/api/auth/member-login',
+      '/auth/member-login',
       data: {
         'phone': phone,
       },

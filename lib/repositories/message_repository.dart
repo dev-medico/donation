@@ -4,7 +4,7 @@ import 'package:donation/models/message.dart';
 
 class MessageRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = '/api/messages';
+  static const String _baseUrl = 'messages';
 
   MessageRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();

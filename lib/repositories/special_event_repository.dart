@@ -4,7 +4,7 @@ import 'package:donation/models/special_event.dart';
 
 class SpecialEventRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = '/api/special-events';
+  static const String _baseUrl = 'special-events';
 
   SpecialEventRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();

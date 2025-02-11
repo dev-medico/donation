@@ -4,7 +4,7 @@ import 'package:donation/models/donar_record.dart';
 
 class DonarRecordRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = '/api/donar-records';
+  static const String _baseUrl = 'donar-records';
 
   DonarRecordRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();

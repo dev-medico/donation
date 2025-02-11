@@ -9,7 +9,7 @@ class DonationService extends BaseService {
   Future<List<dynamic>> getDonations() async {
     final headers = await getAuthHeaders();
     final response = await apiClient.get(
-      '/api/donations',
+      'donations',
       options: Options(headers: headers),
     );
     return response.data['data'] as List<dynamic>;
@@ -18,7 +18,7 @@ class DonationService extends BaseService {
   Future<List<dynamic>> getDonationsByMonthYear(int month, int year) async {
     final headers = await getAuthHeaders();
     final response = await apiClient.get(
-      '/api/donations/by-month-year',
+      'donations/by-month-year',
       queryParameters: {
         'month': month,
         'year': year,
@@ -31,7 +31,7 @@ class DonationService extends BaseService {
   Future<List<dynamic>> getDonationsByYear(int year) async {
     final headers = await getAuthHeaders();
     final response = await apiClient.get(
-      '/api/donations/by-year/$year',
+      'donations/by-year/$year',
       options: Options(headers: headers),
     );
     return response.data['data'] as List<dynamic>;
@@ -40,7 +40,7 @@ class DonationService extends BaseService {
   Future<Map<String, dynamic>> createDonation(Map<String, dynamic> data) async {
     final headers = await getAuthHeaders();
     final response = await apiClient.post(
-      '/api/donations',
+      'donations',
       data: data,
       options: Options(headers: headers),
     );
@@ -51,7 +51,7 @@ class DonationService extends BaseService {
       String id, Map<String, dynamic> data) async {
     final headers = await getAuthHeaders();
     final response = await apiClient.put(
-      '/api/donations/$id',
+      'donations/$id',
       data: data,
       options: Options(headers: headers),
     );
@@ -61,7 +61,7 @@ class DonationService extends BaseService {
   Future<void> deleteDonation(String id) async {
     final headers = await getAuthHeaders();
     await apiClient.delete(
-      '/api/donations/$id',
+      'donations/$id',
       options: Options(headers: headers),
     );
   }
@@ -69,7 +69,7 @@ class DonationService extends BaseService {
   Future<Map<String, dynamic>> getDonationStats() async {
     final headers = await getAuthHeaders();
     final response = await apiClient.get(
-      '/api/donations/stats',
+      'donations/stats',
       options: Options(headers: headers),
     );
     return response.data as Map<String, dynamic>;

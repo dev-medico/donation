@@ -4,7 +4,7 @@ import 'package:donation/models/request_give.dart';
 
 class RequestGiveRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = '/api/request-gives';
+  static const String _baseUrl = 'request-gives';
 
   RequestGiveRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();

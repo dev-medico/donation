@@ -4,7 +4,7 @@ import 'package:donation/models/expenses_record.dart';
 
 class ExpensesRecordRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = '/api/expenses-records';
+  static const String _baseUrl = 'expenses-records';
 
   ExpensesRecordRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();

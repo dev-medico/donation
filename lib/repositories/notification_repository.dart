@@ -4,7 +4,7 @@ import 'package:donation/models/notification.dart';
 
 class NotificationRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = '/api/notifications';
+  static const String _baseUrl = 'notifications';
 
   NotificationRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();

@@ -4,7 +4,7 @@ import 'package:donation/models/donation.dart';
 
 class DonationRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = '/api/donations';
+  static const String _baseUrl = 'donations';
 
   DonationRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();

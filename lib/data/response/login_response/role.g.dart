@@ -7,7 +7,7 @@ part of 'role.dart';
 // **************************************************************************
 
 Role _$RoleFromJson(Map<String, dynamic> json) => Role(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       name: json['name'] == null
           ? null
           : Name.fromJson(json['name'] as Map<String, dynamic>),
@@ -15,7 +15,7 @@ Role _$RoleFromJson(Map<String, dynamic> json) => Role(
       permissions: (json['permissions'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      level: json['level'] as int?,
+      level: (json['level'] as num?)?.toInt(),
       companyId: json['company_id'],
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,

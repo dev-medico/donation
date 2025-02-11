@@ -64,19 +64,16 @@ dependencies:
   url_launcher: ^6.1.11
   win32: ^5.5.5
 
-dependency_overrides: 
+dependency_overrides:
   intl: ^0.19.0
-  analyzer: ^5.13.0
-  # image_picker_platform_interface: 2.6.2
-  # image_picker_for_web: 2.1.10
-  responsive_framework: 0.1.9
   http: 0.13.5
-  
+  responsive_framework: 0.1.9
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  json_serializable: ^6.6.2
-  build_runner: ^2.3.3
+  json_serializable: ^6.7.1
+  build_runner: ^2.4.6
   msix: ^3.12.2
   custom_lint: ^0.6.8
   riverpod_generator: ^2.2.3

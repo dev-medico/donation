@@ -18,8 +18,8 @@ Addresses _$AddressesFromJson(Map<String, dynamic> json) => Addresses(
       wardMm: json['ward_mm'] as String?,
       housing: json['housing'],
       town: json['town'],
-      township: json['township'] as int?,
-      region: json['region'] as int?,
+      township: (json['township'] as num?)?.toInt(),
+      region: (json['region'] as num?)?.toInt(),
       addressesDefault: json['default'] as bool?,
     );
 
