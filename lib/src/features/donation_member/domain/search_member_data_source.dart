@@ -19,21 +19,22 @@ class SearchMemberDataSource extends DataGridSource {
               DataGridCell<String>(
                   columnName: 'အမည်', value: member.name ?? ''),
               DataGridCell<String>(
-                  columnName: 'လှူဒါန်းခဲ့သည့်ရက်',
-                  value: member.lastDate != null
-                      ? DateFormat('dd-MM-yyyy')
-                          .format(DateTime.parse(member.lastDate!))
-                      : ''),
+                  columnName: 'အဖအမည်', value: member.fatherName ?? ''),
               DataGridCell<String>(
                   columnName: 'သွေးအုပ်စု', value: member.bloodType ?? ''),
               DataGridCell<String>(
                   columnName: 'မှတ်ပုံတင်အမှတ်', value: member.nrc ?? ''),
               DataGridCell<String>(
+                  columnName: 'သွေးဘဏ်ကတ်', value: member.bloodBankCard ?? ''),
+              DataGridCell<String>(
+                  columnName: 'သွေးလှူမှုကြိမ်ရေ',
+                  value: member.memberCount ?? ''),
+              DataGridCell<String>(
+                  columnName: 'မွေးသက္ကရာဇ်', value: member.birthDate ?? ''),
+              DataGridCell<String>(
                   columnName: 'ဖုန်းနံပါတ်', value: member.phone ?? ''),
               DataGridCell<String>(
-                  columnName: 'အခြေအနေ', value: member.status ?? ''),
-              DataGridCell<String>(
-                  columnName: 'မှတ်ချက်', value: member.note ?? ''),
+                  columnName: 'နေရပ်လိပ်စာ', value: member.address ?? ''),
             ]))
         .toList();
   }

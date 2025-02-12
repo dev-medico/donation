@@ -26,17 +26,33 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          print('Making request to: ${options.baseUrl}${options.path}');
+          print('Query parameters: ${options.queryParameters}');
+
           // Add auth token if available
           final prefs = await SharedPreferences.getInstance();
           final token = prefs.getString('token');
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
+            print('Using auth token: $token');
+          } else {
+            print('No auth token found');
           }
           return handler.next(options);
         },
+        onResponse: (response, handler) {
+          print('Received response from: ${response.requestOptions.uri}');
+          print('Status code: ${response.statusCode}');
+          print('Response data: ${response.data}');
+          return handler.next(response);
+        },
         onError: (DioException e, handler) {
+          print('Error making request to: ${e.requestOptions.uri}');
+          print('Error type: ${e.type}');
+          print('Error message: ${e.message}');
+          print('Error response: ${e.response?.data}');
+
           if (e.response?.statusCode == 401) {
-            // Handle unauthorized error (e.g., token expired)
             print('Unauthorized: ${e.response?.data?['message']}');
           }
           return handler.next(e);
@@ -64,7 +80,13 @@ class ApiClient {
         options: options,
       );
     } on DioException catch (e) {
+      print('GET request failed: ${e.message}');
+      print('URL: ${e.requestOptions.uri}');
+      print('Response: ${e.response?.data}');
       throw _handleError(e);
+    } catch (e) {
+      print('Unexpected error in GET request: $e');
+      rethrow;
     }
   }
 

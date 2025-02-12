@@ -13,6 +13,8 @@ import 'package:logger/logger.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:donation/src/features/services/member_service.dart'
+    hide memberServiceProvider;
 
 class SearchMemberListScreen extends ConsumerStatefulWidget {
   static const routeName = "/search_members";
@@ -37,13 +39,111 @@ class _SearchMemberListScreenState
     "O (Rh -)",
   ];
   String? selectedBloodType = "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
-  List<Member> dataSegments = [];
+  List<Member> allMembers = [];
+  List<Member> filteredMembers = [];
   TextStyle tabStyle = const TextStyle(fontSize: 16);
 
   final searchController = TextEditingController();
   Timer? _debounceTimer;
   String searchKey = "";
   SearchMemberDataSource? memberDataDataSource;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    final memberService = ref.read(memberServiceProvider);
+    try {
+      setState(() {
+        isLoading = true;
+        allMembers = [];
+      });
+
+      await _fetchAllMembers(memberService);
+
+      setState(() {
+        filteredMembers = allMembers;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading members: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchAllMembers(MemberService memberService) async {
+    try {
+      int page = 0;
+      const int limit = 5000;
+      bool hasMore = true;
+
+      while (hasMore) {
+        final members = await memberService.searchMembers(
+          page: page,
+          limit: limit,
+        );
+
+        if (members.isEmpty) {
+          hasMore = false;
+        } else {
+          setState(() {
+            allMembers.addAll(members);
+          });
+
+          // If we got less than the limit, we've reached the end
+          if (members.length < limit) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching members: $e');
+    }
+  }
+
+  void _filterMembers() {
+    if (allMembers.isEmpty) return;
+
+    List<Member> filtered = List.from(allMembers);
+
+    // Filter by blood type
+    if (selectedBloodType != null &&
+        selectedBloodType != "သွေးအုပ်စုဖြင့် ရှာဖွေမည်") {
+      filtered = filtered
+          .where((member) =>
+              member.bloodType != null && member.bloodType == selectedBloodType)
+          .toList();
+    }
+
+    // Filter by search text
+    if (searchKey.isNotEmpty) {
+      filtered = filtered
+          .where((member) =>
+              (member.name?.toLowerCase().contains(searchKey.toLowerCase()) ??
+                  false) ||
+              (member.memberId
+                      ?.toLowerCase()
+                      .contains(searchKey.toLowerCase()) ??
+                  false) ||
+              (member.phone?.toLowerCase().contains(searchKey.toLowerCase()) ??
+                  false))
+          .toList();
+    }
+
+    setState(() {
+      filteredMembers = filtered;
+      memberDataDataSource =
+          SearchMemberDataSource(memberData: filteredMembers);
+    });
+  }
 
   @override
   void dispose() {
@@ -53,13 +153,6 @@ class _SearchMemberListScreenState
 
   @override
   Widget build(BuildContext context) {
-    final searchResult = ref.watch(searchMemberProvider((
-      search: searchKey,
-      bloodType: selectedBloodType == "သွေးအုပ်စုဖြင့် ရှာဖွေမည်"
-          ? null
-          : selectedBloodType
-    )));
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -155,6 +248,7 @@ class _SearchMemberListScreenState
                                 setState(() {
                                   selectedBloodType = value.toString();
                                 });
+                                _filterMembers();
                               },
                               onSaved: (value) {},
                             ),
@@ -181,6 +275,7 @@ class _SearchMemberListScreenState
                                   setState(() {
                                     searchKey = val;
                                   });
+                                  _filterMembers();
                                 });
                               },
                               decoration: InputDecoration(
@@ -268,6 +363,7 @@ class _SearchMemberListScreenState
                               setState(() {
                                 selectedBloodType = value.toString();
                               });
+                              _filterMembers();
                             },
                             onSaved: (value) {},
                           ),
@@ -293,6 +389,7 @@ class _SearchMemberListScreenState
                                 setState(() {
                                   searchKey = val;
                                 });
+                                _filterMembers();
                               });
                             },
                             decoration: InputDecoration(
@@ -337,16 +434,9 @@ class _SearchMemberListScreenState
                     left: 20.0,
                     top: Responsive.isMobile(context) ? 160 : 100,
                     bottom: 12),
-                child: searchResult.when(
-                  data: (members) {
-                    memberDataDataSource =
-                        SearchMemberDataSource(memberData: members);
-                    return buildSimpleTable();
-                  },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => Center(child: Text('Error: $error')),
-                ),
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : buildSimpleTable(),
               ),
             ],
           )),
@@ -354,7 +444,10 @@ class _SearchMemberListScreenState
   }
 
   Widget buildSimpleTable() {
-    if (memberDataDataSource == null) return Container();
+    if (memberDataDataSource == null) {
+      memberDataDataSource =
+          SearchMemberDataSource(memberData: filteredMembers);
+    }
 
     return Container(
       margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
@@ -363,28 +456,12 @@ class _SearchMemberListScreenState
         onCellTap: (details) async {
           if (details.rowColumnIndex.rowIndex == 0) return;
 
-          final members = memberDataDataSource!.rows
-              .map((row) => Member.fromJson(
-                  row.getCells().asMap().map((key, cell) => MapEntry(
-                      [
-                        'id',
-                        'memberId',
-                        'name',
-                        'lastDate',
-                        'bloodType',
-                        'nrc',
-                        'phone',
-                        'status',
-                        'note'
-                      ][key],
-                      cell.value))))
-              .toList();
-
+          final member = filteredMembers[details.rowColumnIndex.rowIndex - 1];
           showDialog(
               context: context,
               builder: (context) => CallOrRemarkDialog(
                     title: "လုပ်ဆောင်ရန်",
-                    member: members[details.rowColumnIndex.rowIndex - 1],
+                    member: member,
                   ));
         },
         gridLinesVisibility: GridLinesVisibility.both,
@@ -415,13 +492,13 @@ class _SearchMemberListScreenState
                     style: TextStyle(color: Colors.white),
                   ))),
           GridColumn(
-              columnName: 'လှူဒါန်းခဲ့သည့်ရက်',
+              columnName: 'အဖအမည်',
               label: Container(
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
                   child: const Text(
-                    'လှူဒါန်းခဲ့သည့်ရက်',
+                    'အဖအမည်',
                     style: TextStyle(color: Colors.white),
                     overflow: TextOverflow.ellipsis,
                   ))),
@@ -446,6 +523,36 @@ class _SearchMemberListScreenState
                     style: TextStyle(color: Colors.white),
                   ))),
           GridColumn(
+              columnName: 'သွေးဘဏ်ကတ်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'သွေးဘဏ်ကတ်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'သွေးလှူမှုကြိမ်ရေ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'သွေးလှူမှုကြိမ်ရေ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'မွေးသက္ကရာဇ်',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'မွေးသက္ကရာဇ်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
               columnName: 'ဖုန်းနံပါတ်',
               label: Container(
                   color: primaryColor,
@@ -456,23 +563,13 @@ class _SearchMemberListScreenState
                     style: TextStyle(color: Colors.white),
                   ))),
           GridColumn(
-              columnName: 'အခြေအနေ',
+              columnName: 'နေရပ်လိပ်စာ',
               label: Container(
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
                   child: const Text(
-                    'အခြေအနေ',
-                    style: TextStyle(color: Colors.white),
-                  ))),
-          GridColumn(
-              columnName: 'မှတ်ချက်',
-              label: Container(
-                  color: primaryColor,
-                  padding: const EdgeInsets.all(8.0),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'မှတ်ချက်',
+                    'နေရပ်လိပ်စာ',
                     style: TextStyle(color: Colors.white),
                   ))),
         ],

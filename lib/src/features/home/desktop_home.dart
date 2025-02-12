@@ -53,8 +53,8 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     super.initState();
     pages = [
       ReportNewScreen(),
-      Container(), // SearchMemberListScreen(),
-      Container(), // MemberListScreen(),
+      SearchMemberListScreen(),
+       MemberListScreen(),
       Container(), // DonationListScreen(),
       Container(), // SpecialEventListScreen(),
       Container(), // DonarListNewScreen(),

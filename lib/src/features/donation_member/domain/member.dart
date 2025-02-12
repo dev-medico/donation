@@ -1,5 +1,5 @@
 class Member {
-  final int? id;
+  final dynamic id;
   final String? memberId;
   final String? name;
   final String? fatherName;
