@@ -7,7 +7,8 @@ import 'package:donation/src/features/donation_member/domain/member.dart';
 final memberServiceProvider = Provider<MemberService>((ref) => MemberService());
 
 class MemberService extends BaseService {
-  final ApiClient _apiClient = ApiClient();
+  // Base path for all member endpoints
+  final String _basePath = '/member';
 
   Future<List<Member>> searchMembers({
     String? query,
@@ -16,21 +17,35 @@ class MemberService extends BaseService {
     int limit = 50,
   }) async {
     try {
-      final response = await _apiClient.get<Map<String, dynamic>>(
-        '/member/index',
-        queryParameters: {
-          'q': query ?? '',
-          'blood_type': bloodType,
-          'page': page,
-          'limit': limit,
-        },
+      final Map<String, dynamic> params = {
+        'q': query ?? '',
+        'page': page,
+        'limit': limit,
+      };
+
+      if (bloodType != null) {
+        params['blood_type'] = bloodType;
+      }
+
+      print('Searching members with params: $params');
+
+      final response = await apiClient.get<Map<String, dynamic>>(
+        _basePath + '/all',
+        queryParameters: params,
       );
+
+      print('Search members response status: ${response.statusCode}');
+      print('Search members response data: ${response.data}');
 
       if (response.data != null && response.data!['status'] == 'ok') {
         final List<dynamic> memberData = response.data!['data'];
-        return memberData.map((json) => Member.fromJson(json)).toList();
+        final members =
+            memberData.map((json) => Member.fromJson(json)).toList();
+        print('Parsed ${members.length} members');
+        return members;
       }
 
+      print('No members found or invalid response format');
       return [];
     } catch (e) {
       print('Error searching members: $e');
@@ -41,30 +56,53 @@ class MemberService extends BaseService {
   Future<List<dynamic>> getMembers({String? search, String? bloodType}) async {
     final headers = await getAuthHeaders();
 
-    String url = 'members';
+    final Map<String, dynamic> params = {};
     if (search != null && search.isNotEmpty) {
-      url += '?search=$search';
+      params['search'] = search;
     }
     if (bloodType != null && bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
-      url += (search != null && search.isNotEmpty) ? '&' : '?';
-      url += 'blood_type=$bloodType';
+      params['blood_type'] = bloodType;
     }
 
+    print('Getting members with params: $params');
+
     final response = await apiClient.get(
-      url,
+      _basePath + '/all',
+      queryParameters: params,
       options: Options(headers: headers),
     );
 
+    print('Get members response status: ${response.statusCode}');
+
     return response.data['data'] as List<dynamic>;
+  }
+
+  Future<Member> getMemberById(String id) async {
+    final headers = await getAuthHeaders();
+
+    print('Getting member by ID: $id');
+
+    final response = await apiClient.get(
+      '$_basePath/view?$id',
+      options: Options(headers: headers),
+    );
+
+    print('Get member by ID response status: ${response.statusCode}');
+
+    return Member.fromJson(response.data['data']);
   }
 
   Future<Map<String, dynamic>> getMemberByPhone(String phone) async {
     final headers = await getAuthHeaders();
 
+    print('Getting member by phone: $phone');
+
     final response = await apiClient.get(
-      'members/by-phone/$phone',
+      '$_basePath/by-phone/$phone',
       options: Options(headers: headers),
     );
+
+    print('Get member by phone response status: ${response.statusCode}');
 
     return response.data['data'] as Map<String, dynamic>;
   }
@@ -72,10 +110,14 @@ class MemberService extends BaseService {
   Future<Map<String, dynamic>> getMemberStats() async {
     final headers = await getAuthHeaders();
 
+    print('Getting member stats');
+
     final response = await apiClient.get(
-      'members/stats',
+      '$_basePath/stats',
       options: Options(headers: headers),
     );
+
+    print('Get member stats response status: ${response.statusCode}');
 
     return response.data as Map<String, dynamic>;
   }
@@ -83,8 +125,10 @@ class MemberService extends BaseService {
   Future<List<dynamic>> getMembersByAgeRange(int start, int end) async {
     final headers = await getAuthHeaders();
 
+    print('Getting members by age range: $start-$end');
+
     final response = await apiClient.get(
-      'members/by-age-range',
+      '$_basePath/by-age-range',
       queryParameters: {
         'start': start,
         'end': end,
@@ -92,17 +136,71 @@ class MemberService extends BaseService {
       options: Options(headers: headers),
     );
 
+    print('Get members by age range response status: ${response.statusCode}');
+
     return response.data['data'] as List<dynamic>;
   }
 
   Future<List<dynamic>> getMembersByTotalCount() async {
     final headers = await getAuthHeaders();
 
+    print('Getting members by total count');
+
     final response = await apiClient.get(
-      'members/by-total-count',
+      '$_basePath/by-total-count',
       options: Options(headers: headers),
     );
 
+    print('Get members by total count response status: ${response.statusCode}');
+
     return response.data['data'] as List<dynamic>;
+  }
+
+  Future<Member> createMember(Map<String, dynamic> memberData) async {
+    final headers = await getAuthHeaders();
+
+    print('Creating member with data: $memberData');
+
+    final response = await apiClient.post(
+      _basePath+'/create',
+      data: memberData,
+      options: Options(headers: headers),
+    );
+
+    print('Create member response status: ${response.statusCode}');
+
+    return Member.fromJson(response.data['data']);
+  }
+
+  Future<Member> updateMember(
+      String id, Map<String, dynamic> memberData) async {
+    final headers = await getAuthHeaders();
+
+    print('Updating member $id with data: $memberData');
+
+    final response = await apiClient.put(
+      '$_basePath/update/$id',
+      data: memberData,
+      options: Options(headers: headers),
+    );
+
+    print('Update member response status: ${response.statusCode}');
+
+    return Member.fromJson(response.data['data']);
+  }
+
+  Future<bool> deleteMember(String id) async {
+    final headers = await getAuthHeaders();
+
+    print('Deleting member: $id');
+
+    final response = await apiClient.delete(
+      '$_basePath/$id',
+      options: Options(headers: headers),
+    );
+
+    print('Delete member response status: ${response.statusCode}');
+
+    return response.data['success'] == true;
   }
 }

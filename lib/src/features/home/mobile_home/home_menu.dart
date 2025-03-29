@@ -1,4 +1,3 @@
-
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
@@ -25,63 +24,122 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'သွေးလှူရှင် ရှာမည်',
     'အဖွဲ့ဝင် စာရင်း',
     'သွေးလှူမှု မှတ်တမ်း',
-    'ထူးခြားဖြစ်စဥ်',
-    'ရ/သုံး ငွေစာရင်း',
-    'ပို့စ်/အသိပေးချက်များ',
-    'Log Out(V 1.3.8)'
+    'ထွက်မည်'
   ];
   List<String> icons = [
-    'assets/images/dashboard.png',
+    'assets/images/home.png',
     'assets/images/search_list.png',
     'assets/images/members.png',
     'assets/images/donations.png',
-    'assets/images/special_case.png',
-    'assets/images/finance.png',
-    'assets/images/post.png',
-    'assets/images/settings.png',
+    'assets/images/log_out.png',
   ];
 
   @override
   Widget build(BuildContext context) {
+    String? userName = '';
+    String? role = '';
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
-        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.2),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(0.0),
-                itemCount: titles.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return inkwell(index);
-                },
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header with logo and user info
+          Container(
+            color: Colors.red.withOpacity(0.05),
+            padding: const EdgeInsets.fromLTRB(16, 46, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 70,
+                  width: 70,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 5,
+                            spreadRadius: 1)
+                      ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Image.asset(
+                      'assets/images/round_icon.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  userName ?? "User",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  role ?? "Member",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.red.shade700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Divider
+          Divider(height: 1, color: Colors.grey.withOpacity(0.3)),
+
+          // Menu items
+          Expanded(
+            child: ListView.builder(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              itemCount: titles.length,
+              itemBuilder: (BuildContext context, int index) {
+                return menuItem(index);
+              },
+            ),
+          ),
+
+          // App version
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Text(
+              'Version 1.4.0',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
               ),
             ),
-            Divider(
-              height: 1,
-              color: Colors.grey.withOpacity(0.6),
-            ),
-          ],
-        ),
+          ),
+          SizedBox(height: MediaQuery.of(context).padding.bottom),
+        ],
       ),
     );
   }
 
-  Widget inkwell(int index) {
+  Widget menuItem(int index) {
     var selectedIndex = ref.watch(drawerIndexProvider);
     return Padding(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Material(
         color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
         child: InkWell(
-          splashColor: Colors.grey.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          splashColor: Colors.red.withOpacity(0.1),
           highlightColor: Colors.transparent,
           onTap: () async {
             ref.watch(drawerControllerProvider)!.toggle!.call();
-            ref.read(drawerIndexProvider.notifier).state = index;
-            if (index == 7) {
+
+            // Handle log out separately
+            if (index == 4) {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.remove('token');
               prefs.remove('name');
@@ -90,63 +148,39 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),
                   (route) => false);
+            } else {
+              ref.read(drawerIndexProvider.notifier).state = index;
             }
           },
-          child: Stack(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(
-                    top: Responsive.isMobile(context) ? 8.0 : 18,
-                    bottom: Responsive.isMobile(context) ? 8.0 : 18,
-                    left: Responsive.isMobile(context) ? 8 : 12),
-                child: Row(
-                  children: <Widget>[
-                    const Padding(
-                      padding: EdgeInsets.all(4.0),
-                    ),
-                    Image.asset(
-                      icons[index],
-                      width: Responsive.isMobile(context) ? 26 : 30,
-                    ),
-                    SizedBox(
-                      width: Responsive.isMobile(context) ? 16.0 : 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
-                      child: Text(
-                        titles[index],
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: Responsive.isMobile(context) ? 14.5 : 15,
-                          color: selectedIndex == index
-                              ? Colors.red
-                              : Colors.black,
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                    ),
-                  ],
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: selectedIndex == index
+                  ? Colors.red.withOpacity(0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Image.asset(
+                  icons[index],
+                  width: 24,
+                  height: 24,
+                  color: selectedIndex == index ? Colors.red : Colors.black54,
                 ),
-              ),
-              selectedIndex == index
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 4, bottom: 4),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.75 - 64,
-                        height: Responsive.isMobile(context) ? 46 : 60,
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.2),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(0),
-                            topRight: Radius.circular(12),
-                            bottomLeft: Radius.circular(0),
-                            bottomRight: Radius.circular(12),
-                          ),
-                        ),
-                      ),
-                    )
-                  : const SizedBox()
-            ],
+                const SizedBox(width: 16),
+                Text(
+                  titles[index],
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: selectedIndex == index
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: selectedIndex == index ? Colors.red : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

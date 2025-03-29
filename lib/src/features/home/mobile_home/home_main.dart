@@ -1,4 +1,5 @@
 import 'package:donation/realm/realm_services.dart';
+import 'package:donation/src/features/dashboard/dashboard.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donar/donar_list_new.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
@@ -28,39 +29,36 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
     'သွေးလှူရှင် ရှာမည်',
     'အဖွဲ့ဝင် စာရင်း',
     'သွေးလှူမှု မှတ်တမ်း',
-    'ထူးခြားဖြစ်စဥ်',
-    'ရ/သုံး ငွေစာရင်း',
-    'အပြင်အဆင်'
   ];
 
+  // List of screens to display when menu items are selected
   List<Widget> widgets = [
-    ReportNewScreen(),
+    // Dashboard/Home
+    DashBoardScreen(),
 
+    // Search Member
     SearchMemberListScreen(
       fromHome: true,
     ),
+
+    // Member List
     MemberListScreen(
       fromHome: true,
     ),
-    // DonationListScreen(
-    //   fromHome: true,
-    // ),
-    // SpecialEventListScreen(
-    //   fromHome: true,
-    // ),
-    // DonarListNewScreen(
-    //   fromHome: true,
-    // ),
-    // Todo
-    // FeedAdminScreen(
-    //   fromHome: true,
-    // ),
-    Container(),
+
+    // Donation List - using placeholder for now
+    Center(
+      child: Text('သွေးလှူမှု မှတ်တမ်း ကြည့်ရှုခြင်း လုပ်ဆောင်နေဆဲ ဖြစ်ပါသည်။',
+          style: TextStyle(fontSize: 16)),
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     var selectedIndex = ref.watch(drawerIndexProvider);
-    return widgets[selectedIndex ?? 0];
+    return Scaffold(
+      body: widgets[selectedIndex ?? 0],
+      drawer: const SizedBox(width: 0), // Empty drawer to prevent errors
+    );
   }
 }

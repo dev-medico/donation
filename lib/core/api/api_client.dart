@@ -11,17 +11,15 @@ class ApiClient {
   }
 
   ApiClient._internal() {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: 'https://diwar.mooo.com',
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      ),
-    );
+    _dio = Dio(BaseOptions(
+      baseUrl: 'http://16.176.19.197/backend',
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    ));
 
     _dio.interceptors.add(
       InterceptorsWrapper(
@@ -74,9 +72,22 @@ class ApiClient {
     Options? options,
   }) async {
     try {
+      // Clean up query parameters - remove null values
+      final cleanParams = queryParameters?.entries
+          .where((e) => e.value != null)
+          .fold<Map<String, dynamic>>({}, (map, entry) {
+        map[entry.key] = entry.value;
+        return map;
+      });
+
+      final fullPath = path.startsWith('/') ? path.substring(1) : path;
+
+      print('URL: ${_dio.options.baseUrl}/$fullPath');
+      print('Query parameters: $cleanParams');
+
       return await _dio.get(
-        path,
-        queryParameters: queryParameters,
+        fullPath,
+        queryParameters: cleanParams,
         options: options,
       );
     } on DioException catch (e) {

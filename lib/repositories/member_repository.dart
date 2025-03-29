@@ -4,14 +4,19 @@ import 'package:donation/models/member.dart';
 
 class MemberRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = 'members';
+  static const String _baseUrl = 'member';
 
   MemberRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();
 
   Future<ApiResponse<List<Member>>> getAllMembers() async {
     try {
-      final response = await _apiClient.get<Map<String, dynamic>>(_baseUrl);
+      final response = await _apiClient.get<Map<String, dynamic>>('$_baseUrl/all', 
+        queryParameters: {
+          'q': '',
+          'page': 0,
+          'limit': 5000
+        });
       return ApiResponse.fromJsonList(
         response.data!,
         (json) => (json)
@@ -26,7 +31,8 @@ class MemberRepository {
   Future<ApiResponse<Member>> getMemberById(String id) async {
     try {
       final response =
-          await _apiClient.get<Map<String, dynamic>>('$_baseUrl/$id');
+          await _apiClient.get<Map<String, dynamic>>('$_baseUrl/view', 
+              queryParameters: {'id': id});
       return ApiResponse.fromJson(
         response.data!,
         (json) => Member.fromJson(json),
@@ -39,7 +45,7 @@ class MemberRepository {
   Future<ApiResponse<Member>> createMember(Member member) async {
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
-        _baseUrl,
+        '$_baseUrl/create',
         data: member.toJson(),
       );
       return ApiResponse.fromJson(
@@ -54,7 +60,8 @@ class MemberRepository {
   Future<ApiResponse<Member>> updateMember(String id, Member member) async {
     try {
       final response = await _apiClient.put<Map<String, dynamic>>(
-        '$_baseUrl/$id',
+        '$_baseUrl/update',
+        queryParameters: {'id': id},
         data: member.toJson(),
       );
       return ApiResponse.fromJson(
@@ -68,7 +75,7 @@ class MemberRepository {
 
   Future<ApiResponse<void>> deleteMember(String id) async {
     try {
-      await _apiClient.delete('$_baseUrl/$id');
+      await _apiClient.delete('$_baseUrl/delete', queryParameters: {'id': id});
       return ApiResponse(success: true, message: 'Member deleted successfully');
     } catch (e) {
       return ApiResponse.error(e.toString());
@@ -82,13 +89,15 @@ class MemberRepository {
   }) async {
     try {
       final queryParameters = <String, dynamic>{
-        if (name != null) 'name': name,
+        'q': name ?? '',
+        'page': 0,
+        'limit': 5000,
         if (bloodType != null) 'blood_type': bloodType,
         if (phone != null) 'phone': phone,
       };
 
       final response = await _apiClient.get<Map<String, dynamic>>(
-        '$_baseUrl/search',
+        '$_baseUrl/all',
         queryParameters: queryParameters,
       );
 

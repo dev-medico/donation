@@ -149,4 +149,3 @@ final deleteExpensesRecordProvider =
     rethrow;
   }
 });
- 

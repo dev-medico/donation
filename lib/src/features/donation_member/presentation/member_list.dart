@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/domain/search_member_data_source.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
 import 'package:donation/src/features/donation_member/presentation/new_member.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
@@ -38,110 +39,79 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     "AB (Rh -)",
     "O (Rh -)",
   ];
-  String? selectedBloodType = "သွေးအုပ်စု အလိုက်ကြည့်မည်";
-  String? selectedRange;
-  List<Member> allMembers = [];
-  List<Member> filteredMembers = [];
   SearchMemberDataSource? memberDataDataSource;
   TextStyle tabStyle = const TextStyle(fontSize: 16);
-
   final searchController = TextEditingController();
   Timer? _debounceTimer;
-  String searchKey = "";
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadInitialData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeData();
+    });
   }
 
-  Future<void> _loadInitialData() async {
-    print('Starting to load initial data');
-    final memberService = MemberService();
-    try {
-      setState(() {
-        isLoading = true;
-        allMembers = [];
-        filteredMembers = [];
-      });
+  void _initializeData() {
+    // Get current members and populate ranges
+    final membersAsync = ref.read(memberListProvider);
 
-      print('Fetching members from service...');
-      try {
-        final members = await memberService.searchMembers(
-          limit: 5000,
-        );
-        print('API Response received');
-        print('Members count: ${members.length}');
+    membersAsync.whenData((members) {
+      if (members.isNotEmpty) {
+        // Set filtered members initially to all members
+        ref.read(filteredMemberListProvider.notifier).state = members;
 
-        setState(() {
-          allMembers = members;
-          filteredMembers = members;
-          isLoading = false;
-        });
+        // Generate ranges
+        getRanges(members);
 
-        if (members.isNotEmpty) {
-          getRanges(members);
-          _filterMembers();
-        } else {
-          print('No members returned from API');
-        }
-      } catch (apiError) {
-        print('API Error: $apiError');
-        setState(() {
-          isLoading = false;
-        });
-        // Show error dialog
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Error'),
-            content: Text(
-                'Failed to load members. Please check your internet connection and try again.\n\nError: $apiError'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _loadInitialData();
-                },
-                child: Text('Retry'),
-              ),
-            ],
-          ),
-        );
+        // Set default filter states
+        ref.read(memberBloodTypeFilterProvider.notifier).state =
+            "သွေးအုပ်စု အလိုက်ကြည့်မည်";
+        ref.read(memberSearchQueryProvider.notifier).state = '';
+
+        // Trigger setState to rebuild UI with populated ranges
+        setState(() {});
       }
-    } catch (e) {
-      print('Error in _loadInitialData: $e');
-      setState(() {
-        isLoading = false;
-      });
+    });
+  }
+
+  void getRanges(List<Member> data) {
+    ranges.clear();
+    if (data.isEmpty) return;
+
+    // Sort the data by memberId to ensure correct range generation
+    final sortedData = List<Member>.from(data)
+      ..sort((a, b) => (a.memberId ?? '').compareTo(b.memberId ?? ''));
+
+    for (int i = 0; i < sortedData.length; i += 50) {
+      final endIndex =
+          i + 49 < sortedData.length ? i + 49 : sortedData.length - 1;
+      if (sortedData[i].memberId != null &&
+          sortedData[endIndex].memberId != null) {
+        ranges.add(
+            "${sortedData[i].memberId!} မှ ${sortedData[endIndex].memberId!}");
+      }
     }
+
+    // Make sure ranges are generated
+    print('Generated ${ranges.length} ranges');
   }
 
   void _filterMembers() {
-    print('Starting to filter members');
-    if (allMembers.isEmpty) {
-      print('No members to filter');
-      return;
-    }
+    final allMembers = ref.read(memberListProvider).value ?? [];
+    if (allMembers.isEmpty) return;
 
     List<Member> filtered = List.from(allMembers);
-    print('Initial filter count: ${filtered.length}');
+    final selectedBloodType = ref.read(memberBloodTypeFilterProvider);
+    final searchKey = ref.read(memberSearchQueryProvider);
+    final selectedRange = ref.read(memberRangeFilterProvider);
 
     // Filter by blood type
-    if (selectedBloodType != null &&
-        selectedBloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
+    if (selectedBloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
       filtered = filtered
           .where((member) =>
               member.bloodType != null && member.bloodType == selectedBloodType)
           .toList();
-      print('After blood type filter: ${filtered.length}');
     }
 
     // Filter by search text
@@ -157,57 +127,45 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
               (member.phone?.toLowerCase().contains(searchKey.toLowerCase()) ??
                   false))
           .toList();
-      print('After search filter: ${filtered.length}');
     }
 
     // Filter by range
-    if (selectedRange != null && selectedRange!.isNotEmpty) {
-      for (int i = 0; i < ranges.length; i++) {
-        if (selectedRange == ranges[i]) {
-          if (i != ranges.length - 1) {
-            filtered =
-                filtered.sublist(i * 50, min((i + 1) * 50, filtered.length));
-          } else {
-            filtered = filtered.sublist(i * 50);
-          }
-          print('After range filter: ${filtered.length}');
-          break;
+    if (selectedRange != null &&
+        selectedRange.isNotEmpty &&
+        ranges.contains(selectedRange)) {
+      final rangeParts = selectedRange.split(' မှ ');
+      if (rangeParts.length == 2) {
+        final startId = rangeParts[0];
+        final endId = rangeParts[1];
+
+        final startIndex =
+            filtered.indexWhere((member) => member.memberId == startId);
+        final endIndex =
+            filtered.indexWhere((member) => member.memberId == endId);
+
+        if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
+          filtered = filtered.sublist(startIndex, endIndex + 1);
         }
       }
     }
 
-    print('Final filtered count: ${filtered.length}');
-    setState(() {
-      filteredMembers = filtered;
-      _updateDataSource();
-    });
-  }
-
-  void _updateDataSource() {
-    print('Updating data source with ${filteredMembers.length} members');
-    memberDataDataSource = SearchMemberDataSource(memberData: filteredMembers);
-  }
-
-  void getRanges(List<Member> data) {
-    ranges.clear();
-    for (int i = 0; i < data.length; i = i + 50) {
-      if (i + 50 > data.length) {
-        ranges
-            .add("${data[i].memberId!} မှ ${data[data.length - 1].memberId!}");
-      } else {
-        ranges.add("${data[i].memberId!} မှ ${data[i + 49].memberId!}");
-      }
-    }
+    ref.read(filteredMemberListProvider.notifier).state = filtered;
   }
 
   @override
   void dispose() {
+    searchController.dispose();
     _debounceTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final membersAsync = ref.watch(memberListProvider);
+    final filteredMembers = ref.watch(filteredMemberListProvider);
+    final selectedBloodType = ref.watch(memberBloodTypeFilterProvider);
+    final selectedRange = ref.watch(memberRangeFilterProvider);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -222,9 +180,10 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
         leading: widget.fromHome && Responsive.isMobile(context)
             ? Padding(
                 padding: const EdgeInsets.only(top: 4, left: 8),
-                child: Humberger(
-                  onTap: () {
-                    ref.watch(drawerControllerProvider)!.toggle!.call();
+                child: IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
                   },
                 ),
               )
@@ -246,9 +205,23 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                   color: Colors.white)),
         ),
       ),
-      body: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
+      body: membersAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: $error'),
+              ElevatedButton(
+                onPressed: () {
+                  ref.refresh(memberListProvider);
+                },
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+        data: (members) => Stack(
           children: [
             Responsive.isMobile(context)
                 ? Column(
@@ -265,7 +238,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                 margin:
                                     const EdgeInsets.only(top: 20, right: 6),
                                 child: ranges.isNotEmpty
-                                    ? DropdownButtonFormField(
+                                    ? DropdownButtonFormField<String>(
+                                        value: selectedRange,
                                         dropdownColor: Colors.white,
                                         focusColor: Colors.white,
                                         decoration: InputDecoration(
@@ -291,33 +265,50 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                           color: Colors.black45,
                                         ),
                                         iconSize: 30,
-                                        items: ranges
-                                            .map((item) =>
-                                                DropdownMenuItem<String>(
-                                                  value: item,
-                                                  child: Text(
-                                                    item,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                    ),
+                                        items: [
+                                          DropdownMenuItem(
+                                            value: null,
+                                            child: Text(
+                                              "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                              style: TextStyle(fontSize: 13),
+                                            ),
+                                          ),
+                                          ...ranges.map((item) =>
+                                              DropdownMenuItem<String>(
+                                                value: item,
+                                                child: Text(
+                                                  item,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
                                                   ),
-                                                ))
-                                            .toList(),
-                                        validator: (value) {
-                                          if (value == null) {
-                                            return "အမှတ်စဥ် အလိုက်ကြည့်မည်";
-                                          }
-                                          return null;
-                                        },
+                                                ),
+                                              )),
+                                        ],
                                         onChanged: (value) {
-                                          setState(() {
-                                            selectedRange = value.toString();
-                                          });
+                                          ref
+                                              .read(memberRangeFilterProvider
+                                                  .notifier)
+                                              .state = value;
                                           _filterMembers();
                                         },
-                                        onSaved: (value) {},
                                       )
-                                    : Container(),
+                                    : Container(
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.grey[700]),
+                                          ),
+                                        ),
+                                      ),
                               ),
                             ),
                             Expanded(
@@ -328,7 +319,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                   top: 20,
                                   left: 6,
                                 ),
-                                child: DropdownButtonFormField(
+                                child: DropdownButtonFormField<String>(
+                                  value: selectedBloodType,
                                   dropdownColor: Colors.white,
                                   focusColor: Colors.white,
                                   decoration: InputDecoration(
@@ -343,40 +335,38 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                     ),
                                   ),
                                   isExpanded: true,
-                                  hint: Text(
-                                    selectedBloodType!,
-                                    style: const TextStyle(fontSize: 13),
-                                  ),
                                   icon: const Icon(
                                     Icons.arrow_drop_down,
                                     color: Colors.black45,
                                   ),
                                   iconSize: 30,
-                                  items: bloodTypes
-                                      .map((item) => DropdownMenuItem<String>(
-                                            value: item,
-                                            child: Text(
-                                              item,
-                                              textAlign: TextAlign.end,
-                                              style: const TextStyle(
-                                                fontSize: 14,
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: "သွေးအုပ်စု အလိုက်ကြည့်မည်",
+                                      child: Text(
+                                        "သွေးအုပ်စု အလိုက်ကြည့်မည်",
+                                        style: TextStyle(fontSize: 13),
+                                      ),
+                                    ),
+                                    ...bloodTypes
+                                        .map((item) => DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Text(
+                                                item,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                ),
                                               ),
-                                            ),
-                                          ))
-                                      .toList(),
-                                  validator: (value) {
-                                    if (value == null) {
-                                      return "သွေးအုပ်စု အလိုက်ကြည့်မည်";
-                                    }
-                                    return null;
-                                  },
+                                            )),
+                                  ],
                                   onChanged: (value) {
-                                    setState(() {
-                                      selectedBloodType = value.toString();
-                                    });
-                                    _filterMembers();
+                                    if (value != null) {
+                                      ref
+                                          .read(memberBloodTypeFilterProvider
+                                              .notifier)
+                                          .state = value;
+                                    }
                                   },
-                                  onSaved: (value) {},
                                 ),
                               ),
                             ),
@@ -389,7 +379,6 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                             const EdgeInsets.only(right: 20, top: 12, left: 20),
                         padding: const EdgeInsets.only(top: 8, bottom: 8),
                         child: TextFormField(
-                          autofocus: false,
                           controller: searchController,
                           textAlign: TextAlign.start,
                           style: const TextStyle(
@@ -401,10 +390,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
 
                             _debounceTimer =
                                 Timer(const Duration(milliseconds: 500), () {
-                              setState(() {
-                                searchKey = val;
-                              });
-                              _filterMembers();
+                              ref
+                                  .read(memberSearchQueryProvider.notifier)
+                                  .state = val;
                             });
                           },
                           decoration: InputDecoration(
@@ -451,7 +439,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                         height: 50,
                         margin: const EdgeInsets.only(top: 28, left: 24),
                         child: ranges.isNotEmpty
-                            ? DropdownButtonFormField(
+                            ? DropdownButtonFormField<String>(
+                                value: selectedRange,
                                 dropdownColor: Colors.white,
                                 focusColor: Colors.white,
                                 decoration: InputDecoration(
@@ -472,32 +461,49 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                   color: Colors.black45,
                                 ),
                                 iconSize: 30,
-                                items: ranges
-                                    .map((item) => DropdownMenuItem<String>(
-                                          value: item,
-                                          child: Text(
-                                            item,
-                                            style: const TextStyle(
-                                              fontSize: 14,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: null,
+                                    child: Text(
+                                      "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                  ...ranges
+                                      .map((item) => DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(
+                                              item,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
                                             ),
-                                          ),
-                                        ))
-                                    .toList(),
-                                validator: (value) {
-                                  if (value == null) {
-                                    return "အမှတ်စဥ် အလိုက်ကြည့်မည်";
-                                  }
-                                  return null;
-                                },
+                                          )),
+                                ],
                                 onChanged: (value) {
-                                  setState(() {
-                                    selectedRange = value.toString();
-                                  });
+                                  ref
+                                      .read(memberRangeFilterProvider.notifier)
+                                      .state = value;
                                   _filterMembers();
                                 },
-                                onSaved: (value) {},
                               )
-                            : Container(),
+                            : Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(
+                                      "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700]),
+                                    ),
+                                  ),
+                                ),
+                              ),
                       ),
                       Container(
                         width: MediaQuery.of(context).size.width / 5,
@@ -515,7 +521,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           ),
                           isExpanded: true,
                           hint: Text(
-                            selectedBloodType!,
+                            selectedBloodType,
                             style: const TextStyle(fontSize: 14),
                           ),
                           icon: const Icon(
@@ -542,10 +548,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                             return null;
                           },
                           onChanged: (value) {
-                            setState(() {
-                              selectedBloodType = value.toString();
-                            });
-                            _filterMembers();
+                            if (value != null) {
+                              ref
+                                  .read(memberBloodTypeFilterProvider.notifier)
+                                  .state = value;
+                              _filterMembers();
+                            }
                           },
                           onSaved: (value) {},
                         ),
@@ -568,9 +576,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
 
                             _debounceTimer =
                                 Timer(const Duration(milliseconds: 500), () {
-                              setState(() {
-                                searchKey = val;
-                              });
+                              ref
+                                  .read(memberSearchQueryProvider.notifier)
+                                  .state = val;
                               _filterMembers();
                             });
                           },
@@ -616,35 +624,33 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                   left: 20.0,
                   top: Responsive.isMobile(context) ? 160 : 100,
                   bottom: 12),
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : buildSimpleTable(),
+              child: buildSimpleTable(filteredMembers),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
-        onPressed: () async {
-          // await Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => const NewMemberScreen(),
-          //   ),
-          // );
-          _loadInitialData(); // Refresh data after adding new member
+        onPressed: () {
+          // Navigate to a placeholder screen for now
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('အဖွဲ့၀င်အသစ် ထည့်သွင်းခြင်း လုပ်ဆောင်နေဆဲ ဖြစ်ပါသည်။'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+
+          // Refresh the member list
+          ref.refresh(memberListProvider);
         },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget buildSimpleTable() {
-    print('Building table. Has data source: ${memberDataDataSource != null}');
-    if (memberDataDataSource == null) {
-      print('Creating new data source');
-      _updateDataSource();
-    }
+  Widget buildSimpleTable(List<Member> members) {
+    memberDataDataSource = SearchMemberDataSource(memberData: members);
 
     return SizedBox(
       height: MediaQuery.of(context).size.height -
@@ -660,15 +666,17 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                 onCellTap: (details) async {
                   if (details.rowColumnIndex.rowIndex == 0) return;
 
-                  // await Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => MemberDetailScreen(
-                  //       data: filteredMembers[details.rowColumnIndex.rowIndex - 1],
-                  //     ),
-                  //   ),
-                  // );
-                  //_loadInitialData();
+                  final member = members[details.rowColumnIndex.rowIndex - 1];
+
+                  if (member.id != null) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => MemberDetailScreen(
+                          memberId: member.id.toString(),
+                        ),
+                      ),
+                    );
+                  }
                 },
                 gridLinesVisibility: GridLinesVisibility.both,
                 headerGridLinesVisibility: GridLinesVisibility.both,

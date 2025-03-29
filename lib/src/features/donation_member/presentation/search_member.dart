@@ -38,121 +38,44 @@ class _SearchMemberListScreenState
     "AB (Rh -)",
     "O (Rh -)",
   ];
-  String? selectedBloodType = "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
-  List<Member> allMembers = [];
-  List<Member> filteredMembers = [];
+  SearchMemberDataSource? memberDataDataSource;
   TextStyle tabStyle = const TextStyle(fontSize: 16);
 
   final searchController = TextEditingController();
   Timer? _debounceTimer;
-  String searchKey = "";
-  SearchMemberDataSource? memberDataDataSource;
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadInitialData();
-  }
-
-  Future<void> _loadInitialData() async {
-    final memberService = ref.read(memberServiceProvider);
-    try {
-      setState(() {
-        isLoading = true;
-        allMembers = [];
-      });
-
-      await _fetchAllMembers(memberService);
-
-      setState(() {
-        filteredMembers = allMembers;
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Error loading members: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _fetchAllMembers(MemberService memberService) async {
-    try {
-      int page = 0;
-      const int limit = 5000;
-      bool hasMore = true;
-
-      while (hasMore) {
-        final members = await memberService.searchMembers(
-          page: page,
-          limit: limit,
-        );
-
-        if (members.isEmpty) {
-          hasMore = false;
-        } else {
-          setState(() {
-            allMembers.addAll(members);
-          });
-
-          // If we got less than the limit, we've reached the end
-          if (members.length < limit) {
-            hasMore = false;
-          } else {
-            page++;
-          }
-        }
-      }
-    } catch (e) {
-      print('Error fetching members: $e');
-    }
-  }
-
-  void _filterMembers() {
-    if (allMembers.isEmpty) return;
-
-    List<Member> filtered = List.from(allMembers);
-
-    // Filter by blood type
-    if (selectedBloodType != null &&
-        selectedBloodType != "သွေးအုပ်စုဖြင့် ရှာဖွေမည်") {
-      filtered = filtered
-          .where((member) =>
-              member.bloodType != null && member.bloodType == selectedBloodType)
-          .toList();
-    }
-
-    // Filter by search text
-    if (searchKey.isNotEmpty) {
-      filtered = filtered
-          .where((member) =>
-              (member.name?.toLowerCase().contains(searchKey.toLowerCase()) ??
-                  false) ||
-              (member.memberId
-                      ?.toLowerCase()
-                      .contains(searchKey.toLowerCase()) ??
-                  false) ||
-              (member.phone?.toLowerCase().contains(searchKey.toLowerCase()) ??
-                  false))
-          .toList();
-    }
-
-    setState(() {
-      filteredMembers = filtered;
-      memberDataDataSource =
-          SearchMemberDataSource(memberData: filteredMembers);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(memberBloodTypeFilterProvider.notifier).state =
+          "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
+      ref.read(memberSearchQueryProvider.notifier).state = '';
     });
   }
 
   @override
   void dispose() {
+    searchController.dispose();
     _debounceTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Watch all necessary providers
+    final membersAsync = ref.watch(memberListProvider);
+    final filteredMembers = ref.watch(filteredMemberListProvider);
+    final selectedBloodType = ref.watch(memberBloodTypeFilterProvider);
+
+    // Monitor filter state changes and update filtered list
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Only call this after the widget is built
+      if (membersAsync.hasValue) {
+        updateFilteredMembers(ref);
+      }
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -166,9 +89,10 @@ class _SearchMemberListScreenState
         leading: widget.fromHome && Responsive.isMobile(context)
             ? Padding(
                 padding: const EdgeInsets.only(top: 4, left: 8),
-                child: Humberger(
-                  onTap: () {
-                    ref.watch(drawerControllerProvider)!.toggle!.call();
+                child: IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
                   },
                 ),
               )
@@ -191,137 +115,37 @@ class _SearchMemberListScreenState
                   color: Colors.white)),
         ),
       ),
-      body: Scaffold(
-          backgroundColor: Colors.white,
-          body: Stack(
+      body: membersAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Responsive.isMobile(context)
-                  ? Container(
-                      margin: EdgeInsets.only(left: 20, right: 20),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            margin: const EdgeInsets.only(
-                              top: 20,
-                              left: 6,
-                            ),
-                            child: DropdownButtonFormField(
-                              dropdownColor: Colors.white,
-                              focusColor: Colors.white,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                contentPadding: EdgeInsets.only(
-                                    top: 16, left: 20, bottom: 16, right: 12),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              isExpanded: true,
-                              hint: Text(
-                                selectedBloodType!,
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                              icon: const Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.black45,
-                              ),
-                              iconSize: 30,
-                              items: bloodTypes
-                                  .map((item) => DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(
-                                          item,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                              validator: (value) {
-                                if (value == null) {
-                                  return "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
-                                }
-                                return null;
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedBloodType = value.toString();
-                                });
-                                _filterMembers();
-                              },
-                              onSaved: (value) {},
-                            ),
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            margin: const EdgeInsets.only(
-                              top: 20,
-                              left: 6,
-                            ),
-                            child: TextFormField(
-                              autofocus: false,
-                              controller: searchController,
-                              textAlign: TextAlign.start,
-                              style: const TextStyle(
-                                  fontSize: 15, color: Colors.black),
-                              onChanged: (val) {
-                                if (_debounceTimer?.isActive ?? false) {
-                                  _debounceTimer?.cancel();
-                                }
-
-                                _debounceTimer = Timer(
-                                    const Duration(milliseconds: 500), () {
-                                  setState(() {
-                                    searchKey = val;
-                                  });
-                                  _filterMembers();
-                                });
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-                                hintStyle: const TextStyle(
-                                    color: Colors.black, fontSize: 15.0),
-                                fillColor: Colors.white.withOpacity(0.2),
-                                filled: true,
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(
-                                    Icons.search,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                                contentPadding: const EdgeInsets.only(
-                                    left: 20, right: 20, top: 4, bottom: 4),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide:
-                                        const BorderSide(color: Colors.grey)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide:
-                                        const BorderSide(color: Colors.grey)),
-                                disabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide:
-                                        const BorderSide(color: Colors.grey)),
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide:
-                                        const BorderSide(color: Colors.grey)),
-                              ),
-                              keyboardType: TextInputType.text,
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  : Row(
+              Text('Error: $error'),
+              ElevatedButton(
+                onPressed: () {
+                  ref.refresh(memberListProvider);
+                },
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+        data: (members) => Stack(
+          children: [
+            Responsive.isMobile(context)
+                ? Container(
+                    margin: EdgeInsets.only(left: 20, right: 20),
+                    child: Column(
                       children: [
                         Container(
-                          width: MediaQuery.of(context).size.width / 5,
-                          margin: const EdgeInsets.only(top: 28, left: 20),
-                          child: DropdownButtonFormField(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          margin: const EdgeInsets.only(
+                            top: 20,
+                            left: 6,
+                          ),
+                          child: DropdownButtonFormField<String>(
+                            value: selectedBloodType,
                             dropdownColor: Colors.white,
                             focusColor: Colors.white,
                             decoration: InputDecoration(
@@ -333,48 +157,45 @@ class _SearchMemberListScreenState
                               ),
                             ),
                             isExpanded: true,
-                            hint: Text(
-                              selectedBloodType!,
-                              style: const TextStyle(fontSize: 14),
-                            ),
                             icon: const Icon(
                               Icons.arrow_drop_down,
                               color: Colors.black45,
                             ),
                             iconSize: 30,
-                            items: bloodTypes
-                                .map((item) => DropdownMenuItem<String>(
-                                      value: item,
-                                      child: Text(
-                                        item,
-                                        style: const TextStyle(
-                                          fontSize: 14,
+                            items: [
+                              DropdownMenuItem(
+                                value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
+                                child: Text(
+                                  "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                              ...bloodTypes
+                                  .map((item) => DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Text(
+                                          item,
+                                          style: const TextStyle(fontSize: 14),
                                         ),
-                                      ),
-                                    ))
-                                .toList(),
-                            validator: (value) {
-                              if (value == null) {
-                                return "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
-                              }
-                              return null;
-                            },
+                                      )),
+                            ],
                             onChanged: (value) {
-                              setState(() {
-                                selectedBloodType = value.toString();
-                              });
-                              _filterMembers();
+                              if (value != null) {
+                                ref
+                                    .read(
+                                        memberBloodTypeFilterProvider.notifier)
+                                    .state = value;
+                              }
                             },
-                            onSaved: (value) {},
                           ),
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width / 5,
+                          width: MediaQuery.of(context).size.width * 0.9,
                           margin: const EdgeInsets.only(
-                              right: 40, top: 28, left: 20),
-                          padding: const EdgeInsets.only(top: 8, bottom: 8),
+                            top: 20,
+                            left: 6,
+                          ),
                           child: TextFormField(
-                            autofocus: false,
                             controller: searchController,
                             textAlign: TextAlign.start,
                             style: const TextStyle(
@@ -386,10 +207,9 @@ class _SearchMemberListScreenState
 
                               _debounceTimer =
                                   Timer(const Duration(milliseconds: 500), () {
-                                setState(() {
-                                  searchKey = val;
-                                });
-                                _filterMembers();
+                                ref
+                                    .read(memberSearchQueryProvider.notifier)
+                                    .state = val;
                               });
                             },
                             decoration: InputDecoration(
@@ -426,28 +246,140 @@ class _SearchMemberListScreenState
                             ),
                             keyboardType: TextInputType.text,
                           ),
-                        ),
+                        )
                       ],
                     ),
-              Container(
-                margin: EdgeInsets.only(
-                    left: 20.0,
-                    top: Responsive.isMobile(context) ? 160 : 100,
-                    bottom: 12),
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : buildSimpleTable(),
-              ),
-            ],
-          )),
+                  )
+                : Row(
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width / 5,
+                        margin: const EdgeInsets.only(top: 28, left: 20),
+                        child: DropdownButtonFormField<String>(
+                          value: selectedBloodType,
+                          dropdownColor: Colors.white,
+                          focusColor: Colors.white,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: EdgeInsets.only(
+                                top: 16, left: 20, bottom: 16, right: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          isExpanded: true,
+                          icon: const Icon(
+                            Icons.arrow_drop_down,
+                            color: Colors.black45,
+                          ),
+                          iconSize: 30,
+                          items: [
+                            DropdownMenuItem(
+                              value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
+                              child: Text(
+                                "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                            ...bloodTypes
+                                .map((item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    )),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              ref
+                                  .read(memberBloodTypeFilterProvider.notifier)
+                                  .state = value;
+                            }
+                          },
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width / 5,
+                        margin:
+                            const EdgeInsets.only(right: 40, top: 28, left: 20),
+                        padding: const EdgeInsets.only(top: 8, bottom: 8),
+                        child: TextFormField(
+                          controller: searchController,
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                              fontSize: 15, color: Colors.black),
+                          onChanged: (val) {
+                            if (_debounceTimer?.isActive ?? false) {
+                              _debounceTimer?.cancel();
+                            }
+
+                            _debounceTimer =
+                                Timer(const Duration(milliseconds: 500), () {
+                              ref
+                                  .read(memberSearchQueryProvider.notifier)
+                                  .state = val;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
+                            hintStyle: const TextStyle(
+                                color: Colors.black, fontSize: 15.0),
+                            fillColor: Colors.white.withOpacity(0.2),
+                            filled: true,
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Icon(
+                                Icons.search,
+                                color: primaryColor,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.only(
+                                left: 20, right: 20, top: 4, bottom: 4),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    const BorderSide(color: Colors.grey)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    const BorderSide(color: Colors.grey)),
+                            disabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    const BorderSide(color: Colors.grey)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    const BorderSide(color: Colors.grey)),
+                          ),
+                          keyboardType: TextInputType.text,
+                        ),
+                      ),
+                    ],
+                  ),
+            Container(
+              margin: EdgeInsets.only(
+                  left: 20.0,
+                  top: Responsive.isMobile(context) ? 160 : 100,
+                  bottom: 12),
+              child: buildSimpleTable(filteredMembers),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.red,
+        onPressed: () {
+          ref.refresh(memberListProvider);
+        },
+        child: const Icon(Icons.refresh),
+      ),
     );
   }
 
-  Widget buildSimpleTable() {
-    if (memberDataDataSource == null) {
-      memberDataDataSource =
-          SearchMemberDataSource(memberData: filteredMembers);
-    }
+  Widget buildSimpleTable(List<Member> members) {
+    memberDataDataSource = SearchMemberDataSource(memberData: members);
 
     return Container(
       margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
@@ -456,7 +388,7 @@ class _SearchMemberListScreenState
         onCellTap: (details) async {
           if (details.rowColumnIndex.rowIndex == 0) return;
 
-          final member = filteredMembers[details.rowColumnIndex.rowIndex - 1];
+          final member = members[details.rowColumnIndex.rowIndex - 1];
           showDialog(
               context: context,
               builder: (context) => CallOrRemarkDialog(
