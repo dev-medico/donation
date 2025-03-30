@@ -1,176 +1,174 @@
-// import 'dart:developer';
+import 'package:flutter/material.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:donation/src/features/services/report_service.dart';
 
-// import 'package:donation/realm/schemas.dart';
-// import 'package:donation/responsive.dart';
-// import 'package:donation/utils/Colors.dart';
-// import 'package:donation/utils/tool_widgets.dart';
-// import 'package:fluent_ui/fluent_ui.dart' as fluent;
-// import 'package:flutter/material.dart';
+final diseaseStatsProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  try {
+    final reportService = ref.read(reportServiceProvider);
+    return await reportService.getDiseaseStats();
+  } catch (e) {
+    throw Exception('Failed to load disease stats: $e');
+  }
+});
 
-// class DonationChartByDisease extends StatefulWidget {
-//   final List<Donation> data;
-//   const DonationChartByDisease({Key? key, required this.data})
-//       : super(key: key);
+class DonationChartByDisease extends ConsumerWidget {
+  const DonationChartByDisease({Key? key}) : super(key: key);
 
-//   @override
-//   State<DonationChartByDisease> createState() => _DonationChartByDiseaseState();
-// }
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final diseaseStats = ref.watch(diseaseStatsProvider);
 
-// class _DonationChartByDiseaseState extends State<DonationChartByDisease> {
-//   List<String> diseases = [];
+    return Container(
+      height: Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.height * 0.65
+          : MediaQuery.of(context).size.height * 0.52,
+      width: Responsive.isMobile(context)
+          ? MediaQuery.of(context).size.width * 0.9
+          : MediaQuery.of(context).size.width * 0.43,
+      child: Material(
+        elevation: 4,
+        borderRadius:
+            BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16),
+        color: Colors.white,
+        child: diseaseStats.when(
+          data: (data) {
+            // Sort diseases by count (descending)
+            data.sort(
+                (a, b) => (b['count'] as int).compareTo(a['count'] as int));
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     for (var element in widget.data) {
-//       diseases.add(element.patientDisease!);
-//     }
+            final totalDonations =
+                data.fold<int>(0, (sum, item) => sum + (item['count'] as int));
 
-//     //delete duplicate from diseases
-//     diseases = diseases.toSet().toList();
-//     diseases.sort((a, b) => widget.data
-//         .where((element) => element.patientDisease == b)
-//         .length
-//         .compareTo(widget.data
-//             .where((element) => element.patientDisease == a)
-//             .length));
-//     diseases.forEach((element) {
-//       log(element);
-//     });
-//   }
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "ဖြစ်ပွားသည့်ရောဂါ အလိုက် မှတ်တမ်း",
+                    style: TextStyle(
+                      fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                      color: primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: Responsive.isMobile(context) ? 10 : 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "ဖြစ်ပွားသည့်ရောဂါ",
+                        style: TextStyle(
+                          fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "အရေအတွက်",
+                        style: TextStyle(
+                          fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: Responsive.isMobile(context)
+                          ? const NeverScrollableScrollPhysics()
+                          : const BouncingScrollPhysics(),
+                      padding:
+                          const EdgeInsets.only(top: 12.0, right: 12, left: 8),
+                      itemCount: data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final disease = data[index];
+                        final diseaseName = disease['name'] as String;
+                        final count = disease['count'] as int;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: EdgeInsets.symmetric(
-//           horizontal: Responsive.isMobile(context) ? 0 : 8),
-//       margin: const EdgeInsets.all(
-//         2,
-//       ),
-//       decoration: shadowDecoration(Colors.white),
-//       child: fluent.Button(
-//         // style: NeumorphicStyle(
-//         //   color: Colors.white,
-//         //   boxShape: NeumorphicBoxShape.roundRect(
-//         //       BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16)),
-//         //   depth: 4,
-//         //   intensity: 0.8,
-//         //   shadowDarkColor: Colors.black,
-//         //   shadowLightColor: Colors.white,
-//         // ),
-//         onPressed: () async {},
-//         child: ListView(
-//           physics: Responsive.isMobile(context)
-//               ? const NeverScrollableScrollPhysics()
-//               : const BouncingScrollPhysics(),
-//           shrinkWrap: true,
-//           children: [
-//             Text(
-//               "ဖြစ်ပွားသည့်ရောဂါ အလိုက် မှတ်တမ်း",
-//               style: TextStyle(
-//                 fontSize: Responsive.isMobile(context) ? 16.5 : 17.5,
-//                 color: Colors.orange,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             SizedBox(
-//               height: Responsive.isMobile(context) ? 10 : 20,
-//             ),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text(
-//                   "ဖြစ်ပွားသည့်ရောဂါ",
-//                   style: TextStyle(
-//                       fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                       color: Colors.black,
-//                       fontWeight: FontWeight.bold),
-//                 ),
-//                 Text(
-//                   "အရေအတွက်",
-//                   style: TextStyle(
-//                       fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                       color: Colors.black,
-//                       fontWeight: FontWeight.bold),
-//                 ),
-//               ],
-//             ),
-//             ListView.builder(
-//               shrinkWrap: true,
-//               physics: const BouncingScrollPhysics(),
-//               padding: const EdgeInsets.only(top: 12.0, right: 12, left: 8),
-//               itemCount: diseases.length,
-//               itemBuilder: (BuildContext context, int index) {
-//                 return Visibility(
-//                   visible: widget.data
-//                       .where((element) =>
-//                           element.patientDisease == diseases[index])
-//                       .isNotEmpty,
-//                   child: Padding(
-//                     padding: const EdgeInsets.all(8.0),
-//                     child: Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                       children: [
-//                         Expanded(
-//                           child: Text(
-//                             diseases[index] == "" ? "-" : diseases[index],
-//                             style: TextStyle(
-//                               fontSize: Responsive.isMobile(context) ? 15 : 16,
-//                               color: Colors.black,
-//                             ),
-//                           ),
-//                         ),
-//                         Text(
-//                           widget.data
-//                               .where((element) =>
-//                                   element.patientDisease == diseases[index])
-//                               .length
-//                               .toString(),
-//                           style: TextStyle(
-//                             fontSize: Responsive.isMobile(context) ? 15 : 16,
-//                             color: primaryColor,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 );
-//               },
-//             ),
-//             Container(
-//               margin:
-//                   const EdgeInsets.only(left: 12, right: 16, top: 8, bottom: 8),
-//               width: double.infinity,
-//               height: 1,
-//               color: Colors.grey,
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.only(
-//                   left: 12, top: 8, right: 20, bottom: 30),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   Text(
-//                     "စုစုပေါင်း အရေအတွက်",
-//                     style: TextStyle(
-//                       fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                       color: Colors.grey,
-//                     ),
-//                   ),
-//                   Text(
-//                     widget.data.length.toString(),
-//                     style: TextStyle(
-//                       fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-//                       color: Colors.grey,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  diseaseName.isEmpty ? "-" : diseaseName,
+                                  style: TextStyle(
+                                    fontSize:
+                                        Responsive.isMobile(context) ? 15 : 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                count.toString(),
+                                style: TextStyle(
+                                  fontSize:
+                                      Responsive.isMobile(context) ? 15 : 16,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 12, right: 16),
+                    width: double.infinity,
+                    height: 1,
+                    color: Colors.grey,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, top: 8, right: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "စုစုပေါင်း အရေအတွက်",
+                          style: TextStyle(
+                            fontSize:
+                                Responsive.isMobile(context) ? 15.5 : 16.5,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          totalDonations.toString(),
+                          style: TextStyle(
+                            fontSize:
+                                Responsive.isMobile(context) ? 15.5 : 16.5,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+          loading: () => Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                error.toString().replaceAll('Exception: ', ''),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

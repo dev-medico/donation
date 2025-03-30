@@ -43,19 +43,30 @@ class _MemberEditScreenState extends ConsumerState<MemberEditScreen> {
   }
 
   void _loadMemberData() async {
-    final member = await fetchMemberById(ref, widget.memberId);
-    if (member != null) {
-      setState(() {
-        nameController.text = member.name ?? '';
-        fatherNameController.text = member.fatherName ?? '';
-        birthDateController.text = member.birthDate ?? '';
-        nrcController.text = member.nrc ?? '';
-        phoneController.text = member.phone ?? '';
-        bloodBankController.text = member.bloodBankCard ?? '';
-        addressController.text = member.address ?? '';
-        selectedBloodType = member.bloodType;
-        selectedGender = member.gender;
+    try {
+      // Use the provider directly
+      final memberAsync = ref.watch(memberByIdProvider(widget.memberId));
+
+      memberAsync.when(data: (member) {
+        setState(() {
+          nameController.text = member.name ?? '';
+          fatherNameController.text = member.fatherName ?? '';
+          birthDateController.text = member.birthDate ?? '';
+          nrcController.text = member.nrc ?? '';
+          phoneController.text = member.phone ?? '';
+          bloodBankController.text = member.bloodBankCard ?? '';
+          addressController.text = member.address ?? '';
+          selectedBloodType = member.bloodType;
+          selectedGender = member.gender;
+        });
+      }, loading: () {
+        // Handle loading state if needed
+      }, error: (error, stackTrace) {
+        // Handle error state if needed
+        print('Error loading member: $error');
       });
+    } catch (e) {
+      print('Error in _loadMemberData: $e');
     }
   }
 

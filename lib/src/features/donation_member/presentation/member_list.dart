@@ -43,6 +43,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
   TextStyle tabStyle = const TextStyle(fontSize: 16);
   final searchController = TextEditingController();
   Timer? _debounceTimer;
+  bool _showLoadingStatus = false;
 
   @override
   void initState() {
@@ -66,7 +67,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
 
         // Set default filter states
         ref.read(memberBloodTypeFilterProvider.notifier).state =
-            "သွေးအုပ်စု အလိုက်ကြည့်မည်";
+            "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
         ref.read(memberSearchQueryProvider.notifier).state = '';
 
         // Trigger setState to rebuild UI with populated ranges
@@ -107,7 +108,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     final selectedRange = ref.read(memberRangeFilterProvider);
 
     // Filter by blood type
-    if (selectedBloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
+    if (selectedBloodType != "သွေးအုပ်စုဖြင့် ရှာဖွေမည်") {
       filtered = filtered
           .where((member) =>
               member.bloodType != null && member.bloodType == selectedBloodType)
@@ -223,6 +224,55 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
         ),
         data: (members) => Stack(
           children: [
+            // Loading status indicator
+            if (ref.watch(memberLoadingStatusProvider).isNotEmpty)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue.shade200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.blue.shade700),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          ref.watch(memberLoadingStatusProvider),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.blue.shade900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             Responsive.isMobile(context)
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,9 +392,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                   iconSize: 30,
                                   items: [
                                     DropdownMenuItem(
-                                      value: "သွေးအုပ်စု အလိုက်ကြည့်မည်",
+                                      value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
                                       child: Text(
-                                        "သွေးအုပ်စု အလိုက်ကြည့်မည်",
+                                        "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
                                         style: TextStyle(fontSize: 13),
                                       ),
                                     ),
@@ -543,7 +593,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                               .toList(),
                           validator: (value) {
                             if (value == null) {
-                              return "သွေးအုပ်စု အလိုက်ကြည့်မည်";
+                              return "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
                             }
                             return null;
                           },

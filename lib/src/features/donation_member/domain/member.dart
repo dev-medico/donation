@@ -58,4 +58,26 @@ class Member {
       totalCount: json['total_count'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'member_id': memberId,
+      'name': name,
+      'father_name': fatherName,
+      'blood_type': bloodType,
+      'phone': phone,
+      'nrc': nrc,
+      'address': address,
+      'gender': gender,
+      'birth_date': birthDate,
+      'blood_bank_card': bloodBankCard,
+      'note': note,
+      'status': status,
+      'last_date': lastDate,
+      'register_date': registerDate,
+      'member_count': memberCount,
+      'total_count': totalCount,
+    };
+  }
 }

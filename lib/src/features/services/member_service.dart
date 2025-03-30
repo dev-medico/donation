@@ -1,206 +1,180 @@
+import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/services/base_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:donation/core/api/api_client.dart';
-import 'package:donation/src/features/donation_member/domain/member.dart';
+import 'dart:math';
 
-final memberServiceProvider = Provider<MemberService>((ref) => MemberService());
+final memberLoadingStatusProvider = StateProvider<String>((ref) => '');
+final memberServiceProvider =
+    Provider<MemberService>((ref) => MemberService(ref));
 
 class MemberService extends BaseService {
+  final ProviderRef? ref;
+
+  MemberService([this.ref]);
+
   // Base path for all member endpoints
-  final String _basePath = '/member';
+  final String _basePath = '/members';
 
-  Future<List<Member>> searchMembers({
-    String? query,
-    String? bloodType,
-    int page = 0,
-    int limit = 50,
-  }) async {
+  void _updateLoadingStatus(String status) {
+    if (ref != null) {
+      ref!.read(memberLoadingStatusProvider.notifier).state = status;
+    }
+  }
+
+  Future<List<dynamic>> getMembers({int limit = 200}) async {
+    final headers = await getAuthHeaders();
+    _updateLoadingStatus('Fetching members...');
+
     try {
-      final Map<String, dynamic> params = {
-        'q': query ?? '',
-        'page': page,
-        'limit': limit,
-      };
-
-      if (bloodType != null) {
-        params['blood_type'] = bloodType;
-      }
-
-      print('Searching members with params: $params');
-
-      final response = await apiClient.get<Map<String, dynamic>>(
-        _basePath + '/index',
-        queryParameters: params,
+      final response = await apiClient.get(
+        _basePath,
+        options: Options(headers: headers),
+        queryParameters: {'limit': limit},
       );
 
-      print('Search members response status: ${response.statusCode}');
-      print('Search members response data: ${response.data}');
-
-      if (response.data != null && response.data!['status'] == 'ok') {
-        final List<dynamic> memberData = response.data!['data'];
-        final members =
-            memberData.map((json) => Member.fromJson(json)).toList();
-        print('Parsed ${members.length} members');
-        return members;
+      _updateLoadingStatus('');
+      if (response.statusCode == 200) {
+        return response.data['data'] as List<dynamic>;
       }
+      return [];
+    } catch (e) {
+      print('Error fetching members: $e');
+      _updateLoadingStatus('Error: $e');
+      return [];
+    }
+  }
 
-      print('No members found or invalid response format');
+  Future<Map<String, dynamic>> getMemberById(String id) async {
+    final headers = await getAuthHeaders();
+    _updateLoadingStatus('Fetching member details...');
+
+    try {
+      final response = await apiClient.get(
+        '$_basePath/$id',
+        options: Options(headers: headers),
+      );
+
+      _updateLoadingStatus('');
+      if (response.statusCode == 200) {
+        return response.data['data'] as Map<String, dynamic>;
+      }
+      throw Exception('Member not found');
+    } catch (e) {
+      print('Error fetching member by ID: $e');
+      _updateLoadingStatus('Error: $e');
+      throw e;
+    }
+  }
+
+  Future<List<dynamic>> findMembers(String query) async {
+    final headers = await getAuthHeaders();
+    _updateLoadingStatus('Searching members...');
+
+    try {
+      final response = await apiClient.get(
+        '$_basePath/search',
+        queryParameters: {'q': query},
+        options: Options(headers: headers),
+      );
+
+      _updateLoadingStatus('');
+      if (response.statusCode == 200) {
+        return response.data['data'] as List<dynamic>;
+      }
       return [];
     } catch (e) {
       print('Error searching members: $e');
+      _updateLoadingStatus('Error: $e');
       return [];
     }
   }
 
-  Future<List<dynamic>> getMembers({String? search, String? bloodType}) async {
+  Future<Map<String, dynamic>> createMember(Map<String, dynamic> data) async {
     final headers = await getAuthHeaders();
+    _updateLoadingStatus('Creating member...');
 
-    final Map<String, dynamic> params = {};
-    if (search != null && search.isNotEmpty) {
-      params['search'] = search;
+    try {
+      final response = await apiClient.post(
+        _basePath,
+        data: data,
+        options: Options(headers: headers),
+      );
+
+      _updateLoadingStatus('Member created successfully!');
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return response.data['data'] as Map<String, dynamic>;
+      }
+      throw Exception('Failed to create member');
+    } catch (e) {
+      print('Error creating member: $e');
+      _updateLoadingStatus('Error: $e');
+      throw e;
     }
-    if (bloodType != null && bloodType != "သွေးအုပ်စု အလိုက်ကြည့်မည်") {
-      params['blood_type'] = bloodType;
+  }
+
+  Future<Map<String, dynamic>> updateMember(
+      String id, Map<String, dynamic> data) async {
+    final headers = await getAuthHeaders();
+    _updateLoadingStatus('Updating member...');
+
+    try {
+      final response = await apiClient.put(
+        '$_basePath/$id',
+        data: data,
+        options: Options(headers: headers),
+      );
+
+      _updateLoadingStatus('Member updated successfully!');
+      if (response.statusCode == 200) {
+        return response.data['data'] as Map<String, dynamic>;
+      }
+      throw Exception('Failed to update member');
+    } catch (e) {
+      print('Error updating member: $e');
+      _updateLoadingStatus('Error: $e');
+      throw e;
     }
-
-    print('Getting members with params: $params');
-
-    final response = await apiClient.get(
-      _basePath + '/index',
-      queryParameters: params,
-      options: Options(headers: headers),
-    );
-
-    print('Get members response status: ${response.statusCode}');
-
-    return response.data['data'] as List<dynamic>;
   }
 
-  Future<Member> getMemberById(String id) async {
+  Future<void> deleteMember(String id) async {
     final headers = await getAuthHeaders();
+    _updateLoadingStatus('Deleting member...');
 
-    print('Getting member by ID: $id');
+    try {
+      final response = await apiClient.delete(
+        '$_basePath/$id',
+        options: Options(headers: headers),
+      );
 
-    final response = await apiClient.get(
-      '$_basePath/view?$id',
-      options: Options(headers: headers),
-    );
-
-    print('Get member by ID response status: ${response.statusCode}');
-
-    return Member.fromJson(response.data['data']);
-  }
-
-  Future<Map<String, dynamic>> getMemberByPhone(String phone) async {
-    final headers = await getAuthHeaders();
-
-    print('Getting member by phone: $phone');
-
-    final response = await apiClient.get(
-      '$_basePath/by-phone/$phone',
-      options: Options(headers: headers),
-    );
-
-    print('Get member by phone response status: ${response.statusCode}');
-
-    return response.data['data'] as Map<String, dynamic>;
-  }
-
-  Future<Map<String, dynamic>> getMemberStats() async {
-    final headers = await getAuthHeaders();
-
-    print('Getting member stats');
-
-    final response = await apiClient.get(
-      '$_basePath/stats',
-      options: Options(headers: headers),
-    );
-
-    print('Get member stats response status: ${response.statusCode}');
-
-    return response.data as Map<String, dynamic>;
+      _updateLoadingStatus('Member deleted successfully!');
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw Exception('Failed to delete member');
+      }
+    } catch (e) {
+      print('Error deleting member: $e');
+      _updateLoadingStatus('Error: $e');
+      throw e;
+    }
   }
 
   Future<List<dynamic>> getMembersByAgeRange(int start, int end) async {
     final headers = await getAuthHeaders();
-
-    print('Getting members by age range: $start-$end');
-
     final response = await apiClient.get(
       '$_basePath/by-age-range',
-      queryParameters: {
-        'start': start,
-        'end': end,
-      },
+      queryParameters: {'start': start, 'end': end},
       options: Options(headers: headers),
     );
-
-    print('Get members by age range response status: ${response.statusCode}');
-
     return response.data['data'] as List<dynamic>;
   }
 
-  Future<List<dynamic>> getMembersByTotalCount() async {
+  Future<List<dynamic>> getMembersByBlock(String block) async {
     final headers = await getAuthHeaders();
-
-    print('Getting members by total count');
-
     final response = await apiClient.get(
-      '$_basePath/by-total-count',
+      '$_basePath/by-block/$block',
       options: Options(headers: headers),
     );
-
-    print('Get members by total count response status: ${response.statusCode}');
-
     return response.data['data'] as List<dynamic>;
-  }
-
-  Future<Member> createMember(Map<String, dynamic> memberData) async {
-    final headers = await getAuthHeaders();
-
-    print('Creating member with data: $memberData');
-
-    final response = await apiClient.post(
-      _basePath+'/create',
-      data: memberData,
-      options: Options(headers: headers),
-    );
-
-    print('Create member response status: ${response.statusCode}');
-
-    return Member.fromJson(response.data['data']);
-  }
-
-  Future<Member> updateMember(
-      String id, Map<String, dynamic> memberData) async {
-    final headers = await getAuthHeaders();
-
-    print('Updating member $id with data: $memberData');
-
-    final response = await apiClient.put(
-      '$_basePath/update/$id',
-      data: memberData,
-      options: Options(headers: headers),
-    );
-
-    print('Update member response status: ${response.statusCode}');
-
-    return Member.fromJson(response.data['data']);
-  }
-
-  Future<bool> deleteMember(String id) async {
-    final headers = await getAuthHeaders();
-
-    print('Deleting member: $id');
-
-    final response = await apiClient.delete(
-      '$_basePath/$id',
-      options: Options(headers: headers),
-    );
-
-    print('Delete member response status: ${response.statusCode}');
-
-    return response.data['success'] == true;
   }
 }

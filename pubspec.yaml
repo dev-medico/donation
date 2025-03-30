@@ -19,6 +19,7 @@ dependencies:
   equatable: ^2.0.5
   fl_chart: ^0.69.0
   #fluent_ui: 4.6.2
+  fluent_ui: ^4.11.2
   flutter:
     sdk: flutter
   flutter_cupertino_date_picker_fork: ^1.0.7

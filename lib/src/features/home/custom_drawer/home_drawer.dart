@@ -44,28 +44,34 @@ class _HomeDrawerState extends State<HomeDrawer> {
   void setDrawerListArray() {
     drawerList = <DrawerList>[
       DrawerList(
-        index: DrawerIndex.DASHBOARD,
+        index: DrawerIndex.HOME,
         labelName: 'မူလ စာမျက်နှာ',
         isAssetsImage: true,
         imageName: 'assets/images/home.svg',
       ),
       DrawerList(
+        index: DrawerIndex.DASHBOARD,
+        labelName: 'ဒက်ရှ်ဘုတ်',
+        isAssetsImage: true,
+        imageName: 'assets/images/dashboard.png',
+      ),
+      DrawerList(
+        index: DrawerIndex.SEARCH,
+        labelName: 'သွေးလှူရှင်ရှာမည်',
+        isAssetsImage: true,
+        imageName: 'assets/images/search.svg',
+      ),
+      DrawerList(
         index: DrawerIndex.NEWMEMBER,
-        labelName: 'အဖွဲ့၀င် စာရင်း',
+        labelName: 'အဖွဲ့ဝင်စာရင်း',
         isAssetsImage: true,
         imageName: 'assets/images/record.svg',
       ),
       DrawerList(
         index: DrawerIndex.RECORDS,
-        labelName: 'သွေးလှူမှု မှတ်တမ်း',
+        labelName: 'သွေးလှူမှုမှတ်တမ်း',
         isAssetsImage: true,
-        imageName: 'assets/images/record.svg',
-      ),
-      DrawerList(
-        index: DrawerIndex.SEARCH,
-        labelName: 'သွေးလှူရှင် ရှာမည်',
-        isAssetsImage: true,
-        imageName: 'assets/images/search.svg',
+        imageName: 'assets/images/donation.png',
       ),
       // DrawerList(
       //   index: DrawerIndex.REPORT,
@@ -91,8 +97,18 @@ class _HomeDrawerState extends State<HomeDrawer> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Container(
-            color: Colors.white,
             padding: const EdgeInsets.fromLTRB(0, 46, 0, 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -152,7 +168,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             color: Colors.grey.withOpacity(0.6),
           ),
           const SizedBox(
-            height: 12,
+            height: 16,
           ),
           Expanded(
             child: ListView.builder(
@@ -176,7 +192,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   onTapped();
                 },
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+                  padding: const EdgeInsets.fromLTRB(20, 16, 8, 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -243,23 +259,36 @@ class _HomeDrawerState extends State<HomeDrawer> {
         child: Stack(
           children: <Widget>[
             Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
               padding: EdgeInsets.only(
-                  top: Responsive.isMobile(context) ? 8.0 : 18,
-                  bottom: Responsive.isMobile(context) ? 8.0 : 18,
-                  left: Responsive.isMobile(context) ? 8 : 12),
+                  top: Responsive.isMobile(context) ? 10.0 : 18,
+                  bottom: Responsive.isMobile(context) ? 10.0 : 18,
+                  left: Responsive.isMobile(context) ? 12 : 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Row(
                 children: <Widget>[
                   const Padding(
                     padding: EdgeInsets.all(4.0),
                   ),
                   listData.isAssetsImage
-                      ? SvgPicture.asset(
-                          listData.imageName,
-                          color: widget.screenIndex == listData.index
-                              ? Colors.red
-                              : Colors.black,
-                          width: Responsive.isMobile(context) ? 26 : 30,
-                        )
+                      ? (listData.imageName.endsWith('.svg')
+                          ? SvgPicture.asset(
+                              listData.imageName,
+                              color: widget.screenIndex == listData.index
+                                  ? Colors.red
+                                  : Colors.black,
+                              width: Responsive.isMobile(context) ? 24 : 28,
+                            )
+                          : Image.asset(
+                              listData.imageName,
+                              width: Responsive.isMobile(context) ? 24 : 28,
+                              height: Responsive.isMobile(context) ? 24 : 28,
+                              color: widget.screenIndex == listData.index
+                                  ? Colors.red
+                                  : Colors.black,
+                            ))
                       : Icon(listData.icon?.icon,
                           color: widget.screenIndex == listData.index
                               ? Colors.red
@@ -272,7 +301,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     child: Text(
                       listData.labelName,
                       style: TextStyle(
-                        fontWeight: FontWeight.w400,
+                        fontWeight: widget.screenIndex == listData.index ? FontWeight.w600 : FontWeight.w400,
                         fontSize: Responsive.isMobile(context) ? 14.5 : 15,
                         color: widget.screenIndex == listData.index
                             ? Colors.red
@@ -303,13 +332,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                 MediaQuery.of(context).size.width * 0.75 - 64,
                             height: Responsive.isMobile(context) ? 46 : 60,
                             decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.2),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(0),
-                                topRight: Radius.circular(12),
-                                bottomLeft: Radius.circular(0),
-                                bottomRight: Radius.circular(12),
-                              ),
+                              color: Colors.red.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                         ),
@@ -329,10 +353,11 @@ class _HomeDrawerState extends State<HomeDrawer> {
 }
 
 enum DrawerIndex {
+  HOME,
   DASHBOARD,
+  SEARCH,
   NEWMEMBER,
   RECORDS,
-  SEARCH,
   // REPORT,
   // SETTINGS,
 }

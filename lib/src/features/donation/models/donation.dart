@@ -1,63 +1,123 @@
+import 'package:donation/src/features/donation_member/domain/member.dart';
+
 class Donation {
-  final String? id;
-  final String? memberId;
-  final String? memberName;
-  final String? bloodType;
+  final String id;
+  final String? member;
   final DateTime? donationDate;
   final String? hospital;
   final String? patientName;
-  final String? patientPhone;
   final String? patientAddress;
+  final String? patientAge;
+  final String? patientDisease;
+  final String? location;
   final String? remark;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
+  final String? memberId;
+  final Member? memberObj;
+  final String? date;
+  final String ownerId;
 
   Donation({
-    this.id,
-    this.memberId,
-    this.memberName,
-    this.bloodType,
+    required this.id,
+    this.member,
     this.donationDate,
     this.hospital,
     this.patientName,
-    this.patientPhone,
     this.patientAddress,
+    this.patientAge,
+    this.patientDisease,
+    this.location,
     this.remark,
     this.createdAt,
     this.updatedAt,
+    this.memberId,
+    this.memberObj,
+    this.date,
+    this.ownerId = '',
   });
 
   factory Donation.fromJson(Map<String, dynamic> json) {
     return Donation(
-      id: json['id'] as String?,
-      memberId: json['member_id'] as String?,
-      memberName: json['member_name'] as String?,
-      bloodType: json['blood_type'] as String?,
-      donationDate: json['donation_date'] != null ? DateTime.parse(json['donation_date']) : null,
+      id: json['id'] ?? json['_id'] ?? '',
+      member: json['member'] as String?,
+      donationDate: json['donationDate'] != null
+          ? DateTime.parse(json['donationDate'])
+          : null,
       hospital: json['hospital'] as String?,
-      patientName: json['patient_name'] as String?,
-      patientPhone: json['patient_phone'] as String?,
-      patientAddress: json['patient_address'] as String?,
+      patientName: json['patientName'] as String?,
+      patientAddress: json['patientAddress'] as String?,
+      patientAge: json['patientAge'] as String?,
+      patientDisease: json['patientDisease'] as String?,
+      location: json['location'] as String?,
       remark: json['remark'] as String?,
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+      createdAt: json['createdAt'] as String?,
+      updatedAt: json['updatedAt'] as String?,
+      memberId: json['memberId'] as String?,
+      memberObj: json['memberObj'] != null
+          ? Member.fromJson(json['memberObj'] as Map<String, dynamic>)
+          : null,
+      date: json['date'] as String?,
+      ownerId: json['owner_id'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'member_id': memberId,
-      'member_name': memberName,
-      'blood_type': bloodType,
-      'donation_date': donationDate?.toIso8601String(),
+      'member': member,
+      'donationDate': donationDate?.toIso8601String(),
       'hospital': hospital,
-      'patient_name': patientName,
-      'patient_phone': patientPhone,
-      'patient_address': patientAddress,
+      'patientName': patientName,
+      'patientAddress': patientAddress,
+      'patientAge': patientAge,
+      'patientDisease': patientDisease,
+      'location': location,
       'remark': remark,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'memberId': memberId,
+      'memberObj': memberObj?.toJson(),
+      'date': date,
+      'owner_id': ownerId,
     };
   }
-} 
+
+  Donation copyWith({
+    String? id,
+    String? member,
+    DateTime? donationDate,
+    String? hospital,
+    String? patientName,
+    String? patientAddress,
+    String? patientAge,
+    String? patientDisease,
+    String? location,
+    String? remark,
+    String? createdAt,
+    String? updatedAt,
+    String? memberId,
+    Member? memberObj,
+    String? date,
+    String? ownerId,
+  }) {
+    return Donation(
+      id: id ?? this.id,
+      member: member ?? this.member,
+      donationDate: donationDate ?? this.donationDate,
+      hospital: hospital ?? this.hospital,
+      patientName: patientName ?? this.patientName,
+      patientAddress: patientAddress ?? this.patientAddress,
+      patientAge: patientAge ?? this.patientAge,
+      patientDisease: patientDisease ?? this.patientDisease,
+      location: location ?? this.location,
+      remark: remark ?? this.remark,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      memberId: memberId ?? this.memberId,
+      memberObj: memberObj ?? this.memberObj,
+      date: date ?? this.date,
+      ownerId: ownerId ?? this.ownerId,
+    );
+  }
+}

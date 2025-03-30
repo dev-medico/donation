@@ -1,25 +1,32 @@
 import 'dart:developer';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:donation/src/features/services/member_service.dart';
+import 'package:donation/src/features/services/member_service.dart' as ms;
 import 'package:donation/src/features/donation_member/domain/member.dart';
 
 typedef SearchParams = ({String? search, String? bloodType});
 typedef AgeRangeParams = ({int? start, int? end});
 
-final memberServiceProvider = Provider<MemberService>((ref) => MemberService());
+final memberServiceProvider = Provider<ms.MemberService>((ref) => ms.MemberService(ref));
 
 final memberStreamProvider = StreamProvider.family<List<Member>, SearchParams>(
     (ref, searchParam) async* {
   final memberService = ref.read(memberServiceProvider);
   while (true) {
-    final membersJson = await memberService.getMembers(
-      search: searchParam.search,
-      bloodType: searchParam.bloodType,
-    );
+    final membersJson = await memberService.getMembers();
+    // Filter members based on search parameters if needed
     final members = membersJson
         .map((json) => Member.fromJson(json as Map<String, dynamic>))
         .toList();
-    yield members;
+
+    final filteredMembers = members.where((member) =>
+      (searchParam.search == null ||
+       member.name != null &&
+       member.name!.toLowerCase().contains(searchParam.search!.toLowerCase())) &&
+      (searchParam.bloodType == null ||
+       member.bloodType == searchParam.bloodType)
+    ).toList();
+
+    yield filteredMembers;
     await Future.delayed(
         const Duration(seconds: 30)); // Refresh every 30 seconds
   }
@@ -34,34 +41,69 @@ final membersDataProvider = FutureProvider<List<Member>>((ref) async {
 });
 
 final averageAgeOfMemberProvider = FutureProvider<int>((ref) async {
-  final memberService = ref.read(memberServiceProvider);
-  final stats = await memberService.getMemberStats();
-  return stats['average_age'] as int;
+  // Since getMemberStats doesn't exist, we'll compute it manually
+  final membersProvider = ref.watch(membersDataProvider.future);
+  final members = await membersProvider;
+
+  int totalAge = 0;
+  int count = 0;
+
+  for (var member in members) {
+    if (member.birthDate != null) {
+      try {
+        final birthDate = DateTime.parse(member.birthDate!);
+        final age = DateTime.now().year - birthDate.year;
+        totalAge += age;
+        count++;
+      } catch (e) {
+        // Skip invalid dates
+      }
+    }
+  }
+
+  return count > 0 ? totalAge ~/ count : 0;
 });
 
 final memberCountByAgeRangeProvider =
     FutureProvider.family<int, AgeRangeParams>((ref, ageRange) async {
   final memberService = ref.read(memberServiceProvider);
-  final members =
-      await memberService.getMembersByAgeRange(ageRange.start!, ageRange.end!);
+  final members = await memberService.getMembersByAgeRange(ageRange.start ?? 0, ageRange.end ?? 100);
   return members.length;
 });
 
 final membersDataByTotalCountProvider =
     FutureProvider<List<Member>>((ref) async {
+  // Since getMembersByTotalCount doesn't exist, we'll sort them by totalCount
   final memberService = ref.read(memberServiceProvider);
-  final membersJson = await memberService.getMembersByTotalCount();
-  return membersJson
+  final membersJson = await memberService.getMembers();
+  final members = membersJson
       .map((json) => Member.fromJson(json as Map<String, dynamic>))
       .toList();
+
+  // Sort by totalCount if available
+  members.sort((a, b) {
+    final countA = int.tryParse(a.totalCount ?? '0') ?? 0;
+    final countB = int.tryParse(b.totalCount ?? '0') ?? 0;
+    return countB.compareTo(countA); // Descending order
+  });
+
+  return members;
 });
 
 final membersDataByPhoneProvider =
     FutureProvider.family<Member?, String>((ref, phone) async {
+  // Since getMemberByPhone doesn't exist, we'll filter by phone
   final memberService = ref.read(memberServiceProvider);
   try {
-    final memberJson = await memberService.getMemberByPhone(phone);
-    return Member.fromJson(memberJson);
+    final membersJson = await memberService.getMembers();
+    final members = membersJson
+        .map((json) => Member.fromJson(json as Map<String, dynamic>))
+        .toList();
+
+    return members.firstWhere(
+      (member) => member.phone == phone,
+      orElse: () => throw Exception('Member not found with phone: $phone'),
+    );
   } catch (e) {
     return null;
   }
@@ -73,10 +115,26 @@ final searchMemberProvider =
     FutureProvider.family<List<Member>, ({String? search, String? bloodType})>(
   (ref, params) async {
     final memberService = ref.watch(memberServiceProvider);
-    return memberService.searchMembers(
-      query: params.search,
-      bloodType: params.bloodType,
-    );
+    // Since searchMembers doesn't exist, we'll use findMembers or filter from getMembers
+    List<dynamic> results = [];
+    if (params.search != null && params.search!.isNotEmpty) {
+      results = await memberService.findMembers(params.search!);
+    } else {
+      results = await memberService.getMembers();
+    }
+
+    final members = results
+        .map((json) => Member.fromJson(json as Map<String, dynamic>))
+        .toList();
+
+    // Filter by blood type if specified
+    if (params.bloodType != null && params.bloodType!.isNotEmpty) {
+      return members.where((member) =>
+        member.bloodType == params.bloodType
+      ).toList();
+    }
+
+    return members;
   },
 );
 
@@ -84,7 +142,11 @@ final searchMemberProvider =
 final memberListProvider = FutureProvider<List<Member>>((ref) async {
   final memberService = ref.read(memberServiceProvider);
   try {
-    return await memberService.searchMembers(limit: 5000);
+    // Since searchMembers with limit doesn't exist, we'll use getMembers
+    final membersData = await memberService.getMembers(limit: 5000);
+    return membersData
+        .map((json) => Member.fromJson(json as Map<String, dynamic>))
+        .toList();
   } catch (e) {
     print('Error fetching members: $e');
     return [];
@@ -94,7 +156,7 @@ final memberListProvider = FutureProvider<List<Member>>((ref) async {
 // Filter states
 final memberSearchQueryProvider = StateProvider<String>((ref) => '');
 final memberBloodTypeFilterProvider =
-    StateProvider<String>((ref) => 'သွေးအုပ်စု အလိုက်ကြည့်မည်');
+    StateProvider<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
 final memberRangeFilterProvider = StateProvider<String?>((ref) => null);
 
 // Filtered members provider
@@ -110,11 +172,13 @@ final filteredMemberListProvider = StateProvider<List<Member>>((ref) {
       List<Member> filtered = List.from(allMembers);
 
       // Filter by blood type
-      if (bloodType != 'သွေးအုပ်စု အလိုက်ကြည့်မည်' &&
-          bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်') {
+      if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
         filtered = filtered
             .where((member) =>
-                member.bloodType != null && member.bloodType == bloodType)
+                member.bloodType
+                    ?.toLowerCase()
+                    .contains(bloodType.toLowerCase()) ??
+                false)
             .toList();
       }
 
@@ -171,11 +235,11 @@ void updateFilteredMembers(WidgetRef ref) {
 
   List<Member> filtered = List.from(allMembers);
 
-  if (bloodType != 'သွေးအုပ်စု အလိုက်ကြည့်မည်' &&
-      bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်') {
+  if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
     filtered = filtered
         .where((member) =>
-            member.bloodType != null && member.bloodType == bloodType)
+            member.bloodType?.toLowerCase().contains(bloodType.toLowerCase()) ??
+            false)
         .toList();
   }
 
@@ -213,105 +277,90 @@ void updateFilteredMembers(WidgetRef ref) {
   ref.read(filteredMemberListProvider.notifier).state = filtered;
 }
 
-// Selected member provider
-final selectedMemberProvider = StateProvider<Member?>((ref) => null);
-
-// Member operation states
+// Provider for the member loading status
 final memberLoadingProvider = StateProvider<bool>((ref) => false);
+
+// Provider for any error messages
 final memberErrorProvider = StateProvider<String?>((ref) => null);
 
-// Get member by ID provider
+// Provider for the list of all members
+final membersProvider = FutureProvider<List<Member>>((ref) async {
+  final memberService = ref.read(memberServiceProvider);
+  ref.read(memberLoadingProvider.notifier).state = true;
+  ref.read(memberErrorProvider.notifier).state = null;
+
+  try {
+    final membersData = await memberService.getMembers();
+    final members = membersData.map((data) => Member.fromJson(data)).toList();
+    ref.read(memberLoadingProvider.notifier).state = false;
+    return members;
+  } catch (e) {
+    ref.read(memberLoadingProvider.notifier).state = false;
+    ref.read(memberErrorProvider.notifier).state = e.toString();
+    return [];
+  }
+});
+
+// Provider for a specific member by ID
 final memberByIdProvider =
     FutureProvider.family<Member, String>((ref, id) async {
-  final memberService = ref.read(memberServiceProvider);
-
-  try {
-    return await memberService.getMemberById(id);
-  } catch (e) {
-    throw e;
-  }
-});
-
-// Helper function to fetch member by ID with loading state
-Future<Member?> fetchMemberById(WidgetRef ref, String id) async {
   ref.read(memberLoadingProvider.notifier).state = true;
   ref.read(memberErrorProvider.notifier).state = null;
 
   try {
-    final member = await ref.read(memberByIdProvider(id).future);
+    final memberService = ref.read(memberServiceProvider);
+    final memberData = await memberService.getMemberById(id);
+    final member = Member.fromJson(memberData);
     ref.read(memberLoadingProvider.notifier).state = false;
     return member;
   } catch (e) {
     ref.read(memberLoadingProvider.notifier).state = false;
     ref.read(memberErrorProvider.notifier).state = e.toString();
-    return null;
+    throw e;
   }
+});
+
+// Provider for searching members
+final memberSearchProvider =
+    FutureProvider.family<List<Member>, String>((ref, query) async {
+  if (query.isEmpty) return [];
+
+  ref.read(memberLoadingProvider.notifier).state = true;
+  ref.read(memberErrorProvider.notifier).state = null;
+
+  try {
+    final memberService = ref.read(memberServiceProvider);
+    final membersData = await memberService.findMembers(query);
+    final members = membersData.map((data) => Member.fromJson(data)).toList();
+    ref.read(memberLoadingProvider.notifier).state = false;
+    return members;
+  } catch (e) {
+    ref.read(memberLoadingProvider.notifier).state = false;
+    ref.read(memberErrorProvider.notifier).state = e.toString();
+    return [];
+  }
+});
+
+// Function to fetch a member by ID (for use in widgets)
+Future<void> fetchMemberById(WidgetRef ref, String id) async {
+  ref.invalidate(memberByIdProvider(id));
+  await ref.read(memberByIdProvider(id).future);
 }
 
-// Create member provider
-final createMemberProvider =
-    FutureProvider.family<Member, Map<String, dynamic>>(
-        (ref, memberData) async {
-  final memberService = ref.read(memberServiceProvider);
-  ref.read(memberLoadingProvider.notifier).state = true;
-  ref.read(memberErrorProvider.notifier).state = null;
+// Provider for the selected member
+final selectedMemberProvider = StateProvider<Member?>((ref) => null);
 
-  try {
-    final member = await memberService.createMember(memberData);
-    ref.read(memberLoadingProvider.notifier).state = false;
+// Provider for blood type filter
+final bloodTypeFilterProvider = StateProvider<String?>((ref) => null);
 
-    // Refresh the member list
-    ref.refresh(memberListProvider);
+// Provider for filtered members
+final filteredMembersProvider = FutureProvider<List<Member>>((ref) async {
+  final bloodType = ref.watch(bloodTypeFilterProvider);
 
-    return member;
-  } catch (e) {
-    ref.read(memberLoadingProvider.notifier).state = false;
-    ref.read(memberErrorProvider.notifier).state = e.toString();
-    throw e;
+  if (bloodType == null || bloodType.isEmpty) {
+    return ref.watch(membersProvider).value ?? [];
   }
-});
 
-// Update member provider
-final updateMemberProvider =
-    FutureProvider.family<Member, ({String id, Map<String, dynamic> data})>(
-        (ref, params) async {
-  final memberService = ref.read(memberServiceProvider);
-  ref.read(memberLoadingProvider.notifier).state = true;
-  ref.read(memberErrorProvider.notifier).state = null;
-
-  try {
-    final member = await memberService.updateMember(params.id, params.data);
-    ref.read(memberLoadingProvider.notifier).state = false;
-
-    // Refresh the member list
-    ref.refresh(memberListProvider);
-
-    return member;
-  } catch (e) {
-    ref.read(memberLoadingProvider.notifier).state = false;
-    ref.read(memberErrorProvider.notifier).state = e.toString();
-    throw e;
-  }
-});
-
-// Delete member provider
-final deleteMemberProvider =
-    FutureProvider.family<bool, String>((ref, id) async {
-  final memberService = ref.read(memberServiceProvider);
-  ref.read(memberLoadingProvider.notifier).state = true;
-  ref.read(memberErrorProvider.notifier).state = null;
-
-  try {
-    final result = await memberService.deleteMember(id);
-    ref.read(memberLoadingProvider.notifier).state = false;
-
-    // Refresh the member list
-    ref.refresh(memberListProvider);
-
-    return result;
-  } catch (e) {
-    ref.read(memberLoadingProvider.notifier).state = false;
-    ref.read(memberErrorProvider.notifier).state = e.toString();
-    throw e;
-  }
+  final allMembers = ref.watch(membersProvider).value ?? [];
+  return allMembers.where((member) => member.bloodType == bloodType).toList();
 });

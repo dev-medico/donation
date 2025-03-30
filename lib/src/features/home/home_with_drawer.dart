@@ -1,8 +1,8 @@
-import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/dashboard.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
+import 'package:donation/src/features/donation_member/presentation/search_member.dart';
 import 'package:donation/src/features/home/custom_drawer/drawer_user_controller.dart';
 import 'package:donation/src/features/home/custom_drawer/home_drawer.dart';
 import 'package:donation/src/features/setttings/settings.dart';
@@ -23,7 +23,7 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen>
 
   @override
   void initState() {
-    drawerIndex = DrawerIndex.DASHBOARD;
+    drawerIndex = DrawerIndex.HOME;
     screenView = const DashBoardScreen();
     super.initState();
   }
@@ -57,25 +57,31 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen>
   void changeIndex(DrawerIndex drawerIndexdata) {
     if (drawerIndex != drawerIndexdata) {
       drawerIndex = drawerIndexdata;
-      if (drawerIndex == DrawerIndex.DASHBOARD) {
+      if (drawerIndex == DrawerIndex.HOME || drawerIndex == DrawerIndex.DASHBOARD) {
         setState(() {
           screenView = const DashBoardScreen();
         });
       } else if (drawerIndex == DrawerIndex.NEWMEMBER) {
-        // setState(() {
-        //   screenView = const MemberListScreen();
-        // });
+        setState(() {
+          screenView = const MemberListScreen();
+        });
       } else if (drawerIndex == DrawerIndex.RECORDS) {
-        // setState(() {
-        //   animationController = AnimationController(
-        //       duration: const Duration(milliseconds: 600), vsync: this);
-        //   screenView = const DonationListScreen();
-        // });
+        setState(() {
+          animationController = AnimationController(
+              duration: const Duration(milliseconds: 600), vsync: this);
+          // Uncomment when DonationListScreen is implemented
+          // screenView = const DonationListScreen();
+          screenView = const MemberListScreen(); // Temporary fallback
+        });
+      } else if (drawerIndex == DrawerIndex.SEARCH) {
+        setState(() {
+          // Using SearchMemberListScreen which is the actual class name
+          screenView = const SearchMemberListScreen();
+        });
       } else {
         setState(() {
           screenView = const SettingsScreen();
         });
-        //do in your way......
       }
     }
   }

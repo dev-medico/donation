@@ -28,6 +28,7 @@ class DesktopHomeScreen extends ConsumerStatefulWidget {
 class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
   int selectedIndex = 0;
   List<String> titles = [
+    'မူလစာမျက်နှာ',
     'သွေးလှူရှင် ရှာမည်',
     'အဖွဲ့ဝင် စာရင်း',
     'သွေးလှူမှု မှတ်တမ်း',
@@ -37,6 +38,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'Log Out(V 1.3.8)'
   ];
   List<String> icons = [
+    'assets/images/home.png',
     'assets/images/search_list.png',
     'assets/images/members.png',
     'assets/images/donations.png',
@@ -52,13 +54,13 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
   void initState() {
     super.initState();
     pages = [
-      ReportNewScreen(),
-      SearchMemberListScreen(),
-       MemberListScreen(),
-      Container(), // DonationListScreen(),
-      Container(), // SpecialEventListScreen(),
-      Container(), // DonarListNewScreen(),
-      Container(), // FeedAdminScreen(),
+      ReportNewScreen(), // Home/Dashboard
+      SearchMemberListScreen(), // Search Blood Donors
+      MemberListScreen(), // Member List
+      const DonationListScreen(), // Donation List
+      Container(), // Special Events
+      Container(), // Finance
+      Container(), // Posts/Notifications
     ];
   }
 
@@ -71,6 +73,13 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
             extended: !Responsive.isMobile(context),
             minWidth: Responsive.isMobile(context) ? 80 : 64,
             selectedIndex: selectedIndex,
+            backgroundColor: Colors.white,
+            selectedIconTheme: IconThemeData(color: Colors.red),
+            selectedLabelTextStyle:
+                TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            unselectedLabelTextStyle: TextStyle(color: Colors.black87),
+            unselectedIconTheme: IconThemeData(color: Colors.black54),
+            elevation: 6,
             onDestinationSelected: (index) {
               if (index == titles.length - 1) {
                 Navigator.pushAndRemoveUntil(
@@ -85,11 +94,15 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
             destinations: List.generate(
               titles.length,
               (index) => NavigationRailDestination(
-                icon: CustomIcon(icon: icons[index]),
-                label: Text(titles[index], style: smallTextStyle(context)),
+                icon: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: CustomIcon(icon: icons[index]),
+                ),
+                label: Text(titles[index], style: TextStyle(fontSize: 14)),
               ),
             ),
           ),
+          VerticalDivider(thickness: 1, width: 1),
           Expanded(
             child: pages[selectedIndex],
           ),
