@@ -41,7 +41,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     log("name - " + name);
 
     Future.delayed(const Duration(seconds: 5), () async {
-      if (memberPhone == "") {
+      if (memberPhone != "") {
         if (name == "") {
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         } else {

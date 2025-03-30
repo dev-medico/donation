@@ -30,7 +30,7 @@ class MemberService extends BaseService {
       print('Searching members with params: $params');
 
       final response = await apiClient.get<Map<String, dynamic>>(
-        _basePath + '/all',
+        _basePath + '/index',
         queryParameters: params,
       );
 
@@ -67,7 +67,7 @@ class MemberService extends BaseService {
     print('Getting members with params: $params');
 
     final response = await apiClient.get(
-      _basePath + '/all',
+      _basePath + '/index',
       queryParameters: params,
       options: Options(headers: headers),
     );
