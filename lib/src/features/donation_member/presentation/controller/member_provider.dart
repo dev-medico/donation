@@ -2,6 +2,8 @@ import 'dart:developer';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/member_service.dart' as ms;
 import 'package:donation/src/features/donation_member/domain/member.dart';
+import 'package:donation/src/features/donation_member/data/member_repository.dart';
+import 'package:flutter/widgets.dart';
 
 typedef SearchParams = ({String? search, String? bloodType});
 typedef AgeRangeParams = ({int? start, int? end});
@@ -46,7 +48,7 @@ final membersDataProvider = FutureProvider<List<Member>>((ref) async {
 
 final averageAgeOfMemberProvider = FutureProvider<int>((ref) async {
   // Since getMemberStats doesn't exist, we'll compute it manually
-  final membersProvider = ref.watch(membersDataProvider.future);
+  final membersProvider = ref.watch(memberListProvider.future);
   final members = await membersProvider;
 
   int totalAge = 0;
@@ -143,26 +145,57 @@ final searchMemberProvider =
   },
 );
 
-// Fetch and cache the full member list
-final memberListProvider = FutureProvider<List<Member>>((ref) async {
-  ref.read(memberLoadingProvider.notifier).state = true;
-  ref.read(memberErrorProvider.notifier).state = null;
+// Repository provider
+final memberRepositoryProvider = Provider<MemberRepository>((ref) {
+  return MemberRepository();
+});
 
-  try {
-    final memberService = ref.read(memberServiceProvider);
-    final membersData = await memberService.getMembers(limit: 1000);
-    final members = membersData
-        .map((json) => Member.fromJson(json as Map<String, dynamic>))
-        .toList();
+// Loading and error state providers
+final memberLoadingProvider = StateProvider<bool>((ref) => false);
+final memberErrorProvider = StateProvider<String?>((ref) => null);
 
-    ref.read(memberLoadingProvider.notifier).state = false;
-    return members;
-  } catch (e) {
-    ref.read(memberLoadingProvider.notifier).state = false;
-    ref.read(memberErrorProvider.notifier).state = e.toString();
-    print('Error fetching members: $e');
-    return [];
-  }
+// Replace the existing memberListProvider with a simple data-only provider
+final memberListProvider = FutureProvider<List<Member>>((ref) {
+  // Only fetch data without modifying any other state
+  final repository = ref.read(memberRepositoryProvider);
+  return repository.getAllMembers(forceRefresh: false);
+});
+
+// Add a separate function to handle loading state
+final loadMembersProvider =
+    Provider<Future<List<Member>> Function(bool)>((ref) {
+  return (bool forceRefresh) async {
+    try {
+      // First update the loading states
+      ref.read(memberLoadingProvider.notifier).state = true;
+      ref.read(memberErrorProvider.notifier).state = null;
+      ref.read(memberLoadingStatusProvider.notifier).state =
+          'အဖွဲ့၀င်များ ရယူနေပါသည်...';
+
+      // Get repository and fetch data
+      final repository = ref.read(memberRepositoryProvider);
+      final members =
+          await repository.getAllMembers(forceRefresh: forceRefresh);
+
+      // Update states after fetching
+      ref.read(memberLoadingProvider.notifier).state = false;
+      ref.read(memberLoadingStatusProvider.notifier).state = '';
+
+      // Invalidate the provider to refresh the data
+      if (forceRefresh) {
+        ref.invalidate(memberListProvider);
+      }
+
+      return members;
+    } catch (e) {
+      // Handle error
+      ref.read(memberLoadingProvider.notifier).state = false;
+      ref.read(memberErrorProvider.notifier).state = e.toString();
+      ref.read(memberLoadingStatusProvider.notifier).state = '';
+      log('Error fetching members: $e');
+      return [];
+    }
+  };
 });
 
 // Filter states
@@ -290,28 +323,7 @@ void updateFilteredMembers(WidgetRef ref) {
 }
 
 // Provider for the member loading status
-final memberLoadingProvider = StateProvider<bool>((ref) => false);
-
-// Provider for any error messages
-final memberErrorProvider = StateProvider<String?>((ref) => null);
-
-// Provider for the list of all members
-final membersProvider = FutureProvider<List<Member>>((ref) async {
-  final memberService = ref.read(memberServiceProvider);
-  ref.read(memberLoadingProvider.notifier).state = true;
-  ref.read(memberErrorProvider.notifier).state = null;
-
-  try {
-    final membersData = await memberService.getMembers();
-    final members = membersData.map((data) => Member.fromJson(data)).toList();
-    ref.read(memberLoadingProvider.notifier).state = false;
-    return members;
-  } catch (e) {
-    ref.read(memberLoadingProvider.notifier).state = false;
-    ref.read(memberErrorProvider.notifier).state = e.toString();
-    return [];
-  }
-});
+final memberLoadingStatusProvider = StateProvider<String>((ref) => '');
 
 // Provider for a specific member by ID
 final memberByIdProvider =
@@ -370,9 +382,29 @@ final filteredMembersProvider = FutureProvider<List<Member>>((ref) async {
   final bloodType = ref.watch(bloodTypeFilterProvider);
 
   if (bloodType == null || bloodType.isEmpty) {
-    return ref.watch(membersProvider).value ?? [];
+    return ref.watch(memberListProvider).value ?? [];
   }
 
-  final allMembers = ref.watch(membersProvider).value ?? [];
+  final allMembers = ref.watch(memberListProvider).value ?? [];
   return allMembers.where((member) => member.bloodType == bloodType).toList();
 });
+
+// Update the refresh provider to use the new loading function
+final refreshMembersProvider = Provider<Future<void> Function()>((ref) {
+  return () async {
+    try {
+      // Use the loadMembersProvider to handle the loading states
+      await ref.read(loadMembersProvider)(true);
+    } catch (e) {
+      log('Error refreshing members: $e');
+    }
+  };
+});
+
+// Function to reset all filter providers
+void resetFilterProviders(WidgetRef ref) {
+  ref.read(memberSearchQueryProvider.notifier).state = '';
+  ref.read(memberBloodTypeFilterProvider.notifier).state =
+      'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
+  ref.read(memberRangeFilterProvider.notifier).state = null;
+}

@@ -191,7 +191,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
             selectedMember!.id.toString(), memberData);
 
         // Refresh member data
-        ref.refresh(membersProvider);
+        ref.refresh(memberListProvider);
       }
 
       // Clear input fields
@@ -257,7 +257,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final membersAsync = ref.watch(membersProvider);
+    final membersAsync = ref.watch(memberListProvider);
     YYDialog.init(context);
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),

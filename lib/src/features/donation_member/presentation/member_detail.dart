@@ -1,11 +1,13 @@
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
-import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
+import 'package:donation/src/features/donation_member/domain/donation.dart';
 import 'package:donation/src/features/donation_member/presentation/member_edit.dart';
+import 'package:donation/src/features/donation_member/data/member_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 
 class MemberDetailScreen extends ConsumerStatefulWidget {
   static const routeName = '/member-detail';
@@ -21,31 +23,49 @@ class MemberDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
-  Member? memberData;
+  bool _isLoading = true;
+  Member? _member;
+  List<Donation> _donations = [];
+  String? _errorMessage;
+  final MemberRepository _repository = MemberRepository();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadMemberData();
-    });
+    _loadMemberData();
   }
 
   Future<void> _loadMemberData() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
     try {
-      ref.invalidate(memberByIdProvider(widget.memberId));
-      await ref.read(memberByIdProvider(widget.memberId).future);
+      final memberData = await _repository.getMemberById(widget.memberId);
+
+      if (!mounted) return;
+
+      setState(() {
+        _member = memberData.member;
+        _donations = memberData.donations;
+        _isLoading = false;
+      });
     } catch (e) {
-      print("Error loading member data: $e");
+      if (!mounted) return;
+
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+      debugPrint("Error loading member data: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final memberAsync = ref.watch(memberByIdProvider(widget.memberId));
-    final isLoading = ref.watch(memberLoadingProvider);
-    final errorMessage = ref.watch(memberErrorProvider);
-
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(
@@ -66,326 +86,345 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
           ),
         ),
       ),
-      body: isLoading
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : errorMessage != null
+          : _errorMessage != null
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Error: $errorMessage'),
+                      Text('Error: $_errorMessage'),
+                      const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () {
-                          ref.refresh(memberByIdProvider(widget.memberId));
-                        },
+                        onPressed: _loadMemberData,
                         child: const Text('Retry'),
                       ),
                     ],
                   ),
                 )
-              : memberAsync.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Error: $error'),
-                        ElevatedButton(
-                          onPressed: () {
-                            ref.refresh(memberByIdProvider(widget.memberId));
-                          },
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  data: (member) => _buildMemberDetailView(context, member),
-                ),
+              : _member != null
+                  ? _buildMemberDetailView(context, _member!, _donations)
+                  : const Center(child: Text('No member data found')),
     );
   }
 
-  Widget _buildMemberDetailView(BuildContext context, Member member) {
-    return Responsive.isMobile(context)
-        ? ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.zero,
-            children: [
-              Container(
-                width: double.infinity,
-                decoration: shadowDecoration(Colors.white),
-                margin: const EdgeInsets.only(
-                    top: 8, left: 20, right: 20, bottom: 20),
-                child: ListView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(12),
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            Image.asset("assets/images/card.png", width: 54),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text("အဖွဲ့၀င်အမှတ်",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                                const SizedBox(height: 8),
-                                Text(
-                                  member.memberId ?? 'N/A',
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+  Widget _buildMemberDetailView(
+      BuildContext context, Member member, List<Donation> donations) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Member Info Card - Left Half
+          Expanded(
+            flex: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.15),
+                    spreadRadius: 1,
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const SizedBox(width: 8),
+                          Image.asset("assets/images/card.png", width: 54),
+                          const SizedBox(width: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                  Responsive.isMobile(context)
-                                      ? "ရက်စွဲ"
-                                      : "အဖွဲ့ဝင်သည့်ရက်စွဲ",
-                                  style: const TextStyle(
+                              const Text("အဖွဲ့၀င်အမှတ်",
+                                  style: TextStyle(
                                       fontSize: 14,
                                       color:
                                           Color.fromARGB(255, 116, 112, 112))),
                               const SizedBox(height: 8),
                               Text(
-                                member.registerDate ?? 'N/A',
+                                member.memberId ?? 'N/A',
                                 style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      height: 1,
-                      width: MediaQuery.of(context).size.width - 80,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildInfoRow("အမည်", member.name ?? 'N/A'),
-                    _buildInfoRow("အဖအမည်", member.fatherName ?? 'N/A'),
-                    _buildInfoRow("မွေးသက္ကရာဇ်", member.birthDate ?? 'N/A'),
-                    _buildInfoRow("နိုင်ငံသားစီစစ်ရေး\nကတ်ပြားအမှတ်",
-                        member.nrc ?? 'N/A'),
-                    _buildInfoRow("သွေးအုပ်စု", member.bloodType ?? 'N/A'),
-                    _buildInfoRow(
-                        "သွေးဘဏ်ကတ်နံပါတ်", member.bloodBankCard ?? 'N/A'),
-                    _buildInfoRow("လိင်အမျိုးအစား", member.gender ?? 'N/A'),
-                    _buildInfoRow(
-                        "အဖွဲ့နှင့်သွေးလှူဒါန်းမှု", member.memberCount ?? '0'),
-                    _buildInfoRow(
-                        "စုစုပေါင်းသွေးလှူဒါန်းမှု", member.totalCount ?? '0'),
-                    _buildInfoRow("ဖုန်းနံပါတ်", member.phone ?? 'N/A'),
-                    _buildAddressRow("နေရပ်လိပ်စာ", member.address ?? 'N/A'),
-                    const SizedBox(height: 12),
-                    Container(
-                      height: 1,
-                      width: MediaQuery.of(context).size.width - 80,
-                      color: Colors.grey,
-                    ),
-                    widget.isEditable
-                        ? Align(
-                            alignment: Alignment.centerRight,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                top: 12,
-                                right: 12,
-                              ),
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text("ပြင်ဆင်မည်",
-                                        style: TextStyle(
-                                            fontSize: 15, color: primaryColor)),
-                                    const SizedBox(width: 8),
-                                    Image.asset(
-                                      "assets/images/edit.png",
-                                      width: 24,
-                                      color: primaryColor,
-                                    ),
-                                  ],
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => MemberEditScreen(
-                                          memberId: member.id.toString()),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          )
-                        : Container(),
-                  ],
-                ),
-              ),
-            ],
-          )
-        : Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 3,
-                child: Container(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.8,
-                  decoration: shadowDecoration(Colors.white),
-                  margin: const EdgeInsets.only(
-                    left: 20,
-                    top: 30,
-                    bottom: 20,
-                  ),
-                  child: ListView(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(12),
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              const SizedBox(width: 8),
-                              Image.asset("assets/images/card.png", width: 54),
-                              const SizedBox(width: 16),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text("အဖွဲ့၀င်အမှတ်",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color.fromARGB(
-                                              255, 116, 112, 112))),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    member.memberId ?? 'N/A',
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Text("အဖွဲ့ဝင်သည့်ရက်စွဲ",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(
-                                            255, 116, 112, 112))),
-                                const SizedBox(height: 12),
-                                Text(
-                                  member.registerDate ?? 'N/A',
-                                  style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      Container(
-                        height: 1,
-                        width: MediaQuery.of(context).size.width - 80,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildInfoRow("အမည်", member.name ?? 'N/A'),
-                      _buildInfoRow("အဖအမည်", member.fatherName ?? 'N/A'),
-                      _buildInfoRow("မွေးသက္ကရာဇ်", member.birthDate ?? 'N/A'),
-                      _buildInfoRow("နိုင်ငံသားစီစစ်ရေး\nကတ်ပြားအမှတ်",
-                          member.nrc ?? 'N/A'),
-                      _buildInfoRow("သွေးအုပ်စု", member.bloodType ?? 'N/A'),
-                      _buildInfoRow(
-                          "သွေးဘဏ်ကတ်နံပါတ်", member.bloodBankCard ?? 'N/A'),
-                      _buildInfoRow("လိင်အမျိုးအစား", member.gender ?? 'N/A'),
-                      _buildInfoRow("အဖွဲ့နှင့်သွေးလှူဒါန်းမှု",
-                          member.memberCount ?? '0'),
-                      _buildInfoRow("စုစုပေါင်းသွေးလှူဒါန်းမှု",
-                          member.totalCount ?? '0'),
-                      _buildInfoRow("ဖုန်းနံပါတ်", member.phone ?? 'N/A'),
-                      _buildAddressRow("နေရပ်လိပ်စာ", member.address ?? 'N/A'),
-                      const SizedBox(height: 12),
-                      Container(
-                        height: 1,
-                        width: MediaQuery.of(context).size.width - 80,
-                        color: Colors.grey,
-                      ),
-                      widget.isEditable
-                          ? Align(
-                              alignment: Alignment.centerRight,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 12,
-                                  right: 12,
-                                ),
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text("ပြင်ဆင်မည်",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: primaryColor)),
-                                      const SizedBox(width: 8),
-                                      Image.asset(
-                                        "assets/images/edit.png",
-                                        width: 24,
-                                        color: primaryColor,
-                                      ),
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MemberEditScreen(
-                                            memberId: member.id.toString()),
-                                      ),
-                                    );
-                                  },
-                                ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text("ရက်စွဲ",
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Color.fromARGB(255, 116, 112, 112))),
+                            const SizedBox(height: 8),
+                            Text(
+                              member.registerDate ?? 'N/A',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
                               ),
-                            )
-                          : Container(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 1,
+                    color: Colors.grey.shade200,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInfoRow("အမည်", member.name ?? 'N/A'),
+                  _buildInfoRow("အဖအမည်", member.fatherName ?? 'N/A'),
+                  _buildInfoRow("မွေးသက္ကရာဇ်", member.birthDate ?? 'N/A'),
+                  _buildInfoRow(
+                      "နိုင်ငံသားစီစစ်ရေး\nကတ်ပြားအမှတ်", member.nrc ?? 'N/A'),
+                  _buildInfoRow("သွေးအုပ်စု", member.bloodType ?? 'N/A'),
+                  _buildInfoRow(
+                      "သွေးဘဏ်ကတ်နံပါတ်", member.bloodBankCard ?? 'N/A'),
+                  _buildInfoRow("လိင်အမျိုးအစား", _formatGender(member.gender)),
+                  _buildInfoRow(
+                      "အဖွဲ့နှင့်သွေးလှူဒါန်းမှု", donations.length.toString()),
+                  _buildInfoRow(
+                      "စုစုပေါင်းသွေးလှူဒါန်းမှု", member.totalCount ?? '0'),
+                  _buildInfoRow("ဖုန်းနံပါတ်", member.phone ?? 'N/A'),
+                  _buildAddressRow("နေရပ်လိပ်စာ", member.address ?? 'N/A'),
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 1,
+                    color: Colors.grey.shade200,
+                  ),
+                  widget.isEditable
+                      ? Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 12,
+                              right: 12,
+                            ),
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text("ပြင်ဆင်မည်",
+                                      style: TextStyle(
+                                          fontSize: 15, color: primaryColor)),
+                                  const SizedBox(width: 8),
+                                  Image.asset(
+                                    "assets/images/edit.png",
+                                    width: 24,
+                                    color: primaryColor,
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MemberEditScreen(
+                                      memberId: member.id.toString(),
+                                      member: member,
+                                    ),
+                                  ),
+                                ).then((result) {
+                                  if (result == true) {
+                                    _loadMemberData();
+
+                                    // Reset filters when returning from member edit
+                                    resetFilterProviders(ref);
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                        )
+                      : Container(),
+                ],
+              ),
+            ),
+          ),
+
+          // Space between cards
+          const SizedBox(width: 20),
+
+          // Donation History Card - Right Half
+          Expanded(
+            flex: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.15),
+                    spreadRadius: 1,
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      "သွေးလှူဒါန်းမှတ်တမ်း",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: donations.isEmpty
+                        ? Center(
+                            child: Text(
+                              "သွေးလှူဒါန်းမှတ်တမ်း မရှိပါ",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: donations.length,
+                            itemBuilder: (context, index) =>
+                                _buildDonationCard(donations[index]),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDonationCard(Donation donation) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today, size: 14, color: primaryColor),
+                    const SizedBox(width: 4),
+                    Text(
+                      donation.date ?? 'N/A',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    donation.hospital ?? 'N/A',
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                    children: [
+                      const Text(
+                        "လူနာ - ",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          donation.patientName ?? 'N/A',
+                          style: const TextStyle(fontSize: 13),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ),
-            ],
-          );
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Text(
+                        "ရောဂါ - ",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          donation.patientDisease ?? 'N/A',
+                          style: const TextStyle(fontSize: 13),
+                          textAlign: TextAlign.right,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildInfoRow(String label, String value) {
@@ -442,5 +481,18 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
         ],
       ),
     );
+  }
+
+  String _formatGender(String? gender) {
+    if (gender == null) return 'N/A';
+
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return 'ကျား';
+      case 'female':
+        return 'မ';
+      default:
+        return gender;
+    }
   }
 }

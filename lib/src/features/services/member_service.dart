@@ -12,6 +12,11 @@ final memberServiceProvider =
 class MemberService extends BaseService {
   final ProviderRef? ref;
 
+  // Cache for member data
+  List<dynamic>? _cachedMembers;
+  DateTime? _lastFetchTime;
+  final Duration _cacheValidityDuration = const Duration(minutes: 10);
+
   MemberService([this.ref]);
 
   // Base path for all member endpoints
@@ -45,16 +50,29 @@ class MemberService extends BaseService {
         );
 
         if (response.statusCode == 200) {
-          final pageData = response.data['data'] as List<dynamic>;
-          allMembers.addAll(pageData);
+          // Check if response has the expected structure
+          if (response.data != null && response.data['data'] != null) {
+            final pageData = response.data['data'] as List<dynamic>;
+            if (pageData.isNotEmpty) {
+              allMembers.addAll(pageData);
 
-          // Check if we received fewer items than the limit
-          if (pageData.length < limit) {
-            hasMoreData = false;
+              // Check if we received fewer items than the limit
+              if (pageData.length < limit) {
+                hasMoreData = false;
+              } else {
+                currentPage++;
+              }
+            } else {
+              // Empty page, stop fetching
+              hasMoreData = false;
+            }
           } else {
-            currentPage++;
+            // Unexpected response format
+            print('Unexpected response format: ${response.data}');
+            hasMoreData = false;
           }
         } else {
+          print('Non-200 status code: ${response.statusCode}');
           hasMoreData = false;
         }
       }
@@ -121,17 +139,19 @@ class MemberService extends BaseService {
     _updateLoadingStatus('Creating member...');
 
     try {
+      print("Making API request to create member: $data");
       final response = await apiClient.post(
-        _basePath,
+        '$_basePath/create',
         data: data,
         options: Options(headers: headers),
       );
+      print("Response received: ${response.data}");
 
       _updateLoadingStatus('Member created successfully!');
       if (response.statusCode == 201 || response.statusCode == 200) {
         return response.data['data'] as Map<String, dynamic>;
       }
-      throw Exception('Failed to create member');
+      throw Exception('Failed to create member: ${response.data}');
     } catch (e) {
       print('Error creating member: $e');
       _updateLoadingStatus('Error: $e');
