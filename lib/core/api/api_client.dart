@@ -12,7 +12,7 @@ class ApiClient {
 
   ApiClient._internal() {
     _dio = Dio(BaseOptions(
-      baseUrl: 'http://donation_backend.test/', //'http://16.176.19.197/api/',
+      baseUrl: 'http://16.176.19.197/', //'http://donation_backend.test/', //'http://16.176.19.197/api/',
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
       headers: {

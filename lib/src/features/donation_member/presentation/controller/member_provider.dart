@@ -204,6 +204,11 @@ final memberBloodTypeFilterProvider =
     StateProvider<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
 final memberRangeFilterProvider = StateProvider<String?>((ref) => null);
 
+// Separate filter providers for search member screen
+final searchMemberQueryProvider = StateProvider<String>((ref) => '');
+final searchMemberBloodTypeFilterProvider =
+    StateProvider<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
+
 // Filtered members provider
 final filteredMemberListProvider = StateProvider<List<Member>>((ref) {
   final allMembersAsync = ref.watch(memberListProvider);
@@ -216,7 +221,7 @@ final filteredMemberListProvider = StateProvider<List<Member>>((ref) {
 
       List<Member> filtered = List.from(allMembers);
 
-      // Filter by blood type
+      // Apply main page filters if they're set
       if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
         filtered = filtered
             .where((member) =>
@@ -227,7 +232,6 @@ final filteredMemberListProvider = StateProvider<List<Member>>((ref) {
             .toList();
       }
 
-      // Filter by search text
       if (searchQuery.isNotEmpty) {
         filtered = filtered
             .where((member) =>
@@ -262,6 +266,53 @@ final filteredMemberListProvider = StateProvider<List<Member>>((ref) {
             filtered = filtered.sublist(startIndex, endIndex + 1);
           }
         }
+      }
+
+      return filtered;
+    },
+    loading: () => [],
+    error: (_, __) => [],
+  );
+});
+
+// Separate provider for search member screen
+final filteredSearchMemberListProvider = StateProvider<List<Member>>((ref) {
+  final allMembersAsync = ref.watch(memberListProvider);
+
+  return allMembersAsync.when(
+    data: (allMembers) {
+      final searchQuery = ref.watch(searchMemberQueryProvider);
+      final bloodType = ref.watch(searchMemberBloodTypeFilterProvider);
+
+      List<Member> filtered = List.from(allMembers);
+
+      // Apply search page filters
+      if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
+        filtered = filtered
+            .where((member) =>
+                member.bloodType
+                    ?.toLowerCase()
+                    .contains(bloodType.toLowerCase()) ??
+                false)
+            .toList();
+      }
+
+      if (searchQuery.isNotEmpty) {
+        filtered = filtered
+            .where((member) =>
+                (member.name
+                        ?.toLowerCase()
+                        .contains(searchQuery.toLowerCase()) ??
+                    false) ||
+                (member.memberId
+                        ?.toLowerCase()
+                        .contains(searchQuery.toLowerCase()) ??
+                    false) ||
+                (member.phone
+                        ?.toLowerCase()
+                        .contains(searchQuery.toLowerCase()) ??
+                    false))
+            .toList();
       }
 
       return filtered;
@@ -320,6 +371,39 @@ void updateFilteredMembers(WidgetRef ref) {
   }
 
   ref.read(filteredMemberListProvider.notifier).state = filtered;
+}
+
+// Function to update filtered members for search screen
+void updateSearchFilteredMembers(WidgetRef ref) {
+  final allMembers = ref.read(memberListProvider).value ?? [];
+  final searchQuery = ref.read(searchMemberQueryProvider);
+  final bloodType = ref.read(searchMemberBloodTypeFilterProvider);
+
+  List<Member> filtered = List.from(allMembers);
+
+  if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
+    filtered = filtered
+        .where((member) =>
+            member.bloodType?.toLowerCase().contains(bloodType.toLowerCase()) ??
+            false)
+        .toList();
+  }
+
+  if (searchQuery.isNotEmpty) {
+    filtered = filtered
+        .where((member) =>
+            (member.name?.toLowerCase().contains(searchQuery.toLowerCase()) ??
+                false) ||
+            (member.memberId
+                    ?.toLowerCase()
+                    .contains(searchQuery.toLowerCase()) ??
+                false) ||
+            (member.phone?.toLowerCase().contains(searchQuery.toLowerCase()) ??
+                false))
+        .toList();
+  }
+
+  ref.read(filteredSearchMemberListProvider.notifier).state = filtered;
 }
 
 // Provider for the member loading status
@@ -407,4 +491,11 @@ void resetFilterProviders(WidgetRef ref) {
   ref.read(memberBloodTypeFilterProvider.notifier).state =
       'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
   ref.read(memberRangeFilterProvider.notifier).state = null;
+}
+
+// Function to reset search member filter providers
+void resetSearchFilterProviders(WidgetRef ref) {
+  ref.read(searchMemberQueryProvider.notifier).state = '';
+  ref.read(searchMemberBloodTypeFilterProvider.notifier).state =
+      'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
 }

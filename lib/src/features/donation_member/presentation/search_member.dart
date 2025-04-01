@@ -48,16 +48,40 @@ class _SearchMemberListScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(memberBloodTypeFilterProvider.notifier).state =
-          "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
-      ref.read(memberSearchQueryProvider.notifier).state = '';
+      _resetAllFilters();
     });
+  }
+
+  // Method to reset all filters including those from member list
+  void _resetAllFilters() {
+    // Reset search-specific filters
+    resetSearchFilterProviders(ref);
+
+    // Also reset main list filters to prevent cross-contamination
+    resetFilterProviders(ref);
+
+    // Clear search controller
+    searchController.clear();
+
+    // Set initial values
+    ref.read(searchMemberBloodTypeFilterProvider.notifier).state =
+        "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
+    ref.read(searchMemberQueryProvider.notifier).state = '';
+
+    // Force refresh of the filtered list with all members
+    if (ref.read(memberListProvider).hasValue) {
+      final allMembers = ref.read(memberListProvider).value ?? [];
+      ref.read(filteredSearchMemberListProvider.notifier).state =
+          List.from(allMembers);
+    }
   }
 
   @override
   void dispose() {
     searchController.dispose();
     _debounceTimer?.cancel();
+    // Clear filters when screen is disposed
+    resetSearchFilterProviders(ref);
     super.dispose();
   }
 
@@ -65,14 +89,14 @@ class _SearchMemberListScreenState
   Widget build(BuildContext context) {
     // Watch all necessary providers
     final membersAsync = ref.watch(memberListProvider);
-    final filteredMembers = ref.watch(filteredMemberListProvider);
-    final selectedBloodType = ref.watch(memberBloodTypeFilterProvider);
+    final filteredMembers = ref.watch(filteredSearchMemberListProvider);
+    final selectedBloodType = ref.watch(searchMemberBloodTypeFilterProvider);
 
     // Monitor filter state changes and update filtered list
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Only call this after the widget is built
       if (membersAsync.hasValue) {
-        updateFilteredMembers(ref);
+        updateSearchFilteredMembers(ref);
       }
     });
 
@@ -101,6 +125,10 @@ class _SearchMemberListScreenState
                 child: IconButton(
                   icon: Icon(Icons.arrow_back),
                   onPressed: () {
+                    // Clear all filters before navigating back
+                    resetSearchFilterProviders(ref);
+                    // Don't reset main list filters - we want to preserve those
+                    searchController.clear();
                     Navigator.pop(context);
                   },
                 ),
@@ -182,8 +210,8 @@ class _SearchMemberListScreenState
                             onChanged: (value) {
                               if (value != null) {
                                 ref
-                                    .read(
-                                        memberBloodTypeFilterProvider.notifier)
+                                    .read(searchMemberBloodTypeFilterProvider
+                                        .notifier)
                                     .state = value;
                               }
                             },
@@ -208,7 +236,7 @@ class _SearchMemberListScreenState
                               _debounceTimer =
                                   Timer(const Duration(milliseconds: 500), () {
                                 ref
-                                    .read(memberSearchQueryProvider.notifier)
+                                    .read(searchMemberQueryProvider.notifier)
                                     .state = val;
                               });
                             },
@@ -293,7 +321,8 @@ class _SearchMemberListScreenState
                           onChanged: (value) {
                             if (value != null) {
                               ref
-                                  .read(memberBloodTypeFilterProvider.notifier)
+                                  .read(searchMemberBloodTypeFilterProvider
+                                      .notifier)
                                   .state = value;
                             }
                           },
@@ -317,7 +346,7 @@ class _SearchMemberListScreenState
                             _debounceTimer =
                                 Timer(const Duration(milliseconds: 500), () {
                               ref
-                                  .read(memberSearchQueryProvider.notifier)
+                                  .read(searchMemberQueryProvider.notifier)
                                   .state = val;
                             });
                           },
@@ -371,6 +400,10 @@ class _SearchMemberListScreenState
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         onPressed: () {
+          // Reset all filters first
+          _resetAllFilters();
+
+          // Then refresh member list
           ref.refresh(memberListProvider);
         },
         child: const Icon(Icons.refresh),

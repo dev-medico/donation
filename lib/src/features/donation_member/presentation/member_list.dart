@@ -75,6 +75,10 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
       ref.read(memberBloodTypeFilterProvider.notifier).state =
           "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
       ref.read(memberSearchQueryProvider.notifier).state = '';
+      ref.read(memberRangeFilterProvider.notifier).state = null;
+
+      // Clear the search controller
+      searchController.clear();
     } catch (e) {
       dev.log("Error loading member data: $e");
     }
@@ -98,6 +102,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     }
 
     print('Generated ${ranges.length} ranges');
+
+    // Force UI refresh with new ranges
+    setState(() {});
   }
 
   void _filterMembers() {
@@ -193,6 +200,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                 child: IconButton(
                   icon: Icon(Icons.arrow_back),
                   onPressed: () {
+                    // Clear all filters before going back
+                    resetFilterProviders(ref);
+                    searchController.clear();
                     Navigator.pop(context);
                   },
                 ),
@@ -244,9 +254,13 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
               // Reset all filters
               resetFilterProviders(ref);
 
-              // Refresh the member list
+              // Refresh the member list and regenerate ranges
               ref.read(refreshMembersProvider)().then((_) {
-                // After refreshing, re-apply the filter
+                // Regenerate ranges with the updated member list
+                final members = ref.read(memberListProvider).value ?? [];
+                getRanges(members);
+
+                // Re-apply the filter
                 _filterMembers();
 
                 // Show success message
@@ -1830,46 +1844,90 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
 
   // Update the _showMembersFoundDialog to display more detailed information and highlight exact matches
   void _showMembersFoundDialog(BuildContext context, List<Member> members) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dialogWidth =
+        Responsive.isMobile(context) ? screenWidth * 0.9 : screenWidth * 0.5;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                "assets/images/list_exist.png",
-                height: 40,
-                width: 40,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  "အဖွဲ့ဝင် ရှိပြီးသားစာရင်း",
-                  style: TextStyle(color: primaryColor, fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          ),
-          content: Container(
-            width: double.maxFinite,
-            height: 300, // Fixed height for the dialog
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding:
+              EdgeInsets.symmetric(horizontal: (screenWidth - dialogWidth) / 2),
+          child: Container(
+            width: dialogWidth,
+            padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Header with icon and title
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset(
+                        "assets/images/list_exist.png",
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "အဖွဲ့ဝင် ရှိပြီးသားစာရင်း",
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, size: 20, color: Colors.grey),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+
+                // Divider
+                const SizedBox(height: 16),
+                Divider(height: 1, color: Colors.grey.shade300),
+                const SizedBox(height: 16),
+
+                // Subtitle
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
+                  padding: const EdgeInsets.only(bottom: 12.0),
                   child: Text(
                     "အောက်ပါအဖွဲ့ဝင်များနှင့် ကိုက်ညီနေပါသည်",
                     style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                Expanded(
+
+                // Member list
+                Container(
+                  constraints: BoxConstraints(maxHeight: 300),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: members.length,
-                    separatorBuilder: (context, index) => Divider(height: 1),
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1,
+                      color: Colors.grey.shade300,
+                      indent: 12,
+                      endIndent: 12,
+                    ),
                     itemBuilder: (context, index) {
                       final member = members[index];
                       // Check if this is an exact match
@@ -1879,78 +1937,202 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                               member.fatherName?.toLowerCase() ==
                                   fatherNameController.text.toLowerCase());
 
-                      return ListTile(
-                        title: Text(
-                          member.name ?? '',
-                          style: TextStyle(
-                            fontWeight: isExactMatch
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: isExactMatch ? primaryColor : null,
+                      return Container(
+                        decoration: isExactMatch
+                            ? BoxDecoration(
+                                color: primaryColor.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(4),
+                              )
+                            : null,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
                           ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "အဖအမည်: ${member.fatherName ?? '-'}",
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            Text(
-                              "သွေးအမျိုးအစား: ${member.bloodType ?? '-'} | မွေးသက္ကရာဇ်: ${member.birthDate ?? '-'}",
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            if (member.memberId != null)
-                              Text(
-                                "အဖွဲ့၀င်အမှတ်: ${member.memberId}",
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.blue),
+                          title: Row(
+                            children: [
+                              if (isExactMatch)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  margin: const EdgeInsets.only(right: 8),
+                                  decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    "အတိအကျ",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              Expanded(
+                                child: Text(
+                                  member.name ?? '',
+                                  style: TextStyle(
+                                    fontWeight: isExactMatch
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isExactMatch ? primaryColor : null,
+                                    fontSize: 15,
+                                  ),
+                                ),
                               ),
-                          ],
-                        ),
-                        isThreeLine: true,
-                        onTap: () {
-                          // Navigate to member detail
-                          Navigator.of(context).pop();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MemberDetailScreen(
-                                memberId: member.id.toString(),
+                            ],
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      "အဖအမည်: ${member.fatherName ?? '-'}",
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                  ),
+                                  Text(
+                                    "သွေးအမျိုးအစား: ${member.bloodType ?? '-'}",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                ],
                               ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  if (member.memberId != null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        "အဖွဲ့၀င်အမှတ်: ${member.memberId}",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.blue,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  const Spacer(),
+                                  Text(
+                                    "မွေးသက္ကရာဇ်: ${member.birthDate ?? '-'}",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                            ],
+                          ),
+                          trailing: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey.shade100,
                             ),
-                          );
-                        },
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 16,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                // Navigate to member detail
+                                Navigator.of(context).pop();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MemberDetailScreen(
+                                      memberId: member.id.toString(),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          onTap: () {
+                            // Navigate to member detail
+                            Navigator.of(context).pop();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MemberDetailScreen(
+                                  memberId: member.id.toString(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       );
                     },
                   ),
                 ),
+
+                // Action buttons
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.grey.shade300),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        "ထပ်မံရှာဖွေမည်",
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        "အသစ်ထည့်သွင်းမည်",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          nameChecked = true;
+                        });
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              child: Text("ထပ်မံရှာဖွေမည်"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-              ),
-              child: Text(
-                "အသစ်ထည့်သွင်းမည်",
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                setState(() {
-                  nameChecked = true;
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );

@@ -6,7 +6,6 @@ import 'dart:developer';
 import 'package:donation/src/providers/providers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -343,15 +342,35 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                 height: 50,
                                 margin: const EdgeInsets.only(
                                     left: 20, top: 16, bottom: 4, right: 20),
-                                child: fluent.Button(
-                                  child: Text(
-                                    donationDate,
-                                    style: TextStyle(
-                                        fontSize: 14, color: primaryColor),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    elevation: 1,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      side: BorderSide(
+                                          color: Colors.grey.shade300),
+                                    ),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16),
                                   ),
                                   onPressed: () {
-                                    showDatePicker();
+                                    showDonationDatePicker();
                                   },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        donationDate,
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black87),
+                                      ),
+                                      Icon(Icons.calendar_today,
+                                          size: 18, color: primaryColor),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -735,16 +754,36 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                           top: 16,
                                           bottom: 4,
                                           right: 20),
-                                      child: fluent.Button(
-                                        child: Text(
-                                          donationDate,
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: primaryColor),
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white,
+                                          elevation: 1,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                            side: BorderSide(
+                                                color: Colors.grey.shade300),
+                                          ),
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16),
                                         ),
                                         onPressed: () {
-                                          showDatePicker();
+                                          showDonationDatePicker();
                                         },
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              donationDate,
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.black87),
+                                            ),
+                                            Icon(Icons.calendar_today,
+                                                size: 18, color: primaryColor),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -970,15 +1009,29 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     return operator;
   }
 
-  showDatePicker() async {
-    Utils.showCupertinoDatePicker(
-      context,
-      (DateTime newDateTime) {
-        setState(() {
-          donationDate = newDateTime.string("dd-MM-yyyy");
-          donationDateDetail = newDateTime.toLocal();
-        });
+  showDonationDatePicker() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(DateTime.now().year - 1),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: primaryColor,
+            ),
+          ),
+          child: child!,
+        );
       },
     );
+
+    if (picked != null) {
+      setState(() {
+        donationDate = DateFormat("dd-MM-yyyy").format(picked);
+        donationDateDetail = picked;
+      });
+    }
   }
 }
