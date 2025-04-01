@@ -38,7 +38,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'Log Out(V 1.3.8)'
   ];
   List<String> icons = [
-    'assets/images/home.png',
+    'assets/images/dashboard.png',
     'assets/images/search_list.png',
     'assets/images/members.png',
     'assets/images/donations.png',

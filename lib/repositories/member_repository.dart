@@ -4,7 +4,7 @@ import 'package:donation/models/member.dart';
 
 class MemberRepository {
   final ApiClient _apiClient;
-  static const String _baseUrl = 'member';
+  static const String _baseUrl = 'members';
 
   MemberRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();

@@ -27,7 +27,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'ထွက်မည်'
   ];
   List<String> icons = [
-    'assets/images/home.png',
+    'assets/images/dashboard.png',
     'assets/images/search_list.png',
     'assets/images/members.png',
     'assets/images/donations.png',

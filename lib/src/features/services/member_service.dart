@@ -29,7 +29,7 @@ class MemberService extends BaseService {
 
     try {
       final response = await apiClient.get(
-        _basePath,
+        _basePath + '/index',
         options: Options(headers: headers),
         queryParameters: {'limit': limit},
       );
@@ -52,7 +52,7 @@ class MemberService extends BaseService {
 
     try {
       final response = await apiClient.get(
-        '$_basePath/$id',
+        '$_basePath/view/$id',
         options: Options(headers: headers),
       );
 
@@ -121,7 +121,7 @@ class MemberService extends BaseService {
 
     try {
       final response = await apiClient.put(
-        '$_basePath/$id',
+        '$_basePath/update/$id',
         data: data,
         options: Options(headers: headers),
       );
@@ -144,7 +144,7 @@ class MemberService extends BaseService {
 
     try {
       final response = await apiClient.delete(
-        '$_basePath/$id',
+        '$_basePath/delete/$id',
         options: Options(headers: headers),
       );
 
