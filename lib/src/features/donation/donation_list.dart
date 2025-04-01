@@ -10,6 +10,7 @@ import 'package:donation/src/features/donation/new_blood_donation.dart';
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
+import 'package:donation/src/features/services/donation_service.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,6 +29,7 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
   int _yearSelected = 0;
   int _monthSelected = DateTime.now().month - 1;
   List<String> years = [
+    "2025",
     "2024",
     "2023",
     "2022",
@@ -398,10 +400,29 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   }
                 },
                 error: (Object error, StackTrace stackTrace) {
-                  return Center(child: Text(error.toString()));
+                  print('Error in donation list: $error');
+                  print('Stack trace: $stackTrace');
+                  // Rethrow the error for better debugging
+                  throw error;
                 },
                 loading: () {
-                  return Center(child: CircularProgressIndicator());
+                  final loadingStatus =
+                      ref.watch(donationLoadingStatusProvider);
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text(
+                          loadingStatus.isNotEmpty
+                              ? loadingStatus
+                              : 'Loading...',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  );
                 },
               ),
             ),

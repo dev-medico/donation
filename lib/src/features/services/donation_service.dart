@@ -14,7 +14,7 @@ class DonationService extends BaseService {
   DonationService([this.ref]);
 
   // Base path for all donation endpoints
-  final String _basePath = '/donations';
+  final String _basePath = '/donation';
 
   void _updateLoadingStatus(String status) {
     if (ref != null) {
@@ -22,74 +22,141 @@ class DonationService extends BaseService {
     }
   }
 
-  Future<List<dynamic>> getDonations({int limit = 200}) async {
+  Future<List<dynamic>> getDonations({int limit = 500}) async {
     final headers = await getAuthHeaders();
     _updateLoadingStatus('Fetching donations...');
 
+    List<dynamic> allDonations = [];
+    int currentPage = 0;
+    bool hasMoreData = true;
+
     try {
-    final response = await apiClient.get(
-        _basePath,
-      options: Options(headers: headers),
-        queryParameters: {'limit': limit},
-    );
+      while (hasMoreData) {
+        _updateLoadingStatus('Fetching donations page ${currentPage + 1}...');
+
+        final response = await apiClient.get(
+          _basePath,
+          options: Options(headers: headers),
+          queryParameters: {
+            'limit': limit.toString(),
+            'page': currentPage.toString(),
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final pageData = response.data['data'] as List<dynamic>;
+          allDonations.addAll(pageData);
+
+          hasMoreData = response.data['hasMore'] == true;
+
+          if (hasMoreData) {
+            currentPage++;
+          }
+        } else {
+          hasMoreData = false;
+        }
+      }
 
       _updateLoadingStatus('');
-      if (response.statusCode == 200) {
-    return response.data['data'] as List<dynamic>;
-      }
-      return [];
+      return allDonations;
     } catch (e) {
       print('Error fetching donations: $e');
       _updateLoadingStatus('Error: $e');
-      return [];
+      return allDonations;
     }
   }
 
-  Future<List<dynamic>> getDonationsByMonthYear(int month, int year) async {
+  Future<List<dynamic>> getDonationsByMonthYear(int month, int year,
+      {int limit = 500}) async {
     final headers = await getAuthHeaders();
     _updateLoadingStatus('Fetching donations for $month/$year...');
 
+    List<dynamic> allDonations = [];
+    int currentPage = 0;
+    bool hasMoreData = true;
+
     try {
-    final response = await apiClient.get(
-        '$_basePath/by-month-year',
-      queryParameters: {
-        'month': month,
-        'year': year,
-      },
-      options: Options(headers: headers),
-    );
+      while (hasMoreData) {
+        _updateLoadingStatus(
+            'Fetching donations for $month/$year page ${currentPage + 1}...');
+
+        final response = await apiClient.get(
+          '$_basePath/by-month-year',
+          queryParameters: {
+            'month': month.toString(),
+            'year': year.toString(),
+            'limit': limit.toString(),
+            'page': currentPage.toString(),
+          },
+          options: Options(headers: headers),
+        );
+
+        if (response.statusCode == 200) {
+          final pageData = response.data['data'] as List<dynamic>;
+          allDonations.addAll(pageData);
+
+          hasMoreData = response.data['hasMore'] == true;
+
+          if (hasMoreData) {
+            currentPage++;
+          }
+        } else {
+          hasMoreData = false;
+        }
+      }
 
       _updateLoadingStatus('');
-      if (response.statusCode == 200) {
-    return response.data['data'] as List<dynamic>;
-      }
-      return [];
+      return allDonations;
     } catch (e) {
       print('Error fetching donations by month/year: $e');
       _updateLoadingStatus('Error: $e');
-      return [];
+      return allDonations;
     }
   }
 
-  Future<List<dynamic>> getDonationsByYear(int year) async {
+  Future<List<dynamic>> getDonationsByYear(int year, {int limit = 500}) async {
     final headers = await getAuthHeaders();
     _updateLoadingStatus('Fetching donations for $year...');
 
+    List<dynamic> allDonations = [];
+    int currentPage = 0;
+    bool hasMoreData = true;
+
     try {
-    final response = await apiClient.get(
-        '$_basePath/by-year/$year',
-      options: Options(headers: headers),
-    );
+      while (hasMoreData) {
+        _updateLoadingStatus(
+            'Fetching donations for $year page ${currentPage + 1}...');
+
+        final response = await apiClient.get(
+          '$_basePath/by-year',
+          queryParameters: {
+            'year': year.toString(),
+            'limit': limit.toString(),
+            'page': currentPage.toString(),
+          },
+          options: Options(headers: headers),
+        );
+
+        if (response.statusCode == 200) {
+          final pageData = response.data['data'] as List<dynamic>;
+          allDonations.addAll(pageData);
+
+          hasMoreData = response.data['hasMore'] == true;
+
+          if (hasMoreData) {
+            currentPage++;
+          }
+        } else {
+          hasMoreData = false;
+        }
+      }
 
       _updateLoadingStatus('');
-      if (response.statusCode == 200) {
-    return response.data['data'] as List<dynamic>;
-      }
-      return [];
+      return allDonations;
     } catch (e) {
       print('Error fetching donations by year: $e');
       _updateLoadingStatus('Error: $e');
-      return [];
+      return allDonations;
     }
   }
 
@@ -120,15 +187,15 @@ class DonationService extends BaseService {
     _updateLoadingStatus('Creating donation...');
 
     try {
-    final response = await apiClient.post(
+      final response = await apiClient.post(
         _basePath,
-      data: data,
-      options: Options(headers: headers),
-    );
+        data: data,
+        options: Options(headers: headers),
+      );
 
       _updateLoadingStatus('Donation created successfully!');
       if (response.statusCode == 201 || response.statusCode == 200) {
-    return response.data['data'] as Map<String, dynamic>;
+        return response.data['data'] as Map<String, dynamic>;
       }
       throw Exception('Failed to create donation');
     } catch (e) {
@@ -144,15 +211,15 @@ class DonationService extends BaseService {
     _updateLoadingStatus('Updating donation...');
 
     try {
-    final response = await apiClient.put(
+      final response = await apiClient.put(
         '$_basePath/$id',
-      data: data,
-      options: Options(headers: headers),
-    );
+        data: data,
+        options: Options(headers: headers),
+      );
 
       _updateLoadingStatus('Donation updated successfully!');
       if (response.statusCode == 200) {
-    return response.data['data'] as Map<String, dynamic>;
+        return response.data['data'] as Map<String, dynamic>;
       }
       throw Exception('Failed to update donation');
     } catch (e) {
@@ -169,8 +236,8 @@ class DonationService extends BaseService {
     try {
       final response = await apiClient.delete(
         '$_basePath/$id',
-      options: Options(headers: headers),
-    );
+        options: Options(headers: headers),
+      );
 
       _updateLoadingStatus('Donation deleted successfully!');
       if (response.statusCode != 200 && response.statusCode != 204) {
@@ -188,14 +255,14 @@ class DonationService extends BaseService {
     _updateLoadingStatus('Fetching donation statistics...');
 
     try {
-    final response = await apiClient.get(
+      final response = await apiClient.get(
         '$_basePath/stats',
-      options: Options(headers: headers),
-    );
+        options: Options(headers: headers),
+      );
 
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
-    return response.data as Map<String, dynamic>;
+        return response.data as Map<String, dynamic>;
       }
       return {};
     } catch (e) {

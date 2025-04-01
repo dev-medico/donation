@@ -71,28 +71,16 @@ class DonationDataSource extends DataGridSource {
 
   DonationDataSource(
       {required List<Donation> donationData, required WidgetRef ref}) {
-    // Fetch member list
-    final memberAsyncValue = ref.read(memberListProvider);
-
     _donationData = donationData.map<DataGridRow>((e) {
-      // Default values when member data is not available
+      // Use memberObj data if available
       String memberName = "        -        ";
       String bloodType = "    -   ";
 
-      // Try to find the member associated with this donation
-      if (e.member != null && memberAsyncValue is AsyncData) {
-        final membersList = memberAsyncValue.value ?? [];
-        final memberId = e.member;
-
-        for (final member in membersList) {
-          if (member.id != null && member.id == memberId) {
-            // Use null-safe operators when accessing member properties
-            final name = member.name;
-            memberName = "        ${name ?? '-'}        ";
-            bloodType = member.bloodType ?? "    -   ";
-            break;
-          }
-        }
+      if (e.memberObj != null) {
+        // Use memberObj data which comes directly from the API
+        final name = e.memberObj!.name;
+        memberName = "        ${name ?? '-'}        ";
+        bloodType = e.memberObj!.bloodType ?? "    -   ";
       }
 
       return DataGridRow(cells: [

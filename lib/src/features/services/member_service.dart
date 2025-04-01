@@ -15,7 +15,7 @@ class MemberService extends BaseService {
   MemberService([this.ref]);
 
   // Base path for all member endpoints
-  final String _basePath = '/members';
+  final String _basePath = '/member';
 
   void _updateLoadingStatus(String status) {
     if (ref != null) {
@@ -23,26 +23,48 @@ class MemberService extends BaseService {
     }
   }
 
-  Future<List<dynamic>> getMembers({int limit = 200}) async {
+  Future<List<dynamic>> getMembers({int limit = 1000}) async {
     final headers = await getAuthHeaders();
     _updateLoadingStatus('Fetching members...');
 
+    List<dynamic> allMembers = [];
+    int currentPage = 0;
+    bool hasMoreData = true;
+
     try {
-      final response = await apiClient.get(
-        _basePath + '/index',
-        options: Options(headers: headers),
-        queryParameters: {'limit': limit},
-      );
+      while (hasMoreData) {
+        _updateLoadingStatus('Fetching members page ${currentPage + 1}...');
+
+        final response = await apiClient.get(
+          _basePath + '/index',
+          options: Options(headers: headers),
+          queryParameters: {
+            'limit': limit,
+            'page': currentPage,
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final pageData = response.data['data'] as List<dynamic>;
+          allMembers.addAll(pageData);
+
+          // Check if we received fewer items than the limit
+          if (pageData.length < limit) {
+            hasMoreData = false;
+          } else {
+            currentPage++;
+          }
+        } else {
+          hasMoreData = false;
+        }
+      }
 
       _updateLoadingStatus('');
-      if (response.statusCode == 200) {
-        return response.data['data'] as List<dynamic>;
-      }
-      return [];
+      return allMembers;
     } catch (e) {
       print('Error fetching members: $e');
       _updateLoadingStatus('Error: $e');
-      return [];
+      return allMembers;
     }
   }
 
@@ -58,9 +80,12 @@ class MemberService extends BaseService {
 
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
-        return response.data['data'] as Map<String, dynamic>;
+        if (response.data != null && response.data['data'] != null) {
+          return response.data['data'] as Map<String, dynamic>;
+        }
+        throw Exception('Invalid response format - missing data field');
       }
-      throw Exception('Member not found');
+      throw Exception('Member not found. Status: ${response.statusCode}');
     } catch (e) {
       print('Error fetching member by ID: $e');
       _updateLoadingStatus('Error: $e');

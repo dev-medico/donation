@@ -1,8 +1,8 @@
 import 'package:donation/src/features/donation_member/domain/member.dart';
 
 class Donation {
-  final String id;
-  final String? member;
+  final dynamic id;
+  final dynamic member;
   final DateTime? donationDate;
   final String? hospital;
   final String? patientName;
@@ -40,20 +40,20 @@ class Donation {
   factory Donation.fromJson(Map<String, dynamic> json) {
     return Donation(
       id: json['id'] ?? json['_id'] ?? '',
-      member: json['member'] as String?,
-      donationDate: json['donationDate'] != null
-          ? DateTime.parse(json['donationDate'])
+      member: json['member'] != null ? json['member'].toString() : null,
+      donationDate: json['donation_date'] != null
+          ? DateTime.parse(json['donation_date'])
           : null,
       hospital: json['hospital'] as String?,
-      patientName: json['patientName'] as String?,
-      patientAddress: json['patientAddress'] as String?,
-      patientAge: json['patientAge'] as String?,
-      patientDisease: json['patientDisease'] as String?,
+      patientName: json['patient_name'] as String?,
+      patientAddress: json['patient_address'] as String?,
+      patientAge: json['patient_age'] as String?,
+      patientDisease: json['patient_disease'] as String?,
       location: json['location'] as String?,
       remark: json['remark'] as String?,
       createdAt: json['createdAt'] as String?,
       updatedAt: json['updatedAt'] as String?,
-      memberId: json['memberId'] as String?,
+      memberId: json['member_id'] as String?,
       memberObj: json['memberObj'] != null
           ? Member.fromJson(json['memberObj'] as Map<String, dynamic>)
           : null,

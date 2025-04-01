@@ -12,12 +12,15 @@ class ApiClient {
 
   ApiClient._internal() {
     _dio = Dio(BaseOptions(
-      baseUrl: 'http://16.176.19.197/index.php/',
+      baseUrl: 'http://donation_backend.test/', //'http://16.176.19.197/api/',
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+      },
+      validateStatus: (status) {
+        return status != null && status < 500;
       },
     ));
 
@@ -82,7 +85,7 @@ class ApiClient {
 
       final fullPath = path.startsWith('/') ? path.substring(1) : path;
 
-      print('URL: ${_dio.options.baseUrl}/$fullPath');
+      print('URL: ${_dio.options.baseUrl}$fullPath');
       print('Query parameters: $cleanParams');
 
       return await _dio.get(

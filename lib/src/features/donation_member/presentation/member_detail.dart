@@ -32,7 +32,12 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
   }
 
   Future<void> _loadMemberData() async {
-    await fetchMemberById(ref, widget.memberId);
+    try {
+      ref.invalidate(memberByIdProvider(widget.memberId));
+      await ref.read(memberByIdProvider(widget.memberId).future);
+    } catch (e) {
+      print("Error loading member data: $e");
+    }
   }
 
   @override
