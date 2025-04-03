@@ -6,6 +6,7 @@
     { "src": "/manifest.json", "dest": "/manifest.json", "headers": { "Content-Type": "application/manifest+json" } },
     { "src": "/(.*)", "dest": "/$1" }
   ],
-  "buildCommand": "flutter build web --release",
+  "installCommand": "if cd flutter; then git pull && cd ..; else git clone https://github.com/flutter/flutter.git; fi && flutter/bin/flutter config --enable-web && flutter/bin/flutter pub get",
+  "buildCommand": "flutter/bin/flutter build web --release",
   "outputDirectory": "build/web"
 }
