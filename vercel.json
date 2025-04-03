@@ -1,21 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "build/web",
-      "use": "@vercel/static"
-    }
-  ],
+  "buildCommand": "if cd flutter; then git pull && cd ..; else git clone https://github.com/flutter/flutter.git; fi && flutter/bin/flutter config --enable-web && flutter/bin/flutter pub get && flutter/bin/flutter build web",
+  "outputDirectory": "build/web",
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/build/web/$1"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "dest": "/index.html"
     }
   ]
 }
