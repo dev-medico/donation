@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "if cd flutter; then git pull && cd ..; else git clone https://github.com/flutter/flutter.git; fi && flutter/bin/flutter config --enable-web && flutter/bin/flutter pub get && flutter/bin/flutter build web",
-  "outputDirectory": "build/web",
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
+    { "src": "/flutter_service_worker.js", "dest": "/flutter_service_worker.js", "headers": { "Content-Type": "application/javascript" } },
+    { "src": "/(.*\\.js)$", "dest": "/$1", "headers": { "Content-Type": "application/javascript" } },
+    { "src": "/manifest.json", "dest": "/manifest.json", "headers": { "Content-Type": "application/manifest+json" } },
+    { "src": "/(.*)", "dest": "/$1" }
+  ],
+  "buildCommand": "flutter build web --release",
+  "outputDirectory": "build/web"
 }
