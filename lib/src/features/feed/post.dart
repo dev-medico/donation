@@ -11,8 +11,7 @@
 // import 'package:donation/utils/extensions.dart';
 // import 'package:donation/utils/utils.dart';
 // import 'package:flutter/material.dart';
-// import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-// import 'package:flutter_svg/svg.dart';
+// // import 'package:flutter_svg/svg.dart';
 // import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:provider/provider.dart';
 // import 'package:readmore/readmore.dart';
@@ -112,7 +111,7 @@
 
 //   @override
 //   Widget build(BuildContext context, WidgetRef ref) {
-//     YYDialog.init(context);
+//
 //     double descriptionFontSize = model.text!.length > 100 ? 13.5 : 15;
 //     FontWeight descriptionFontWeight = FontWeight.w400;
 //     TextStyle textStyle = TextStyle(

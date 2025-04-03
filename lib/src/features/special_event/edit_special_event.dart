@@ -2,8 +2,7 @@
 // import 'dart:developer';
 
 // import 'package:donation/realm/schemas.dart';
-// import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-// import 'package:fluent_ui/fluent_ui.dart' as fluent;
+// // import 'package:fluent_ui/fluent_ui.dart' as fluent;
 // import 'package:flutter/material.dart';
 // import 'package:donation/responsive.dart';
 // import 'package:donation/utils/Colors.dart';
@@ -58,7 +57,7 @@
 
 //   @override
 //   Widget build(BuildContext context) {
-//     YYDialog.init(context);
+//
 //     return Scaffold(
 //       backgroundColor: const Color(0xfff2f2f2),
 //       appBar: AppBar(

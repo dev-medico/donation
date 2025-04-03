@@ -5,7 +5,6 @@ import 'dart:developer';
 // import 'package:donation/realm/schemas.dart' hide Donation;
 import 'package:donation/src/providers/providers.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -257,7 +256,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
   @override
   Widget build(BuildContext context) {
     final membersAsync = ref.watch(memberListProvider);
-    YYDialog.init(context);
+
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(

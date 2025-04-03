@@ -5,7 +5,6 @@ import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
-import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 // import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -40,7 +39,6 @@ class _ReportNewScreenState extends ConsumerState<ReportNewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    YYDialog.init(context);
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(

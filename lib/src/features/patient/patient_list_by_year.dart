@@ -5,8 +5,7 @@
 // import 'package:donation/src/features/home/mobile_home/humberger.dart';
 // import 'package:donation/src/features/patient/patient_data_source.dart';
 // import 'package:donation/src/providers/providers.dart';
-// import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
-// import 'package:fluent_ui/fluent_ui.dart' as fluent;
+// // import 'package:fluent_ui/fluent_ui.dart' as fluent;
 // import 'package:flutter/material.dart';
 // import 'package:donation/responsive.dart';
 // import 'package:donation/utils/Colors.dart';
@@ -43,7 +42,7 @@
 //   @override
 //   Widget build(BuildContext context) {
 //     var donationData = ref.watch(donationListByYearProvider(widget.year));
-//     YYDialog.init(context);
+//
 //     if (notloaded) {
 //       //
 //       notloaded = false;

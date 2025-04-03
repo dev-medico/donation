@@ -5,7 +5,6 @@ import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -26,8 +25,6 @@ class _NewNotiScreenState extends ConsumerState<NewNotiScreen> {
 
   @override
   Widget build(BuildContext context) {
-    YYDialog.init(context);
-
     return ModalProgressHUD(
       inAsyncCall: isLoading,
       child: Scaffold(

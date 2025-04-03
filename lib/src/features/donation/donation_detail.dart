@@ -4,7 +4,6 @@ import 'package:donation/src/features/donation/blood_donation_edit.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
@@ -30,7 +29,6 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    YYDialog.init(context);
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(
@@ -1115,73 +1113,81 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
 
   messageDialog(
       String msg, BuildContext context, String buttonMsg, Color color) {
-    return YYDialog().build()
-      ..width = Responsive.isMobile(context)
-          ? MediaQuery.of(context).size.width - 60
-          : MediaQuery.of(context).size.width / 3
-      ..backgroundColor = Colors.white
-      ..borderRadius = 20.0
-      ..showCallBack = () {}
-      ..dismissCallBack = () {}
-      ..widget(Column(
-        children: [
-          const SizedBox(height: 30),
-          SvgPicture.asset(
-            "assets/images/warn.svg",
-            height: 50,
-            width: 50,
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
           ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(5, 24, 0, 12),
-            child: Text(
-              msg,
-              textAlign: TextAlign.center,
-              maxLines: 4,
-              style: const TextStyle(
-                  fontSize: 16,
-                  height: 1.5,
-                  fontWeight: FontWeight.normal,
-                  color: Colors.black),
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: Responsive.isMobile(context)
+                ? 30
+                : MediaQuery.of(context).size.width / 3,
+          ),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 30),
+                SvgPicture.asset(
+                  "assets/images/warn.svg",
+                  height: 50,
+                  width: 50,
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(5, 24, 5, 12),
+                  child: Text(
+                    msg,
+                    textAlign: TextAlign.center,
+                    maxLines: 4,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        height: 1.5,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 24, left: 20, right: 20, bottom: 30),
+                  child: MaterialButton(
+                      padding: EdgeInsets.all(
+                          Responsive.isMobile(context) ? 12.0 : 24),
+                      textColor: Colors.white,
+                      splashColor: primaryColor,
+                      color: primaryColor,
+                      elevation: 2.0,
+                      minWidth: 155,
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true)
+                            .pop('dialog');
+                        deleteDonation();
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Center(
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text(buttonMsg,
+                                  textScaler: const TextScaler.linear(1.0),
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Colors.white))
+                            ]),
+                      )),
+                ),
+              ],
             ),
           ),
-        ],
-      ))
-      ..widget(Padding(
-        padding:
-            const EdgeInsets.only(top: 24, left: 20, right: 20, bottom: 30),
-        child: MaterialButton(
-            padding: EdgeInsets.all(Responsive.isMobile(context) ? 12.0 : 24),
-            textColor: Colors.white,
-            splashColor: primaryColor,
-            color: primaryColor,
-            elevation: 2.0,
-            minWidth: 155,
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true).pop('dialog');
-              deleteDonation();
-            },
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: Center(
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(buttonMsg,
-                        textScaleFactor: 1.0,
-                        textAlign: TextAlign.center,
-                        style:
-                            const TextStyle(fontSize: 15, color: Colors.white))
-                  ]),
-            )),
-      ))
-      ..animatedFunc = (child, animation) {
-        return ScaleTransition(
-          scale: Tween(begin: 0.0, end: 1.0).animate(animation),
-          child: child,
         );
-      }
-      ..show();
+      },
+    );
   }
 
   deleteDonation() {

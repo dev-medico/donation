@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -212,7 +211,6 @@ class _BloodDonationEditScreenState
 
   @override
   Widget build(BuildContext context) {
-    YYDialog.init(context);
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(
