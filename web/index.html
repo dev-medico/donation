@@ -18,13 +18,16 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Red Juniors Blood Donation App">
+  
+  <!-- Disable CORS & Web Security -->
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'self' blob: data: gap:; style-src * 'self' 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * 'self' blob: data: gap:; connect-src * 'self' blob: data: gap:; frame-src * 'self' blob: data: gap:;">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Safe Blood">
+  <meta name="apple-mobile-web-app-title" content="Red Juniors">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
@@ -37,6 +40,15 @@
   <script>
     // The value below is injected by flutter build, do not touch.
     var serviceWorkerVersion = null;
+    
+    // Disable web security at runtime
+    if (window.trustedTypes && window.trustedTypes.createPolicy) {
+      window.trustedTypes.createPolicy('default', {
+        createHTML: string => string,
+        createScriptURL: string => string,
+        createScript: string => string
+      });
+    }
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
@@ -50,7 +62,11 @@
           serviceWorkerVersion: serviceWorkerVersion,
         },
         onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
+          engineInitializer.initializeEngine({
+            // Disable CORS at initialization
+            hostElement: document.querySelector('#flutter_target'),
+            renderer: 'html'
+          }).then(function(appRunner) {
             appRunner.runApp();
           });
         }
