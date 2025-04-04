@@ -11,19 +11,16 @@ class MemberRepository {
 
   Future<ApiResponse<List<Member>>> getAllMembers() async {
     try {
-      final response = await _apiClient.get<Map<String, dynamic>>('$_baseUrl/index', 
-        queryParameters: {
-          'q': '',
-          'page': 0,
-          'limit': 5000
-        });
-      
+      final response = await _apiClient.get<Map<String, dynamic>>(
+          '$_baseUrl/index',
+          queryParameters: {'q': '', 'page': 0, 'limit': 500});
+
       if (response.data == null) {
         return ApiResponse.error('Invalid response data');
       }
-      
+
       final jsonData = response.data!;
-      
+
       if (jsonData['success'] == true && jsonData['data'] is List) {
         return ApiResponse<List<Member>>(
           success: true,
@@ -34,7 +31,8 @@ class MemberRepository {
           meta: jsonData['meta'] as Map<String, dynamic>?,
         );
       } else {
-        return ApiResponse.error(jsonData['message'] ?? 'Failed to retrieve members');
+        return ApiResponse.error(
+            jsonData['message'] ?? 'Failed to retrieve members');
       }
     } catch (e) {
       return ApiResponse.error(e.toString());
@@ -43,9 +41,9 @@ class MemberRepository {
 
   Future<ApiResponse<Member>> getMemberById(String id) async {
     try {
-      final response =
-          await _apiClient.get<Map<String, dynamic>>('$_baseUrl/view', 
-              queryParameters: {'id': id});
+      final response = await _apiClient.get<Map<String, dynamic>>(
+          '$_baseUrl/view',
+          queryParameters: {'id': id});
       return ApiResponse.fromJson(
         response.data!,
         (json) => Member.fromJson(json),
@@ -104,7 +102,7 @@ class MemberRepository {
       final queryParameters = <String, dynamic>{
         'q': name ?? '',
         'page': 0,
-        'limit': 5000,
+        'limit': 500,
         if (bloodType != null) 'blood_type': bloodType,
         if (phone != null) 'phone': phone,
       };
@@ -117,9 +115,9 @@ class MemberRepository {
       if (response.data == null) {
         return ApiResponse.error('Invalid response data');
       }
-      
+
       final jsonData = response.data!;
-      
+
       if (jsonData['success'] == true && jsonData['data'] is List) {
         return ApiResponse<List<Member>>(
           success: true,
@@ -130,7 +128,8 @@ class MemberRepository {
           meta: jsonData['meta'] as Map<String, dynamic>?,
         );
       } else {
-        return ApiResponse.error(jsonData['message'] ?? 'Failed to retrieve members');
+        return ApiResponse.error(
+            jsonData['message'] ?? 'Failed to retrieve members');
       }
     } catch (e) {
       return ApiResponse.error(e.toString());
