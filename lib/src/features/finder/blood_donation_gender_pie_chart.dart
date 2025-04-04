@@ -69,11 +69,6 @@ class _BloodDonationGenderPieChartState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.only(left: 30),
-          child: Text("ပျမ်းမျှ အသက်"),
-        ),
-        SizedBox(height: 4),
         genderStats.when(
           data: (data) {
             final genderData =
@@ -95,11 +90,17 @@ class _BloodDonationGenderPieChartState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 30),
-                      child: Text(
-                        "$averageAge နှစ်",
-                        style: TextStyle(
-                            fontSize: 17, fontWeight: FontWeight.bold),
+                      padding: const EdgeInsets.only(right: 4),
+                      child: Row(
+                        children: [
+                          Text("ပျမ်းမျှ အသက်"),
+                          SizedBox(height: 4),
+                          Text(
+                            "$averageAge နှစ်",
+                            style: TextStyle(
+                                fontSize: 17, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
                     ),
                     Padding(
@@ -127,11 +128,11 @@ class _BloodDonationGenderPieChartState
                 //   ],
                 // ),
                 // SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30),
-                  child: Text("အသက်အပိုင်းအခြား အလိုက် အဖွဲ့ဝင်များ"),
-                ),
-                SizedBox(height: 8),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 30),
+                //   child: Text("အသက်အပိုင်းအခြား အလိုက် အဖွဲ့ဝင်များ"),
+                // ),
+                // SizedBox(height: 8),
                 Row(
                   children: [
                     Container(width: 0),

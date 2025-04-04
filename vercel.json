@@ -1,12 +1,47 @@
 {
   "version": 2,
   "routes": [
-    { "src": "/flutter_service_worker.js", "dest": "/flutter_service_worker.js", "headers": { "Content-Type": "application/javascript" } },
-    { "src": "/(.*\\.js)$", "dest": "/$1", "headers": { "Content-Type": "application/javascript" } },
-    { "src": "/manifest.json", "dest": "/manifest.json", "headers": { "Content-Type": "application/manifest+json" } },
-    { "src": "/(.*)", "dest": "/$1" }
+    { 
+      "src": "/flutter_service_worker.js", 
+      "dest": "/flutter_service_worker.js", 
+      "headers": { 
+        "Content-Type": "application/javascript",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+      } 
+    },
+    { 
+      "src": "/(.*\\.js)$", 
+      "dest": "/$1", 
+      "headers": { 
+        "Content-Type": "application/javascript",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+      } 
+    },
+    { 
+      "src": "/manifest.json", 
+      "dest": "/manifest.json", 
+      "headers": { 
+        "Content-Type": "application/manifest+json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+      } 
+    },
+    { 
+      "src": "/(.*)", 
+      "dest": "/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+      }
+    }
   ],
   "installCommand": "if cd flutter; then git pull && cd ..; else git clone https://github.com/flutter/flutter.git; fi && flutter/bin/flutter config --enable-web && flutter/bin/flutter pub get",
-  "buildCommand": "flutter/bin/flutter build web --release",
+  "buildCommand": "chmod +x ./build-for-vercel.sh && ./build-for-vercel.sh",
   "outputDirectory": "build/web"
 }
