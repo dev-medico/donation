@@ -39,7 +39,6 @@ class ApiClient {
     _defaultHeaders = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
     };
 
     // Log instance creation in debug mode
