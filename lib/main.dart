@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:desktop_window/desktop_window.dart';
 // import 'package:donation/firebase_options.dart';
+import 'package:donation/core/api/api_client.dart';
 import 'package:donation/src/features/home/home.dart';
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -71,6 +72,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
+
+  // Configure API client for development/production environment
+  if (kDebugMode) {
+    // Set this to true to use localhost during development
+    ApiClient.useLocalhost(false);
+  }
 
   // if ((Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
   //   await DesktopWindow.setFullScreen(true);

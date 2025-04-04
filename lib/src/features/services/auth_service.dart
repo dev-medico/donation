@@ -1,6 +1,5 @@
 import 'package:donation/src/features/services/base_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());

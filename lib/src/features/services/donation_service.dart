@@ -1,6 +1,5 @@
 import 'package:donation/src/features/services/base_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:dio/dio.dart';
 import 'package:donation/src/features/donation/models/donation.dart';
 import 'dart:math';
 
@@ -36,18 +35,18 @@ class DonationService extends BaseService {
 
         final response = await apiClient.get(
           _basePath,
-          options: Options(headers: headers),
           queryParameters: {
             'limit': limit.toString(),
             'page': currentPage.toString(),
           },
+          options: {'headers': headers},
         );
 
         if (response.statusCode == 200) {
-          final pageData = response.data['data'] as List<dynamic>;
+          final pageData = response.data!['data'] as List<dynamic>;
           allDonations.addAll(pageData);
 
-          hasMoreData = response.data['hasMore'] == true;
+          hasMoreData = response.data!['hasMore'] == true;
 
           if (hasMoreData) {
             currentPage++;
@@ -88,14 +87,14 @@ class DonationService extends BaseService {
             'limit': limit.toString(),
             'page': currentPage.toString(),
           },
-          options: Options(headers: headers),
+          options: {'headers': headers},
         );
 
         if (response.statusCode == 200) {
-          final pageData = response.data['data'] as List<dynamic>;
+          final pageData = response.data!['data'] as List<dynamic>;
           allDonations.addAll(pageData);
 
-          hasMoreData = response.data['hasMore'] == true;
+          hasMoreData = response.data!['hasMore'] == true;
 
           if (hasMoreData) {
             currentPage++;
@@ -134,14 +133,14 @@ class DonationService extends BaseService {
             'limit': limit.toString(),
             'page': currentPage.toString(),
           },
-          options: Options(headers: headers),
+          options: {'headers': headers},
         );
 
         if (response.statusCode == 200) {
-          final pageData = response.data['data'] as List<dynamic>;
+          final pageData = response.data!['data'] as List<dynamic>;
           allDonations.addAll(pageData);
 
-          hasMoreData = response.data['hasMore'] == true;
+          hasMoreData = response.data!['hasMore'] == true;
 
           if (hasMoreData) {
             currentPage++;
@@ -167,12 +166,12 @@ class DonationService extends BaseService {
     try {
       final response = await apiClient.get(
         '$_basePath/$id',
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
 
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
-        return response.data['data'] as Map<String, dynamic>;
+        return response.data!['data'] as Map<String, dynamic>;
       }
       throw Exception('Donation not found');
     } catch (e) {
@@ -190,12 +189,12 @@ class DonationService extends BaseService {
       final response = await apiClient.post(
         _basePath,
         data: data,
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
 
       _updateLoadingStatus('Donation created successfully!');
       if (response.statusCode == 201 || response.statusCode == 200) {
-        return response.data['data'] as Map<String, dynamic>;
+        return response.data!['data'] as Map<String, dynamic>;
       }
       throw Exception('Failed to create donation');
     } catch (e) {
@@ -214,12 +213,12 @@ class DonationService extends BaseService {
       final response = await apiClient.put(
         '$_basePath/$id',
         data: data,
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
 
       _updateLoadingStatus('Donation updated successfully!');
       if (response.statusCode == 200) {
-        return response.data['data'] as Map<String, dynamic>;
+        return response.data!['data'] as Map<String, dynamic>;
       }
       throw Exception('Failed to update donation');
     } catch (e) {
@@ -236,7 +235,7 @@ class DonationService extends BaseService {
     try {
       final response = await apiClient.delete(
         '$_basePath/$id',
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
 
       _updateLoadingStatus('Donation deleted successfully!');
@@ -257,12 +256,12 @@ class DonationService extends BaseService {
     try {
       final response = await apiClient.get(
         '$_basePath/stats',
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
 
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
-        return response.data as Map<String, dynamic>;
+        return response.data! as Map<String, dynamic>;
       }
       return {};
     } catch (e) {

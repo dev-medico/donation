@@ -1,7 +1,6 @@
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/services/base_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:dio/dio.dart';
 import 'package:donation/core/api/api_client.dart';
 import 'dart:math';
 
@@ -42,7 +41,7 @@ class MemberService extends BaseService {
 
         final response = await apiClient.get(
           _basePath + '/index',
-          options: Options(headers: headers),
+          options: {'headers': headers},
           queryParameters: {
             'limit': limit,
             'page': currentPage,
@@ -51,8 +50,8 @@ class MemberService extends BaseService {
 
         if (response.statusCode == 200) {
           // Check if response has the expected structure
-          if (response.data != null && response.data['data'] != null) {
-            final pageData = response.data['data'] as List<dynamic>;
+          if (response.data != null && response.data!['data'] != null) {
+            final pageData = response.data!['data'] as List<dynamic>;
             if (pageData.isNotEmpty) {
               allMembers.addAll(pageData);
 
@@ -93,13 +92,13 @@ class MemberService extends BaseService {
     try {
       final response = await apiClient.get(
         '$_basePath/view/$id',
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
 
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
-        if (response.data != null && response.data['data'] != null) {
-          return response.data['data'] as Map<String, dynamic>;
+        if (response.data != null && response.data!['data'] != null) {
+          return response.data!['data'] as Map<String, dynamic>;
         }
         throw Exception('Invalid response format - missing data field');
       }
@@ -119,12 +118,12 @@ class MemberService extends BaseService {
       final response = await apiClient.get(
         '$_basePath/search',
         queryParameters: {'q': query},
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
 
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
-        return response.data['data'] as List<dynamic>;
+        return response.data!['data'] as List<dynamic>;
       }
       return [];
     } catch (e) {
@@ -143,13 +142,13 @@ class MemberService extends BaseService {
       final response = await apiClient.post(
         '$_basePath/create',
         data: data,
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
       print("Response received: ${response.data}");
 
       _updateLoadingStatus('Member created successfully!');
       if (response.statusCode == 201 || response.statusCode == 200) {
-        return response.data['data'] as Map<String, dynamic>;
+        return response.data!['data'] as Map<String, dynamic>;
       }
       throw Exception('Failed to create member: ${response.data}');
     } catch (e) {
@@ -168,12 +167,12 @@ class MemberService extends BaseService {
       final response = await apiClient.put(
         '$_basePath/update/$id',
         data: data,
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
 
       _updateLoadingStatus('Member updated successfully!');
       if (response.statusCode == 200) {
-        return response.data['data'] as Map<String, dynamic>;
+        return response.data!['data'] as Map<String, dynamic>;
       }
       throw Exception('Failed to update member');
     } catch (e) {
@@ -190,7 +189,7 @@ class MemberService extends BaseService {
     try {
       final response = await apiClient.delete(
         '$_basePath/delete/$id',
-        options: Options(headers: headers),
+        options: {'headers': headers},
       );
 
       _updateLoadingStatus('Member deleted successfully!');
@@ -209,17 +208,17 @@ class MemberService extends BaseService {
     final response = await apiClient.get(
       '$_basePath/by-age-range',
       queryParameters: {'start': start, 'end': end},
-      options: Options(headers: headers),
+      options: {'headers': headers},
     );
-    return response.data['data'] as List<dynamic>;
+    return response.data!['data'] as List<dynamic>;
   }
 
   Future<List<dynamic>> getMembersByBlock(String block) async {
     final headers = await getAuthHeaders();
     final response = await apiClient.get(
       '$_basePath/by-block/$block',
-      options: Options(headers: headers),
+      options: {'headers': headers},
     );
-    return response.data['data'] as List<dynamic>;
+    return response.data!['data'] as List<dynamic>;
   }
 }
