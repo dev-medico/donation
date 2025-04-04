@@ -8,7 +8,7 @@ class ApiClient {
   late String _baseUrl;
   late final Duration _timeout;
   late final Map<String, String> _defaultHeaders;
-  static bool _useLocalhost = false;
+  static bool _useLocalhost = true;
 
   // Allow switching between localhost and production server
   static void useLocalhost(bool value) {
@@ -21,10 +21,10 @@ class ApiClient {
   }
 
   void _updateBaseUrl() {
-    _baseUrl = _useLocalhost 
-        ? 'http://localhost:8080/' 
+    _baseUrl = _useLocalhost
+        ? 'http://donation_backend.test/'
         : 'https://redjuniors.mooo.com/';
-    
+
     if (kDebugMode) {
       print('ApiClient baseUrl updated to: $_baseUrl');
     }
@@ -33,7 +33,7 @@ class ApiClient {
   ApiClient._internal() {
     // Default to production URL unless explicitly set to use localhost
     _baseUrl = kDebugMode && _useLocalhost
-        ? 'http://localhost:8080/' 
+        ? 'http://donation_backend.test/'
         : 'https://redjuniors.mooo.com/';
     _timeout = const Duration(seconds: 30);
     _defaultHeaders = {
@@ -50,7 +50,7 @@ class ApiClient {
   // Helper method to add auth token to headers
   Future<Map<String, String>> _getHeaders() async {
     final headers = Map<String, String>.from(_defaultHeaders);
-    
+
     // Add auth token if available
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -64,7 +64,7 @@ class ApiClient {
         print('No auth token found');
       }
     }
-    
+
     return headers;
   }
 
@@ -111,10 +111,10 @@ class ApiClient {
   ) async {
     try {
       _logRequest(method, url, queryParams);
-      
+
       final response = await requestFunc().timeout(_timeout);
       _logResponse(response);
-      
+
       // Handle CORS errors - typically shown in preflight responses
       if (response.statusCode == 0) {
         if (kDebugMode) {
@@ -122,12 +122,12 @@ class ApiClient {
         }
         throw NetworkException('CORS error: Server is not allowing cross-origin requests. Status code: 0');
       }
-      
+
       // Check for error status codes
       if (response.statusCode >= 400) {
         throw _createApiException(response);
       }
-      
+
       // Parse JSON response
       dynamic responseData;
       if (response.body.isNotEmpty) {
@@ -140,7 +140,7 @@ class ApiClient {
           responseData = response.body;
         }
       }
-      
+
       return _convertResponse<T>(response, responseData as T?);
     } on http.ClientException catch (e) {
       if (kDebugMode) {
@@ -177,7 +177,7 @@ class ApiClient {
   Uri _buildUri(String path, Map<String, dynamic>? queryParameters) {
     final cleanPath = path.startsWith('/') ? path.substring(1) : path;
     final fullUrl = '$_baseUrl$cleanPath';
-    
+
     // Clean up query parameters - remove null values
     final cleanParams = queryParameters?.entries
         .where((e) => e.value != null)
@@ -185,7 +185,7 @@ class ApiClient {
           map[entry.key] = entry.value.toString();
           return map;
         });
-    
+
     // Parse the URL with query parameters
     return Uri.parse(fullUrl).replace(queryParameters: cleanParams);
   }
@@ -197,7 +197,7 @@ class ApiClient {
   }) async {
     final uri = _buildUri(path, queryParameters);
     final headers = await _getHeaders();
-    
+
     return _handleRequest<T>(
       () => http.get(uri, headers: headers),
       'GET',
@@ -215,7 +215,7 @@ class ApiClient {
     final uri = _buildUri(path, queryParameters);
     final headers = await _getHeaders();
     final body = data != null ? jsonEncode(data) : null;
-    
+
     return _handleRequest<T>(
       () => http.post(uri, headers: headers, body: body),
       'POST',
@@ -233,7 +233,7 @@ class ApiClient {
     final uri = _buildUri(path, queryParameters);
     final headers = await _getHeaders();
     final body = data != null ? jsonEncode(data) : null;
-    
+
     return _handleRequest<T>(
       () => http.put(uri, headers: headers, body: body),
       'PUT',
@@ -251,7 +251,7 @@ class ApiClient {
     final uri = _buildUri(path, queryParameters);
     final headers = await _getHeaders();
     final body = data != null ? jsonEncode(data) : null;
-    
+
     return _handleRequest<T>(
       () => http.delete(uri, headers: headers, body: body),
       'DELETE',
