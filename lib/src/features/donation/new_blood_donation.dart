@@ -27,6 +27,7 @@ import 'package:donation/src/features/donation_member/presentation/controller/me
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
 import 'package:donation/src/features/services/member_service.dart'
     as member_services;
+import 'package:donation/src/features/services/donation_service.dart';
 
 class NewBloodDonationScreen extends ConsumerStatefulWidget {
   NewBloodDonationScreen({Key? key}) : super(key: key);
@@ -170,8 +171,44 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
             });
             print(
                 'Loaded ${cachedMembers.length} members from repository cache');
+
+            // Refresh the provider via invalidation instead of direct state setting
+            ref.invalidate(memberListProvider);
           } else {
-            // If still empty, fetch from API
+            // If repository is empty, force fetch from API
+            print('No members found in repository, fetching from API...');
+            final fetchedMembers = await memberService.getMembers();
+
+            if (fetchedMembers.isNotEmpty) {
+              final memberList =
+                  fetchedMembers.map((m) => Member.fromJson(m)).toList();
+
+              // Save to repository for future use
+              for (var member in memberList) {
+                await memberRepository.addMember(member);
+              }
+
+              setState(() {
+                cachedMembers = memberList;
+                isLoading = false;
+              });
+
+              // Refresh the provider
+              ref.invalidate(memberListProvider);
+              print(
+                  'Fetched and cached ${cachedMembers.length} members from API');
+            } else {
+              setState(() {
+                cachedMembers = [];
+                isLoading = false;
+              });
+              print('No members found in API');
+            }
+          }
+        } catch (e) {
+          // If any errors occur during repository or API fetch, try direct API fetch as last resort
+          print('Error with repository fetch: $e, trying direct API call');
+          try {
             final fetchedMembers = await memberService.getMembers();
             final memberList =
                 fetchedMembers.map((m) => Member.fromJson(m)).toList();
@@ -181,17 +218,17 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
               isLoading = false;
             });
 
-            // Update the provider
-            ref.refresh(memberListProvider);
+            // Refresh the provider
+            ref.invalidate(memberListProvider);
             print(
-                'Fetched and cached ${cachedMembers.length} members from API');
+                'Recovered with direct API fetch: ${cachedMembers.length} members');
+          } catch (finalError) {
+            setState(() {
+              cachedMembers = [];
+              isLoading = false;
+            });
+            print('Failed to fetch members after all attempts: $finalError');
           }
-        } catch (e) {
-          setState(() {
-            cachedMembers = [];
-            isLoading = false;
-          });
-          print('Error fetching members: $e');
         }
       }
     } catch (e) {
@@ -247,22 +284,35 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
     final donationData = {
       'member': selectedMember != null ? selectedMember!.id : null,
+      'member_id': selectedMember != null ? selectedMember!.memberId : "",
       'date': donationDateDetail != null
           ? DateFormat("dd MMM yyyy").format(donationDateDetail!)
           : null,
-      'donationDate': donationDateDetail?.toIso8601String(),
+      'donation_date': donationDateDetail?.toIso8601String(),
       'hospital': selectHospital,
-      'memberId': selectedMember != null ? selectedMember!.memberId : "",
-      'patientAddress': formattedAddress,
-      'patientAge': age,
-      'patientDisease': selectDisease,
-      'patientName': name,
+      'patient_address': formattedAddress,
+      'patient_age': age,
+      'patient_disease': selectDisease,
+      'patient_name': name,
+      // Set owner_id to be the same as member_id as required by the server
+      'owner_id': selectedMember != null ? selectedMember!.memberId : "",
     };
 
     try {
-      // Use the donation provider to create the donation
-      final donationNotifier = ref.read(donationListProvider.notifier);
-      await donationNotifier.createDonation(donationData);
+      print('Sending donation data to API: $donationData');
+
+      // Use the donation service directly to ensure we're using the correct API endpoint
+      final donationService = ref.read(donationServiceProvider);
+      final donationResult = await donationService.createDonation(donationData);
+
+      // Instead of refreshing the entire donation list, only invalidate the month/year specific data
+      // Get current month and year
+      final now = DateTime.now();
+      final currentMonth = donationDateDetail?.month ?? now.month;
+      final currentYear = donationDateDetail?.year ?? now.year;
+
+      // Refresh only the specific month/year data
+      ref.invalidate(donationsByMonthYearProvider);
 
       // Update the member if needed
       if (selectedMember != null) {
@@ -300,21 +350,22 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
             selectedMember!.id.toString(), memberData);
 
         // Refresh member data
-        ref.refresh(memberListProvider);
+        ref.invalidate(memberListProvider);
       }
 
       setState(() {
         isLoading = false;
       });
 
+      // Show success message and then navigate back
       Utils.messageSuccessDialog(
           "သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
           context,
           "အိုကေ",
           Colors.black);
 
-      // Clear input fields
-      _resetForm();
+      // Pop back to previous screen after successful creation
+      Navigator.of(context).pop();
     } catch (e) {
       setState(() {
         isLoading = false;

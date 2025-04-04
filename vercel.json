@@ -42,6 +42,6 @@
     }
   ],
   "installCommand": "if cd flutter; then git pull && cd ..; else git clone https://github.com/flutter/flutter.git; fi && flutter/bin/flutter config --enable-web && flutter/bin/flutter pub get",
-  "buildCommand": "cd donation && flutter build web --release --dart-define=DISABLE_CORS=true",
+  "buildCommand": "cd donation && flutter build web --release --dart-define=DISABLE_CORS=true --web-renderer canvaskit --no-tree-shake-icons",
   "outputDirectory": "build/web"
 }
