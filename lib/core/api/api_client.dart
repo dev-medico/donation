@@ -21,9 +21,10 @@ class ApiClient {
   }
 
   void _updateBaseUrl() {
-    _baseUrl = _useLocalhost
-        ? 'http://donation_backend.test/'
-        : 'https://redjuniors.mooo.com/';
+    _baseUrl = 'http://donation_backend.test/';
+    // _baseUrl = _useLocalhost
+    //     ? 'http://donation_backend.test/'
+    //     : 'https://redjuniors.mooo.com/';
 
     if (kDebugMode) {
       print('ApiClient baseUrl updated to: $_baseUrl');
@@ -32,9 +33,10 @@ class ApiClient {
 
   ApiClient._internal() {
     // Default to production URL unless explicitly set to use localhost
-    _baseUrl = kDebugMode && _useLocalhost
-        ? 'http://donation_backend.test/'
-        : 'https://redjuniors.mooo.com/';
+    _baseUrl = 'http://donation_backend.test/';
+    // _baseUrl = kDebugMode && _useLocalhost
+    //     ? 'http://donation_backend.test/'
+    //     : 'https://redjuniors.mooo.com/';
     _timeout = const Duration(seconds: 30);
     _defaultHeaders = {
       'Accept': 'application/json',
@@ -69,7 +71,8 @@ class ApiClient {
   }
 
   // Helper for logging requests in debug mode
-  void _logRequest(String method, String url, Map<String, dynamic>? queryParams) {
+  void _logRequest(
+      String method, String url, Map<String, dynamic>? queryParams) {
     if (kDebugMode) {
       print('Making $method request to: $url');
       if (queryParams != null) {
@@ -118,9 +121,11 @@ class ApiClient {
       // Handle CORS errors - typically shown in preflight responses
       if (response.statusCode == 0) {
         if (kDebugMode) {
-          print('CORS error detected - status code 0. This usually means the server is not allowing cross-origin requests.');
+          print(
+              'CORS error detected - status code 0. This usually means the server is not allowing cross-origin requests.');
         }
-        throw NetworkException('CORS error: Server is not allowing cross-origin requests. Status code: 0');
+        throw NetworkException(
+            'CORS error: Server is not allowing cross-origin requests. Status code: 0');
       }
 
       // Check for error status codes
@@ -182,9 +187,9 @@ class ApiClient {
     final cleanParams = queryParameters?.entries
         .where((e) => e.value != null)
         .fold<Map<String, String>>({}, (map, entry) {
-          map[entry.key] = entry.value.toString();
-          return map;
-        });
+      map[entry.key] = entry.value.toString();
+      return map;
+    });
 
     // Parse the URL with query parameters
     return Uri.parse(fullUrl).replace(queryParameters: cleanParams);

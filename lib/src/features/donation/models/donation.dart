@@ -38,11 +38,23 @@ class Donation {
   });
 
   factory Donation.fromJson(Map<String, dynamic> json) {
+    DateTime? parseDonationDate(String? dateString) {
+      if (dateString == null) return null;
+      try {
+        // Parse the ISO 8601 date string - without timezone conversion
+        // This ensures we preserve the original date as entered
+        return DateTime.parse(dateString);
+      } catch (e) {
+        print('Error parsing donation date: $e');
+        return null;
+      }
+    }
+
     return Donation(
       id: json['id'] ?? json['_id'] ?? '',
       member: json['member'] != null ? json['member'].toString() : null,
       donationDate: json['donation_date'] != null
-          ? DateTime.parse(json['donation_date'])
+          ? parseDonationDate(json['donation_date'])
           : null,
       hospital: json['hospital'] as String?,
       patientName: json['patient_name'] as String?,

@@ -21,95 +21,77 @@ class DonationService extends BaseService {
     }
   }
 
-  Future<List<dynamic>> getDonations({int limit = 500}) async {
-    final headers = await getAuthHeaders();
-    _updateLoadingStatus('Fetching donations...');
+  // Future<List<dynamic>> getDonations({int limit = 500}) async {
+  //   final headers = await getAuthHeaders();
+  //   _updateLoadingStatus('Fetching donations...');
 
-    List<dynamic> allDonations = [];
-    int currentPage = 0;
-    bool hasMoreData = true;
+  //   List<dynamic> allDonations = [];
+  //   int currentPage = 0;
+  //   bool hasMoreData = true;
 
-    try {
-      while (hasMoreData) {
-        _updateLoadingStatus('Fetching donations page ${currentPage + 1}...');
+  //   try {
+  //     while (hasMoreData) {
+  //       _updateLoadingStatus('Fetching donations page ${currentPage + 1}...');
 
-        final response = await apiClient.get(
-          _basePath,
-          queryParameters: {
-            'limit': limit.toString(),
-            'page': currentPage.toString(),
-          },
-          options: {'headers': headers},
-        );
+  //       final response = await apiClient.get(
+  //         _basePath,
+  //         queryParameters: {
+  //           'limit': limit.toString(),
+  //           'page': currentPage.toString(),
+  //         },
+  //         options: {'headers': headers},
+  //       );
 
-        if (response.statusCode == 200) {
-          final pageData = response.data!['data'] as List<dynamic>;
-          allDonations.addAll(pageData);
+  //       if (response.statusCode == 200) {
+  //         final pageData = response.data!['data'] as List<dynamic>;
+  //         allDonations.addAll(pageData);
 
-          hasMoreData = response.data!['hasMore'] == true;
+  //         hasMoreData = response.data!['hasMore'] == true;
 
-          if (hasMoreData) {
-            currentPage++;
-          }
-        } else {
-          hasMoreData = false;
-        }
-      }
+  //         if (hasMoreData) {
+  //           currentPage++;
+  //         }
+  //       } else {
+  //         hasMoreData = false;
+  //       }
+  //     }
 
-      _updateLoadingStatus('');
-      return allDonations;
-    } catch (e) {
-      print('Error fetching donations: $e');
-      _updateLoadingStatus('Error: $e');
-      return allDonations;
-    }
-  }
+  //     _updateLoadingStatus('');
+  //     return allDonations;
+  //   } catch (e) {
+  //     print('Error fetching donations: $e');
+  //     _updateLoadingStatus('Error: $e');
+  //     return allDonations;
+  //   }
+  // }
 
   Future<List<dynamic>> getDonationsByMonthYear(int month, int year,
       {int limit = 500}) async {
     final headers = await getAuthHeaders();
     _updateLoadingStatus('Fetching donations for $month/$year...');
 
-    List<dynamic> allDonations = [];
-    int currentPage = 0;
-    bool hasMoreData = true;
-
     try {
-      while (hasMoreData) {
-        _updateLoadingStatus(
-            'Fetching donations for $month/$year page ${currentPage + 1}...');
-
-        final response = await apiClient.get(
-          '$_basePath/by-month-year',
-          queryParameters: {
-            'month': month.toString(),
-            'year': year.toString(),
-            'limit': limit.toString(),
-            'page': currentPage.toString(),
-          },
-          options: {'headers': headers},
-        );
-
-        if (response.statusCode == 200) {
-          final pageData = response.data!['data'] as List<dynamic>;
-          allDonations.addAll(pageData);
-
-          hasMoreData = response.data!['hasMore'] == true;
-
-          if (hasMoreData) {
-            currentPage++;
-          }
-        } else {
-          hasMoreData = false;
-        }
-      }
+      // Make a single API call instead of paginating in a loop
+      final response = await apiClient.get(
+        '$_basePath/by-month-year',
+        queryParameters: {
+          'month': month.toString(),
+          'year': year.toString(),
+          'limit': limit.toString(),
+          'page': '0', // Just get the first page
+        },
+        options: {'headers': headers},
+      );
 
       _updateLoadingStatus('');
-      return allDonations;
+      if (response.statusCode == 200) {
+        return response.data!['data'] as List<dynamic>;
+      }
+      return [];
     } catch (e) {
       print('Error fetching donations by month/year: $e');
       _updateLoadingStatus('Error: $e');
-      return allDonations;
+      return [];
     }
   }
 
@@ -233,8 +215,9 @@ class DonationService extends BaseService {
     _updateLoadingStatus('Deleting donation...');
 
     try {
-      final response = await apiClient.delete(
-        '$_basePath/$id',
+      final response = await apiClient.post(
+        '$_basePath/delete',
+        queryParameters: {'id': id},
         options: {'headers': headers},
       );
 

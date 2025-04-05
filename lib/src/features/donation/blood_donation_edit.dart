@@ -177,16 +177,28 @@ class _BloodDonationEditScreenState
         'patient_name': nameController.text,
         'patient_age': ageController.text,
         'hospital': hospitalController.text,
-        'donation_date': donationDateDetail?.toIso8601String(),
+        'donation_date': donationDateDetail != null
+            ? DateTime(
+                donationDateDetail!.year,
+                donationDateDetail!.month,
+                donationDateDetail!.day,
+                donationDateDetail!.hour,
+                donationDateDetail!.minute,
+                donationDateDetail!.second,
+              ).toIso8601String()
+            : null,
         'patient_disease': diseaseController.text,
         'patient_address': "${quarterController.text}၊${townController.text}",
         'member_id': widget.data.memberId,
         'member': widget.data.member
       };
 
-      // Use the donation provider to update
-      final donationNotifier = ref.read(donationListProvider.notifier);
-      await donationNotifier.updateDonation(widget.data.id, updateData);
+      // Use donation service directly instead of provider
+      final donationService = ref.read(donationServiceProvider);
+      await donationService.updateDonation(widget.data.id, updateData);
+
+      // After update, invalidate the month/year provider to refresh the list
+      ref.invalidate(donationsByMonthYearProvider);
 
       // Show success message and navigate back
       Utils.messageSuccessDialog("အချက်အလက်ပြင်ဆင်ခြင်း \nအောင်မြင်ပါသည်။",
@@ -238,13 +250,19 @@ class _BloodDonationEditScreenState
             ? const Center(child: CircularProgressIndicator())
             : Responsive.isMobile(context)
                 ? SingleChildScrollView(
-                    child: _buildEditForm(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: _buildEditForm(),
+                    ),
                   )
                 : Center(
                     child: Container(
                       constraints: const BoxConstraints(maxWidth: 800),
                       child: SingleChildScrollView(
-                        child: _buildEditForm(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: _buildEditForm(),
+                        ),
                       ),
                     ),
                   ),
@@ -252,35 +270,76 @@ class _BloodDonationEditScreenState
     );
   }
 
+  // Formatted address getter for preview
+  String get formattedAddress =>
+      "${quarterController.text}${quarterController.text.isNotEmpty ? '၊' : ''}${townController.text}";
+
+  // Helper method for displaying info rows in member details
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEditForm() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          margin:
-              const EdgeInsets.only(left: 12, top: 12, bottom: 15, right: 12),
-          child: Container(
-            padding:
-                const EdgeInsets.only(bottom: 20, left: 4, right: 4, top: 8),
-            decoration: shadowDecoration(Colors.white),
+      children: [
+        // Member information would go here if this screen needed it
+
+        // Donation Information Card
+        Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          margin: const EdgeInsets.only(bottom: 16),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "သွေးလှူဒါန်းမှု အချက်အလက်များ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
                       children: [
                         Text(
                           "အကျဥ်း",
                           textScaleFactor: 1.0,
                           style: TextStyle(
                               fontSize: 15,
-                              color: switchNew ? Colors.black : primaryColor),
+                              color: !switchNew ? primaryColor : Colors.black),
                         ),
                         Switch(
                             value: switchNew,
@@ -298,323 +357,302 @@ class _BloodDonationEditScreenState
                         ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
-                _buildDatePicker(),
-                _buildHospitalInput(),
-                Visibility(
-                  visible: switchNew,
-                  child: Column(
-                    children: [
-                      _buildPatientNameInput(),
-                      _buildPatientAgeInput(),
-                      _buildPatientAddressInput(),
-                      _buildPatientDiseaseInput(),
-                    ],
-                  ),
+                SizedBox(height: 16),
+
+                // Date Picker
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "လှူဒါန်းသည့် ရက်စွဲ",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () async {
+                        final DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: donationDateDetail ?? DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime.now(),
+                        );
+                        if (pickedDate != null) {
+                          setState(() {
+                            donationDateDetail = pickedDate;
+                            donationDate =
+                                DateFormat("dd-MM-yyyy").format(pickedDate);
+                          });
+                        }
+                      },
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              donationDate,
+                              style: TextStyle(
+                                color: donationDateDetail != null
+                                    ? Colors.black
+                                    : Colors.grey,
+                              ),
+                            ),
+                            Icon(Icons.calendar_today),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                _buildActionButtons(),
+                SizedBox(height: 16),
+
+                // Hospital input
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "လှူဒါန်းသည့် နေရာ",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    TypeAheadField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                        controller: hospitalController,
+                        decoration: InputDecoration(
+                          hintText: 'နေရာ ရွေးပါ (သို့) ရိုက်ပါ',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      suggestionsCallback: (pattern) {
+                        return hospitals.where((item) =>
+                            item.toLowerCase().contains(pattern.toLowerCase()));
+                      },
+                      itemBuilder: (context, String suggestion) {
+                        return ListTile(
+                          title: Text(suggestion),
+                        );
+                      },
+                      onSuggestionSelected: (String suggestion) {
+                        hospitalController.text = suggestion;
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
         ),
-      ],
-    );
-  }
 
-  Widget _buildDatePicker() {
-    return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "လှူဒါန်းသည့် ရက်စွဲ",
-            style: TextStyle(fontSize: 15),
-          ),
-          GestureDetector(
-            onTap: () async {
-              final DateTime? pickedDate = await showDatePicker(
-                context: context,
-                initialDate: donationDateDetail ?? DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime.now(),
-              );
-              if (pickedDate != null) {
-                setState(() {
-                  donationDateDetail = pickedDate;
-                  donationDate = DateFormat("dd-MM-yyyy").format(pickedDate);
-                });
-              }
-            },
-            child: Container(
-              margin: const EdgeInsets.only(top: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade400),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // Patient Information Card (Only visible when switchNew is true)
+        Visibility(
+          visible: switchNew,
+          child: Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            margin: const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    donationDate,
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                    "လူနာ အချက်အလက်",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const Icon(Icons.calendar_today, size: 18),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'လူနာအမည်',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  TextField(
+                    controller: ageController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'လူနာအသက်',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "လူနာလိပ်စာ",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: quarterController,
+                          decoration: InputDecoration(
+                            labelText: 'ရပ်ကွက်/ကျေးရွာ',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: TypeAheadField(
+                          textFieldConfiguration: TextFieldConfiguration(
+                            controller: townController,
+                            decoration: InputDecoration(
+                              labelText: 'မြို့နယ်',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          suggestionsCallback: (pattern) {
+                            return townships.where((item) => item
+                                .toLowerCase()
+                                .contains(pattern.toLowerCase()));
+                          },
+                          itemBuilder: (context, String suggestion) {
+                            return ListTile(
+                              title: Text(suggestion),
+                            );
+                          },
+                          onSuggestionSelected: (String suggestion) {
+                            townController.text = suggestion;
+                            setRegion(suggestion);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  if (quarterController.text.isNotEmpty ||
+                      townController.text.isNotEmpty) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'လိပ်စာပြည့်စုံ:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            formattedAddress,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                  ],
+                  SizedBox(height: 12),
+                  TypeAheadField(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: diseaseController,
+                      decoration: InputDecoration(
+                        labelText: 'ဖြစ်ပွားသည့် ရောဂါ',
+                        hintText: 'ရောဂါ ရွေးပါ (သို့) ရိုက်ပါ',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    suggestionsCallback: (pattern) {
+                      return diseases.where((item) =>
+                          item.toLowerCase().contains(pattern.toLowerCase()));
+                    },
+                    itemBuilder: (context, String suggestion) {
+                      return ListTile(
+                        title: Text(suggestion),
+                      );
+                    },
+                    onSuggestionSelected: (String suggestion) {
+                      diseaseController.text = suggestion;
+                    },
+                  ),
                 ],
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
 
-  Widget _buildHospitalInput() {
-    return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "လှူဒါန်းသည့် နေရာ",
-            style: TextStyle(fontSize: 15),
-          ),
-          const SizedBox(height: 8),
-          TypeAheadField(
-            textFieldConfiguration: TextFieldConfiguration(
-              controller: hospitalController,
-              decoration: InputDecoration(
-                hintText: 'နေရာ ရွေးပါ (သို့) ရိုက်ပါ',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-              ),
-            ),
-            suggestionsCallback: (pattern) {
-              return hospitals.where(
-                  (item) => item.toLowerCase().contains(pattern.toLowerCase()));
-            },
-            itemBuilder: (context, String suggestion) {
-              return ListTile(
-                title: Text(suggestion),
-              );
-            },
-            onSuggestionSelected: (String suggestion) {
-              hospitalController.text = suggestion;
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPatientNameInput() {
-    return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "လူနာ အမည်",
-            style: TextStyle(fontSize: 15),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: nameController,
-            decoration: InputDecoration(
-              hintText: 'လူနာအမည်ရိုက်ပါ',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPatientAgeInput() {
-    return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "လူနာ အသက်",
-            style: TextStyle(fontSize: 15),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: ageController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              hintText: 'လူနာ အသက်ရိုက်ပါ',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPatientAddressInput() {
-    return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "လူနာ လိပ်စာ",
-            style: TextStyle(fontSize: 15),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: quarterController,
-                  decoration: InputDecoration(
-                    hintText: 'ရပ်ကွက်/ကျေးရွာ',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 12),
+        // Action buttons
+        SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  backgroundColor: Colors.red.withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+                child: const Text(
+                  "ဖျက်သိမ်းမည်",
+                  style: TextStyle(fontSize: 15),
+                ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TypeAheadField(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    controller: townController,
-                    decoration: InputDecoration(
-                      hintText: 'မြို့နယ်',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 12),
-                    ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: updateDonation,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: primaryColor,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  suggestionsCallback: (pattern) {
-                    return townships.where((item) =>
-                        item.toLowerCase().contains(pattern.toLowerCase()));
-                  },
-                  itemBuilder: (context, String suggestion) {
-                    return ListTile(
-                      title: Text(suggestion),
-                    );
-                  },
-                  onSuggestionSelected: (String suggestion) {
-                    townController.text = suggestion;
-                    setRegion(suggestion);
-                  },
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPatientDiseaseInput() {
-    return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "ဖြစ်ပွားသည့် ရောဂါ",
-            style: TextStyle(fontSize: 15),
-          ),
-          const SizedBox(height: 8),
-          TypeAheadField(
-            textFieldConfiguration: TextFieldConfiguration(
-              controller: diseaseController,
-              decoration: InputDecoration(
-                hintText: 'ရောဂါ ရွေးပါ (သို့) ရိုက်ပါ',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                child: const Text(
+                  "ပြင်ဆင်မည်",
+                  style: TextStyle(fontSize: 15),
                 ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               ),
             ),
-            suggestionsCallback: (pattern) {
-              return diseases.where(
-                  (item) => item.toLowerCase().contains(pattern.toLowerCase()));
-            },
-            itemBuilder: (context, String suggestion) {
-              return ListTile(
-                title: Text(suggestion),
-              );
-            },
-            onSuggestionSelected: (String suggestion) {
-              diseaseController.text = suggestion;
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButtons() {
-    return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, top: 24),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.red,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                backgroundColor: Colors.red.withOpacity(0.1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                "ဖျက်သိမ်းမည်",
-                style: TextStyle(fontSize: 15),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: updateDonation,
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: primaryColor,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                "ပြင်ဆင်မည်",
-                style: TextStyle(fontSize: 15),
-              ),
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

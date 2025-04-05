@@ -4,27 +4,6 @@ import 'package:donation/src/features/donation/models/donation.dart';
 
 typedef DonationFilterModel = ({int year, int month});
 
-// Stream provider for all donations - refreshes every 30 seconds
-final donationStreamProvider = StreamProvider<List<Donation>>((ref) async* {
-  final donationService = ref.read(donationServiceProvider);
-  while (true) {
-    final donationsJson = await donationService.getDonations();
-    final donations = donationsJson
-        .map((json) => Donation.fromJson(json as Map<String, dynamic>))
-        .toList();
-    yield donations;
-    await Future.delayed(const Duration(seconds: 30));
-  }
-});
-
-// Future provider for all donations - one-time fetch
-final donationProvider = FutureProvider<List<Donation>>((ref) async {
-  final donationService = ref.read(donationServiceProvider);
-  final donationsJson = await donationService.getDonations();
-  return donationsJson
-      .map((json) => Donation.fromJson(json as Map<String, dynamic>))
-      .toList();
-});
 
 // Stream provider for donations by month and year - refreshes every 30 seconds
 final donationByMonthYearStreamProvider =

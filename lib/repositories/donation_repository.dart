@@ -86,7 +86,7 @@ class DonationRepository {
 
   Future<ApiResponse<void>> deleteDonation(String id) async {
     try {
-      await _apiClient.delete('$_baseUrl/$id');
+      await _apiClient.post('$_baseUrl/delete/$id');
       return ApiResponse(
           success: true, message: 'Donation deleted successfully');
     } catch (e) {

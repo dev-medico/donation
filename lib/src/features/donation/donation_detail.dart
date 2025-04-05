@@ -10,6 +10,7 @@ import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:donation/src/features/services/donation_service.dart';
 
 class DonationDetailScreen extends ConsumerStatefulWidget {
   Donation data;
@@ -1191,20 +1192,80 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
   }
 
   deleteDonation() {
-    // TODO: Uncomment when realmProvider is available
-    // if (data.memberObj != null) {
-    //   ref.watch(realmProvider)!.updateMember(
-    //         data.memberObj!,
-    //         memberCount: ((int.parse(data.memberObj!.memberCount ?? "0")) - 1)
-    //             .toString(),
-    //         totalCount:
-    //             ((int.parse(data.memberObj!.totalCount ?? "0")) - 1).toString(),
-    //       );
-    // }
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("သွေးလှူဒါန်းမှု ဖျက်နေသည်..."),
+              ],
+            ),
+          ),
+        );
+      },
+    );
 
-    // ref.watch(realmProvider)!.deleteDonation(data);
+    // Get the donation date to refresh the correct month/year list after deletion
+    final donationDate = data.donationDate;
+    final month =
+        donationDate != null ? donationDate.month : DateTime.now().month;
+    final year = donationDate != null ? donationDate.year : DateTime.now().year;
 
-    Navigator.pop(context);
+    // Call the donation provider to delete the donation
+    if (data.id != null) {
+      final donationService = ref.read(donationServiceProvider);
+
+      donationService.deleteDonation(data.id.toString()).then((_) {
+        // Close loading dialog
+        Navigator.of(context, rootNavigator: true).pop();
+
+        // Refresh specific month/year data
+        final params = (month: month, year: year);
+        ref.invalidate(donationsByMonthYearProvider(params));
+        ref.invalidate(donationsByYearProvider(year));
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('သွေးလှူဒါန်းမှု ဖျက်ပြီးပါပြီ'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Go back to previous screen
+        Navigator.pop(context);
+      }).catchError((error) {
+        // Close loading dialog
+        Navigator.of(context, rootNavigator: true).pop();
+
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('သွေးလှူဒါန်းမှု ဖျက်၍မရပါ: $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    } else {
+      // Close loading dialog
+      Navigator.of(context, rootNavigator: true).pop();
+
+      // Show error message if donation ID is null
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('သွေးလှူဒါန်းမှု အိုင်ဒီ မရှိပါ'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void goToDetail() {

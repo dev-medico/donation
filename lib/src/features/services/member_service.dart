@@ -165,7 +165,8 @@ class MemberService extends BaseService {
 
     try {
       final response = await apiClient.put(
-        '$_basePath/update/$id',
+        '$_basePath/update',
+        queryParameters: {'id': id},
         data: data,
         options: {'headers': headers},
       );
@@ -187,8 +188,9 @@ class MemberService extends BaseService {
     _updateLoadingStatus('Deleting member...');
 
     try {
-      final response = await apiClient.delete(
-        '$_basePath/delete/$id',
+      final response = await apiClient.post(
+        '$_basePath/delete',
+        queryParameters: {'id': id},
         options: {'headers': headers},
       );
 

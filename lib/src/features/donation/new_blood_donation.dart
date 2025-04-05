@@ -124,6 +124,10 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     "လိပ်ခေါင်းရောဂါ",
   ];
 
+  // Add formatted address preview
+  String get formattedAddress =>
+      "${quarterController.text}${quarterController.text.isNotEmpty ? '၊' : ''}${townController.text}";
+
   @override
   void initState() {
     super.initState();
@@ -135,6 +139,17 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     setState(() {
       donationDateDetail = DateTime.now();
       donationDate = DateFormat("dd MMM yyyy").format(donationDateDetail!);
+    });
+
+    // Add listeners to address controllers to update UI when they change
+    quarterController.addListener(_addressFieldsChanged);
+    townController.addListener(_addressFieldsChanged);
+  }
+
+  // Handle changes to address fields
+  void _addressFieldsChanged() {
+    setState(() {
+      // Just triggers a rebuild to show updated formatted address
     });
   }
 
@@ -262,6 +277,12 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       return;
     }
 
+    if (quarter.isEmpty && township.isEmpty) {
+      Utils.messageDialog(
+          "လူနာလိပ်စာ ဖြည့်ရန်လိုအပ်ပါသည်", context, "အိုကေ", Colors.red);
+      return;
+    }
+
     if (selectHospital.isEmpty) {
       Utils.messageDialog(
           "ဆေးရုံအမည် ရွေးချယ်ရန်လိုအပ်ပါသည်", context, "အိုကေ", Colors.red);
@@ -288,7 +309,16 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       'date': donationDateDetail != null
           ? DateFormat("dd MMM yyyy").format(donationDateDetail!)
           : null,
-      'donation_date': donationDateDetail?.toIso8601String(),
+      'donation_date': donationDateDetail != null
+          ? DateTime(
+              donationDateDetail!.year,
+              donationDateDetail!.month,
+              donationDateDetail!.day,
+              donationDateDetail!.hour,
+              donationDateDetail!.minute,
+              donationDateDetail!.second,
+            ).toIso8601String()
+          : null,
       'hospital': selectHospital,
       'patient_address': formattedAddress,
       'patient_age': age,
@@ -303,55 +333,9 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
       // Use the donation service directly to ensure we're using the correct API endpoint
       final donationService = ref.read(donationServiceProvider);
-      final donationResult = await donationService.createDonation(donationData);
+      await donationService.createDonation(donationData);
 
-      // Instead of refreshing the entire donation list, only invalidate the month/year specific data
-      // Get current month and year
-      final now = DateTime.now();
-      final currentMonth = donationDateDetail?.month ?? now.month;
-      final currentYear = donationDateDetail?.year ?? now.year;
-
-      // Refresh only the specific month/year data
       ref.invalidate(donationsByMonthYearProvider);
-
-      // Update the member if needed
-      if (selectedMember != null) {
-        final memberService = ref.read(member_services.memberServiceProvider);
-
-        // Get current count values
-        final memberCount = int.parse(selectedMember!.memberCount ?? "0") + 1;
-        final totalCount = int.parse(selectedMember!.totalCount ?? "0") + 1;
-
-        // Determine last date
-        DateTime? lastDate;
-        if (selectedMember!.lastDate != null) {
-          try {
-            final DateTime existingLastDate =
-                DateTime.parse(selectedMember!.lastDate!);
-            lastDate = donationDateDetail != null &&
-                    donationDateDetail!.isAfter(existingLastDate)
-                ? donationDateDetail
-                : existingLastDate;
-          } catch (e) {
-            lastDate = donationDateDetail;
-          }
-        } else {
-          lastDate = donationDateDetail;
-        }
-
-        // Update member data
-        final memberData = {
-          'member_count': memberCount.toString(),
-          'total_count': totalCount.toString(),
-          'last_date': lastDate?.toIso8601String(),
-        };
-
-        await memberService.updateMember(
-            selectedMember!.id.toString(), memberData);
-
-        // Refresh member data
-        ref.invalidate(memberListProvider);
-      }
 
       setState(() {
         isLoading = false;
@@ -565,6 +549,91 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                   ),
                 ),
                 SizedBox(height: 12),
+                Text(
+                  'လူနာလိပ်စာ',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: quarterController,
+                        decoration: InputDecoration(
+                          labelText: 'ရပ်ကွက်',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: TypeAheadField<String>(
+                        textFieldConfiguration: TextFieldConfiguration(
+                          controller: townController,
+                          decoration: InputDecoration(
+                            labelText: 'မြို့နယ်',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        suggestionsCallback: (pattern) {
+                          return townships
+                              .where((township) => township
+                                  .toLowerCase()
+                                  .contains(pattern.toLowerCase()))
+                              .take(5)
+                              .toList();
+                        },
+                        itemBuilder: (context, String township) {
+                          return ListTile(
+                            title: Text(township),
+                          );
+                        },
+                        onSuggestionSelected: (String township) {
+                          townController.text = township;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                if (quarterController.text.isNotEmpty ||
+                    townController.text.isNotEmpty) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'လိပ်စာပြည့်စုံ:',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          formattedAddress,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                ],
                 TypeAheadField<String>(
                   textFieldConfiguration: TextFieldConfiguration(
                     controller: hospitalController,
@@ -843,6 +912,15 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                   ),
                 ),
                 SizedBox(height: 12),
+                Text(
+                  'လူနာလိပ်စာ',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -884,7 +962,41 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: 8),
+                if (quarterController.text.isNotEmpty ||
+                    townController.text.isNotEmpty) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'လိပ်စာပြည့်စုံ:',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          formattedAddress,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                ],
                 TypeAheadField<String>(
                   textFieldConfiguration: TextFieldConfiguration(
                     controller: hospitalController,
