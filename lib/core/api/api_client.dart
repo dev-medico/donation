@@ -8,35 +8,14 @@ class ApiClient {
   late String _baseUrl;
   late final Duration _timeout;
   late final Map<String, String> _defaultHeaders;
-  static bool _useLocalhost = true;
-
-  // Allow switching between localhost and production server
-  static void useLocalhost(bool value) {
-    _useLocalhost = value;
-    _instance._updateBaseUrl();
-  }
 
   factory ApiClient() {
     return _instance;
   }
 
-  void _updateBaseUrl() {
-    _baseUrl = 'http://donation_backend.test/';
-    // _baseUrl = _useLocalhost
-    //     ? 'http://donation_backend.test/'
-    //     : 'https://redjuniors.mooo.com/';
-
-    if (kDebugMode) {
-      print('ApiClient baseUrl updated to: $_baseUrl');
-    }
-  }
-
   ApiClient._internal() {
-    // Default to production URL unless explicitly set to use localhost
-    _baseUrl = 'http://donation_backend.test/';
-    // _baseUrl = kDebugMode && _useLocalhost
-    //     ? 'http://donation_backend.test/'
-    //     : 'https://redjuniors.mooo.com/';
+    // _baseUrl = 'http://donation_backend.test/';
+    _baseUrl = 'https://redjuniors.mooo.com/';
     _timeout = const Duration(seconds: 30);
     _defaultHeaders = {
       'Accept': 'application/json',
@@ -263,18 +242,6 @@ class ApiClient {
       uri.toString(),
       queryParameters,
     );
-  }
-
-  Exception _handleError(dynamic error) {
-    if (error is TimeoutException) {
-      return error;
-    } else if (error is ApiException) {
-      return error;
-    } else if (error is NetworkException) {
-      return error;
-    } else {
-      return NetworkException('Unknown error occurred: $error');
-    }
   }
 }
 

@@ -73,12 +73,6 @@ void main() async {
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
 
-  // Configure API client for development/production environment
-  if (kDebugMode) {
-    // Set this to true to use localhost during development
-    ApiClient.useLocalhost(false);
-  }
-
   // if ((Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
   //   await DesktopWindow.setFullScreen(true);
   //   await DesktopWindow.setMinWindowSize(const Size(1280, 800));
