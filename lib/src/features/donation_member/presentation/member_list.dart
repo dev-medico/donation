@@ -18,6 +18,10 @@ import 'package:donation/src/features/services/member_service.dart'
 import 'package:donation/utils/Colors.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:donation/src/features/donation_member/domain/member_repository.dart';
+import 'package:donation/utils/tool_widgets.dart';
+import 'package:donation/utils/utils.dart';
+import 'package:donation/utils/nrc_data.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 // Provider for MemberRepository
 final memberRepositoryProvider = Provider<MemberRepository>((ref) {
@@ -941,58 +945,12 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
     "O (Rh -)",
   ];
 
-  // NRC related lists
-  List<String> nrc_initial_options = [
-    "၁",
-    "၂",
-    "၃",
-    "၄",
-    "၅",
-    "၆",
-    "၇",
-    "၈",
-    "၉",
-    "၁၀",
-    "၁၁",
-    "၁၂",
-    "၁၃",
-    "၁၄"
-  ];
+  // Use NRC data from utility
+  List<String> nrc_initial_options = NrcData.nrc_initial_options;
+  List<String> nrc_type_options = NrcData.nrc_type_options;
 
-  List<String> nrc_type_options = ["နိုင်", "ဧည့်", "ပြု", "သ"];
-
-  // Yangon townships (just a sample for demo - in real app you'd have all townships)
-  List<String> yangon_townships = [
-    "လမန",
-    "မလမ",
-    "သကန",
-    "တကန",
-    "ကမရ",
-    "လသန",
-    "သဃန",
-    "မရန",
-    "ဒဂန",
-    "ဒဂမ"
-  ];
-
-  // Other state and township mappings would be defined here...
-  Map<String, List<String>> townshipMap = {
-    "၁၀": [
-      "လမန",
-      "မလမ",
-      "သကန",
-      "တကန",
-      "ကမရ",
-      "လသန",
-      "သဃန",
-      "မရန",
-      "ဒဂန",
-      "ဒဂမ"
-    ], // Yangon sample
-    "၉": ["မကန", "မကတ", "မလန"], // Mandalay sample
-    "၅": ["မရန", "ကပတ"], // Sagaing sample
-    // Other states would be included here
-  };
+  // Map of state codes to township lists
+  Map<String, List<String>> townshipMap = NrcData.commonTownshipMap;
 
   // Add nameChecked variable
   bool nameChecked = false;
@@ -1261,11 +1219,24 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                             Padding(
                               padding:
                                   const EdgeInsets.only(left: 8.0, bottom: 8.0),
-                              child: Text(
-                                "နိုင်ငံသားစီစစ်ရေးကတ်ပြားအမှတ်",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Color.fromARGB(255, 116, 112, 112)),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "နိုင်ငံသားစီစစ်ရေးကတ်ပြားအမှတ်",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color:
+                                            Color.fromARGB(255, 116, 112, 112)),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    "(ဖြည့်စွက်ရန် မလိုအပ်ပါ)",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.grey[600]),
+                                  ),
+                                ],
                               ),
                             ),
                             Row(
@@ -1733,7 +1704,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
 
   // Helper methods to create dropdown items
   List<DropdownMenuItem<String>> getNrcInitialDropdownItems() {
-    return nrc_initial_options.map((String item) {
+    return NrcData.nrc_initial_options.map((String item) {
       return DropdownMenuItem<String>(
         value: item,
         child: Text(item),
@@ -1742,7 +1713,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
   }
 
   List<DropdownMenuItem<String>> getNrcTypeDropdownItems() {
-    return nrc_type_options.map((String item) {
+    return NrcData.nrc_type_options.map((String item) {
       return DropdownMenuItem<String>(
         value: item,
         child: Text(item),
@@ -1752,7 +1723,11 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
 
   List<DropdownMenuItem<String>> getNrcRegionStateDropdownItems(
       String stateCode) {
-    List<String> townshipList = townshipMap[stateCode] ?? yangon_townships;
+    // Get the township list from the NrcData utility if available, otherwise fall back to common township map
+    List<String> townshipList = NrcData.stateToTownshipMap[stateCode] ??
+        NrcData.commonTownshipMap[stateCode] ??
+        NrcData.mon; // Default to Mon townships
+
     return townshipList.map((String item) {
       return DropdownMenuItem<String>(
         value: item,
@@ -1763,11 +1738,12 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
 
   // Get complete NRC string
   String _getCompleteNrc() {
-    if (nrcValue == 0) {
-      return "$nrc_initial_options_Value/$nrc_region_state_options_Value($nrc_type_options_Value)${nrcController.text}";
-    } else {
-      return "MME-${nrcController.text}";
-    }
+    return NrcData.getCompleteNrc(
+        nrcValue,
+        nrc_initial_options_Value ?? "",
+        nrc_region_state_options_Value ?? "",
+        nrc_type_options_Value ?? "",
+        nrcController.text);
   }
 
   // Update the _checkExistingMember method to check by name, father name, and blood type
@@ -2173,11 +2149,10 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
     // Validate required fields
     if (nameController.text.isEmpty ||
         fatherNameController.text.isEmpty ||
-        phoneController.text.isEmpty ||
-        nrcController.text.isEmpty) {
+        phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ'),
+          content: Text('အမည်, အဖအမည်, နှင့် ဖုန်းနံပါတ် ဖြည့်သွင်းပေးပါ'),
           backgroundColor: Colors.red,
         ),
       );

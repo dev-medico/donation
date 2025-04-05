@@ -35,12 +35,12 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
 
   final List<String> bloodTypes = [
     'A (Rh +)',
-    'A (Rh -)',
     'B (Rh +)',
-    'B (Rh -)',
     'AB (Rh +)',
-    'AB (Rh -)',
     'O (Rh +)',
+    'A (Rh -)',
+    'B (Rh -)',
+    'AB (Rh -)',
     'O (Rh -)',
   ];
 
@@ -177,212 +177,215 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Display member ID (non-editable)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "အဖွဲ့ဝင်အမှတ်",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.member.memberId ?? 'N/A',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Name
-                    TextFormField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: "အမည်",
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'အမည်ဖြည့်ရန် လိုအပ်ပါသည်';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Father's Name
-                    TextFormField(
-                      controller: fatherNameController,
-                      decoration: const InputDecoration(
-                        labelText: "အဖအမည်",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Birth Date
-                    GestureDetector(
-                      onTap: () => _selectDate(context),
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          controller: birthDateController,
-                          decoration: InputDecoration(
-                            labelText: "မွေးသက္ကရာဇ်",
-                            border: const OutlineInputBorder(),
-                            suffixIcon:
-                                Icon(Icons.calendar_today, color: primaryColor),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // NRC
-                    TextFormField(
-                      controller: nrcController,
-                      decoration: const InputDecoration(
-                        labelText: "နိုင်ငံသားစီစစ်ရေး အမှတ်",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Phone
-                    TextFormField(
-                      controller: phoneController,
-                      decoration: const InputDecoration(
-                        labelText: "ဖုန်းနံပါတ်",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Blood Bank Card
-                    TextFormField(
-                      controller: bloodBankController,
-                      decoration: const InputDecoration(
-                        labelText: "သွေးဘဏ်ကတ်နံပါတ်",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Blood Type Dropdown
-                    DropdownButtonFormField<String>(
-                      value: selectedBloodType,
-                      decoration: const InputDecoration(
-                        labelText: "သွေးအုပ်စု",
-                        border: OutlineInputBorder(),
-                      ),
-                      items: bloodTypes.map((String bloodType) {
-                        return DropdownMenuItem<String>(
-                          value: bloodType,
-                          child: Text(bloodType),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedBloodType = newValue;
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Gender Dropdown
-                    DropdownButtonFormField<String>(
-                      value: selectedGender,
-                      decoration: const InputDecoration(
-                        labelText: "လိင်အမျိုးအစား",
-                        border: OutlineInputBorder(),
-                      ),
-                      items: genders.map((String gender) {
-                        return DropdownMenuItem<String>(
-                          value: gender,
-                          child: Text(gender == 'male' ? 'ကျား' : 'မ'),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedGender = newValue;
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Address
-                    TextFormField(
-                      controller: addressController,
-                      maxLines: 3,
-                      decoration: const InputDecoration(
-                        labelText: "နေရပ်လိပ်စာ",
-                        border: OutlineInputBorder(),
-                        alignLabelWithHint: true,
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Error message
-                    if (_errorMessage != null)
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Display member ID (non-editable)
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.red.shade100,
+                          color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          _errorMessage!,
-                          style: TextStyle(color: Colors.red.shade900),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "အဖွဲ့ဝင်အမှတ်",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              widget.member.memberId ?? 'N/A',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 20),
 
-                    // Submit button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _updateMember,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
+                      // Name
+                      TextFormField(
+                        controller: nameController,
+                        decoration: const InputDecoration(
+                          labelText: "အမည်",
+                          border: OutlineInputBorder(),
                         ),
-                        child: const Text(
-                          "သိမ်းဆည်းမည်",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'အမည်ဖြည့်ရန် လိုအပ်ပါသည်';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Father's Name
+                      TextFormField(
+                        controller: fatherNameController,
+                        decoration: const InputDecoration(
+                          labelText: "အဖအမည်",
+                          border: OutlineInputBorder(),
                         ),
                       ),
-                    ),
-                  ],
+
+                      const SizedBox(height: 16),
+
+                      // Birth Date
+                      GestureDetector(
+                        onTap: () => _selectDate(context),
+                        child: AbsorbPointer(
+                          child: TextFormField(
+                            controller: birthDateController,
+                            decoration: InputDecoration(
+                              labelText: "မွေးသက္ကရာဇ်",
+                              border: const OutlineInputBorder(),
+                              suffixIcon: Icon(Icons.calendar_today,
+                                  color: primaryColor),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // NRC
+                      TextFormField(
+                        controller: nrcController,
+                        decoration: const InputDecoration(
+                          labelText: "နိုင်ငံသားစီစစ်ရေး အမှတ်",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Phone
+                      TextFormField(
+                        controller: phoneController,
+                        decoration: const InputDecoration(
+                          labelText: "ဖုန်းနံပါတ်",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Blood Bank Card
+                      TextFormField(
+                        controller: bloodBankController,
+                        decoration: const InputDecoration(
+                          labelText: "သွေးဘဏ်ကတ်နံပါတ်",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Blood Type Dropdown
+                      DropdownButtonFormField<String>(
+                        value: selectedBloodType,
+                        decoration: const InputDecoration(
+                          labelText: "သွေးအုပ်စု",
+                          border: OutlineInputBorder(),
+                        ),
+                        items: bloodTypes.map((String bloodType) {
+                          return DropdownMenuItem<String>(
+                            value: bloodType,
+                            child: Text(bloodType),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedBloodType = newValue;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Gender Dropdown
+                      DropdownButtonFormField<String>(
+                        value: selectedGender,
+                        decoration: const InputDecoration(
+                          labelText: "လိင်အမျိုးအစား",
+                          border: OutlineInputBorder(),
+                        ),
+                        items: genders.map((String gender) {
+                          return DropdownMenuItem<String>(
+                            value: gender,
+                            child: Text(gender == 'male' ? 'ကျား' : 'မ'),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedGender = newValue;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Address
+                      TextFormField(
+                        controller: addressController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          labelText: "နေရပ်လိပ်စာ",
+                          border: OutlineInputBorder(),
+                          alignLabelWithHint: true,
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Error message
+                      if (_errorMessage != null)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(color: Colors.red.shade900),
+                          ),
+                        ),
+
+                      const SizedBox(height: 16),
+
+                      // Submit button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _updateMember,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                          ),
+                          child: const Text(
+                            "သိမ်းဆည်းမည်",
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
