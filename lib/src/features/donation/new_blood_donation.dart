@@ -341,12 +341,15 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
         isLoading = false;
       });
 
-      // Show success message and then navigate back
-      Utils.messageSuccessDialog(
-          "သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
-          context,
-          "အိုကေ",
-          Colors.black);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nအောင်မြင်ပါသည်။",
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
 
       // Pop back to previous screen after successful creation
       Navigator.of(context).pop();

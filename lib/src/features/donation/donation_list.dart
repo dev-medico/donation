@@ -507,13 +507,13 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                     style: TextStyle(color: Colors.white),
                   ))),
           GridColumn(
-              columnName: 'လူနာအမည်',
+              columnName: 'လူနာ',
               label: Container(
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
                   child: const Text(
-                    'လူနာအမည်',
+                    'လူနာ',
                     style: TextStyle(color: Colors.white),
                   ))),
           GridColumn(

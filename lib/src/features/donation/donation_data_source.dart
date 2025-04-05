@@ -97,7 +97,7 @@ class DonationDataSource extends DataGridSource {
                 ? "                                "
                 : "        ${e.hospital}        "),
         DataGridCell<String>(
-            columnName: 'လူနာအမည်',
+            columnName: 'လူနာ',
             value: e.patientName == null || e.patientName!.isEmpty
                 ? "                 "
                 : e.patientName.toString()),

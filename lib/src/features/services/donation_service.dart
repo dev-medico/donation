@@ -192,9 +192,10 @@ class DonationService extends BaseService {
     _updateLoadingStatus('Updating donation...');
 
     try {
-      final response = await apiClient.put(
-        '$_basePath/$id',
+      final response = await apiClient.post(
+        '$_basePath/update',
         data: data,
+        queryParameters: {'id': id},
         options: {'headers': headers},
       );
 

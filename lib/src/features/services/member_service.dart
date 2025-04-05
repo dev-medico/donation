@@ -164,7 +164,7 @@ class MemberService extends BaseService {
     _updateLoadingStatus('Updating member...');
 
     try {
-      final response = await apiClient.put(
+      final response = await apiClient.post(
         '$_basePath/update',
         queryParameters: {'id': id},
         data: data,
