@@ -4,11 +4,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // Provider for fetching special events list
 final specialEventsProvider = FutureProvider.family<List<dynamic>, int>((ref, page) async {
   final service = ref.read(specialEventServiceProvider);
-  
+
   try {
     final events = await service.getSpecialEvents(
       page: page,
-      limit: 50,
+      limit: 1000,
     );
     return events;
   } catch (e) {
@@ -20,7 +20,7 @@ final specialEventsProvider = FutureProvider.family<List<dynamic>, int>((ref, pa
 // Provider for a single special event
 final specialEventProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, id) async {
   final service = ref.read(specialEventServiceProvider);
-  
+
   try {
     final event = await service.getSpecialEventById(id);
     return event;
@@ -33,7 +33,7 @@ final specialEventProvider = FutureProvider.family<Map<String, dynamic>, String>
 // Provider for searching special events
 final specialEventSearchProvider = FutureProvider.family<List<dynamic>, String>((ref, query) async {
   final service = ref.read(specialEventServiceProvider);
-  
+
   try {
     final events = await service.getSpecialEvents(
       page: 0,
@@ -59,7 +59,7 @@ class SpecialEventFormState {
   final String vdrlTest;
   final String labName;
   final String total;
-  
+
   SpecialEventFormState({
     this.id,
     required this.date,
@@ -72,7 +72,7 @@ class SpecialEventFormState {
     required this.labName,
     required this.total,
   });
-  
+
   Map<String, dynamic> toJson() {
     return {
       'date': date.toIso8601String().split('T')[0],
@@ -86,7 +86,7 @@ class SpecialEventFormState {
       'total': total,
     };
   }
-  
+
   factory SpecialEventFormState.fromJson(Map<String, dynamic> json) {
     return SpecialEventFormState(
       id: json['id']?.toString(),
@@ -106,7 +106,7 @@ class SpecialEventFormState {
 // Provider for creating special event
 final createSpecialEventProvider = FutureProvider.family<Map<String, dynamic>, SpecialEventFormState>((ref, formState) async {
   final service = ref.read(specialEventServiceProvider);
-  
+
   try {
     final result = await service.createSpecialEvent(formState.toJson());
     // Invalidate the list to refresh
@@ -121,11 +121,11 @@ final createSpecialEventProvider = FutureProvider.family<Map<String, dynamic>, S
 // Provider for updating special event
 final updateSpecialEventProvider = FutureProvider.family<Map<String, dynamic>, SpecialEventFormState>((ref, formState) async {
   final service = ref.read(specialEventServiceProvider);
-  
+
   if (formState.id == null) {
     throw Exception('Event ID is required for update');
   }
-  
+
   try {
     final result = await service.updateSpecialEvent(formState.id!, formState.toJson());
     // Invalidate the list and single event to refresh
@@ -141,7 +141,7 @@ final updateSpecialEventProvider = FutureProvider.family<Map<String, dynamic>, S
 // Provider for deleting special event
 final deleteSpecialEventProvider = FutureProvider.family<void, String>((ref, id) async {
   final service = ref.read(specialEventServiceProvider);
-  
+
   try {
     await service.deleteSpecialEvent(id);
     // Invalidate the list to refresh

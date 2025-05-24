@@ -3,6 +3,7 @@ import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donar/donar_list_new.dart';
+import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donar/yearly_report_screen.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
@@ -36,7 +37,6 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'သွေးလှူမှု မှတ်တမ်း',
     'ထူးခြားဖြစ်စဥ်',
     'ရ/သုံး ငွေစာရင်း',
-    'ပို့စ်/အသိပေးချက်များ',
     'Log Out(V 1.3.8)'
   ];
   List<String> icons = [
@@ -46,7 +46,6 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'assets/images/donations.png',
     'assets/images/special_case.png',
     'assets/images/finance.png',
-    'assets/images/post.png',
     'assets/images/settings.png',
   ];
 
@@ -61,7 +60,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
       MemberListScreen(), // Member List
       const DonationListScreen(), // Donation List
       const SpecialEventListScreen(), // Special Events
-      const YearlyReportScreen(), // Finance
+      const DonarListScreen(), // Finance - Donar List with tabs
       Container(), // Posts/Notifications
     ];
   }

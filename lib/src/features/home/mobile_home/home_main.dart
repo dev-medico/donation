@@ -2,6 +2,7 @@ import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/dashboard/dashboard.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donar/donar_list_new.dart';
+import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donar/yearly_report_screen.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
@@ -61,8 +62,10 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
       fromHome: true,
     ),
 
-    // Yearly Report
-    YearlyReportScreen(),
+    // Donar List with tabs
+    DonarListScreen(
+      fromHome: true,
+    ),
   ];
 
   @override

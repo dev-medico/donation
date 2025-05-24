@@ -29,7 +29,7 @@ class RequestGiveService extends BaseService {
 
     try {
       final response = await apiClient.get(
-        _basePath,
+        '$_basePath/index',
         options: {'headers': headers},
         queryParameters: {
           'page': page,
@@ -40,7 +40,7 @@ class RequestGiveService extends BaseService {
 
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
-        if (response.data != null && response.data!['data'] != null) {
+        if (response.data != null && response.data!['status'] == 'ok' && response.data!['data'] != null) {
           return response.data!['data'] as List<dynamic>;
         }
         return [];
@@ -59,13 +59,14 @@ class RequestGiveService extends BaseService {
 
     try {
       final response = await apiClient.get(
-        '$_basePath/view/$id',
+        '$_basePath/view',
         options: {'headers': headers},
+        queryParameters: {'id': id},
       );
 
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
-        if (response.data != null && response.data!['data'] != null) {
+        if (response.data != null && response.data!['status'] == 'ok' && response.data!['data'] != null) {
           return response.data!['data'] as Map<String, dynamic>;
         }
         throw Exception('Invalid response format');
@@ -91,7 +92,9 @@ class RequestGiveService extends BaseService {
 
       _updateLoadingStatus('Request give created successfully!');
       if (response.statusCode == 201 || response.statusCode == 200) {
-        return response.data!['data'] as Map<String, dynamic>;
+        if (response.data != null && response.data!['status'] == 'ok') {
+          return response.data!['data'] as Map<String, dynamic>;
+        }
       }
       throw Exception('Failed to create request give');
     } catch (e) {
@@ -108,14 +111,17 @@ class RequestGiveService extends BaseService {
 
     try {
       final response = await apiClient.post(
-        '$_basePath/update/$id',
+        '$_basePath/update',
         data: data,
         options: {'headers': headers},
+        queryParameters: {'id': id},
       );
 
       _updateLoadingStatus('Request give updated successfully!');
       if (response.statusCode == 200) {
-        return response.data!['data'] as Map<String, dynamic>;
+        if (response.data != null && response.data!['status'] == 'ok') {
+          return response.data!['data'] as Map<String, dynamic>;
+        }
       }
       throw Exception('Failed to update request give');
     } catch (e) {
@@ -131,8 +137,9 @@ class RequestGiveService extends BaseService {
 
     try {
       final response = await apiClient.post(
-        '$_basePath/delete/$id',
+        '$_basePath/delete',
         options: {'headers': headers},
+        queryParameters: {'id': id},
       );
 
       _updateLoadingStatus('Request give deleted successfully!');

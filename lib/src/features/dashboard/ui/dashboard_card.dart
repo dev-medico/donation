@@ -1,22 +1,19 @@
-import 'package:donation/src/features/donar/donar_list_new.dart';
-import 'package:donation/src/features/donar/yearly_report_screen.dart';
+import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
-import 'package:donation/src/features/patient/patient_list.dart';
+import 'package:donation/src/features/finder/request_give_list_screen.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../donar/donar_list.dart';
-
 class DashboardCard extends ConsumerWidget {
-  int index;
-  Color color;
-  String title;
-  String subtitle;
-  String amount;
-  Color amountColor;
+  final int index;
+  final Color color;
+  final String title;
+  final String subtitle;
+  final String amount;
+  final Color amountColor;
 
   DashboardCard({
     Key? key,
@@ -59,8 +56,16 @@ class DashboardCard extends ConsumerWidget {
                 // Navigate to special events
                 await Navigator.pushNamed(context, SpecialEventListScreen.routeName);
               } else if (index == 3) {
-                // Navigate to yearly report for finance
-                await Navigator.pushNamed(context, YearlyReportScreen.routeName);
+                // Navigate to donar list for finance
+                await Navigator.pushNamed(context, DonarListScreen.routeName);
+              } else if (index == 4) {
+                // Navigate to request give list
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RequestGiveListScreen(),
+                  ),
+                );
               }
             },
             child: Padding(
