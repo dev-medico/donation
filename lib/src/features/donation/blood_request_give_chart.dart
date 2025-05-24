@@ -127,9 +127,9 @@ class _BloodRequestGiveChartScreenState
           ),
         ),
       ),
-            // Add button overlay - smaller
+            // Add button overlay - smaller with top padding
             Positioned(
-              top: 6,
+              top: 12,
               right: 6,
               child: Container(
                 padding: const EdgeInsets.all(4),

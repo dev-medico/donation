@@ -12,6 +12,7 @@ dependencies:
   animated_text_kit: ^4.2.2
   animated_widgets: ^1.1.0
   cached_network_image: ^3.3.0
+  custom_lint: ^0.7.5
   desktop_window: ^0.4.0
   # dio: ^5.3.3 - Removed due to web compatibility issues
   dotted_line: ^3.2.2
@@ -76,7 +77,6 @@ dev_dependencies:
   json_serializable: ^6.7.1
   build_runner: ^2.4.6
   msix: ^3.12.2
-  custom_lint: ^0.6.8
   riverpod_generator: ^2.2.3
 
 flutter:
