@@ -26,22 +26,22 @@ class DonationYearlyReport extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [primaryColor, primaryDark],
-        ))),
-        centerTitle: true,
-        title: const Padding(
-          padding: EdgeInsets.only(top: 4),
-          child: Text("ရ/သုံး ငွေစာရင်း",
-              textScaleFactor: 1.0,
-              style: TextStyle(fontSize: 15, color: Colors.white)),
-        ),
-      ),
+      // appBar: AppBar(
+      //   flexibleSpace: Container(
+      //       decoration: BoxDecoration(
+      //           gradient: LinearGradient(
+      //     begin: Alignment.centerLeft,
+      //     end: Alignment.centerRight,
+      //     colors: [primaryColor, primaryDark],
+      //   ))),
+      //   centerTitle: true,
+      //   title: const Padding(
+      //     padding: EdgeInsets.only(top: 4),
+      //     child: Text("ရ/သုံး ငွေစာရင်း",
+      //         textScaleFactor: 1.0,
+      //         style: TextStyle(fontSize: 15, color: Colors.white)),
+      //   ),
+      // ),
       body: Container(
         decoration: shadowDecoration(Colors.white),
         padding: const EdgeInsets.only(left: 8, right: 8, bottom: 20, top: 12),

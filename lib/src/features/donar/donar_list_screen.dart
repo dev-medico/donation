@@ -220,21 +220,23 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                                 setState(() {
                                   isLoading = true;
                                 });
-                                
+
                                 try {
-                                  final selectedYear = int.parse(years[_yearSelected]);
-                                  
+                                  final selectedYear =
+                                      int.parse(years[_yearSelected]);
+
                                   // Load yearly report data to get monthly stats
                                   final reportData = await ref.read(
-                                      yearlyReportProvider(selectedYear).future);
-                                  
+                                      yearlyReportProvider(selectedYear)
+                                          .future);
+
                                   // Calculate opening and closing balances
                                   _calculateBalances(reportData);
-                                  
+
                                   // Clear previous month data
                                   donorsByMonth.clear();
                                   expensesByMonth.clear();
-                                  
+
                                   // Load only the current selected month data
                                   await _loadMonthData(_monthSelected + 1);
                                 } catch (e) {
@@ -275,14 +277,14 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                         onTap: () async {
                           _monthSelected = i;
                           final month = i + 1;
-                          
+
                           // Check if data for this month is already loaded
-                          if (!donorsByMonth.containsKey(month) || 
+                          if (!donorsByMonth.containsKey(month) ||
                               !expensesByMonth.containsKey(month)) {
                             setState(() {
                               isLoading = true;
                             });
-                            
+
                             try {
                               await _loadMonthData(month);
                             } catch (e) {
@@ -346,7 +348,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.black.withOpacity(0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -355,58 +357,115 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
             child: Column(
               children: [
                 // Month header - Slimmer
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    '${monthsMM[month - 1]}လ',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
-                    ),
-                  ),
-                ),
+                // Container(
+                //   width: double.infinity,
+                //   padding: const EdgeInsets.symmetric(vertical: 8),
+                //   decoration: BoxDecoration(
+                //     color: primaryColor.withOpacity(0.1),
+                //     borderRadius: const BorderRadius.only(
+                //       topLeft: Radius.circular(12),
+                //       topRight: Radius.circular(12),
+                //     ),
+                //   ),
+                //   child: Text(
+                //     '${monthsMM[month - 1]}လ',
+                //     textAlign: TextAlign.center,
+                //     style: TextStyle(
+                //       fontSize: 14,
+                //       fontWeight: FontWeight.bold,
+                //       color: primaryColor,
+                //     ),
+                //   ),
+                // ),
 
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     children: [
-                      // Opening balance - Compact
+                      // Opening and Closing balance in one row - Space efficient
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.account_balance_wallet,
-                                color: Colors.blue[700],
-                                size: 16,
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'စာရင်းဖွင့်',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[700],
-                                ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.account_balance_wallet,
+                                        color: Colors.blue[700],
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'စာရင်းဖွင့်',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.blue[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    '${Utils.strToMM(openingBalance.toString())}',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue[700],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                          Text(
-                            '${Utils.strToMM(openingBalance.toString())} ကျပ်',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue[700],
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.account_balance,
+                                        color: primaryColor,
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'စာရင်းပိတ်',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: primaryColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    '${Utils.strToMM(closingBalance.toString())}',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -502,49 +561,6 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                           ),
                         ],
                       ),
-
-                      const SizedBox(height: 10),
-
-                      // Closing balance - Compact
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.account_balance,
-                                  color: primaryColor,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 6),
-                                const Text(
-                                  'စာရင်းပိတ်',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              '${Utils.strToMM(closingBalance.toString())} ကျပ်',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -552,141 +568,44 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
             ),
           ),
 
-          // Tab bar for donors and expenses
+          // Side by side tables for donors and expenses (responsive)
           Expanded(
-            child: DefaultTabController(
-              length: 2,
-              child: Column(
-                children: [
-                  Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: TabBar(
-                      indicator: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      indicatorPadding: EdgeInsets.zero,
-                      labelPadding: const EdgeInsets.symmetric(horizontal: 20),
-                      labelColor: primaryColor,
-                      unselectedLabelColor: Colors.grey[600],
-                      labelStyle: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      unselectedLabelStyle: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.normal,
-                      ),
-                      tabs: [
-                        Tab(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Icon(
-                                  Icons.volunteer_activism,
-                                  size: 18,
-                                  color: Colors.green[700],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text('အလှူရှင်'),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${donors.length}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green[700],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Tab(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Icon(
-                                  Icons.receipt_long,
-                                  size: 18,
-                                  color: Colors.red[700],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text('အသုံးစရိတ်'),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${expenses.length}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red[700],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: TabBarView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Responsive.isMobile(context)
+                  ? Column(
                       children: [
-                        _buildDonorsList(donors, month),
-                        _buildExpensesList(expenses, month),
+                        // Donors table (mobile - top half)
+                        Expanded(
+                          child:
+                              _buildDonarSection(donors, month, Colors.green),
+                        ),
+                        const SizedBox(height: 16),
+                        // Expenses table (mobile - bottom half)
+                        Expanded(
+                          child:
+                              _buildExpenseSection(expenses, month, Colors.red),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Donors table (desktop - left half)
+                        Expanded(
+                          child:
+                              _buildDonarSection(donors, month, Colors.green),
+                        ),
+
+                        const SizedBox(width: 16),
+
+                        // Expenses table (desktop - right half)
+                        Expanded(
+                          child:
+                              _buildExpenseSection(expenses, month, Colors.red),
+                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
             ),
           ),
         ],
@@ -696,28 +615,40 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
 
   Widget _buildDonorsList(List<dynamic> donors, int month) {
     if (donors.isEmpty) {
-      return const Center(
-        child: Text('ဤလအတွက် အလှူရှင်မှတ်တမ်း မရှိသေးပါ'),
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+          ),
+          border: Border.all(color: Colors.green.withOpacity(0.2)),
+        ),
+        child: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('ဤလအတွက် အလှူရှင်မှတ်တမ်း မရှိသေးပါ'),
+          ),
+        ),
       );
     }
 
     final dataSource = DonarDataSource(donarData: donors);
 
     return Container(
-      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
+        border: Border.all(color: Colors.green.withOpacity(0.2)),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
         child: SfDataGrid(
           source: dataSource,
           onCellTap: (details) {
@@ -782,28 +713,40 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
 
   Widget _buildExpensesList(List<dynamic> expenses, int month) {
     if (expenses.isEmpty) {
-      return const Center(
-        child: Text('ဤလအတွက် အသုံးစရိတ်မှတ်တမ်း မရှိသေးပါ'),
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+          ),
+          border: Border.all(color: Colors.red.withOpacity(0.2)),
+        ),
+        child: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('ဤလအတွက် အသုံးစရိတ်မှတ်တမ်း မရှိသေးပါ'),
+          ),
+        ),
       );
     }
 
     final dataSource = ExpenseDataSource(expenseData: expenses);
 
     return Container(
-      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
+        border: Border.all(color: Colors.red.withOpacity(0.2)),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
         child: SfDataGrid(
           source: dataSource,
           onCellTap: (details) {
@@ -868,6 +811,136 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
 
   int _calculateTotal(List<dynamic> items, String field) {
     return items.fold(0, (sum, item) => sum + (item[field] as int? ?? 0));
+  }
+
+  Widget _buildDonarSection(
+      List<dynamic> donors, int month, MaterialColor color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Donors header
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  Icons.volunteer_activism,
+                  size: 18,
+                  color: color[700],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'အလှူရှင်',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: color[700],
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${donors.length}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: color[700],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Donors table content
+        Expanded(
+          child: _buildDonorsList(donors, month),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExpenseSection(
+      List<dynamic> expenses, int month, MaterialColor color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Expenses header
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  Icons.receipt_long,
+                  size: 18,
+                  color: color[700],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'အသုံးစရိတ်',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: color[700],
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${expenses.length}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: color[700],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Expenses table content
+        Expanded(
+          child: _buildExpensesList(expenses, month),
+        ),
+      ],
+    );
   }
 
   void _showYearlyReport() {
