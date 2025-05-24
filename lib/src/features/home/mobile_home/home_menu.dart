@@ -24,6 +24,8 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'သွေးလှူရှင် ရှာမည်',
     'အဖွဲ့ဝင် စာရင်း',
     'သွေးလှူမှု မှတ်တမ်း',
+    'ထူးခြားဖြစ်စဉ်',
+    'ရ/သုံး ငွေစာရင်း',
     'ထွက်မည်'
   ];
   List<String> icons = [
@@ -31,6 +33,8 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'assets/images/search_list.png',
     'assets/images/members.png',
     'assets/images/donations.png',
+    'assets/images/special_case.png',
+    'assets/images/finance.png',
     'assets/images/log_out.png',
   ];
 
@@ -139,7 +143,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
             ref.watch(drawerControllerProvider)!.toggle!.call();
 
             // Handle log out separately
-            if (index == 4) {
+            if (index == 6) {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.remove('token');
               prefs.remove('name');

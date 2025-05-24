@@ -1,7 +1,9 @@
 import 'package:donation/src/features/donar/donar_list_new.dart';
+import 'package:donation/src/features/donar/yearly_report_screen.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/patient/patient_list.dart';
+import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -49,24 +51,17 @@ class DashboardCard extends ConsumerWidget {
             borderRadius:
                 BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16),
             onTap: () async {
-              // Todo
-              // if (index == 0) {
-              //   // ref.watch(membersProvider).forEach((element) {
-              //   //   ref.watch(realmProvider)!.deleteMember(element);
-              //   // });
-              //   // await Navigator.pushNamed(
-              //   //     context, MemberListBackupScreen.routeName);
-              //   await Navigator.pushNamed(context, MemberListScreen.routeName);
-              // } else if (index == 1) {
-              //   // ref.watch(donationsProvider).forEach((element) {
-              //   //   ref.watch(realmProvider)!.deleteDonation(element);
-              //   // });
-              //   await Navigator.pushNamed(context, DonationListScreen.routeName);
-              // } else if (index == 2) {
-              //   await Navigator.pushNamed(context, PatientList.routeName);
-              // } else if (index == 3) {
-              //   await Navigator.pushNamed(context, DonarListNewScreen.routeName);
-              // }
+              if (index == 0) {
+                await Navigator.pushNamed(context, MemberListScreen.routeName);
+              } else if (index == 1) {
+                await Navigator.pushNamed(context, DonationListScreen.routeName);
+              } else if (index == 2) {
+                // Navigate to special events
+                await Navigator.pushNamed(context, SpecialEventListScreen.routeName);
+              } else if (index == 3) {
+                // Navigate to yearly report for finance
+                await Navigator.pushNamed(context, YearlyReportScreen.routeName);
+              }
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),

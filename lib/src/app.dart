@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donar/donar_list_new.dart';
+import 'package:donation/src/features/donar/yearly_report_screen.dart';
 import 'package:donation/src/features/donation/controller/donation_provider.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
@@ -11,6 +12,7 @@ import 'package:donation/src/features/home/desktop_home.dart';
 import 'package:donation/src/features/home/home.dart';
 import 'package:donation/src/features/patient/patient_list.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
+import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -236,24 +238,25 @@ class _MyAppState extends ConsumerState<MyApp> {
                 return const HomeScreen();
               case DesktopHomeScreen.routeName:
                 return const DesktopHomeScreen();
-              // Todo
-              // case MemberListScreen.routeName:
-              //   return const MemberListScreen();
+              
+              case YearlyReportScreen.routeName:
+                return const YearlyReportScreen();
+                
+              case MemberListScreen.routeName:
+                return const MemberListScreen();
 
+              case DonationListScreen.routeName:
+                return const DonationListScreen();
+                
+              case SpecialEventListScreen.routeName:
+                return const SpecialEventListScreen();
+
+              // Todo - Uncomment when ready
               // case MemberListBackupScreen.routeName:
               //   return const MemberListBackupScreen();
 
-              // case DonationListScreen.routeName:
-              //   return const DonationListScreen();
-
               // case PatientList.routeName:
               //   return const PatientList();
-
-              // case SpecialEventListScreen.routeName:
-              //   return const SpecialEventListScreen();
-
-              // // case EventListScreen.routeName:
-              // //   return EventListScreen();
 
               // case DonarListNewScreen.routeName:
               //   return DonarListNewScreen();

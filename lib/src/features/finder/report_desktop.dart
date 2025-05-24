@@ -345,7 +345,7 @@ class _ReportDesktopScreenState extends ConsumerState<ReportDesktopScreen> {
                   width: Responsive.isMobile(context)
                       ? MediaQuery.of(context).size.width * 0.9
                       : MediaQuery.of(context).size.width * 0.43,
-                 
+
                   child: DonationChartByHospital(
                   ),
                 ),

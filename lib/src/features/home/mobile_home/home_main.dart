@@ -2,6 +2,7 @@ import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/dashboard/dashboard.dart';
 import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donar/donar_list_new.dart';
+import 'package:donation/src/features/donar/yearly_report_screen.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/donation_member/presentation/search_member.dart';
@@ -10,6 +11,7 @@ import 'package:donation/src/features/finder/report_new.dart';
 import 'package:donation/src/features/home/mobile_home/home_menu.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
+import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,6 +31,8 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
     'သွေးလှူရှင် ရှာမည်',
     'အဖွဲ့ဝင် စာရင်း',
     'သွေးလှူမှု မှတ်တမ်း',
+    'ထူးခြားဖြစ်စဉ်',
+    'ရ/သုံး ငွေစာရင်း',
   ];
 
   // List of screens to display when menu items are selected
@@ -51,6 +55,14 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
       child: Text('သွေးလှူမှု မှတ်တမ်း ကြည့်ရှုခြင်း လုပ်ဆောင်နေဆဲ ဖြစ်ပါသည်။',
           style: TextStyle(fontSize: 16)),
     ),
+
+    // Special Events
+    SpecialEventListScreen(
+      fromHome: true,
+    ),
+
+    // Yearly Report
+    YearlyReportScreen(),
   ];
 
   @override
