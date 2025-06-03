@@ -1,4 +1,5 @@
 /// Package imports
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:donation/src/features/finder/common_chart_data.dart';
@@ -22,16 +23,23 @@ class DonationModel {
 final diseaseStatsProvider =
     FutureProvider.autoDispose<List<DonationModel>>((ref) async {
   try {
+    dev.log('BloodDonationPieChart: Fetching disease stats...');
     final reportService = ref.read(reportServiceProvider);
     final stats = await reportService.getDiseaseStats();
-    return stats
+    dev.log('BloodDonationPieChart: Received ${stats.length} stats');
+    
+    final result = stats
         .map((stat) => DonationModel(
-              disease: stat['patient_disease']?.toString() ?? 'Unknown',
-              quantity: (stat['quantity'] as num?)?.toDouble() ?? 0,
+              disease: stat['name']?.toString() ?? stat['patient_disease']?.toString() ?? 'Unknown',
+              quantity: (stat['count'] as num?)?.toDouble() ?? (stat['quantity'] as num?)?.toDouble() ?? 0,
             ))
         .toList()
       ..sort((a, b) => (b.quantity ?? 0).compareTo(a.quantity ?? 0));
+      
+    dev.log('BloodDonationPieChart: Mapped to ${result.length} donation models');
+    return result;
   } catch (e) {
+    dev.log('BloodDonationPieChart: Error = $e');
     throw Exception('Failed to load disease stats: $e');
   }
 });
@@ -71,6 +79,7 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
 
   @override
   Widget build(BuildContext context) {
+    dev.log('BloodDonationPieChart: Building widget');
     final diseaseStats = ref.watch(diseaseStatsProvider);
 
     return Column(

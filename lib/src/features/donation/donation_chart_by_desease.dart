@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
@@ -9,9 +10,16 @@ import 'package:donation/src/features/services/report_service.dart';
 final diseaseStatsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   try {
+    log('Fetching disease stats...');
     final reportService = ref.read(reportServiceProvider);
-    return await reportService.getDiseaseStats();
-  } catch (e) {
+    final result = await reportService.getDiseaseStats();
+    log('Disease stats result: $result');
+    
+    // Return data even if empty (let the UI handle empty state)
+    return result;
+  } catch (e, stack) {
+    log('Error in diseaseStatsProvider: $e');
+    log('Stack trace: $stack');
     throw Exception('Failed to load disease stats: $e');
   }
 });
@@ -37,6 +45,19 @@ class DonationChartByDisease extends ConsumerWidget {
         color: Colors.white,
         child: diseaseStats.when(
           data: (data) {
+            log('Disease chart building with data: ${data.length} items');
+            if (data.isEmpty) {
+              return Center(
+                child: Text(
+                  'မှတ်တမ်း မရှိပါ',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+              );
+            }
+
             // Sort diseases by count (descending)
             data.sort(
                 (a, b) => (b['count'] as int).compareTo(a['count'] as int));
@@ -90,8 +111,8 @@ class DonationChartByDisease extends ConsumerWidget {
                       itemCount: data.length,
                       itemBuilder: (BuildContext context, int index) {
                         final disease = data[index];
-                        final diseaseName = disease['name'] as String;
-                        final count = disease['count'] as int;
+                        final diseaseName = disease['name'] as String? ?? '';
+                        final count = disease['count'] as int? ?? 0;
 
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -157,16 +178,43 @@ class DonationChartByDisease extends ConsumerWidget {
               ),
             );
           },
-          loading: () => Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                error.toString().replaceAll('Exception: ', ''),
-                textAlign: TextAlign.center,
+          loading: () {
+            log('Disease chart loading...');
+            return Center(child: CircularProgressIndicator());
+          },
+          error: (error, stack) {
+            log('Disease chart error: $error');
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    SizedBox(height: 16),
+                    Text(
+                      'ရောဂါအလိုက် မှတ်တမ်း ရယူ၍မရပါ',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      error.toString().replaceAll('Exception: ', ''),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

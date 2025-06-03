@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,10 +21,7 @@ class ApiClient {
       'Content-Type': 'application/json',
     };
 
-    // Log instance creation in debug mode
-    if (kDebugMode) {
-      print('ApiClient initialized with baseUrl: $_baseUrl');
-    }
+    // Logging removed for performance
   }
 
   // Helper method to add auth token to headers
@@ -37,13 +33,6 @@ class ApiClient {
     final token = prefs.getString('token');
     if (token != null) {
       headers['Authorization'] = 'Bearer $token';
-      if (kDebugMode) {
-        print('Using auth token: $token');
-      }
-    } else {
-      if (kDebugMode) {
-        print('No auth token found');
-      }
     }
 
     return headers;
@@ -52,20 +41,21 @@ class ApiClient {
   // Helper for logging requests in debug mode
   void _logRequest(
       String method, String url, Map<String, dynamic>? queryParams) {
-    if (kDebugMode) {
-      print('Making $method request to: $url');
-      if (queryParams != null) {
-        print('Query parameters: $queryParams');
+    // Only log for debugging blood donation report
+    if (url.contains('report')) {
+      print('API Request: $method $url');
+      if (queryParams != null && queryParams.isNotEmpty) {
+        print('Query params: $queryParams');
       }
     }
   }
 
   // Helper for logging responses in debug mode
   void _logResponse(http.Response response) {
-    if (kDebugMode) {
-      print('Received response from: ${response.request?.url}');
-      print('Status code: ${response.statusCode}');
-      print('Response data: ${response.body}');
+    // Only log errors for debugging
+    if (response.statusCode >= 400) {
+      print('API Error: ${response.statusCode} - ${response.request?.url}');
+      print('Response body: ${response.body}');
     }
   }
 
@@ -99,10 +89,6 @@ class ApiClient {
 
       // Handle CORS errors - typically shown in preflight responses
       if (response.statusCode == 0) {
-        if (kDebugMode) {
-          print(
-              'CORS error detected - status code 0. This usually means the server is not allowing cross-origin requests.');
-        }
         throw NetworkException(
             'CORS error: Server is not allowing cross-origin requests. Status code: 0');
       }
@@ -118,31 +104,16 @@ class ApiClient {
         try {
           responseData = jsonDecode(response.body);
         } catch (e) {
-          if (kDebugMode) {
-            print('Failed to parse JSON response: $e');
-          }
           responseData = response.body;
         }
       }
 
       return _convertResponse<T>(response, responseData as T?);
     } on http.ClientException catch (e) {
-      if (kDebugMode) {
-        print('HTTP client exception: $e');
-        if (e.message.contains('XMLHttpRequest error')) {
-          print('Possible CORS issue: XMLHttpRequest error detected');
-        }
-      }
       throw NetworkException('Network error occurred: ${e.message}');
     } on TimeoutException catch (e) {
-      if (kDebugMode) {
-        print('Request timeout: $e');
-      }
       throw e;
     } catch (e) {
-      if (kDebugMode) {
-        print('Unexpected error in $method request: $e');
-      }
       rethrow;
     }
   }

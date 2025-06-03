@@ -58,7 +58,7 @@ class _DonationChartByBloodState extends ConsumerState<DonationChartByBlood> {
         child: bloodStats.when(
           data: (data) {
             final bloodTypeData = Map<String, int>.from(data['data']);
-            final totalDonations = data['totalDonations'] as int;
+            final totalDonations = data['totalDonations'] as int? ?? 0;
 
             return Padding(
               padding: const EdgeInsets.all(16.0),

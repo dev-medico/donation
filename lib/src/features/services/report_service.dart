@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:donation/core/api/api_client.dart';
 import 'package:donation/src/features/services/base_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,15 +12,30 @@ class ReportService extends BaseService {
       final response = await apiClient.get<Map<String, dynamic>>(
         '/report/by-disease',
       );
+      
+      log('Disease stats response: ${response.data}');
 
       if (response.data != null && response.data!['status'] == 'ok') {
         final data = response.data!['data'];
-        return List<Map<String, dynamic>>.from(data);
+        final rawResult = List<Map<String, dynamic>>.from(data);
+        
+        // Map the data to expected format
+        final result = rawResult.map((item) {
+          return {
+            'name': item['patient_disease'] ?? item['name'] ?? '',
+            'count': int.tryParse(item['quantity']?.toString() ?? item['count']?.toString() ?? '0') ?? 0,
+          };
+        }).toList();
+        
+        log('Mapped disease stats: $result');
+        
+        return result;
       } else {
         throw Exception(
-            response.data?['message'] ?? 'Failed to load disease stats');
+            response.data?['message'] ?? 'API returned error status');
       }
     } catch (e) {
+      log('Error in getDiseaseStats: $e');
       throw Exception('Error loading disease stats: $e');
     }
   }
@@ -125,6 +141,65 @@ class ReportService extends BaseService {
       }
     } catch (e) {
       throw Exception('Error loading request/give stats: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getDonationSummary({int? year, int? month}) async {
+    try {
+      final apiClient = ApiClient();
+      
+      // Build query parameters properly using ApiClient's queryParameters feature
+      Map<String, dynamic> queryParams = {};
+      if (year != null) queryParams['year'] = year;
+      if (month != null) queryParams['month'] = month;
+      
+      final response = await apiClient.get<Map<String, dynamic>>(
+        '/report/donation-summary',
+        queryParameters: queryParams,
+      );
+
+      if (response.data != null && response.data!['status'] == 'ok') {
+        final data = response.data!['data'] as Map<String, dynamic>;
+        return data;
+      } else {
+        throw Exception(
+            response.data?['message'] ?? 'Failed to load donation summary');
+      }
+    } catch (e) {
+      throw Exception('Error loading donation summary: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getBloodDonationReport({int? year, int? month}) async {
+    try {
+      final apiClient = ApiClient();
+      
+      // Build query parameters properly using ApiClient's queryParameters feature
+      Map<String, dynamic> queryParams = {};
+      if (year != null) queryParams['year'] = year;
+      if (month != null) queryParams['month'] = month;
+      
+      log('Calling blood donation report API with params: $queryParams');
+      
+      // Use Yii2 action naming convention
+      final response = await apiClient.get<Map<String, dynamic>>(
+        '/report/blood-donation-report',
+        queryParameters: queryParams,
+      );
+      
+      log('Blood donation report API response status: ${response.statusCode}');
+      log('Blood donation report API response data: ${response.data}');
+
+      if (response.data != null && response.data!['status'] == 'ok') {
+        final data = response.data!['data'] as Map<String, dynamic>;
+        return data;
+      } else {
+        throw Exception(
+            response.data?['message'] ?? 'Failed to load blood donation report');
+      }
+    } catch (e) {
+      log('Error in getBloodDonationReport: $e');
+      throw Exception('Error loading blood donation report: $e');
     }
   }
 }

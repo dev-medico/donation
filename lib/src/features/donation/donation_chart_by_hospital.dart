@@ -45,7 +45,7 @@ class _DonationChartByHospitalState
         child: hospitalStats.when(
           data: (data) {
             final hospitalData = Map<String, int>.from(data['data']);
-            final totalDonations = data['totalDonations'] as int;
+            final totalDonations = data['totalDonations'] as int? ?? 0;
             final sortedHospitals = hospitalData.entries.toList()
               ..sort((a, b) => b.value.compareTo(a.value));
 

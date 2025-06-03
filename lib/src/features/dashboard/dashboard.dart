@@ -7,6 +7,7 @@ import 'package:donation/data/response/xata_donation_list_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
 import 'package:donation/src/features/donation/blood_request_give_chart.dart';
+import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
@@ -110,78 +111,76 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
       body: Responsive.isMobile(context)
           ? ListView(
               children: [
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12.0, top: 8),
-                      child: Row(
-                        children: [
-                          DashboardCard(
-                            index: 0,
-                            color: primaryDark,
-                            title: "အဖွဲ့၀င် စာရင်း",
-                            subtitle: "စုစုပေါင်း အရေအတွက်",
-                            amount:
-                                "${Utils.strToMM(totalMember.toString())} ဦး",
-                            amountColor: Colors.black,
-                          ),
-                          DashboardCard(
-                            index: 1,
-                            color: primaryDark,
-                            title: "သွေးလှူမှု မှတ်တမ်း",
-                            subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                            amount:
-                                "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                            amountColor: Colors.blue,
-                          ),
-                        ],
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0, top: 8),
+                  child: Row(
+                    children: [
+                      DashboardCard(
+                        index: 0,
+                        color: primaryDark,
+                        title: "အဖွဲ့၀င် စာရင်း",
+                        subtitle: "စုစုပေါင်း အရေအတွက်",
+                        amount: "${Utils.strToMM(totalMember.toString())} ဦး",
+                        amountColor: Colors.black,
                       ),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 12.0, top: 8, bottom: 12),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              children: [
-                                DashboardCard(
-                                  index: 2,
-                                  color: primaryDark,
-                                  title: "ထူးခြားဖြစ်စဉ်",
-                                  subtitle: "",
-                                  amount: "",
-                                  amountColor: Colors.black,
-                                ),
-                                DashboardCard(
-                                  index: 3,
-                                  color: primaryDark,
-                                  title: "ရ/သုံး ငွေစာရင်း",
-                                  subtitle: "",
-                                  amount: "",
-                                  amountColor: Colors.black,
-                                ),
-                              ],
+                      DashboardCard(
+                        index: 1,
+                        color: primaryDark,
+                        title: "သွေးလှူမှု မှတ်တမ်း",
+                        subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                        amount:
+                            "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                        amountColor: Colors.blue,
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 12.0, top: 8, bottom: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            DashboardCard(
+                              index: 2,
+                              color: primaryDark,
+                              title: "ထူးခြားဖြစ်စဉ်",
+                              subtitle: "",
+                              amount: "",
+                              amountColor: Colors.black,
                             ),
-                          ),
-                          DashboardCard(
-                            index: 4,
-                            color: primaryDark,
-                            title: "သွေးတောင်းခံ/လှူဒါန်းမှု",
-                            subtitle: "အသေးစိတ် ကြည့်မည်",
-                            amount: "",
-                            amountColor: Colors.black,
-                          ),
-                        ],
+                            DashboardCard(
+                              index: 3,
+                              color: primaryDark,
+                              title: "ရ/သုံး ငွေစာရင်း",
+                              subtitle: "",
+                              amount: "",
+                              amountColor: Colors.black,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      DashboardCard(
+                        index: 4,
+                        color: primaryDark,
+                        title: "သွေးတောင်းခံ/လှူဒါန်းမှု",
+                        subtitle: "အသေးစိတ် ကြည့်မည်",
+                        amount: "",
+                        amountColor: Colors.black,
+                      ),
+                    ],
+                  ),
                 ),
                 // Request Give Chart
                 const Padding(
                   padding: EdgeInsets.all(12),
                   child: BloodRequestGiveChartScreen(),
                 ),
+                // Disease Chart
+                BloodDonationPieChart(),
               ],
             )
           : Row(
@@ -255,12 +254,25 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
                     ),
                   ],
                 ),
-                // Request Give Chart for Desktop
-                const Expanded(
+                // Charts column for Desktop
+                Expanded(
                   flex: 1,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 12, right: 20),
-                    child: BloodRequestGiveChartScreen(),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Request Give Chart for Desktop
+                        const Padding(
+                          padding: EdgeInsets.only(top: 12, right: 20),
+                          child: BloodRequestGiveChartScreen(),
+                        ),
+                        // Disease Chart for Desktop
+                        Padding(
+                          padding: EdgeInsets.only(top: 12, right: 20),
+                          child: BloodDonationPieChart(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -337,7 +349,8 @@ class _AddRequestGiveDialogState extends State<_AddRequestGiveDialog> {
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(4),
@@ -453,7 +466,8 @@ class _AddRequestGiveDialogState extends State<_AddRequestGiveDialog> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('သွေးတောင်းခံ/လှူဒါန်းမှု မှတ်တမ်း အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ'),
+          content: Text(
+              'သွေးတောင်းခံ/လှူဒါန်းမှု မှတ်တမ်း အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ'),
           backgroundColor: Colors.green,
         ),
       );
