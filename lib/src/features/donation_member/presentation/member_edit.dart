@@ -114,16 +114,11 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
       await _repository.updateMember(widget.memberId, updatedMember);
 
       if (mounted) {
-        setState(() {
-          _isLoading = false;
+        // Return success result to parent screen
+        Navigator.pop(context, {
+          'success': true,
+          'message': 'အဖွဲ့ဝင်အချက်အလက် အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ'
         });
-
-        // Show success message and return
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('အဖွဲ့ဝင်အချက်အလက် အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ')));
-
-        Navigator.pop(
-            context, true); // Return true to indicate successful update
       }
     } catch (e) {
       if (mounted) {
@@ -132,8 +127,22 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
           _errorMessage = e.toString();
         });
 
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $_errorMessage')));
+        // Show error in dialog instead of SnackBar
+        showDialog(
+          context: context,
+          builder: (BuildContext dialogContext) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: Text('Error: $_errorMessage'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       }
     }
   }

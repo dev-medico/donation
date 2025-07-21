@@ -467,26 +467,31 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     ),
                   ),
                   suggestionsCallback: (pattern) {
+                    if (pattern.isEmpty) {
+                      return [];
+                    }
                     return cachedMembers
                         .where((member) =>
                             member.name != null &&
                             member.name!
                                 .toLowerCase()
                                 .contains(pattern.toLowerCase()))
-                        .take(10)
+                        .take(20) // Increased from 10 to 20 to show more results
                         .toList();
                   },
                   itemBuilder: (context, Member member) {
                     return ListTile(
                       title: Text(member.name ?? ''),
                       subtitle: Text(
-                          '${member.bloodType ?? ''} - ${member.memberId ?? ''}'),
+                          '${member.memberId ?? ''} - ${member.birthDate ?? ''} - ${member.bloodType ?? ''}'),
+                      dense: true,
                     );
                   },
                   onSuggestionSelected: (Member member) {
                     setState(() {
                       selectedMember = member;
-                      memberController.text = member.name ?? '';
+                      // Show name with member ID to differentiate same names
+                      memberController.text = '${member.name ?? ''} (${member.memberId ?? ''})';
                     });
                   },
                 ),
@@ -822,26 +827,31 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     ),
                   ),
                   suggestionsCallback: (pattern) {
+                    if (pattern.isEmpty) {
+                      return [];
+                    }
                     return cachedMembers
                         .where((member) =>
                             member.name != null &&
                             member.name!
                                 .toLowerCase()
                                 .contains(pattern.toLowerCase()))
-                        .take(10)
+                        .take(20) // Increased from 10 to 20 to show more results
                         .toList();
                   },
                   itemBuilder: (context, Member member) {
                     return ListTile(
                       title: Text(member.name ?? ''),
                       subtitle: Text(
-                          '${member.bloodType ?? ''} - ${member.memberId ?? ''}'),
+                          '${member.memberId ?? ''} - ${member.birthDate ?? ''} - ${member.bloodType ?? ''}'),
+                      dense: true,
                     );
                   },
                   onSuggestionSelected: (Member member) {
                     setState(() {
                       selectedMember = member;
-                      memberController.text = member.name ?? '';
+                      // Show name with member ID to differentiate same names
+                      memberController.text = '${member.name ?? ''} (${member.memberId ?? ''})';
                     });
                   },
                 ),

@@ -246,11 +246,22 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                                     ),
                                   ),
                                 ).then((result) {
-                                  if (result == true) {
+                                  if (result != null && result is Map && result['success'] == true) {
+                                    // Refresh member detail
                                     _loadMemberData();
 
-                                    // Reset filters when returning from member edit
-                                    resetFilterProviders(ref);
+                                    // Refresh member list
+                                    ref.read(refreshMembersProvider)().then((_) {
+                                      // Reset filters after refreshing
+                                      resetFilterProviders(ref);
+                                      
+                                      // Show success message
+                                      if (result['message'] != null) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text(result['message'])),
+                                        );
+                                      }
+                                    });
                                   }
                                 });
                               },
