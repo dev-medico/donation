@@ -483,15 +483,14 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     return ListTile(
                       title: Text(member.name ?? ''),
                       subtitle: Text(
-                          '${member.memberId ?? ''} - ${member.birthDate ?? ''} - ${member.bloodType ?? ''}'),
+                          '${member.bloodType ?? ''} - ${member.memberId ?? ''} - ${member.birthDate ?? ''}'),
                       dense: true,
                     );
                   },
                   onSuggestionSelected: (Member member) {
                     setState(() {
                       selectedMember = member;
-                      // Show name with member ID to differentiate same names
-                      memberController.text = '${member.name ?? ''} (${member.memberId ?? ''})';
+                      memberController.text = member.name ?? '';
                     });
                   },
                 ),
@@ -843,15 +842,14 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     return ListTile(
                       title: Text(member.name ?? ''),
                       subtitle: Text(
-                          '${member.memberId ?? ''} - ${member.birthDate ?? ''} - ${member.bloodType ?? ''}'),
+                          '${member.bloodType ?? ''} - ${member.memberId ?? ''} - ${member.birthDate ?? ''}'),
                       dense: true,
                     );
                   },
                   onSuggestionSelected: (Member member) {
                     setState(() {
                       selectedMember = member;
-                      // Show name with member ID to differentiate same names
-                      memberController.text = '${member.name ?? ''} (${member.memberId ?? ''})';
+                      memberController.text = member.name ?? '';
                     });
                   },
                 ),
