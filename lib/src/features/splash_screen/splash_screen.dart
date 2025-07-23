@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animated_widgets/animated_widgets.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
-import 'package:donation/src/features/feed/feed_main.dart';
 import 'package:donation/src/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';

@@ -13,8 +13,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/donation_service.dart';
 
 class DonationDetailScreen extends ConsumerStatefulWidget {
-  Donation data;
-  DonationDetailScreen({
+  final Donation data;
+  const DonationDetailScreen({
     Key? key,
     required this.data,
   }) : super(key: key);
@@ -45,10 +45,8 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
           padding: const EdgeInsets.only(top: 4, right: 20),
           child: Center(
             child: Text("သွေးလှူဒါန်းမှု အချက်အလက်များ",
-                textScaleFactor: 1.0,
-                style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15 : 16,
-                    color: Colors.white)),
+                textScaler: TextScaler.linear(1.0),
+                style: TextStyle(fontSize: 16, color: Colors.white)),
           ),
         ),
       ),

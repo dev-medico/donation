@@ -561,11 +561,6 @@ Future<File> compressFile(File file, String targetPath) async {
   return File(result!.path);
 }
 
-extension on DateTime {
-  String formatDate() {
-    return DateFormat('dd MMM yyyy').format(this);
-  }
-}
 
 extension FormatExtension on DateTime {
   String string(String pattern) {

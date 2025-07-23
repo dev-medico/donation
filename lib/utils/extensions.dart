@@ -14,8 +14,8 @@ extension OnPressed on Widget {
             bottom: 0,
             child: TextButton(
                 style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    shape: MaterialStateProperty.all(
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                    shape: WidgetStateProperty.all(
                       RoundedRectangleBorder(borderRadius: borderRadius),
                     )),
                 onPressed: () {

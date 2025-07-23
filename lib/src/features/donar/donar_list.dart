@@ -242,7 +242,7 @@
 //                               height: 44,
 //                               decoration: shadowDecorationOnlyTop(
 //                                   rangesSelect[index]
-//                                       ? Colors.red.withOpacity(0.6)
+//                                       ? Colors.red.withValues(alpha: 0.6)
 //                                       : const Color(0xffe3e3e3)),
 //                               child: Center(
 //                                   child: Text(

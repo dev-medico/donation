@@ -1,26 +1,16 @@
 import 'dart:convert';
-import 'dart:developer';
 
 // import 'package:donation/realm/realm_services.dart';
 // import 'package:donation/realm/schemas.dart' hide Donation;
-import 'package:donation/src/providers/providers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:donation/data/repository/repository.dart';
-import 'package:donation/data/response/member_response.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
-import 'package:donation/data/response/xata_member_list_response.dart';
-import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
-import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:donation/src/features/donation/models/donation.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/domain/member_repository.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
@@ -28,6 +18,7 @@ import 'package:donation/src/features/donation/providers/donation_providers.dart
 import 'package:donation/src/features/services/member_service.dart'
     as member_services;
 import 'package:donation/src/features/services/donation_service.dart';
+import 'package:donation/responsive.dart';
 
 class NewBloodDonationScreen extends ConsumerStatefulWidget {
   NewBloodDonationScreen({Key? key}) : super(key: key);
@@ -423,7 +414,9 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
+                  width: Responsive.isMobile(context) 
+                      ? double.infinity 
+                      : MediaQuery.of(context).size.width * 0.5,
                   alignment: Alignment.centerLeft,
                   child: isFullForm ? _buildFullForm() : _buildShortForm(),
                 ),

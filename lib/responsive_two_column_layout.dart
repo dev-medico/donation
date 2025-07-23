@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:donation/utils/responsive_utils.dart';
 
+/// Legacy breakpoint class - maintained for backward compatibility
+/// New code should use ResponsiveBreakpoints from responsive_utils.dart
 class Breakpoint {
-  static const double desktop = 900;
-  static const double tablet = 600;
+  static const double desktop = ResponsiveBreakpoints.tablet;
+  static const double tablet = ResponsiveBreakpoints.mobile;
 }
 
 /// Responsive layout that shows two child widgets side by side if there is

@@ -5,10 +5,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/xata_donation_list_response.dart';
 import 'package:donation/responsive.dart';
-import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
+import 'package:donation/src/features/dashboard/ui/responsive_dashboard_card.dart';
 import 'package:donation/src/features/donation/blood_request_give_chart.dart';
 import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
+import 'package:donation/src/features/donation/providers/donation_providers.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -31,6 +33,42 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
   List<DonationRecord> dataList = [];
   List<DonationRecord> data = [];
 
+  @override
+  void initState() {
+    super.initState();
+    // Load data after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadDashboardData();
+    });
+  }
+
+  void _loadDashboardData() async {
+    // Load member count
+    try {
+      final membersAsync = ref.read(memberListProvider);
+      if (membersAsync.hasValue) {
+        setState(() {
+          totalMember = membersAsync.value?.length ?? 0;
+        });
+      }
+    } catch (e) {
+      print('Error loading members: $e');
+    }
+
+    // Load donation count
+    try {
+      // Get current year donations count
+      final currentYear = DateTime.now().year;
+      final donationsAsync =
+          await ref.read(donationsByYearProvider(currentYear).future);
+      setState(() {
+        totalDonation = donationsAsync.length;
+      });
+    } catch (e) {
+      print('Error loading donations: $e');
+    }
+  }
+
   callAPI(String after) {
     if (after.isEmpty) {
       setState(() {
@@ -40,20 +78,18 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
     }
     XataRepository().getDonationsList(after).then((response) {
       setState(() {
-        dataList.addAll(
-            XataDonationListResponse.fromJson(jsonDecode(response.body))
-                .records!);
+        final responseData =
+            XataDonationListResponse.fromJson(jsonDecode(response.body));
+        if (responseData.records != null) {
+          dataList.addAll(responseData.records!);
+        }
       });
 
-      if (XataDonationListResponse.fromJson(jsonDecode(response.body))
-              .meta!
-              .page!
-              .more ??
-          false) {
-        callAPI(XataDonationListResponse.fromJson(jsonDecode(response.body))
-            .meta!
-            .page!
-            .cursor!);
+      final responseData =
+          XataDonationListResponse.fromJson(jsonDecode(response.body));
+      if (responseData.meta?.page?.more == true &&
+          responseData.meta?.page?.cursor != null) {
+        callAPI(responseData.meta!.page!.cursor!);
       } else {
         data = [];
         for (int i = 0; i < dataList.length; i++) {
@@ -62,10 +98,11 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
           String donationYear = DateFormat('yyyy').format(date);
 
           var tempDate = "";
-          if (dataList[i].date!.toString().contains("T")) {
-            tempDate = dataList[i].date!.toString().split("T")[0];
-          } else if (dataList[i].date!.toString().contains(" ")) {
-            tempDate = dataList[i].date!.toString().split(" ")[0];
+          final dateStr = dataList[i].date?.toString() ?? "";
+          if (dateStr.contains("T")) {
+            tempDate = dateStr.split("T")[0];
+          } else if (dateStr.contains(" ")) {
+            tempDate = dateStr.split(" ")[0];
           }
 
           if (tempDate.split("-")[0] == donationYear) {
@@ -85,16 +122,18 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
   @override
   Widget build(BuildContext context) {
     DateTime date = DateTime.now().toLocal();
-    String dateFormat = DateFormat('dd MMM yyyy ( EEEE )').format(date);
+    // String dateFormat = DateFormat('dd MMM yyyy ( EEEE )').format(date);
 
     return Scaffold(
       //backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Padding(
-          padding: EdgeInsets.only(top: 4.0),
-          child: Text("RED Juniors Blood Care Unit",
-              style: TextStyle(fontSize: 17, color: Colors.white)),
-        ),
+        title: Responsive.isMobile(context) 
+            ? null 
+            : const Padding(
+                padding: EdgeInsets.only(top: 4.0),
+                child: Text("RED Juniors Blood Care Unit",
+                    style: TextStyle(fontSize: 17, color: Colors.white)),
+              ),
         centerTitle: true,
         backgroundColor: primaryColor,
         actions: [
@@ -108,82 +147,89 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
           ),
         ],
       ),
-      body: Responsive.isMobile(context)
-          ? ListView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 12.0, top: 8),
-                  child: Row(
-                    children: [
-                      DashboardCard(
-                        index: 0,
-                        color: primaryDark,
-                        title: "အဖွဲ့၀င် စာရင်း",
-                        subtitle: "စုစုပေါင်း အရေအတွက်",
-                        amount: "${Utils.strToMM(totalMember.toString())} ဦး",
-                        amountColor: Colors.black,
-                      ),
-                      DashboardCard(
-                        index: 1,
-                        color: primaryDark,
-                        title: "သွေးလှူမှု မှတ်တမ်း",
-                        subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                        amount:
-                            "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                        amountColor: Colors.blue,
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(left: 12.0, top: 8, bottom: 12),
-                  child: Row(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final bool isMobile = constraints.maxWidth < 600;
+          final bool isTablet =
+              constraints.maxWidth >= 600 && constraints.maxWidth < 1200;
+
+          if (isMobile || isTablet) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Row(
                     children: [
                       Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            DashboardCard(
-                              index: 2,
-                              color: primaryDark,
-                              title: "ထူးခြားဖြစ်စဉ်",
-                              subtitle: "",
-                              amount: "",
-                              amountColor: Colors.black,
-                            ),
-                            DashboardCard(
-                              index: 3,
-                              color: primaryDark,
-                              title: "ရ/သုံး ငွေစာရင်း",
-                              subtitle: "",
-                              amount: "",
-                              amountColor: Colors.black,
-                            ),
-                          ],
+                        child: ResponsiveDashboardCard(
+                          index: 0,
+                          color: primaryDark,
+                          title: "အဖွဲ့၀င်\nစာရင်း",
+                          subtitle: "စုစုပေါင်း",
+                          amount: Utils.strToMM(totalMember.toString()),
+                          amountColor: Colors.black,
                         ),
                       ),
-                      DashboardCard(
-                        index: 4,
-                        color: primaryDark,
-                        title: "သွေးတောင်းခံ/လှူဒါန်းမှု",
-                        subtitle: "အသေးစိတ် ကြည့်မည်",
-                        amount: "",
-                        amountColor: Colors.black,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ResponsiveDashboardCard(
+                          index: 1,
+                          color: primaryDark,
+                          title: "သွေးလှူမှု\nမှတ်တမ်း",
+                          subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                          amount: Utils.strToMM(totalDonation.toString()),
+                          amountColor: Colors.blue,
+                        ),
                       ),
                     ],
                   ),
-                ),
-                // Request Give Chart
-                const Padding(
-                  padding: EdgeInsets.all(12),
-                  child: BloodRequestGiveChartScreen(),
-                ),
-                // Disease Chart
-                BloodDonationPieChart(),
-              ],
-            )
-          : Row(
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ResponsiveDashboardCard(
+                          index: 2,
+                          color: primaryDark,
+                          title: "ထူးခြား\nဖြစ်စဉ်",
+                          subtitle: "စုစုပေါင်း",
+                          amount: Utils.strToMM(totalDonar.toString()),
+                          amountColor: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ResponsiveDashboardCard(
+                          index: 3,
+                          color: primaryDark,
+                          title: "ရ/သုံး\nငွေစာရင်း",
+                          subtitle: "အသေးစိတ်",
+                          amount: finance ? "364995500/32152850" : "",
+                          amountColor: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ResponsiveDashboardCard(
+                    index: 4,
+                    color: primaryDark,
+                    title: "သွေးတောင်းခံ/လှူဒါန်းမှု",
+                    subtitle: "အသေးစိတ် ကြည့်မည်",
+                    amount: "",
+                    amountColor: Colors.black,
+                  ),
+                  const SizedBox(height: 16),
+                  // Request Give Chart
+                  const BloodRequestGiveChartScreen(),
+                  const SizedBox(height: 16),
+                  // Disease Chart
+                  BloodDonationPieChart(),
+                ],
+              ),
+            );
+          } else {
+            // Desktop layout
+            return Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -194,26 +240,30 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
                       padding: const EdgeInsets.only(left: 20.0, top: 24),
                       child: Row(
                         children: [
-                          DashboardCard(
-                            index: 0,
-                            color: primaryDark,
-                            title: "အဖွဲ့၀င် စာရင်း",
-                            subtitle: "စုစုပေါင်း အရေအတွက်",
-                            amount:
-                                "${Utils.strToMM(totalMember.toString())} ဦး",
-                            amountColor: Colors.black,
+                          Expanded(
+                            child: ResponsiveDashboardCard(
+                              index: 0,
+                              color: primaryDark,
+                              title: "အဖွဲ့၀င် စာရင်း",
+                              subtitle: "စုစုပေါင်း အရေအတွက်",
+                              amount:
+                                  "${Utils.strToMM(totalMember.toString())} ဦး",
+                              amountColor: Colors.black,
+                            ),
                           ),
                           const SizedBox(
                             width: 12,
                           ),
-                          DashboardCard(
-                            index: 1,
-                            color: primaryDark,
-                            title: "သွေးလှူမှု မှတ်တမ်း",
-                            subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                            amount:
-                                "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                            amountColor: Colors.blue,
+                          Expanded(
+                            child: ResponsiveDashboardCard(
+                              index: 1,
+                              color: primaryDark,
+                              title: "သွေးလှူမှု မှတ်တမ်း",
+                              subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                              amount:
+                                  "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                              amountColor: Colors.blue,
+                            ),
                           ),
                         ],
                       ),
@@ -230,24 +280,28 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
                       padding: const EdgeInsets.only(left: 20.0, bottom: 12),
                       child: Row(
                         children: [
-                          DashboardCard(
-                            index: 2,
-                            color: primaryDark,
-                            title: "ထူးခြားဖြစ်စဉ်",
-                            subtitle: "အသေးစိတ် ကြည့်မည်",
-                            amount: "",
-                            amountColor: Colors.black,
+                          Expanded(
+                            child: ResponsiveDashboardCard(
+                              index: 2,
+                              color: primaryDark,
+                              title: "ထူးခြားဖြစ်စဉ်",
+                              subtitle: "အသေးစိတ် ကြည့်မည်",
+                              amount: "",
+                              amountColor: Colors.black,
+                            ),
                           ),
                           const SizedBox(
                             width: 12,
                           ),
-                          DashboardCard(
-                            index: 3,
-                            color: primaryDark,
-                            title: "ရ/သုံး ငွေစာရင်း",
-                            subtitle: "အသေးစိတ် ကြည့်မည်",
-                            amount: "",
-                            amountColor: Colors.black,
+                          Expanded(
+                            child: ResponsiveDashboardCard(
+                              index: 3,
+                              color: primaryDark,
+                              title: "ရ/သုံး ငွေစာရင်း",
+                              subtitle: "အသေးစိတ် ကြည့်မည်",
+                              amount: "",
+                              amountColor: Colors.black,
+                            ),
                           ),
                         ],
                       ),
@@ -276,7 +330,10 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
                   ),
                 ),
               ],
-            ),
+            );
+          }
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showAddRequestGiveDialog();
@@ -444,7 +501,7 @@ class _AddRequestGiveDialogState extends State<_AddRequestGiveDialog> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_formKey.currentState?.validate() != true) return;
 
     setState(() {
       _isLoading = true;

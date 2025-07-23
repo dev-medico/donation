@@ -4,7 +4,14 @@
       "Bash(ls:*)",
       "Bash(ln:*)",
       "Bash(sudo ln:*)",
-      "Bash(cursor:*)"
+      "Bash(cursor:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(dart fix:*)",
+      "Bash(flutter pub:*)",
+      "Bash(find:*)",
+      "Bash(rm:*)",
+      "Bash(grep:*)",
+      "Bash(dart format:*)"
     ],
     "deny": []
   }

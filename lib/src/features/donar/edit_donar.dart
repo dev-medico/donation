@@ -300,7 +300,7 @@
 //           : MediaQuery.of(context).size.width * 0.3
 // //      ..height = 110
 //       ..backgroundColor =
-//           Colors.white //Colors.black.withOpacity(0.8)//main_theme_color
+//           Colors.white //Colors.black.withValues(alpha: 0.8)//main_theme_color
 //       ..borderRadius = 10.0
 //       ..barrierColor = const Color(0xDD000000)
 //       ..showCallBack = () {

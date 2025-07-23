@@ -46,7 +46,7 @@ class CustomLoader {
   }
 
   buildLoader(BuildContext context, {Color? backgroundColor}) {
-    backgroundColor ??= const Color(0xffa8a8a8).withOpacity(.5);
+    backgroundColor ??= const Color(0xffa8a8a8).withValues(alpha: .5);
     var height = 150.0;
     return CustomScreenLoader(
       height: height,

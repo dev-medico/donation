@@ -91,7 +91,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white.withOpacity(0.5),
+      backgroundColor: Colors.white.withValues(alpha: 0.5),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -102,7 +102,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: Colors.grey.withValues(alpha: 0.2),
                   spreadRadius: 1,
                   blurRadius: 4,
                   offset: const Offset(0, 2),
@@ -165,7 +165,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
           ),
           Divider(
             height: 1,
-            color: Colors.grey.withOpacity(0.6),
+            color: Colors.grey.withValues(alpha: 0.6),
           ),
           const SizedBox(
             height: 16,
@@ -182,7 +182,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
           ),
           Divider(
             height: 1,
-            color: Colors.grey.withOpacity(0.6),
+            color: Colors.grey.withValues(alpha: 0.6),
           ),
           Column(
             children: <Widget>[
@@ -251,7 +251,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        splashColor: Colors.grey.withOpacity(0.1),
+        splashColor: Colors.grey.withValues(alpha: 0.1),
         highlightColor: Colors.transparent,
         onTap: () {
           navigationtoScreen(listData.index!);
@@ -332,7 +332,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                 MediaQuery.of(context).size.width * 0.75 - 64,
                             height: Responsive.isMobile(context) ? 46 : 60,
                             decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.15),
+                              color: Colors.red.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),

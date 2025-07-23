@@ -281,7 +281,7 @@ class MultipleImageView extends StatelessWidget {
                     child: Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         borderRadius: const BorderRadius.only(
                           bottomRight: Radius.circular(20),
                         ),

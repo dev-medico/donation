@@ -53,7 +53,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
           padding: const EdgeInsets.only(top: 4),
           child: Center(
             child: Text("ထူးခြားဖြစ်စဥ်အသစ် ထည့်သွင်းမည်",
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 15 : 16,
                     color: Colors.white)),
@@ -172,7 +172,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                                 padding: EdgeInsets.only(top: 16, bottom: 16),
                                 child: Text(
                                   "ထည့်သွင်းမည်",
-                                  textScaleFactor: 1.0,
+                                  textScaler: TextScaler.linear(1.0),
                                   style: TextStyle(
                                       fontSize: 18.0, color: Colors.white),
                                 ))),
@@ -343,7 +343,7 @@ class _NewEventAddScreenState extends State<NewEventAddScreen> {
                                   padding: EdgeInsets.only(top: 16, bottom: 16),
                                   child: Text(
                                     "ထည့်သွင်းမည်",
-                                    textScaleFactor: 1.0,
+                                    textScaler: TextScaler.linear(1.0),
                                     style: TextStyle(
                                         fontSize: 17, color: Colors.white),
                                   ))),

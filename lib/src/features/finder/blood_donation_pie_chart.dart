@@ -45,7 +45,7 @@ final diseaseStatsProvider =
 });
 
 class BloodDonationPieChart extends ConsumerStatefulWidget {
-  BloodDonationPieChart({
+  const BloodDonationPieChart({
     super.key,
   });
 
@@ -169,6 +169,7 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
           dataSource: dataList,
           enableTooltip: true,
           radius: '80%',
+          animationDuration: 0, // Disable animations to prevent disposal issues
           dataLabelSettings: DataLabelSettings(
               isVisible: true,
               labelIntersectAction: LabelIntersectAction.none,
@@ -190,7 +191,7 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
   }
 
   generateRandomColor() {
-    return Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
+    return Color((Random().nextDouble() * 0xFFFFFF).toInt()).withValues(alpha: 1.0);
   }
 
   @override

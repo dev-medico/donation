@@ -145,9 +145,9 @@ class MenuItemWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 12.0),
       child: TextButton(
-        onPressed: () => callback!(item!.index),
+        onPressed: callback != null && item != null ? () => callback!(item!.index) : null,
         style: TextButton.styleFrom(
-          foregroundColor: selected! ? const Color(0x44000000) : null,
+          foregroundColor: selected == true ? const Color(0x44000000) : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.max,
@@ -155,13 +155,13 @@ class MenuItemWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             SvgPicture.asset(
-              item!.icon,
+              item?.icon ?? 'assets/images/default_icon.png',
               width: 24,
             ),
-            widthBox!,
+            widthBox ?? const SizedBox(width: 8),
             Expanded(
               child: Text(
-                item!.title,
+                item?.title ?? '',
                 style: style,
               ),
             )

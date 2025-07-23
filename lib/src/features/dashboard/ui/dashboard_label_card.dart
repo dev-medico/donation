@@ -65,7 +65,7 @@ class DashBoardLabelCard extends StatelessWidget {
                         children: [
                           SvgPicture.asset(
                             icon,
-                            color: primaryColor,
+                            colorFilter: ColorFilter.mode(primaryColor, BlendMode.srcIn),
                             height: Responsive.isMobile(context) ? 24 : 26,
                           ),
                           Text(

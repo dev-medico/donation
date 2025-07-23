@@ -1,9 +1,7 @@
-import 'package:donation/realm/realm_services.dart';
-import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,7 +33,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'assets/images/donations.png',
     'assets/images/special_case.png',
     'assets/images/finance.png',
-    'assets/images/log_out.png',
+    'assets/images/log_out.svg',
   ];
 
   @override
@@ -50,7 +48,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
         children: [
           // Header with logo and user info
           Container(
-            color: Colors.red.withOpacity(0.05),
+            color: Colors.red.withValues(alpha: 0.05),
             padding: const EdgeInsets.fromLTRB(16, 46, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +61,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 5,
                             spreadRadius: 1)
                       ]),
@@ -77,7 +75,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  userName ?? "User",
+                  userName.isEmpty ? "User" : userName,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -85,7 +83,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  role ?? "Member",
+                  role.isEmpty ? "Member" : role,
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.red.shade700,
@@ -96,7 +94,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
           ),
 
           // Divider
-          Divider(height: 1, color: Colors.grey.withOpacity(0.3)),
+          Divider(height: 1, color: Colors.grey.withValues(alpha: 0.3)),
 
           // Menu items
           Expanded(
@@ -137,10 +135,10 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          splashColor: Colors.red.withOpacity(0.1),
+          splashColor: Colors.red.withValues(alpha: 0.1),
           highlightColor: Colors.transparent,
           onTap: () async {
-            ref.watch(drawerControllerProvider)!.toggle!.call();
+            ref.watch(drawerControllerProvider)?.toggle?.call();
 
             // Handle log out separately
             if (index == 6) {
@@ -160,20 +158,38 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: selectedIndex == index
-                  ? Colors.red.withOpacity(0.1)
+                  ? Colors.red.withValues(alpha: 0.1)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              children: [
-                Image.asset(
-                  icons[index],
-                  width: 24,
-                  height: 24,
-                  color: selectedIndex == index ? Colors.red : Colors.black54,
-                ),
-                const SizedBox(width: 16),
-                Text(
+            child: Row(children: [
+              icons[index].endsWith('.svg')
+                  ? SvgPicture.asset(
+                      icons[index],
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        selectedIndex == index ? Colors.red : Colors.black54,
+                        BlendMode.srcIn,
+                      ),
+                    )
+                  : Image.asset(
+                      icons[index],
+                      width: 24,
+                      height: 24,
+                      color:
+                          selectedIndex == index ? Colors.red : Colors.black54,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.image_not_supported,
+                        size: 24,
+                        color: selectedIndex == index
+                            ? Colors.red
+                            : Colors.black54,
+                      ),
+                    ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
                   titles[index],
                   style: TextStyle(
                     fontSize: 16,
@@ -182,9 +198,10 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                         : FontWeight.normal,
                     color: selectedIndex == index ? Colors.red : Colors.black87,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
+              )
+            ]),
           ),
         ),
       ),

@@ -1,5 +1,3 @@
-/// Package imports
-import 'dart:math';
 
 import 'package:donation/src/features/finder/common_chart_data.dart';
 import 'package:donation/src/features/services/report_service.dart';
@@ -183,6 +181,7 @@ class _BloodDonationGenderPieChartState
           dataSource: dataList,
           enableTooltip: true,
           radius: '80%',
+          animationDuration: 0, // Disable animations to prevent disposal issues
           dataLabelSettings: DataLabelSettings(
               isVisible: true,
               labelIntersectAction: LabelIntersectAction.none,
@@ -223,6 +222,7 @@ class _BloodDonationGenderPieChartState
           dataSource: dataList,
           enableTooltip: true,
           radius: '80%',
+          animationDuration: 0, // Disable animations to prevent disposal issues
           dataLabelSettings: DataLabelSettings(
               isVisible: true,
               labelIntersectAction: LabelIntersectAction.none,

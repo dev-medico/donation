@@ -1,27 +1,19 @@
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'dart:math';
 
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/domain/search_member_data_source.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
-import 'package:donation/src/features/donation_member/presentation/new_member.dart';
-import 'package:donation/src/features/home/mobile_home.dart';
-import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/logger.dart';
 import 'package:donation/src/features/services/member_service.dart'
     as member_service;
 import 'package:donation/utils/Colors.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:donation/src/features/donation_member/domain/member_repository.dart';
-import 'package:donation/utils/tool_widgets.dart';
-import 'package:donation/utils/utils.dart';
 import 'package:donation/utils/nrc_data.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 // Provider for MemberRepository
 final memberRepositoryProvider = Provider<MemberRepository>((ref) {
@@ -172,6 +164,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     final membersAsync = ref.watch(memberListProvider);
     final filteredMembers = ref.watch(filteredMemberListProvider);
     final selectedBloodType = ref.watch(memberBloodTypeFilterProvider);
@@ -180,26 +173,18 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [primaryColor, primaryDark],
-        ))),
-        centerTitle: true,
-        leading: widget.fromHome && Responsive.isMobile(context)
-            ? Padding(
-                padding: const EdgeInsets.only(top: 4, left: 8),
-                child: IconButton(
-                  icon: Icon(Icons.menu),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                ),
-              )
-            : Padding(
+      appBar: Responsive.isMobile(context) 
+          ? null
+          : AppBar(
+              flexibleSpace: Container(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [primaryColor, primaryDark],
+              ))),
+              centerTitle: true,
+              leading: Padding(
                 padding: const EdgeInsets.only(top: 4, left: 8),
                 child: IconButton(
                   icon: Icon(Icons.arrow_back),
@@ -211,26 +196,26 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                   },
                 ),
               ),
-        title: Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Text("အဖွဲ့၀င်များ",
-              textScaleFactor: 1.0,
-              style: TextStyle(
-                  fontSize: Responsive.isMobile(context) ? 15 : 16,
-                  color: Colors.white)),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.refresh,
-              color: Colors.white,
+              title: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text("အဖွဲ့၀င်များ",
+                    textScaler: TextScaler.linear(1.0),
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white)),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.refresh,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    ref.read(refreshMembersProvider)();
+                  },
+                ),
+              ],
             ),
-            onPressed: () {
-              ref.read(refreshMembersProvider)();
-            },
-          ),
-        ],
-      ),
       body: _buildBody(isLoading, membersAsync, filteredMembers,
           selectedBloodType, selectedRange),
       floatingActionButton: FloatingActionButton(
@@ -342,21 +327,22 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
 
   Widget _buildMainContent(List<Member> filteredMembers,
       String selectedBloodType, String selectedRange) {
-    return Stack(
-      children: [
-        Responsive.isMobile(context)
-            ? Column(
+    final isMobile = Responsive.isMobile(context);
+    final isTablet = Responsive.isTablet(context);
+    
+    return isMobile
+        ? Column(
+            children: [
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    margin: EdgeInsets.only(left: 20, right: 20),
+                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: Row(
                       children: [
                         Expanded(
-                          flex: 1,
                           child: Container(
-                            width: MediaQuery.of(context).size.width / 2.3,
-                            margin: const EdgeInsets.only(top: 20, right: 6),
+                            height: 48,
                             child: ranges.isNotEmpty
                                 ? DropdownButtonFormField<String>(
                                     value: ranges.contains(selectedRange)
@@ -367,31 +353,28 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                     decoration: InputDecoration(
                                       isDense: true,
                                       fillColor: Colors.white,
-                                      contentPadding: EdgeInsets.only(
-                                          top: 16,
-                                          left: 20,
-                                          bottom: 16,
-                                          right: 12),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(color: Colors.grey.shade300),
                                       ),
                                     ),
                                     isExpanded: true,
                                     hint: const Text(
-                                      "အမှတ်စဥ် အလိုက်ကြည့်မည်",
-                                      style: TextStyle(fontSize: 13),
+                                      "အမှတ်စဥ်",
+                                      style: TextStyle(fontSize: 12),
                                     ),
                                     icon: const Icon(
                                       Icons.arrow_drop_down,
                                       color: Colors.black45,
                                     ),
-                                    iconSize: 30,
+                                    iconSize: 24,
                                     items: [
                                       DropdownMenuItem(
                                         value: null,
                                         child: Text(
-                                          "အမှတ်စဥ် အလိုက်ကြည့်မည်",
-                                          style: TextStyle(fontSize: 13),
+                                          "အမှတ်စဥ်",
+                                          style: TextStyle(fontSize: 12),
                                         ),
                                       ),
                                       ...ranges.map(
@@ -400,7 +383,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                 child: Text(
                                                   item,
                                                   style: const TextStyle(
-                                                    fontSize: 14,
+                                                    fontSize: 12,
                                                   ),
                                                 ),
                                               )),
@@ -414,30 +397,26 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                     },
                                   )
                                 : Container(
-                                    height: 50,
+                                    height: 48,
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.grey.shade300),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Center(
                                       child: Text(
-                                        "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                        "အမှတ်စဥ်",
                                         style: TextStyle(
-                                            fontSize: 13,
+                                            fontSize: 12,
                                             color: Colors.grey[700]),
                                       ),
                                     ),
                                   ),
                           ),
                         ),
+                        SizedBox(width: 8),
                         Expanded(
-                          flex: 1,
                           child: Container(
-                            width: MediaQuery.of(context).size.width / 2.3,
-                            margin: const EdgeInsets.only(
-                              top: 20,
-                              left: 6,
-                            ),
+                            height: 48,
                             child: DropdownButtonFormField<String>(
                               value: bloodTypes.contains(selectedBloodType)
                                   ? selectedBloodType
@@ -446,10 +425,10 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                               focusColor: Colors.white,
                               decoration: InputDecoration(
                                 isDense: true,
-                                contentPadding: EdgeInsets.only(
-                                    top: 16, left: 20, bottom: 16, right: 12),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(color: Colors.grey.shade300),
                                 ),
                               ),
                               isExpanded: true,
@@ -457,13 +436,13 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                 Icons.arrow_drop_down,
                                 color: Colors.black45,
                               ),
-                              iconSize: 30,
+                              iconSize: 24,
                               items: [
                                 DropdownMenuItem(
                                   value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
                                   child: Text(
-                                    "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                                    style: TextStyle(fontSize: 13),
+                                    "သွေးအုပ်စု",
+                                    style: TextStyle(fontSize: 12),
                                   ),
                                 ),
                                 ...bloodTypes
@@ -472,7 +451,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                           child: Text(
                                             item,
                                             style: const TextStyle(
-                                              fontSize: 14,
+                                              fontSize: 12,
                                             ),
                                           ),
                                         )),
@@ -493,13 +472,13 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                     ),
                   ),
                   Container(
-                    width: MediaQuery.of(context).size.width - 40,
-                    margin: const EdgeInsets.only(right: 20, top: 12, left: 20),
-                    padding: const EdgeInsets.only(top: 8, bottom: 8),
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.only(bottom: 8),
                     child: TextFormField(
                       controller: searchController,
                       textAlign: TextAlign.start,
-                      style: const TextStyle(fontSize: 15, color: Colors.black),
+                      style: const TextStyle(fontSize: 14, color: Colors.black),
                       onChanged: (val) {
                         if (_debounceTimer?.isActive ?? false) {
                           _debounceTimer?.cancel();
@@ -513,43 +492,59 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-                        hintStyle: const TextStyle(
-                            color: Colors.black, fontSize: 15.0),
-                        fillColor: Colors.white.withOpacity(0.2),
+                        hintStyle: TextStyle(
+                            color: Colors.grey[700], fontSize: 12),
+                        fillColor: Colors.white,
                         filled: true,
                         suffixIcon: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Icon(
                             Icons.search,
                             color: primaryColor,
+                            size: 20,
                           ),
                         ),
-                        contentPadding: const EdgeInsets.only(
-                            left: 20, right: 20, top: 4, bottom: 4),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300)),
                         focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: primaryColor)),
                         disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300)),
                         enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300)),
                       ),
                       keyboardType: TextInputType.text,
                     ),
                   ),
                 ],
-              )
-            : Row(
+              ),
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(
+                      left: 12.0,
+                      right: 12.0,
+                      top: 8.0,
+                      bottom: 12),
+                  child: buildSimpleTable(filteredMembers),
+                ),
+              ),
+            ],
+          )
+        : Column(
+            children: [
+              Wrap(
+                spacing: 16,
+                runSpacing: 16,
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width / 5,
+                    width: isTablet ? MediaQuery.of(context).size.width / 3 : MediaQuery.of(context).size.width / 5,
                     height: 50,
-                    margin: const EdgeInsets.only(top: 28, left: 24),
+                    margin: const EdgeInsets.only(top: 16, left: 16),
                     child: ranges.isNotEmpty
                         ? DropdownButtonFormField<String>(
                             value: ranges.contains(selectedRange)
@@ -618,8 +613,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           ),
                   ),
                   Container(
-                    width: MediaQuery.of(context).size.width / 5,
-                    margin: const EdgeInsets.only(top: 28, left: 20),
+                    width: isTablet ? MediaQuery.of(context).size.width / 3 : MediaQuery.of(context).size.width / 5,
+                    margin: const EdgeInsets.only(top: 16),
                     child: DropdownButtonFormField<String>(
                       value: bloodTypes.contains(selectedBloodType)
                           ? selectedBloodType
@@ -677,8 +672,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                     ),
                   ),
                   Container(
-                    width: MediaQuery.of(context).size.width / 5,
-                    margin: const EdgeInsets.only(right: 40, top: 28, left: 20),
+                    width: isTablet ? MediaQuery.of(context).size.width * 0.8 : MediaQuery.of(context).size.width / 5,
+                    margin: const EdgeInsets.only(top: 16, right: 16),
                     padding: const EdgeInsets.only(top: 8, bottom: 8),
                     child: TextFormField(
                       autofocus: false,
@@ -701,7 +696,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                         hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
                         hintStyle: const TextStyle(
                             color: Colors.black, fontSize: 15.0),
-                        fillColor: Colors.white.withOpacity(0.2),
+                        fillColor: Colors.white.withValues(alpha: 0.2),
                         filled: true,
                         suffixIcon: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -730,31 +725,29 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                   ),
                 ],
               ),
-        Container(
-          margin: EdgeInsets.only(
-              left: 20.0,
-              top: Responsive.isMobile(context) ? 160 : 100,
-              bottom: 12),
-          child: buildSimpleTable(filteredMembers),
-        ),
-      ],
-    );
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      top: 16.0,
+                      bottom: 12),
+                  child: buildSimpleTable(filteredMembers),
+                ),
+              ),
+            ],
+          );
   }
 
   Widget buildSimpleTable(List<Member> members) {
     memberDataDataSource = SearchMemberDataSource(memberData: members);
+    final isMobile = Responsive.isMobile(context);
+    final isTablet = Responsive.isTablet(context);
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height -
-          (Responsive.isMobile(context) ? 220 : 160),
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.only(
-                  right: Responsive.isMobile(context) ? 20 : 20),
-              child: SfDataGrid(
-                source: memberDataDataSource!,
+    return SfDataGrid(
+      source: memberDataDataSource!,
+      headerRowHeight: isMobile ? 36 : 56,
+      rowHeight: isMobile ? 32 : 52,
                 onCellTap: (details) async {
                   if (details.rowColumnIndex.rowIndex == 0) return;
 
@@ -783,9 +776,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                 },
                 gridLinesVisibility: GridLinesVisibility.both,
                 headerGridLinesVisibility: GridLinesVisibility.both,
-                columnWidthMode: Responsive.isMobile(context)
-                    ? ColumnWidthMode.auto
-                    : ColumnWidthMode.fitByCellValue,
+                columnWidthMode: isMobile
+                    ? ColumnWidthMode.none
+                    : (isTablet ? ColumnWidthMode.fill : ColumnWidthMode.fitByCellValue),
                 columns: <GridColumn>[
                   GridColumn(
                       columnName: 'အမှတ်စဥ်',
@@ -794,9 +787,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'အမှတ်စဥ်',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                           ))),
                   GridColumn(
                       columnName: 'အမည်',
@@ -804,9 +800,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'အမည်',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                           ))),
                   GridColumn(
                       columnName: 'အဖအမည်',
@@ -814,9 +813,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'အဖအမည်',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ))),
                   GridColumn(
@@ -825,9 +827,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'သွေးအုပ်စု',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                           ))),
                   GridColumn(
                       columnName: 'မှတ်ပုံတင်အမှတ်',
@@ -835,9 +840,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'မှတ်ပုံတင်အမှတ်',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                           ))),
                   GridColumn(
                       columnName: 'သွေးဘဏ်ကတ်',
@@ -845,9 +853,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'သွေးဘဏ်ကတ်',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                           ))),
                   GridColumn(
                       columnName: 'သွေးလှူမှုကြိမ်ရေ',
@@ -855,9 +866,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'သွေးလှူမှုကြိမ်ရေ',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                           ))),
                   GridColumn(
                       columnName: 'မွေးသက္ကရာဇ်',
@@ -865,9 +879,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'မွေးသက္ကရာဇ်',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                           ))),
                   GridColumn(
                       columnName: 'ဖုန်းနံပါတ်',
@@ -875,9 +892,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'ဖုန်းနံပါတ်',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                           ))),
                   GridColumn(
                       columnName: 'နေရပ်လိပ်စာ',
@@ -885,17 +905,15 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'နေရပ်လိပ်စာ',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 14,
+                            ),
                           ))),
                 ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+              );
   }
 }
 
@@ -999,7 +1017,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.15),
+                      color: Colors.grey.withValues(alpha: 0.15),
                       spreadRadius: 1,
                       blurRadius: 3,
                       offset: const Offset(0, 1),
@@ -1562,7 +1580,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.15),
+                          color: Colors.grey.withValues(alpha: 0.15),
                           spreadRadius: 1,
                           blurRadius: 3,
                           offset: const Offset(0, 1),
@@ -1845,7 +1863,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.1),
+                        color: primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Image.asset(
@@ -1916,7 +1934,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                       return Container(
                         decoration: isExactMatch
                             ? BoxDecoration(
-                                color: primaryColor.withOpacity(0.05),
+                                color: primaryColor.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(4),
                               )
                             : null,
@@ -1992,7 +2010,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                                         vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue.withOpacity(0.1),
+                                        color: Colors.blue.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(

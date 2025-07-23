@@ -2,7 +2,7 @@
 // import 'dart:developer';
 
 // // import 'package:fluent_ui/fluent_ui.dart' as fluent;
-import 'package:flutter/material.dart'; // import 'package:donation/data/repository/repository.dart';
+// import 'package:donation/data/repository/repository.dart';
 // import 'package:donation/data/response/special_event_list_response.dart';
 // import 'package:donation/responsive.dart';
 // import 'package:donation/src/features/special_event/edit_special_event.dart';
@@ -154,7 +154,7 @@ import 'package:flutter/material.dart'; // import 'package:donation/data/reposit
 //                               height: 50,
 //                               decoration: shadowDecorationOnlyTop(
 //                                   rangesSelect[index]
-//                                       ? Colors.red.withOpacity(0.6)
+//                                       ? Colors.red.withValues(alpha: 0.6)
 //                                       : const Color(0xffe3e3e3)),
 //                               child: Center(
 //                                   child: Text(

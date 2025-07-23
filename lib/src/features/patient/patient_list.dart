@@ -233,7 +233,7 @@
 //                               hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
 //                               hintStyle: const TextStyle(
 //                                   color: Colors.black, fontSize: 15.0),
-//                               fillColor: Colors.white.withOpacity(0.2),
+//                               fillColor: Colors.white.withValues(alpha: 0.2),
 //                               filled: true,
 //                               suffixIcon: Padding(
 //                                 padding: const EdgeInsets.all(8.0),
@@ -379,7 +379,7 @@
 //                               hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
 //                               hintStyle: const TextStyle(
 //                                   color: Colors.black, fontSize: 15.0),
-//                               fillColor: Colors.white.withOpacity(0.2),
+//                               fillColor: Colors.white.withValues(alpha: 0.2),
 //                               filled: true,
 //                               suffixIcon: Padding(
 //                                 padding: const EdgeInsets.all(8.0),

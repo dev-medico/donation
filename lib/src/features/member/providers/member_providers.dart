@@ -35,7 +35,7 @@ class MemberListNotifier extends AsyncNotifier<List<Member>> {
     try {
       final memberService = ref.read(memberServiceProvider);
       final memberData = await memberService.getMemberById(id);
-      return memberData != null ? Member.fromJson(memberData) : null;
+      return Member.fromJson(memberData);
     } catch (e) {
       print('Error getting member by ID: $e');
       return null;
@@ -50,7 +50,7 @@ class MemberListNotifier extends AsyncNotifier<List<Member>> {
       // Refresh the list to include the new member
       refresh();
 
-      return memberData != null ? Member.fromJson(memberData) : null;
+      return Member.fromJson(memberData);
     } catch (e) {
       print('Error creating member: $e');
       return null;
@@ -65,7 +65,7 @@ class MemberListNotifier extends AsyncNotifier<List<Member>> {
       // Refresh the list to reflect the updated member
       refresh();
 
-      return memberData != null ? Member.fromJson(memberData) : null;
+      return Member.fromJson(memberData);
     } catch (e) {
       print('Error updating member: $e');
       return null;

@@ -43,23 +43,23 @@ class _DrawerUserControllerState extends State<DrawerUserController>
         duration: const Duration(milliseconds: 0), curve: Curves.fastOutSlowIn);
     scrollController =
         ScrollController(initialScrollOffset: widget.drawerWidth);
-    scrollController!.addListener(() {
-      if (scrollController!.offset <= 0) {
+    scrollController?.addListener(() {
+      if ((scrollController?.offset ?? 0) <= 0) {
         if (scrolloffset != 1.0) {
           setState(() {
             scrolloffset = 1.0;
             try {
-              widget.drawerIsOpen!(true);
+              widget.drawerIsOpen?.call(true);
             } catch (_) {}
           });
         }
         iconAnimationController?.animateTo(0.0,
             duration: const Duration(milliseconds: 0),
             curve: Curves.fastOutSlowIn);
-      } else if (scrollController!.offset > 0 &&
-          scrollController!.offset < widget.drawerWidth.floor()) {
+      } else if ((scrollController?.offset ?? 0) > 0 &&
+          (scrollController?.offset ?? 0) < widget.drawerWidth.floor()) {
         iconAnimationController?.animateTo(
-            (scrollController!.offset * 100 / (widget.drawerWidth)) / 100,
+            ((scrollController?.offset ?? 0) * 100 / (widget.drawerWidth)) / 100,
             duration: const Duration(milliseconds: 0),
             curve: Curves.fastOutSlowIn);
       } else {
@@ -67,7 +67,7 @@ class _DrawerUserControllerState extends State<DrawerUserController>
           setState(() {
             scrolloffset = 0.0;
             try {
-              widget.drawerIsOpen!(false);
+              widget.drawerIsOpen?.call(false);
             } catch (_) {}
           });
         }
@@ -106,12 +106,12 @@ class _DrawerUserControllerState extends State<DrawerUserController>
                 //we divided first drawer Width with HomeDrawer and second full-screen Width with all home screen, we called screen View
                 height: MediaQuery.of(context).size.height,
                 child: AnimatedBuilder(
-                  animation: iconAnimationController!,
+                  animation: iconAnimationController ?? AnimationController(vsync: this),
                   builder: (BuildContext context, Widget? child) {
                     return Transform(
                       //transform we use for the stable drawer  we, not need to move with scroll view
                       transform: Matrix4.translationValues(
-                          scrollController!.offset, 0.0, 0.0),
+                          scrollController?.offset ?? 0.0, 0.0, 0.0),
                       child: HomeDrawer(
                         screenIndex:
                             widget.screenIndex ?? DrawerIndex.DASHBOARD,
@@ -119,7 +119,7 @@ class _DrawerUserControllerState extends State<DrawerUserController>
                         callBackIndex: (DrawerIndex indexType) {
                           onDrawerClick();
                           try {
-                            widget.onDrawerCall!(indexType);
+                            widget.onDrawerCall?.call(indexType);
                           } catch (e) {}
                         },
                       ),
@@ -136,7 +136,7 @@ class _DrawerUserControllerState extends State<DrawerUserController>
                     color: Colors.white,
                     boxShadow: <BoxShadow>[
                       BoxShadow(
-                          color: Colors.grey.withOpacity(0.6), blurRadius: 24),
+                          color: Colors.grey.withValues(alpha: 0.6), blurRadius: 24),
                     ],
                   ),
                   child: Stack(

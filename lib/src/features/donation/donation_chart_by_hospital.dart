@@ -30,34 +30,21 @@ class _DonationChartByHospitalState
   Widget build(BuildContext context) {
     final hospitalStats = ref.watch(hospitalStatsProvider);
 
-    return Container(
-      height: Responsive.isMobile(context)
-          ? MediaQuery.of(context).size.height * 0.65
-          : MediaQuery.of(context).size.height * 0.52,
-      width: Responsive.isMobile(context)
-          ? MediaQuery.of(context).size.width * 0.9
-          : MediaQuery.of(context).size.width * 0.43,
-      child: Material(
-        elevation: 4,
-        borderRadius:
-            BorderRadius.circular(Responsive.isMobile(context) ? 12 : 16),
-        color: Colors.white,
-        child: hospitalStats.when(
+    return hospitalStats.when(
           data: (data) {
             final hospitalData = Map<String, int>.from(data['data']);
             final totalDonations = data['totalDonations'] as int? ?? 0;
             final sortedHospitals = hospitalData.entries.toList()
               ..sort((a, b) => b.value.compareTo(a.value));
 
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
+            return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     "လှူဒါန်းသည့်နေရာအလိုက် မှတ်တမ်း",
                     style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                      fontSize: Responsive.isMobile(context) ? 13 : 16.5,
                       color: primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
@@ -69,7 +56,7 @@ class _DonationChartByHospitalState
                       Text(
                         "လှူဒါန်းသည့်နေရာ",
                         style: TextStyle(
-                          fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                          fontSize: Responsive.isMobile(context) ? 12 : 16.5,
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
@@ -80,7 +67,7 @@ class _DonationChartByHospitalState
                             "အရေအတွက်",
                             style: TextStyle(
                               fontSize:
-                                  Responsive.isMobile(context) ? 15.5 : 16.5,
+                                  Responsive.isMobile(context) ? 12 : 16.5,
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
@@ -90,7 +77,7 @@ class _DonationChartByHospitalState
                             "%",
                             style: TextStyle(
                               fontSize:
-                                  Responsive.isMobile(context) ? 15.5 : 16.5,
+                                  Responsive.isMobile(context) ? 12 : 16.5,
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
@@ -99,73 +86,44 @@ class _DonationChartByHospitalState
                       ),
                     ],
                   ),
-                  Expanded(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: Responsive.isMobile(context)
-                          ? const NeverScrollableScrollPhysics()
-                          : const BouncingScrollPhysics(),
-                      padding:
-                          const EdgeInsets.only(top: 12.0, right: 12, left: 8),
-                      itemCount: sortedHospitals.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final hospital = sortedHospitals[index];
-                        final count = hospital.value;
-                        // final percentage = totalDonations > 0
-                        //     ? (count / totalDonations * 100).toStringAsFixed(1)
-                        //     : '0.0';
-
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ...sortedHospitals.map((hospital) {
+                    final count = hospital.value;
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              hospital.key.isEmpty ? "-" : hospital.key,
+                              style: TextStyle(
+                                fontSize:
+                                    Responsive.isMobile(context) ? 12 : 16,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Row(
                             children: [
-                              Expanded(
+                              Container(
+                                width: 60,
+                                alignment: Alignment.centerRight,
                                 child: Text(
-                                  hospital.key.isEmpty ? "-" : hospital.key,
+                                  count.toString(),
                                   style: TextStyle(
-                                    fontSize:
-                                        Responsive.isMobile(context) ? 15 : 16,
-                                    color: Colors.black,
+                                    fontSize: Responsive.isMobile(context)
+                                        ? 12
+                                        : 16,
+                                    color: primaryColor,
                                   ),
                                 ),
                               ),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      count.toString(),
-                                      style: TextStyle(
-                                        fontSize: Responsive.isMobile(context)
-                                            ? 15
-                                            : 16,
-                                        color: primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                  // Container(
-                                  //   width: 50,
-                                  //   alignment: Alignment.centerRight,
-                                  //   child: Text(
-                                  //     percentage,
-                                  //     style: TextStyle(
-                                  //       fontSize: Responsive.isMobile(context)
-                                  //           ? 15
-                                  //           : 16,
-                                  //       color: Colors.grey,
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                ],
-                              ),
                             ],
                           ),
-                        );
-                      },
-                    ),
-                  ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                   Container(
                     margin: const EdgeInsets.only(left: 12, right: 16),
                     width: double.infinity,
@@ -181,7 +139,7 @@ class _DonationChartByHospitalState
                           "စုစုပေါင်း အရေအတွက်",
                           style: TextStyle(
                             fontSize:
-                                Responsive.isMobile(context) ? 15.5 : 16.5,
+                                Responsive.isMobile(context) ? 12 : 16.5,
                             color: Colors.grey,
                           ),
                         ),
@@ -189,7 +147,7 @@ class _DonationChartByHospitalState
                           totalDonations.toString(),
                           style: TextStyle(
                             fontSize:
-                                Responsive.isMobile(context) ? 15.5 : 16.5,
+                                Responsive.isMobile(context) ? 12 : 16.5,
                             color: Colors.grey,
                             fontWeight: FontWeight.bold,
                           ),
@@ -198,8 +156,7 @@ class _DonationChartByHospitalState
                     ),
                   ),
                 ],
-              ),
-            );
+              );
           },
           loading: () => Center(child: CircularProgressIndicator()),
           error: (error, stack) => Center(
@@ -211,8 +168,6 @@ class _DonationChartByHospitalState
               ),
             ),
           ),
-        ),
-      ),
-    );
+        );
   }
 }

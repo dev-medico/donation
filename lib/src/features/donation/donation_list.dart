@@ -8,8 +8,6 @@ import 'package:donation/src/features/donation/donation_detail.dart';
 import 'package:donation/src/features/donation/models/donation.dart';
 import 'package:donation/src/features/donation/new_blood_donation.dart';
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
-import 'package:donation/src/features/home/mobile_home.dart';
-import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/features/services/donation_service.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
@@ -25,9 +23,12 @@ class DonationListScreen extends ConsumerStatefulWidget {
   ConsumerState<DonationListScreen> createState() => _DonationListScreenState();
 }
 
-class _DonationListScreenState extends ConsumerState<DonationListScreen> {
+class _DonationListScreenState extends ConsumerState<DonationListScreen>
+    with SingleTickerProviderStateMixin {
   int _yearSelected = 0;
   int _monthSelected = DateTime.now().month - 1;
+  late TabController _tabController;
+
   List<String> years = [
     "2025",
     "2024",
@@ -75,7 +76,116 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: 12,
+      vsync: this,
+      initialIndex: _monthSelected,
+    );
+
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        setState(() {
+          _monthSelected = _tabController.index;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _showYearPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const Text(
+                'Select Year',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 200,
+                child: ListView.builder(
+                  itemCount: years.length,
+                  itemBuilder: (context, index) {
+                    final year = years[index];
+                    final isSelected =
+                        int.parse(year) == int.parse(years[_yearSelected]);
+
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          _yearSelected = index;
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Theme.of(context)
+                                  .primaryColor
+                                  .withValues(alpha: 0.1)
+                              : null,
+                        ),
+                        child: Center(
+                          child: Text(
+                            year,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isSelected
+                                  ? Theme.of(context).primaryColor
+                                  : null,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isMobile = Responsive.isMobile(context);
+
     var donationData = ref.watch(donationsByMonthYearProvider(
         (month: _monthSelected + 1, year: int.parse(years[_yearSelected]))));
     return Scaffold(
@@ -90,31 +200,21 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
             ),
           );
           // Refresh the list after returning from new donation screen
-          ref.refresh(donationsByMonthYearProvider((
-            month: _monthSelected + 1,
-            year: int.parse(years[_yearSelected])
-          )));
+          ref.invalidate(donationsByMonthYearProvider);
         },
         child: const Icon(Icons.add),
       ),
-      appBar: AppBar(
-        flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [primaryColor, primaryDark],
-        ))),
-        leading: widget.fromHome && Responsive.isMobile(context)
-            ? Padding(
-                padding: const EdgeInsets.only(top: 4, left: 8),
-                child: Humberger(
-                  onTap: () {
-                    ref.watch(drawerControllerProvider)!.toggle!.call();
-                  },
-                ),
-              )
-            : Padding(
+      appBar: Responsive.isMobile(context)
+          ? null
+          : AppBar(
+              flexibleSpace: Container(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [primaryColor, primaryDark],
+              ))),
+              leading: Padding(
                 padding: const EdgeInsets.only(top: 4, left: 8),
                 child: IconButton(
                   icon: Icon(Icons.arrow_back),
@@ -123,78 +223,134 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   },
                 ),
               ),
-        centerTitle: true,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Text("သွေးလှူဒါန်းမှုစာရင်း",
-              textScaleFactor: 1.0,
-              style: TextStyle(
-                  fontSize: Responsive.isMobile(context) ? 15 : 16,
-                  color: Colors.white)),
-        ),
-      ),
+              centerTitle: true,
+              title: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text("သွေးလှူဒါန်းမှုစာရင်း",
+                    textScaler: TextScaler.linear(1.0),
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white)),
+              ),
+            ),
       body: Container(
-        margin: EdgeInsets.all(Responsive.isMobile(context) ? 8 : 24),
+        margin: EdgeInsets.all(isMobile ? 0 : 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 60,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  Container(
-                    width: Responsive.isMobile(context)
-                        ? MediaQuery.of(context).size.width * 1.8
-                        : MediaQuery.of(context).size.width * 0.8,
-                    height: Responsive.isMobile(context) ? 40 : 60,
-                    child: CommonTabBar(
-                      underline: false,
-                      listWidget: [
-                        for (int i = 0; i < years.length; i++)
-                          CommonTabBarWidget(
-                            underline: false,
-                            name: years[i],
-                            isSelected: _yearSelected,
-                            i: i,
-                            onTap: () {
-                              _yearSelected = i;
-                              setState(() {});
-                            },
+            // Year selector - show dropdown for mobile, tabs for desktop
+            if (isMobile) ...[
+              // Mobile year selector
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: InkWell(
+                  onTap: _showYearPicker,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: primaryColor, width: 1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Year: ${years[_yearSelected]}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: primaryColor,
                           ),
+                        ),
+                        Icon(Icons.arrow_drop_down, color: primaryColor, size: 20),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 8),
-              width: Responsive.isMobile(context)
-                  ? MediaQuery.of(context).size.width * 1.8
-                  : MediaQuery.of(context).size.width * 0.8,
-              height: Responsive.isMobile(context) ? 40 : 60,
-              child: CommonTabBar(
-                underline: false,
-                listWidget: [
-                  for (int i = 0; i < months.length; i++)
-                    CommonTabBarWidget(
-                      color: primaryColor,
-                      underline: false,
-                      name: Responsive.isMobile(context)
-                          ? monthsMobile[i]
-                          : months[i],
-                      isSelected: _monthSelected,
-                      i: i,
-                      onTap: () {
-                        _monthSelected = i;
-                        setState(() {});
-                      },
+              const SizedBox(height: 8),
+              // Mobile month tabs
+              Container(
+                height: 32,
+                margin: EdgeInsets.symmetric(horizontal: 8),
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: primaryColor,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicator: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: primaryColor,
+                  ),
+                  tabs: months
+                      .map((month) => Tab(
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              child: Text(month,
+                                  style: const TextStyle(fontSize: 11)),
+                            ),
+                          ))
+                      .toList(),
+                ),
+              ),
+            ] else ...[
+              // Desktop year tabs
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 60,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      height: 60,
+                      child: CommonTabBar(
+                        underline: false,
+                        listWidget: [
+                          for (int i = 0; i < years.length; i++)
+                            CommonTabBarWidget(
+                              underline: false,
+                              name: years[i],
+                              isSelected: _yearSelected,
+                              i: i,
+                              onTap: () {
+                                _yearSelected = i;
+                                setState(() {});
+                              },
+                            ),
+                        ],
+                      ),
                     ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              // Desktop month tabs
+              Container(
+                margin: EdgeInsets.only(top: 8),
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: 60,
+                child: CommonTabBar(
+                  underline: false,
+                  listWidget: [
+                    for (int i = 0; i < months.length; i++)
+                      CommonTabBarWidget(
+                        color: primaryColor,
+                        underline: false,
+                        name: months[i],
+                        isSelected: _monthSelected,
+                        i: i,
+                        onTap: () {
+                          _monthSelected = i;
+                          setState(() {});
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            ],
             Expanded(
               child: donationData.when(
                 data: (results) {
@@ -204,16 +360,16 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                         Align(
                           alignment: Alignment.topLeft,
                           child: Container(
-                            height: 60,
+                            height: isMobile ? 42 : 60,
                             decoration: BoxDecoration(
                                 color: primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(12.0))),
-                            margin: const EdgeInsets.only(
-                              left: 15,
-                              top: 12,
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(isMobile ? 8 : 12))),
+                            margin: EdgeInsets.only(
+                              left: isMobile ? 12 : 15,
+                              top: isMobile ? 8 : 12,
                             ),
-                            width: 164,
+                            width: isMobile ? 140 : 164,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
@@ -237,20 +393,22 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                               child: Align(
                                   alignment: Alignment.center,
                                   child: Row(
-                                    children: const [
+                                    children: [
                                       SizedBox(
-                                        width: 12,
+                                        width: isMobile ? 8 : 12,
                                       ),
                                       Icon(Icons.list_alt_outlined,
-                                          color: Colors.white),
+                                          color: Colors.white, size: isMobile ? 18 : 24),
                                       Padding(
                                           padding: EdgeInsets.only(
-                                              top: 12, bottom: 12, left: 12),
+                                              top: isMobile ? 8 : 12, 
+                                              bottom: isMobile ? 8 : 12, 
+                                              left: isMobile ? 8 : 12),
                                           child: Text(
                                             "နှစ်ချုပ် မှတ်တမ်း",
-                                            textScaleFactor: 1.0,
+                                            textScaler: TextScaler.linear(1.0),
                                             style: TextStyle(
-                                                fontSize: 15.0,
+                                                fontSize: isMobile ? 12 : 15,
                                                 color: Colors.white),
                                           )),
                                     ],
@@ -276,13 +434,13 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                     color: primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(12.0))),
-                                margin: const EdgeInsets.only(
-                                  left: 15,
-                                  top: 12,
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(isMobile ? 8 : 12))),
+                                margin: EdgeInsets.only(
+                                  left: isMobile ? 12 : 15,
+                                  top: isMobile ? 8 : 12,
                                 ),
-                                width: 164,
+                                width: isMobile ? 140 : 164,
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.translucent,
                                   onTap: () {
@@ -307,22 +465,23 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                                   child: Align(
                                       alignment: Alignment.center,
                                       child: Row(
-                                        children: const [
+                                        children: [
                                           SizedBox(
-                                            width: 12,
+                                            width: isMobile ? 8 : 12,
                                           ),
                                           Icon(Icons.list_alt_outlined,
-                                              color: Colors.white),
+                                              color: Colors.white, size: isMobile ? 18 : 24),
                                           Padding(
                                               padding: EdgeInsets.only(
-                                                  top: 12,
-                                                  bottom: 12,
-                                                  left: 12),
+                                                  top: isMobile ? 8 : 12,
+                                                  bottom: isMobile ? 8 : 12,
+                                                  left: isMobile ? 8 : 12),
                                               child: Text(
                                                 "နှစ်ချုပ် မှတ်တမ်း",
-                                                textScaleFactor: 1.0,
+                                                textScaler:
+                                                    TextScaler.linear(1.0),
                                                 style: TextStyle(
-                                                    fontSize: 15.0,
+                                                    fontSize: isMobile ? 12 : 15,
                                                     color: Colors.white),
                                               )),
                                         ],
@@ -332,13 +491,13 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                     color: primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(12.0))),
-                                margin: const EdgeInsets.only(
-                                  left: 15,
-                                  top: 12,
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(isMobile ? 8 : 12))),
+                                margin: EdgeInsets.only(
+                                  left: isMobile ? 8 : 15,
+                                  top: isMobile ? 8 : 12,
                                 ),
-                                width: 160,
+                                width: isMobile ? 130 : 160,
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.translucent,
                                   onTap: () {
@@ -356,22 +515,23 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                                   child: Align(
                                       alignment: Alignment.center,
                                       child: Row(
-                                        children: const [
+                                        children: [
                                           SizedBox(
-                                            width: 12,
+                                            width: isMobile ? 8 : 12,
                                           ),
                                           Icon(Icons.list_alt_outlined,
-                                              color: Colors.white),
+                                              color: Colors.white, size: isMobile ? 18 : 24),
                                           Padding(
                                               padding: EdgeInsets.only(
-                                                  top: 12,
-                                                  bottom: 12,
-                                                  left: 12),
+                                                  top: isMobile ? 8 : 12,
+                                                  bottom: isMobile ? 8 : 12,
+                                                  left: isMobile ? 8 : 12),
                                               child: Text(
                                                 "လချုပ် မှတ်တမ်း",
-                                                textScaleFactor: 1.0,
+                                                textScaler:
+                                                    TextScaler.linear(1.0),
                                                 style: TextStyle(
-                                                    fontSize: 15.0,
+                                                    fontSize: isMobile ? 12 : 15,
                                                     color: Colors.white),
                                               )),
                                         ],
@@ -388,9 +548,10 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                             height: double.infinity,
                             child: Container(
                               padding: EdgeInsets.only(
-                                  left: Responsive.isMobile(context) ? 8 : 12,
-                                  top: Responsive.isMobile(context) ? 8 : 12,
-                                  bottom: 12),
+                                  left: isMobile ? 4 : 12,
+                                  right: isMobile ? 4 : 0,
+                                  top: isMobile ? 4 : 12,
+                                  bottom: isMobile ? 4 : 12),
                               child: buildSimpleTable(results),
                             ),
                           ),
@@ -433,12 +594,18 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
   }
 
   buildSimpleTable(List<Donation> data) {
+    final isMobile = Responsive.isMobile(context);
+    final isTablet = Responsive.isTablet(context);
     DonationDataSource memberDataDataSource =
         DonationDataSource(donationData: data, ref: ref);
+
+    // Unified responsive data grid for all devices
     return Container(
-      margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
+      margin: EdgeInsets.only(right: isMobile ? 0 : 20),
       child: SfDataGrid(
         source: memberDataDataSource,
+        headerRowHeight: isMobile ? 36 : 56,
+        rowHeight: isMobile ? 32 : 52,
         onCellTap: (details) async {
           if (details.rowColumnIndex.rowIndex > 0) {
             final index = details.rowColumnIndex.rowIndex - 1;
@@ -452,18 +619,15 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                             data: donation,
                           )));
               // Refresh the list after returning from detail screen
-              ref.refresh(donationsByMonthYearProvider((
-                month: _monthSelected + 1,
-                year: int.parse(years[_yearSelected])
-              )));
+              ref.invalidate(donationsByMonthYearProvider);
             }
           }
         },
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,
-        columnWidthMode: Responsive.isMobile(context)
-            ? ColumnWidthMode.auto
-            : ColumnWidthMode.fitByCellValue,
+        columnWidthMode: isMobile
+            ? ColumnWidthMode.none
+            : (isTablet ? ColumnWidthMode.fill : ColumnWidthMode.fitByCellValue),
         columns: <GridColumn>[
           GridColumn(
               columnName: 'ရက်စွဲ',
@@ -471,9 +635,9 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: Text(
                     'ရက်စွဲ',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: isMobile ? 11 : 14),
                   ))),
           GridColumn(
               columnName: 'သွေးအလှူရှင်',
@@ -481,9 +645,9 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: Text(
                     'သွေးအလှူရှင်',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: isMobile ? 11 : 14),
                   ))),
           GridColumn(
               columnName: 'သွေးအုပ်စု',
@@ -491,9 +655,9 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: Text(
                     'သွေးအုပ်စု',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: isMobile ? 11 : 14),
                     overflow: TextOverflow.ellipsis,
                   ))),
           GridColumn(
@@ -502,9 +666,12 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: Text(
                     'လှူဒါန်းသည့်နေရာ',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isMobile ? 11 : 14,
+                    ),
                   ))),
           GridColumn(
               columnName: 'လူနာ',
@@ -512,9 +679,9 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: Text(
                     'လူနာ',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: isMobile ? 11 : 14),
                   ))),
           GridColumn(
               columnName: 'လိပ်စာ',
@@ -522,9 +689,9 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: Text(
                     'လိပ်စာ',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: isMobile ? 11 : 14),
                   ))),
           GridColumn(
               columnName: 'အသက်',
@@ -532,9 +699,9 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: Text(
                     'အသက်',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: isMobile ? 11 : 14),
                   ))),
           GridColumn(
               columnName: 'ဖြစ်ပွားသည့်ရောဂါ',
@@ -542,9 +709,9 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: Text(
                     'ဖြစ်ပွားသည့်ရောဂါ',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: isMobile ? 11 : 14),
                   ))),
         ],
       ),

@@ -1,15 +1,12 @@
 // import 'dart:developer';
 
-import 'package:donation/realm/schemas.dart' hide Donation;
 import 'package:flutter/material.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:donation/src/features/donation/models/donation.dart';
-import 'package:donation/src/features/donation/providers/donation_providers.dart';
-import 'package:donation/src/features/member/providers/member_providers.dart';
-import 'package:donation/src/features/member/models/member.dart';
+import 'package:donation/responsive.dart';
 
 class DonationDataSource extends DataGridSource {
   //List<DonationRecord>
@@ -130,12 +127,23 @@ class DonationDataSource extends DataGridSource {
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
-      return Container(
-        alignment: Utils.isNumeric(e.value.toString())
-            ? Alignment.centerRight
-            : Alignment.centerLeft,
-        padding: const EdgeInsets.all(8.0),
-        child: Text(e.value.toString()),
+      return Builder(
+        builder: (context) {
+          final isMobile = Responsive.isMobile(context);
+          return Container(
+            alignment: Utils.isNumeric(e.value.toString())
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
+            padding: EdgeInsets.all(isMobile ? 4.0 : 8.0),
+            child: Text(
+              e.value.toString(),
+              style: TextStyle(
+                fontSize: isMobile ? 10 : 14,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          );
+        },
       );
     }).toList());
   }

@@ -8,7 +8,7 @@
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:intl/intl.dart';
+import 'package:donation/responsive.dart';
 
 class SearchMemberDataSource extends DataGridSource {
   SearchMemberDataSource({required List<Member> memberData}) {
@@ -48,13 +48,21 @@ class SearchMemberDataSource extends DataGridSource {
   DataGridRowAdapter? buildRow(DataGridRow row) {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((dataGridCell) {
-      return Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          dataGridCell.value.toString(),
-          overflow: TextOverflow.ellipsis,
-        ),
+      return Builder(
+        builder: (context) {
+          final isMobile = Responsive.isMobile(context);
+          return Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.all(isMobile ? 4.0 : 8.0),
+            child: Text(
+              dataGridCell.value.toString(),
+              style: TextStyle(
+                fontSize: isMobile ? 10 : 14,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          );
+        },
       );
     }).toList());
   }

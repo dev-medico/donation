@@ -1,31 +1,19 @@
-import 'dart:developer';
 
-import 'package:donation/realm/realm_services.dart';
-import 'package:donation/realm/schemas.dart';
-import 'package:donation/src/features/donar/donar_list_new.dart';
 import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donar/yearly_report_screen.dart';
-import 'package:donation/src/features/donation/controller/donation_provider.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
-import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
-import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:donation/src/features/home/desktop_home.dart';
 import 'package:donation/src/features/home/home.dart';
-import 'package:donation/src/features/patient/patient_list.dart';
-import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/dashboard/dashboard.dart';
-import 'package:donation/src/features/donar/donar_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
-import 'package:donation/src/features/home/home_with_drawer.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/splash_screen/splash_screen.dart';
 import 'package:donation/utils/custom_scroll.dart';
-import 'package:intl/intl.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
@@ -254,16 +242,6 @@ class _MyAppState extends ConsumerState<MyApp> {
                 
               case DonarListScreen.routeName:
                 return const DonarListScreen();
-
-              // Todo - Uncomment when ready
-              // case MemberListBackupScreen.routeName:
-              //   return const MemberListBackupScreen();
-
-              // case PatientList.routeName:
-              //   return const PatientList();
-
-              // case DonarListNewScreen.routeName:
-              //   return DonarListNewScreen();
               default:
                 return SplashScreen();
             }

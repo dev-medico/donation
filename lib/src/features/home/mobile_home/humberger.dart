@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Humberger extends StatelessWidget {
-  Function onTap;
-  Humberger({super.key, required this.onTap});
+  final Function onTap;
+  const Humberger({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class Humberger extends StatelessWidget {
             child: SvgPicture.asset(
               "assets/images/menu_humberger.svg",
               width: 20,
-              color: Colors.white,
+              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
             ),
           )),
           onTap: () {

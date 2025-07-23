@@ -2,24 +2,17 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/services.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:donation/src/features/donation/models/donation.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
-import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
-import 'package:donation/utils/tool_widgets.dart';
-import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
-import 'package:donation/src/features/donation_member/domain/member.dart';
-import 'package:donation/src/features/services/member_service.dart'
-    as member_services;
 import 'package:donation/src/features/services/donation_service.dart';
+import 'package:donation/responsive.dart';
 
 class BloodDonationEditScreen extends ConsumerStatefulWidget {
   final Donation data;
@@ -266,7 +259,9 @@ class _BloodDonationEditScreenState
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
+                    width: Responsive.isMobile(context) 
+                        ? double.infinity 
+                        : MediaQuery.of(context).size.width * 0.5,
                     alignment: Alignment.centerLeft,
                     child: _buildEditForm(),
                   ),

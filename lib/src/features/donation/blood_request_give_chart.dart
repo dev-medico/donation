@@ -98,6 +98,7 @@ class _BloodRequestGiveChartScreenState
                       ColumnSeries<ChartData, String>(
                         name: 'တောင်းခံ',
                         color: Colors.red,
+                        animationDuration: 0, // Disable animations to prevent disposal issues
                         dataSource: chartData,
                         xValueMapper: (ChartData data, _) => data.x,
                         yValueMapper: (ChartData data, _) => data.y,
@@ -105,6 +106,7 @@ class _BloodRequestGiveChartScreenState
                       ColumnSeries<ChartData, String>(
                         name: 'လှူဒါန်း',
                         color: Colors.green,
+                        animationDuration: 0, // Disable animations to prevent disposal issues
                         dataSource: chartData,
                         xValueMapper: (ChartData data, _) => data.x,
                         yValueMapper: (ChartData data, _) => data.y1,

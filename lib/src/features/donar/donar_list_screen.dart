@@ -1,12 +1,10 @@
 import 'package:donation/responsive.dart';
 import 'package:donation/src/common_widgets/common_tab_bar.dart';
-import 'package:donation/src/features/donar/donar_yearly_report.dart';
 import 'package:donation/src/features/donar/providers/yearly_report_provider.dart';
 import 'package:donation/src/features/donar/yearly_report_screen.dart';
 import 'package:donation/src/features/services/donar_record_service.dart';
 import 'package:donation/src/features/services/expense_record_service.dart';
 import 'package:donation/utils/Colors.dart';
-import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -314,7 +312,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
           if (isLoading)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 child: const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -348,7 +346,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -361,7 +359,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                 //   width: double.infinity,
                 //   padding: const EdgeInsets.symmetric(vertical: 8),
                 //   decoration: BoxDecoration(
-                //     color: primaryColor.withOpacity(0.1),
+                //     color: primaryColor.withValues(alpha: 0.1),
                 //     borderRadius: const BorderRadius.only(
                 //       topLeft: Radius.circular(12),
                 //       topRight: Radius.circular(12),
@@ -390,7 +388,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 10),
                               decoration: BoxDecoration(
-                                color: Colors.blue.withOpacity(0.08),
+                                color: Colors.blue.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
@@ -432,7 +430,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 10),
                               decoration: BoxDecoration(
-                                color: primaryColor.withOpacity(0.08),
+                                color: primaryColor.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
@@ -481,7 +479,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 8),
                               decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.08),
+                                color: Colors.green.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
@@ -523,7 +521,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 8),
                               decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.08),
+                                color: Colors.red.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
@@ -622,7 +620,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
             bottomLeft: Radius.circular(12),
             bottomRight: Radius.circular(12),
           ),
-          border: Border.all(color: Colors.green.withOpacity(0.2)),
+          border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
         ),
         child: const Center(
           child: Padding(
@@ -642,7 +640,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
           bottomLeft: Radius.circular(12),
           bottomRight: Radius.circular(12),
         ),
-        border: Border.all(color: Colors.green.withOpacity(0.2)),
+        border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
       ),
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
@@ -720,7 +718,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
             bottomLeft: Radius.circular(12),
             bottomRight: Radius.circular(12),
           ),
-          border: Border.all(color: Colors.red.withOpacity(0.2)),
+          border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
         ),
         child: const Center(
           child: Padding(
@@ -740,7 +738,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
           bottomLeft: Radius.circular(12),
           bottomRight: Radius.circular(12),
         ),
-        border: Border.all(color: Colors.red.withOpacity(0.2)),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
       ),
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
@@ -822,7 +820,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(12),
               topRight: Radius.circular(12),
@@ -833,7 +831,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -855,7 +853,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -887,7 +885,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(12),
               topRight: Radius.circular(12),
@@ -898,7 +896,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -920,7 +918,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
