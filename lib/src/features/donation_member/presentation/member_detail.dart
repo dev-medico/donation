@@ -202,6 +202,8 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                       "သွေးဘဏ်ကတ်နံပါတ်", member.bloodBankCard ?? 'N/A'),
                   _buildInfoRow("လိင်အမျိုးအစား", _formatGender(member.gender)),
                   _buildInfoRow(
+                      "ယခင်သွေးလှူအကြိမ်", member.memberCount ?? '0'),
+                  _buildInfoRow(
                       "အဖွဲ့နှင့်သွေးလှူဒါန်းမှု", donations.length.toString()),
                   _buildInfoRow(
                       "စုစုပေါင်းသွေးလှူဒါန်းမှု", member.totalCount ?? '0'),

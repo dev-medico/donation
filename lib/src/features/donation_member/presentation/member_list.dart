@@ -912,6 +912,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
   final phoneController = TextEditingController();
   final extraPhoneController = TextEditingController();
   final bloodBankCardController = TextEditingController();
+  final memberCountController = TextEditingController();
   final nrcController = TextEditingController(); // For the number part only
   final homeNoController = TextEditingController();
   final streetController = TextEditingController();
@@ -1512,6 +1513,10 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
 
                       _buildInputRow(
                           "သွေးဘဏ်ကတ်နံပါတ်", bloodBankCardController),
+                      _buildInputRow(
+                          "ယခင်သွေးလှူအကြိမ်", memberCountController,
+                          keyboardType: TextInputType.number,
+                          hintText: "ကျွန်ုပ်တို့အဖွဲ့သို့မဝင်မီ သွေးလှူထားသည့်အကြိမ်"),
                       _buildInputRow("အိမ်အမှတ်", homeNoController),
                       _buildInputRow("လမ်းအမည်", streetController),
                       _buildInputRow("ရပ်ကွက်/ရွာအမည်", quarterController),
@@ -1614,7 +1619,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
   }
 
   Widget _buildInputRow(String label, TextEditingController controller,
-      {String? hintText}) {
+      {String? hintText, TextInputType? keyboardType}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Row(
@@ -1632,6 +1637,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
             flex: 4,
             child: TextFormField(
               controller: controller,
+              keyboardType: keyboardType,
               decoration: InputDecoration(
                 hintText: hintText,
                 isDense: true,
@@ -2206,6 +2212,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
         'phone': phoneController.text,
         'phone_2': extraPhone ? extraPhoneController.text : null,
         'blood_bank_card': bloodBankCardController.text,
+        'member_count': memberCountController.text.isEmpty ? '0' : memberCountController.text,
         'birth_date': formattedBirthDate,
         'gender': genderValue == 0 ? 'male' : 'female',
         'address': address,
