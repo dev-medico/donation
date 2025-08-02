@@ -1514,9 +1514,10 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                       _buildInputRow(
                           "သွေးဘဏ်ကတ်နံပါတ်", bloodBankCardController),
                       _buildInputRow(
-                          "ယခင်သွေးလှူအကြိမ်", memberCountController,
-                          keyboardType: TextInputType.number,
-                          hintText: "ကျွန်ုပ်တို့အဖွဲ့သို့မဝင်မီ သွေးလှူထားသည့်အကြိမ်"),
+                        "ယခင်သွေးလှူအကြိမ်",
+                        memberCountController,
+                        keyboardType: TextInputType.number,
+                      ),
                       _buildInputRow("အိမ်အမှတ်", homeNoController),
                       _buildInputRow("လမ်းအမည်", streetController),
                       _buildInputRow("ရပ်ကွက်/ရွာအမည်", quarterController),
@@ -2212,7 +2213,9 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
         'phone': phoneController.text,
         'phone_2': extraPhone ? extraPhoneController.text : null,
         'blood_bank_card': bloodBankCardController.text,
-        'member_count': memberCountController.text.isEmpty ? '0' : memberCountController.text,
+        'member_count': memberCountController.text.isEmpty
+            ? '0'
+            : memberCountController.text,
         'birth_date': formattedBirthDate,
         'gender': genderValue == 0 ? 'male' : 'female',
         'address': address,

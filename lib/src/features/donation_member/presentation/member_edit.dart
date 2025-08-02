@@ -27,6 +27,7 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
   late TextEditingController phoneController;
   late TextEditingController bloodBankController;
   late TextEditingController addressController;
+  late TextEditingController memberCountController;
   String? selectedBloodType;
   String? selectedGender;
 
@@ -61,6 +62,8 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
         TextEditingController(text: widget.member.bloodBankCard ?? '');
     addressController =
         TextEditingController(text: widget.member.address ?? '');
+    memberCountController =
+        TextEditingController(text: widget.member.memberCount ?? '');
     selectedBloodType = widget.member.bloodType;
     selectedGender = widget.member.gender;
   }
@@ -74,6 +77,7 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
     phoneController.dispose();
     bloodBankController.dispose();
     addressController.dispose();
+    memberCountController.dispose();
     super.dispose();
   }
 
@@ -102,7 +106,9 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
         bloodType: selectedBloodType,
         gender: selectedGender,
         // Keep other fields unchanged
-        memberCount: widget.member.memberCount,
+        memberCount: memberCountController.text.isEmpty
+            ? null
+            : memberCountController.text,
         totalCount: widget.member.totalCount,
         registerDate: widget.member.registerDate,
         status: widget.member.status,
@@ -357,6 +363,28 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
                           border: OutlineInputBorder(),
                           alignLabelWithHint: true,
                         ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Member Count
+                      TextFormField(
+                        controller: memberCountController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: "ယခင်သွေးလှူအကြိမ်",
+                          border: OutlineInputBorder(),
+                          hintText: "ဥပမာ - 1, 2, 3",
+                        ),
+                        validator: (value) {
+                          if (value != null && value.isNotEmpty) {
+                            final number = int.tryParse(value);
+                            if (number == null || number < 0) {
+                              return 'ကျေးဇူးပြု၍ မှန်ကန်သော နံပါတ်ဖြည့်ပါ';
+                            }
+                          }
+                          return null;
+                        },
                       ),
 
                       const SizedBox(height: 24),

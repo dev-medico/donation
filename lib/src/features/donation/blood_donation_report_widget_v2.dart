@@ -302,6 +302,37 @@ class _BloodDonationReportWidgetState extends ConsumerState<BloodDonationReportW
 
   Widget _buildBloodTypeChart(BuildContext context,
       List<Map<String, dynamic>> bloodTypes, int totalDonations) {
+    // Sort blood types in the specified order: all Rh+ first, then all Rh-
+    final bloodTypeOrder = [
+      'A (Rh +)', 'B (Rh +)', 'AB (Rh +)', 'O (Rh +)',
+      'A (Rh -)', 'B (Rh -)', 'AB (Rh -)', 'O (Rh -)'
+    ];
+    
+    // Create a map for quick lookup
+    final bloodTypeMap = <String, Map<String, dynamic>>{};
+    for (final bloodType in bloodTypes) {
+      final type = bloodType['blood_type'] as String? ?? '';
+      if (type.isNotEmpty) {
+        bloodTypeMap[type] = bloodType;
+      }
+    }
+    
+    // Create sorted list based on the specified order
+    final sortedBloodTypes = <Map<String, dynamic>>[];
+    for (final type in bloodTypeOrder) {
+      if (bloodTypeMap.containsKey(type)) {
+        sortedBloodTypes.add(bloodTypeMap[type]!);
+      }
+    }
+    
+    // Add any blood types that aren't in our predefined order
+    for (final bloodType in bloodTypes) {
+      final type = bloodType['blood_type'] as String? ?? '';
+      if (type.isNotEmpty && !bloodTypeOrder.contains(type)) {
+        sortedBloodTypes.add(bloodType);
+      }
+    }
+    
     return Container(
       height: Responsive.isMobile(context) ? 400 : 450,
       decoration: BoxDecoration(
@@ -365,7 +396,7 @@ class _BloodDonationReportWidgetState extends ConsumerState<BloodDonationReportW
             ),
             const Divider(height: 16),
             Expanded(
-              child: bloodTypes.isEmpty
+              child: sortedBloodTypes.isEmpty
                   ? Center(
                       child: Text(
                         "မှတ်တမ်း မရှိပါ",
@@ -373,9 +404,9 @@ class _BloodDonationReportWidgetState extends ConsumerState<BloodDonationReportW
                       ),
                     )
                   : ListView.builder(
-                      itemCount: bloodTypes.length,
+                      itemCount: sortedBloodTypes.length,
                       itemBuilder: (context, index) {
-                        final bloodType = bloodTypes[index];
+                        final bloodType = sortedBloodTypes[index];
                         final type = bloodType['blood_type'] as String? ?? '';
                         final count = (bloodType['count'] as num?)?.toInt() ?? 0;
                         final percentage =

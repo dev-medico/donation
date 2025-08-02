@@ -324,6 +324,37 @@ class BloodDonationReportWidget extends ConsumerWidget {
 
   Widget _buildBloodTypeChart(BuildContext context,
       List<Map<String, dynamic>> bloodTypes, int totalDonations) {
+    // Sort blood types in the specified order
+    final bloodTypeOrder = [
+      'A (Rh +)', 'B (Rh +)', 'AB (Rh +)', 'O (Rh +)',
+      'A (Rh -)', 'B (Rh -)', 'AB (Rh -)', 'O (Rh -)'
+    ];
+    
+    // Create a map for quick lookup
+    final bloodTypeMap = <String, Map<String, dynamic>>{};
+    for (final bloodType in bloodTypes) {
+      final type = bloodType['blood_type'] as String? ?? '';
+      if (type.isNotEmpty) {
+        bloodTypeMap[type] = bloodType;
+      }
+    }
+    
+    // Create sorted list based on the specified order
+    final sortedBloodTypes = <Map<String, dynamic>>[];
+    for (final type in bloodTypeOrder) {
+      if (bloodTypeMap.containsKey(type)) {
+        sortedBloodTypes.add(bloodTypeMap[type]!);
+      }
+    }
+    
+    // Add any blood types that aren't in our predefined order
+    for (final bloodType in bloodTypes) {
+      final type = bloodType['blood_type'] as String? ?? '';
+      if (type.isNotEmpty && !bloodTypeOrder.contains(type)) {
+        sortedBloodTypes.add(bloodType);
+      }
+    }
+    
     return Container(
       height: Responsive.isMobile(context) ? 400 : 450,
       decoration: BoxDecoration(
@@ -387,7 +418,7 @@ class BloodDonationReportWidget extends ConsumerWidget {
             ),
             const Divider(height: 16),
             Expanded(
-              child: bloodTypes.isEmpty
+              child: sortedBloodTypes.isEmpty
                   ? Center(
                       child: Text(
                         "မှတ်တမ်း မရှိပါ",
@@ -395,9 +426,9 @@ class BloodDonationReportWidget extends ConsumerWidget {
                       ),
                     )
                   : ListView.builder(
-                      itemCount: bloodTypes.length,
+                      itemCount: sortedBloodTypes.length,
                       itemBuilder: (context, index) {
-                        final bloodType = bloodTypes[index];
+                        final bloodType = sortedBloodTypes[index];
                         final type = bloodType['blood_type'] as String? ?? '';
                         final count = (bloodType['count'] ??
                                 bloodType['quantity']) as int? ??

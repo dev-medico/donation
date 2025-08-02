@@ -11,7 +11,7 @@ import 'package:donation/src/features/donation_member/presentation/controller/me
 import 'package:donation/src/features/donation_member/presentation/member_list_back_up.dart';
 import 'package:donation/src/features/home/desktop_home.dart';
 import 'package:donation/src/features/home/home.dart';
-import 'package:donation/src/features/patient/patient_list.dart';
+import 'package:donation/src/features/patient/patient_list_screen.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -254,13 +254,13 @@ class _MyAppState extends ConsumerState<MyApp> {
                 
               case DonarListScreen.routeName:
                 return const DonarListScreen();
+                
+              case PatientListScreen.routeName:
+                return const PatientListScreen();
 
               // Todo - Uncomment when ready
               // case MemberListBackupScreen.routeName:
               //   return const MemberListBackupScreen();
-
-              // case PatientList.routeName:
-              //   return const PatientList();
 
               // case DonarListNewScreen.routeName:
               //   return DonarListNewScreen();

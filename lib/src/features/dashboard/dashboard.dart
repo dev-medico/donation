@@ -171,6 +171,15 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
                         amount: "",
                         amountColor: Colors.black,
                       ),
+                      const SizedBox(width: 12),
+                      DashboardCard(
+                        index: 2,
+                        color: primaryDark,
+                        title: "လူနာစာရင်း",
+                        subtitle: "အသေးစိတ် ကြည့်မည်",
+                        amount: "",
+                        amountColor: Colors.black,
+                      ),
                     ],
                   ),
                 ),
@@ -246,6 +255,40 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
                             color: primaryDark,
                             title: "ရ/သုံး ငွေစာရင်း",
                             subtitle: "အသေးစိတ် ကြည့်မည်",
+                            amount: "",
+                            amountColor: Colors.black,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                          left: 12, right: 12, top: 20, bottom: 8),
+                      width: MediaQuery.of(context).size.width / 2.15,
+                      height: 1,
+                      color: Colors.grey,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width / 2,
+                      padding: const EdgeInsets.only(left: 20.0, bottom: 12),
+                      child: Row(
+                        children: [
+                          DashboardCard(
+                            index: 4,
+                            color: primaryDark,
+                            title: "သွေးတောင်းခံ/လှူဒါန်းမှု",
+                            subtitle: "အသေးစိတ် ကြည့်မည်",
+                            amount: "",
+                            amountColor: Colors.black,
+                          ),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          DashboardCard(
+                            index: 2,
+                            color: primaryDark,
+                            title: "လူနာစာရင်း",
+                            subtitle: "အသေးစိတ် ကြည့်မည်",
                             amount: "",
                             amountColor: Colors.black,
                           ),

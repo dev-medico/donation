@@ -2,6 +2,7 @@ import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/finder/request_give_list_screen.dart';
+import 'package:donation/src/features/patient/patient_list_screen.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
@@ -53,8 +54,14 @@ class DashboardCard extends ConsumerWidget {
               } else if (index == 1) {
                 await Navigator.pushNamed(context, DonationListScreen.routeName);
               } else if (index == 2) {
-                // Navigate to special events
-                await Navigator.pushNamed(context, SpecialEventListScreen.routeName);
+                // Check if this is patient list by looking at the title
+                if (title.contains("လူနာ")) {
+                  // Navigate to patient list
+                  await Navigator.pushNamed(context, PatientListScreen.routeName);
+                } else {
+                  // Navigate to special events
+                  await Navigator.pushNamed(context, SpecialEventListScreen.routeName);
+                }
               } else if (index == 3) {
                 // Navigate to donar list for finance
                 await Navigator.pushNamed(context, DonarListScreen.routeName);
