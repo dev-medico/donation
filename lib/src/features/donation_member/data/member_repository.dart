@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:donation/core/api/api_client.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/domain/donation.dart';
@@ -51,8 +53,7 @@ class MemberRepository {
       }
 
       final responseData = response.data!;
-      debugPrint(
-          'Response received: ${responseData.toString().substring(0, min(100, responseData.toString().length))}...');
+      log('Response received: ${responseData.toString()}...');
 
       // Check status from backend
       if (responseData['status'] == 'error') {

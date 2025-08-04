@@ -145,7 +145,7 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
     }
 
     // Take only top 8 diseases
-    final topDonations = donations!.take(8).toList();
+    final topDonations = donations!.take(50).toList();
 
     topDonations.forEach((element) {
       if (element.disease != null &&

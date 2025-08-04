@@ -171,6 +171,17 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
           isLoading = false;
         });
         print('Using ${cachedMembers.length} members from provider cache');
+
+        // Debug: Check if specific member exists
+        final testMember = cachedMembers
+            .where((m) => m.name != null && m.name!.contains('ကိုဝေယံ'))
+            .toList();
+        if (testMember.isNotEmpty) {
+          print(
+              'Found test member: ${testMember.first.name} (ID: ${testMember.first.memberId})');
+        } else {
+          print('Test member "ကိုဝေယံ" not found in cached list');
+        }
       } else {
         // If not in provider, fetch and cache them
         final memberService = ref.read(member_services.memberServiceProvider);
@@ -470,14 +481,33 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     if (pattern.isEmpty) {
                       return [];
                     }
-                    return cachedMembers
-                        .where((member) =>
-                            member.name != null &&
-                            member.name!
-                                .toLowerCase()
-                                .contains(pattern.toLowerCase()))
-                        .take(20) // Increased from 10 to 20 to show more results
+                    // Normalize the search pattern for better Burmese text matching
+                    final searchPattern = pattern.trim();
+                    
+                    print('Searching for: "$searchPattern" in ${cachedMembers.length} members');
+                    
+                    final results = cachedMembers
+                        .where((member) {
+                          // Search in multiple fields for better results
+                          final nameMatch = member.name != null &&
+                              member.name!.contains(searchPattern);
+                          final memberIdMatch = member.memberId != null &&
+                              member.memberId!.contains(searchPattern);
+                          final phoneMatch = member.phone != null &&
+                              member.phone!.contains(searchPattern);
+                          
+                          // Debug specific member
+                          if (member.name != null && member.name!.contains('ကိုဝေယံ')) {
+                            print('Found ကိုဝေယံ - Checking match: name=$nameMatch, id=$memberIdMatch, phone=$phoneMatch');
+                          }
+                          
+                          return nameMatch || memberIdMatch || phoneMatch;
+                        })
+                        .take(300) // Increased to show more results
                         .toList();
+                        
+                    print('Found ${results.length} matching members');
+                    return results;
                   },
                   itemBuilder: (context, Member member) {
                     return ListTile(
@@ -591,7 +621,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                               .where((township) => township
                                   .toLowerCase()
                                   .contains(pattern.toLowerCase()))
-                              .take(5)
+                              .take(10)
                               .toList();
                         },
                         itemBuilder: (context, String township) {
@@ -829,14 +859,33 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     if (pattern.isEmpty) {
                       return [];
                     }
-                    return cachedMembers
-                        .where((member) =>
-                            member.name != null &&
-                            member.name!
-                                .toLowerCase()
-                                .contains(pattern.toLowerCase()))
-                        .take(20) // Increased from 10 to 20 to show more results
+                    // Normalize the search pattern for better Burmese text matching
+                    final searchPattern = pattern.trim();
+                    
+                    print('Searching for: "$searchPattern" in ${cachedMembers.length} members');
+                    
+                    final results = cachedMembers
+                        .where((member) {
+                          // Search in multiple fields for better results
+                          final nameMatch = member.name != null &&
+                              member.name!.contains(searchPattern);
+                          final memberIdMatch = member.memberId != null &&
+                              member.memberId!.contains(searchPattern);
+                          final phoneMatch = member.phone != null &&
+                              member.phone!.contains(searchPattern);
+                          
+                          // Debug specific member
+                          if (member.name != null && member.name!.contains('ကိုဝေယံ')) {
+                            print('Found ကိုဝေယံ - Checking match: name=$nameMatch, id=$memberIdMatch, phone=$phoneMatch');
+                          }
+                          
+                          return nameMatch || memberIdMatch || phoneMatch;
+                        })
+                        .take(300) // Increased to show more results
                         .toList();
+                        
+                    print('Found ${results.length} matching members');
+                    return results;
                   },
                   itemBuilder: (context, Member member) {
                     return ListTile(
@@ -958,7 +1007,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                               .where((township) => township
                                   .toLowerCase()
                                   .contains(pattern.toLowerCase()))
-                              .take(5)
+                              .take(10)
                               .toList();
                         },
                         itemBuilder: (context, String township) {
