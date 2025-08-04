@@ -22,6 +22,11 @@ import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:donation/utils/nrc_data.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'package:donation/data/response/township_response/township_response.dart';
+import 'package:donation/data/response/township_response/datum.dart';
 
 // Provider for MemberRepository
 final memberRepositoryProvider = Provider<MemberRepository>((ref) {
@@ -53,8 +58,15 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
   SearchMemberDataSource? memberDataDataSource;
   TextStyle tabStyle = const TextStyle(fontSize: 16);
   final searchController = TextEditingController();
+  final birthDateController = TextEditingController();
+  final phoneController = TextEditingController();
+  final fatherNameController = TextEditingController();
+  final bloodBankCardController = TextEditingController();
+  final memberIdController = TextEditingController();
+
   Timer? _debounceTimer;
   bool _showLoadingStatus = true;
+  bool _isAdvancedSearchExpanded = false;
 
   @override
   void initState() {
@@ -119,6 +131,13 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     final selectedBloodType = ref.read(memberBloodTypeFilterProvider);
     final searchKey = ref.read(memberSearchQueryProvider);
     final selectedRange = ref.read(memberRangeFilterProvider);
+    
+    // Advanced search filters
+    final birthDateSearch = ref.read(memberBirthDateSearchProvider);
+    final phoneSearch = ref.read(memberPhoneSearchProvider);
+    final fatherNameSearch = ref.read(memberFatherNameSearchProvider);
+    final bloodBankCardSearch = ref.read(memberBloodBankCardSearchProvider);
+    final memberIdSearch = ref.read(memberIdSearchProvider);
 
     if (selectedBloodType != "သွေးအုပ်စုဖြင့် ရှာဖွေမည်") {
       filtered = filtered
@@ -138,6 +157,47 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                   false) ||
               (member.phone?.toLowerCase().contains(searchKey.toLowerCase()) ??
                   false))
+          .toList();
+    }
+
+    // Apply advanced search filters
+    if (birthDateSearch.isNotEmpty) {
+      filtered = filtered
+          .where((member) =>
+              member.birthDate?.toLowerCase().contains(birthDateSearch.toLowerCase()) ??
+              false)
+          .toList();
+    }
+
+    if (phoneSearch.isNotEmpty) {
+      filtered = filtered
+          .where((member) =>
+              member.phone?.toLowerCase().contains(phoneSearch.toLowerCase()) ??
+                  false)
+          .toList();
+    }
+
+    if (fatherNameSearch.isNotEmpty) {
+      filtered = filtered
+          .where((member) =>
+              member.fatherName?.toLowerCase().contains(fatherNameSearch.toLowerCase()) ??
+              false)
+          .toList();
+    }
+
+    if (bloodBankCardSearch.isNotEmpty) {
+      filtered = filtered
+          .where((member) =>
+              member.bloodBankCard?.toLowerCase().contains(bloodBankCardSearch.toLowerCase()) ??
+              false)
+          .toList();
+    }
+
+    if (memberIdSearch.isNotEmpty) {
+      filtered = filtered
+          .where((member) =>
+              member.memberId?.toLowerCase().contains(memberIdSearch.toLowerCase()) ??
+              false)
           .toList();
     }
 
@@ -166,6 +226,11 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
   @override
   void dispose() {
     searchController.dispose();
+    birthDateController.dispose();
+    phoneController.dispose();
+    fatherNameController.dispose();
+    bloodBankCardController.dispose();
+    memberIdController.dispose();
     _debounceTimer?.cancel();
     super.dispose();
   }
@@ -296,7 +361,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(),
-            SizedBox(height: 16),
+            SizedBox(height: 8),
             Text(
               'အဖွဲ့၀င်များ ရယူနေပါသည်။ ခေတ္တစောင့်ဆိုင်းပေးပါ။',
               style: TextStyle(fontSize: 14, color: Colors.grey[700]),
@@ -310,13 +375,13 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.error_outline, color: Colors.red, size: 48),
-            SizedBox(height: 16),
+            SizedBox(height: 8),
             Text(
               'အမှား - ${membersAsync.error}',
               style: TextStyle(fontSize: 16, color: Colors.red[700]),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () {
                 setState(() {
@@ -342,219 +407,495 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
 
   Widget _buildMainContent(List<Member> filteredMembers,
       String selectedBloodType, String selectedRange) {
-    return Stack(
+    return Column(
       children: [
-        Responsive.isMobile(context)
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(left: 20, right: 20),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            width: MediaQuery.of(context).size.width / 2.3,
-                            margin: const EdgeInsets.only(top: 20, right: 6),
-                            child: ranges.isNotEmpty
-                                ? DropdownButtonFormField<String>(
-                                    value: ranges.contains(selectedRange)
-                                        ? selectedRange
-                                        : null,
-                                    dropdownColor: Colors.white,
-                                    focusColor: Colors.white,
-                                    decoration: InputDecoration(
-                                      isDense: true,
-                                      fillColor: Colors.white,
-                                      contentPadding: EdgeInsets.only(
-                                          top: 16,
-                                          left: 20,
-                                          bottom: 16,
-                                          right: 12),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    isExpanded: true,
-                                    hint: const Text(
-                                      "အမှတ်စဥ် အလိုက်ကြည့်မည်",
-                                      style: TextStyle(fontSize: 13),
-                                    ),
-                                    icon: const Icon(
-                                      Icons.arrow_drop_down,
-                                      color: Colors.black45,
-                                    ),
-                                    iconSize: 30,
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: null,
-                                        child: Text(
-                                          "အမှတ်စဥ် အလိုက်ကြည့်မည်",
-                                          style: TextStyle(fontSize: 13),
+        // Filters section with scroll
+        SingleChildScrollView(
+          child: Column(
+            children: [
+          Responsive.isMobile(context)
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left: 16, right: 16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              width: MediaQuery.of(context).size.width / 2.3,
+                              margin: const EdgeInsets.only(top: 12, right: 4),
+                              child: ranges.isNotEmpty
+                                  ? DropdownButtonFormField<String>(
+                                      value: ranges.contains(selectedRange)
+                                          ? selectedRange
+                                          : null,
+                                      dropdownColor: Colors.white,
+                                      focusColor: Colors.white,
+                                      decoration: InputDecoration(
+                                        isDense: true,
+                                        fillColor: Colors.white,
+                                        contentPadding: EdgeInsets.only(
+                                            top: 16,
+                                            left: 20,
+                                            bottom: 16,
+                                            right: 12),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                       ),
-                                      ...ranges.map(
-                                          (item) => DropdownMenuItem<String>(
-                                                value: item,
-                                                child: Text(
-                                                  item,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
+                                      isExpanded: true,
+                                      hint: const Text(
+                                        "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                        style: TextStyle(fontSize: 13),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Colors.black45,
+                                      ),
+                                      iconSize: 30,
+                                      items: [
+                                        DropdownMenuItem(
+                                          value: null,
+                                          child: Text(
+                                            "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                            style: TextStyle(fontSize: 13),
+                                          ),
+                                        ),
+                                        ...ranges.map(
+                                            (item) => DropdownMenuItem<String>(
+                                                  value: item,
+                                                  child: Text(
+                                                    item,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                    ),
                                                   ),
-                                                ),
-                                              )),
-                                    ],
-                                    onChanged: (value) {
+                                                )),
+                                      ],
+                                      onChanged: (value) {
+                                        ref
+                                            .read(memberRangeFilterProvider
+                                                .notifier)
+                                            .state = value;
+                                        _filterMembers();
+                                      },
+                                    )
+                                  : Container(
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                          style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.grey[700]),
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              width: MediaQuery.of(context).size.width / 2.3,
+                              margin: const EdgeInsets.only(
+                                top: 12,
+                                left: 4,
+                              ),
+                              child: DropdownButtonFormField<String>(
+                                value: bloodTypes.contains(selectedBloodType)
+                                    ? selectedBloodType
+                                    : "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
+                                dropdownColor: Colors.white,
+                                focusColor: Colors.white,
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.only(
+                                      top: 12, left: 16, bottom: 12, right: 10),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                isExpanded: true,
+                                icon: const Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.black45,
+                                ),
+                                iconSize: 30,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
+                                    child: Text(
+                                      "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                  ),
+                                  ...bloodTypes
+                                      .map((item) => DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(
+                                              item,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          )),
+                                ],
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    ref
+                                        .read(memberBloodTypeFilterProvider
+                                            .notifier)
+                                        .state = value;
+                                    _filterMembers();
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Search and Advanced Search Section
+                    Container(
+                      margin:
+                          const EdgeInsets.only(left: 16, right: 16, top: 8),
+                      child: Column(
+                        children: [
+                          // Main search with toggle button
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: searchController,
+                                  textAlign: TextAlign.start,
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Colors.black),
+                                  onChanged: (val) {
+                                    if (_debounceTimer?.isActive ?? false) {
+                                      _debounceTimer?.cancel();
+                                    }
+
+                                    _debounceTimer = Timer(
+                                        const Duration(milliseconds: 500), () {
                                       ref
-                                          .read(memberRangeFilterProvider
+                                          .read(memberSearchQueryProvider
                                               .notifier)
-                                          .state = value;
-                                      _filterMembers();
-                                    },
-                                  )
-                                : Container(
-                                    height: 50,
+                                          .state = val;
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
+                                    hintStyle: const TextStyle(
+                                        color: Colors.black, fontSize: 15.0),
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    suffixIcon: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Icon(
+                                        Icons.search,
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                    contentPadding: const EdgeInsets.only(
+                                        left: 20, right: 20, top: 4, bottom: 4),
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                            color: Colors.grey)),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                            color: Colors.grey)),
+                                    disabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                            color: Colors.grey)),
+                                    enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                            color: Colors.grey)),
+                                  ),
+                                  keyboardType: TextInputType.text,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _isAdvancedSearchExpanded =
+                                        !_isAdvancedSearchExpanded;
+                                  });
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: _isAdvancedSearchExpanded
+                                        ? primaryColor
+                                        : Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    _isAdvancedSearchExpanded
+                                        ? Icons.filter_list_off
+                                        : Icons.filter_list,
+                                    color: _isAdvancedSearchExpanded
+                                        ? Colors.white
+                                        : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Advanced search fields
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            height: _isAdvancedSearchExpanded ? null : 0,
+                            child: _isAdvancedSearchExpanded
+                                ? Container(
+                                    margin: EdgeInsets.only(top: 12),
+                                    padding: EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
+                                      color: Colors.grey[50],
+                                      borderRadius: BorderRadius.circular(12),
+                                      border:
+                                          Border.all(color: Colors.grey[300]!),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        // First row
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildSearchField(
+                                                "ဖုန်းနံပါတ်",
+                                                phoneController,
+                                                (val) {
+                                                  ref
+                                                      .read(
+                                                          memberPhoneSearchProvider
+                                                              .notifier)
+                                                      .state = val;
+                                                  _filterMembers();
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(width: 12),
+                                            Expanded(
+                                              child: _buildSearchField(
+                                                "အဖေနာမည်",
+                                                fatherNameController,
+                                                (val) {
+                                                  ref
+                                                      .read(
+                                                          memberFatherNameSearchProvider
+                                                              .notifier)
+                                                      .state = val;
+                                                  _filterMembers();
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 12),
+                                        // Second row
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildSearchField(
+                                                "သွေးဘဏ်ကတ်နံပါတ်",
+                                                bloodBankCardController,
+                                                (val) {
+                                                  ref
+                                                      .read(
+                                                          memberBloodBankCardSearchProvider
+                                                              .notifier)
+                                                      .state = val;
+                                                  _filterMembers();
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(width: 12),
+                                            Expanded(
+                                              child: _buildSearchField(
+                                                "အဖွဲ့ဝင် အမှတ်စဉ်",
+                                                memberIdController,
+                                                (val) {
+                                                  ref
+                                                      .read(memberIdSearchProvider
+                                                          .notifier)
+                                                      .state = val;
+                                                  _filterMembers();
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 12),
+                                        // Third row - Birthdate
+                                        _buildSearchField(
+                                          "မွေးသက္ကရာဇ်",
+                                          birthDateController,
+                                          (val) {
+                                            ref
+                                                .read(
+                                                    memberBirthDateSearchProvider
+                                                        .notifier)
+                                                .state = val;
+                                            _filterMembers();
+                                          },
+                                        ),
+                                        SizedBox(height: 12),
+                                        // Clear filters button
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: TextButton.icon(
+                                            onPressed: () {
+                                              birthDateController.clear();
+                                              phoneController.clear();
+                                              fatherNameController.clear();
+                                              bloodBankCardController.clear();
+                                              memberIdController.clear();
+                                              ref
+                                                  .read(
+                                                      memberBirthDateSearchProvider
+                                                          .notifier)
+                                                  .state = '';
+                                              ref
+                                                  .read(
+                                                      memberPhoneSearchProvider
+                                                          .notifier)
+                                                  .state = '';
+                                              ref
+                                                  .read(
+                                                      memberFatherNameSearchProvider
+                                                          .notifier)
+                                                  .state = '';
+                                              ref
+                                                  .read(
+                                                      memberBloodBankCardSearchProvider
+                                                          .notifier)
+                                                  .state = '';
+                                              ref
+                                                  .read(memberIdSearchProvider
+                                                      .notifier)
+                                                  .state = '';
+                                              _filterMembers();
+                                            },
+                                            icon:
+                                                Icon(Icons.clear_all, size: 20),
+                                            label: Text("ရှင်းလင်းမည်"),
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: Colors.red,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : SizedBox(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // First row with dropdowns and search
+                    Row(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width / 5,
+                          height: 50,
+                          margin: const EdgeInsets.only(top: 28, left: 24),
+                          child: ranges.isNotEmpty
+                              ? DropdownButtonFormField<String>(
+                                  value: ranges.contains(selectedRange)
+                                      ? selectedRange
+                                      : null,
+                                  dropdownColor: Colors.white,
+                                  focusColor: Colors.white,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.only(
+                                        top: 16,
+                                        left: 20,
+                                        bottom: 16,
+                                        right: 12),
+                                    border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: Center(
+                                  ),
+                                  isExpanded: true,
+                                  hint: const Text(
+                                    "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Colors.black45,
+                                  ),
+                                  iconSize: 30,
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: null,
+                                      child: Text(
+                                        "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                    ...ranges
+                                        .map((item) => DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Text(
+                                                item,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            )),
+                                  ],
+                                  onChanged: (value) {
+                                    ref
+                                        .read(
+                                            memberRangeFilterProvider.notifier)
+                                        .state = value;
+                                    _filterMembers();
+                                  },
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
                                       child: Text(
                                         "အမှတ်စဥ် အလိုက်ကြည့်မည်",
                                         style: TextStyle(
-                                            fontSize: 13,
+                                            fontSize: 14,
                                             color: Colors.grey[700]),
                                       ),
                                     ),
                                   ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            width: MediaQuery.of(context).size.width / 2.3,
-                            margin: const EdgeInsets.only(
-                              top: 20,
-                              left: 6,
-                            ),
-                            child: DropdownButtonFormField<String>(
-                              value: bloodTypes.contains(selectedBloodType)
-                                  ? selectedBloodType
-                                  : "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                              dropdownColor: Colors.white,
-                              focusColor: Colors.white,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                contentPadding: EdgeInsets.only(
-                                    top: 16, left: 20, bottom: 16, right: 12),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ),
-                              isExpanded: true,
-                              icon: const Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.black45,
-                              ),
-                              iconSize: 30,
-                              items: [
-                                DropdownMenuItem(
-                                  value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                                  child: Text(
-                                    "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                                    style: TextStyle(fontSize: 13),
-                                  ),
-                                ),
-                                ...bloodTypes
-                                    .map((item) => DropdownMenuItem<String>(
-                                          value: item,
-                                          child: Text(
-                                            item,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        )),
-                              ],
-                              onChanged: (value) {
-                                if (value != null) {
-                                  ref
-                                      .read(memberBloodTypeFilterProvider
-                                          .notifier)
-                                      .state = value;
-                                  _filterMembers();
-                                }
-                              },
-                            ),
-                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width - 40,
-                    margin: const EdgeInsets.only(right: 20, top: 12, left: 20),
-                    padding: const EdgeInsets.only(top: 8, bottom: 8),
-                    child: TextFormField(
-                      controller: searchController,
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(fontSize: 15, color: Colors.black),
-                      onChanged: (val) {
-                        if (_debounceTimer?.isActive ?? false) {
-                          _debounceTimer?.cancel();
-                        }
-
-                        _debounceTimer =
-                            Timer(const Duration(milliseconds: 500), () {
-                          ref.read(memberSearchQueryProvider.notifier).state =
-                              val;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-                        hintStyle: const TextStyle(
-                            color: Colors.black, fontSize: 15.0),
-                        fillColor: Colors.white.withOpacity(0.2),
-                        filled: true,
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.search,
-                            color: primaryColor,
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.only(
-                            left: 20, right: 20, top: 4, bottom: 4),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                      ),
-                      keyboardType: TextInputType.text,
-                    ),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width / 5,
-                    height: 50,
-                    margin: const EdgeInsets.only(top: 28, left: 24),
-                    child: ranges.isNotEmpty
-                        ? DropdownButtonFormField<String>(
-                            value: ranges.contains(selectedRange)
-                                ? selectedRange
-                                : null,
+                        Container(
+                          width: MediaQuery.of(context).size.width / 5,
+                          margin: const EdgeInsets.only(top: 28, left: 20),
+                          child: DropdownButtonFormField<String>(
+                            value: bloodTypes.contains(selectedBloodType)
+                                ? selectedBloodType
+                                : "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
                             dropdownColor: Colors.white,
                             focusColor: Colors.white,
                             decoration: InputDecoration(
@@ -566,9 +907,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                               ),
                             ),
                             isExpanded: true,
-                            hint: const Text(
-                              "အမှတ်စဥ် အလိုက်ကြည့်မည်",
-                              style: TextStyle(fontSize: 14),
+                            hint: Text(
+                              selectedBloodType,
+                              style: const TextStyle(fontSize: 14),
                             ),
                             icon: const Icon(
                               Icons.arrow_drop_down,
@@ -577,324 +918,471 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                             iconSize: 30,
                             items: [
                               DropdownMenuItem(
-                                value: null,
+                                value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
                                 child: Text(
-                                  "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                  "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
                                   style: TextStyle(fontSize: 14),
                                 ),
                               ),
-                              ...ranges.map((item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Text(
-                                      item,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  )),
+                              ...bloodTypes
+                                  .map((item) => DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Text(
+                                          item,
+                                          textAlign: TextAlign.end,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ))
+                                  .toList(),
                             ],
                             onChanged: (value) {
-                              ref
-                                  .read(memberRangeFilterProvider.notifier)
-                                  .state = value;
-                              _filterMembers();
+                              if (value != null) {
+                                ref
+                                    .read(
+                                        memberBloodTypeFilterProvider.notifier)
+                                    .state = value;
+                                _filterMembers();
+                              }
                             },
-                          )
-                        : Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Text(
-                                  "အမှတ်စဥ် အလိုက်ကြည့်မည်",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.grey[700]),
+                            onSaved: (value) {},
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width / 5,
+                          margin: const EdgeInsets.only(
+                              right: 40, top: 28, left: 20),
+                          padding: const EdgeInsets.only(top: 8, bottom: 8),
+                          child: TextFormField(
+                            autofocus: false,
+                            controller: searchController,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.black),
+                            onChanged: (val) {
+                              if (_debounceTimer?.isActive ?? false) {
+                                _debounceTimer?.cancel();
+                              }
+
+                              _debounceTimer =
+                                  Timer(const Duration(milliseconds: 500), () {
+                                ref
+                                    .read(memberSearchQueryProvider.notifier)
+                                    .state = val;
+                                _filterMembers();
+                              });
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
+                              hintStyle: const TextStyle(
+                                  color: Colors.black, fontSize: 15.0),
+                              fillColor: Colors.white.withOpacity(0.2),
+                              filled: true,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Icon(
+                                  Icons.search,
+                                  color: primaryColor,
                                 ),
+                              ),
+                              contentPadding: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 4, bottom: 4),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                            ),
+                            keyboardType: TextInputType.text,
+                          ),
+                        ),
+                        // Advanced search toggle button
+                        Container(
+                          margin: const EdgeInsets.only(top: 28),
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _isAdvancedSearchExpanded =
+                                    !_isAdvancedSearchExpanded;
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: _isAdvancedSearchExpanded
+                                    ? primaryColor
+                                    : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                _isAdvancedSearchExpanded
+                                    ? Icons.filter_list_off
+                                    : Icons.filter_list,
+                                color: _isAdvancedSearchExpanded
+                                    ? Colors.white
+                                    : Colors.black87,
                               ),
                             ),
                           ),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width / 5,
-                    margin: const EdgeInsets.only(top: 28, left: 20),
-                    child: DropdownButtonFormField<String>(
-                      value: bloodTypes.contains(selectedBloodType)
-                          ? selectedBloodType
-                          : "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                      dropdownColor: Colors.white,
-                      focusColor: Colors.white,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.only(
-                            top: 16, left: 20, bottom: 16, right: 12),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                      isExpanded: true,
-                      hint: Text(
-                        selectedBloodType,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      icon: const Icon(
-                        Icons.arrow_drop_down,
-                        color: Colors.black45,
-                      ),
-                      iconSize: 30,
-                      items: [
-                        DropdownMenuItem(
-                          value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                          child: Text(
-                            "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ),
-                        ...bloodTypes
-                            .map((item) => DropdownMenuItem<String>(
-                                  value: item,
-                                  child: Text(
-                                    item,
-                                    textAlign: TextAlign.end,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ))
-                            .toList(),
                       ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          ref
-                              .read(memberBloodTypeFilterProvider.notifier)
-                              .state = value;
-                          _filterMembers();
-                        }
-                      },
-                      onSaved: (value) {},
                     ),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width / 5,
-                    margin: const EdgeInsets.only(right: 40, top: 28, left: 20),
-                    padding: const EdgeInsets.only(top: 8, bottom: 8),
-                    child: TextFormField(
-                      autofocus: false,
-                      controller: searchController,
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(fontSize: 15, color: Colors.black),
-                      onChanged: (val) {
-                        if (_debounceTimer?.isActive ?? false) {
-                          _debounceTimer?.cancel();
-                        }
-
-                        _debounceTimer =
-                            Timer(const Duration(milliseconds: 500), () {
-                          ref.read(memberSearchQueryProvider.notifier).state =
-                              val;
-                          _filterMembers();
-                        });
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-                        hintStyle: const TextStyle(
-                            color: Colors.black, fontSize: 15.0),
-                        fillColor: Colors.white.withOpacity(0.2),
-                        filled: true,
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.search,
-                            color: primaryColor,
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.only(
-                            left: 20, right: 20, top: 4, bottom: 4),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                      ),
-                      keyboardType: TextInputType.text,
+                    // Advanced search fields for desktop
+                    AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      height: _isAdvancedSearchExpanded ? null : 0,
+                      child: _isAdvancedSearchExpanded
+                          ? Container(
+                              margin:
+                                  EdgeInsets.only(left: 24, right: 40, top: 16),
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildSearchField(
+                                          "ဖုန်းနံပါတ်",
+                                          phoneController,
+                                          (val) {
+                                            ref
+                                                .read(memberPhoneSearchProvider
+                                                    .notifier)
+                                                .state = val;
+                                            _filterMembers();
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(width: 16),
+                                      Expanded(
+                                        child: _buildSearchField(
+                                          "အဖေနာမည်",
+                                          fatherNameController,
+                                          (val) {
+                                            ref
+                                                .read(
+                                                    memberFatherNameSearchProvider
+                                                        .notifier)
+                                                .state = val;
+                                            _filterMembers();
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(width: 16),
+                                      Expanded(
+                                        child: _buildSearchField(
+                                          "သွေးဘဏ်ကတ်နံပါတ်",
+                                          bloodBankCardController,
+                                          (val) {
+                                            ref
+                                                .read(
+                                                    memberBloodBankCardSearchProvider
+                                                        .notifier)
+                                                .state = val;
+                                            _filterMembers();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildSearchField(
+                                          "အဖွဲ့ဝင် အမှတ်စဉ်",
+                                          memberIdController,
+                                          (val) {
+                                            ref
+                                                .read(memberIdSearchProvider
+                                                    .notifier)
+                                                .state = val;
+                                            _filterMembers();
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(width: 16),
+                                      Expanded(
+                                        child: _buildSearchField(
+                                          "မွေးသက္ကရာဇ်",
+                                          birthDateController,
+                                          (val) {
+                                            ref
+                                                .read(
+                                                    memberBirthDateSearchProvider
+                                                        .notifier)
+                                                .state = val;
+                                            _filterMembers();
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(width: 16),
+                                      Expanded(
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: TextButton.icon(
+                                            onPressed: () {
+                                              birthDateController.clear();
+                                              phoneController.clear();
+                                              fatherNameController.clear();
+                                              bloodBankCardController.clear();
+                                              memberIdController.clear();
+                                              ref
+                                                  .read(
+                                                      memberBirthDateSearchProvider
+                                                          .notifier)
+                                                  .state = '';
+                                              ref
+                                                  .read(
+                                                      memberPhoneSearchProvider
+                                                          .notifier)
+                                                  .state = '';
+                                              ref
+                                                  .read(
+                                                      memberFatherNameSearchProvider
+                                                          .notifier)
+                                                  .state = '';
+                                              ref
+                                                  .read(
+                                                      memberBloodBankCardSearchProvider
+                                                          .notifier)
+                                                  .state = '';
+                                              ref
+                                                  .read(memberIdSearchProvider
+                                                      .notifier)
+                                                  .state = '';
+                                              _filterMembers();
+                                            },
+                                            icon:
+                                                Icon(Icons.clear_all, size: 20),
+                                            label: Text("ရှင်းလင်းမည်"),
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: Colors.red,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )
+                          : SizedBox(),
                     ),
-                  ),
-                ],
-              ),
-        Container(
-          margin: EdgeInsets.only(
-              left: 20.0,
-              top: Responsive.isMobile(context) ? 160 : 100,
-              bottom: 12),
-          child: buildSimpleTable(filteredMembers),
+                  ],
+                ),
+            ],
+          ),
+        ),
+        // Add spacing between search UI and table
+        SizedBox(height: 12),
+        // Data table - outside of SingleChildScrollView
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8),
+            child: buildSimpleTable(filteredMembers),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSearchField(String label, TextEditingController controller,
+      Function(String) onChanged) {
+    return TextFormField(
+      controller: controller,
+      style: const TextStyle(fontSize: 14, color: Colors.black),
+      onChanged: (val) {
+        if (_debounceTimer?.isActive ?? false) {
+          _debounceTimer?.cancel();
+        }
+        _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+          onChanged(val);
+        });
+      },
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(fontSize: 13, color: Colors.grey[700]),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: primaryColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        fillColor: Colors.white,
+        filled: true,
+      ),
     );
   }
 
   Widget buildSimpleTable(List<Member> members) {
     memberDataDataSource = SearchMemberDataSource(memberData: members);
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height -
-          (Responsive.isMobile(context) ? 220 : 160),
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.only(
-                  right: Responsive.isMobile(context) ? 20 : 20),
-              child: SfDataGrid(
-                source: memberDataDataSource!,
-                onCellTap: (details) async {
-                  if (details.rowColumnIndex.rowIndex == 0) return;
+    return Container(
+      margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 16 : 16),
+      child: SfDataGrid(
+              source: memberDataDataSource!,
+              onCellTap: (details) async {
+                if (details.rowColumnIndex.rowIndex == 0) return;
 
-                  final member = members[details.rowColumnIndex.rowIndex - 1];
+                final member = members[details.rowColumnIndex.rowIndex - 1];
 
-                  if (member.id != null) {
-                    Navigator.of(context)
-                        .push(
-                      MaterialPageRoute(
-                        builder: (context) => MemberDetailScreen(
-                          memberId: member.id.toString(),
-                        ),
+                if (member.id != null) {
+                  Navigator.of(context)
+                      .push(
+                    MaterialPageRoute(
+                      builder: (context) => MemberDetailScreen(
+                        memberId: member.id.toString(),
                       ),
-                    )
-                        .then((_) {
-                      // When returning from detail screen, refresh data and clear filters
-                      resetFilterProviders(ref);
+                    ),
+                  )
+                      .then((_) {
+                    // When returning from detail screen, refresh data and clear filters
+                    resetFilterProviders(ref);
 
-                      // Clear search field
-                      searchController.clear();
+                    // Clear search field
+                    searchController.clear();
 
-                      // Refresh data
-                      ref.read(refreshMembersProvider)();
-                    });
-                  }
-                },
-                gridLinesVisibility: GridLinesVisibility.both,
-                headerGridLinesVisibility: GridLinesVisibility.both,
-                columnWidthMode: Responsive.isMobile(context)
-                    ? ColumnWidthMode.auto
-                    : ColumnWidthMode.fitByCellValue,
-                columns: <GridColumn>[
-                  GridColumn(
-                      columnName: 'အမှတ်စဥ်',
-                      label: Container(
-                          width: MediaQuery.of(context).size.width * 0.3,
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'အမှတ်စဥ်',
-                            style: TextStyle(color: Colors.white),
-                          ))),
-                  GridColumn(
-                      columnName: 'အမည်',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'အမည်',
-                            style: TextStyle(color: Colors.white),
-                          ))),
-                  GridColumn(
-                      columnName: 'အဖအမည်',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'အဖအမည်',
-                            style: TextStyle(color: Colors.white),
-                            overflow: TextOverflow.ellipsis,
-                          ))),
-                  GridColumn(
-                      columnName: 'သွေးအုပ်စု',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'သွေးအုပ်စု',
-                            style: TextStyle(color: Colors.white),
-                          ))),
-                  GridColumn(
-                      columnName: 'မှတ်ပုံတင်အမှတ်',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'မှတ်ပုံတင်အမှတ်',
-                            style: TextStyle(color: Colors.white),
-                          ))),
-                  GridColumn(
-                      columnName: 'သွေးဘဏ်ကတ်',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'သွေးဘဏ်ကတ်',
-                            style: TextStyle(color: Colors.white),
-                          ))),
-                  GridColumn(
-                      columnName: 'သွေးလှူမှုကြိမ်ရေ',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'သွေးလှူမှုကြိမ်ရေ',
-                            style: TextStyle(color: Colors.white),
-                          ))),
-                  GridColumn(
-                      columnName: 'မွေးသက္ကရာဇ်',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'မွေးသက္ကရာဇ်',
-                            style: TextStyle(color: Colors.white),
-                          ))),
-                  GridColumn(
-                      columnName: 'ဖုန်းနံပါတ်',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'ဖုန်းနံပါတ်',
-                            style: TextStyle(color: Colors.white),
-                          ))),
-                  GridColumn(
-                      columnName: 'နေရပ်လိပ်စာ',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'နေရပ်လိပ်စာ',
-                            style: TextStyle(color: Colors.white),
-                          ))),
-                ],
-              ),
+                    // Refresh data
+                    ref.read(refreshMembersProvider)();
+                  });
+                }
+              },
+              gridLinesVisibility: GridLinesVisibility.both,
+              headerGridLinesVisibility: GridLinesVisibility.both,
+              columnWidthMode: Responsive.isMobile(context)
+                  ? ColumnWidthMode.auto
+                  : ColumnWidthMode.fitByCellValue,
+              columns: <GridColumn>[
+                GridColumn(
+                    columnName: 'အမှတ်စဥ်',
+                    label: Container(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'အမှတ်စဥ်',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+                GridColumn(
+                    columnName: 'အမည်',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'အမည်',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+                GridColumn(
+                    columnName: 'အဖအမည်',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'အဖအမည်',
+                          style: TextStyle(color: Colors.white),
+                          overflow: TextOverflow.ellipsis,
+                        ))),
+                GridColumn(
+                    columnName: 'သွေးအုပ်စု',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'သွေးအုပ်စု',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+                GridColumn(
+                    columnName: 'မှတ်ပုံတင်အမှတ်',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'မှတ်ပုံတင်အမှတ်',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+                GridColumn(
+                    columnName: 'သွေးဘဏ်ကတ်',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'သွေးဘဏ်ကတ်',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+                GridColumn(
+                    columnName: 'သွေးလှူမှုကြိမ်ရေ',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'သွေးလှူမှုကြိမ်ရေ',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+                GridColumn(
+                    columnName: 'မွေးသက္ကရာဇ်',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'မွေးသက္ကရာဇ်',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+                GridColumn(
+                    columnName: 'ဖုန်းနံပါတ်',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'ဖုန်းနံပါတ်',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+                GridColumn(
+                    columnName: 'နေရပ်လိပ်စာ',
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(4.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'နေရပ်လိပ်စာ',
+                          style: TextStyle(color: Colors.white),
+                        ))),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -957,6 +1445,10 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
   bool nameChecked = false;
   bool isSearchingMember = false;
 
+  // Township data
+  late TownshipResponse townshipResponse;
+  List<String> townships = <String>[];
+
   @override
   void initState() {
     super.initState();
@@ -965,6 +1457,25 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
     nrc_type_options_dropDownMenuItems = getNrcTypeDropdownItems();
     nrc_region_state_options_dropDownMenuItems =
         getNrcRegionStateDropdownItems("၁၀"); // Default to Yangon
+
+    // Load township data
+    _loadTownshipData();
+  }
+
+  Future<void> _loadTownshipData() async {
+    final String response =
+        await rootBundle.loadString('assets/json/township.json');
+    townshipResponse = TownshipResponse.fromJson(json.decode(response));
+    if (townshipResponse.data != null) {
+      setState(() {
+        townships = townshipResponse.data!
+            .map((datum) => datum.township ?? '')
+            .where((township) => township.isNotEmpty)
+            .toSet() // Remove duplicates
+            .toList()
+          ..sort(); // Sort alphabetically
+      });
+    }
   }
 
   @override
@@ -1521,11 +2032,70 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                       _buildInputRow("အိမ်အမှတ်", homeNoController),
                       _buildInputRow("လမ်းအမည်", streetController),
                       _buildInputRow("ရပ်ကွက်/ရွာအမည်", quarterController),
-                      _buildInputRow("မြို့နယ်", townshipController),
+
+                      // Township TypeAheadField
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 4,
+                              child: Text("မြို့နယ်",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 116, 112, 112))),
+                            ),
+                            const Text("-",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black)),
+                            const SizedBox(width: 24),
+                            Expanded(
+                              flex: 4,
+                              child: TypeAheadField<String>(
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  controller: townshipController,
+                                  decoration: InputDecoration(
+                                    hintText: 'မြို့နယ်ရွေးချယ်ပါ',
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                  ),
+                                ),
+                                suggestionsCallback: (pattern) {
+                                  if (pattern.isEmpty) {
+                                    return townships.take(10).toList();
+                                  }
+                                  return townships
+                                      .where((township) => township
+                                          .toLowerCase()
+                                          .contains(pattern.toLowerCase()))
+                                      .take(10)
+                                      .toList();
+                                },
+                                itemBuilder: (context, String township) {
+                                  return ListTile(
+                                    dense: true,
+                                    title: Text(township,
+                                        style: TextStyle(fontSize: 14)),
+                                  );
+                                },
+                                onSuggestionSelected: (String township) {
+                                  townshipController.text = township;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
                       const SizedBox(height: 12),
                       Container(height: 1, color: Colors.grey.shade200),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
 
                       // Submit Button
                       Consumer(builder: (context, ref, child) {
@@ -1561,7 +2131,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
               Expanded(
                 flex: 1,
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
+                  padding: const EdgeInsets.only(left: 16.0),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -1880,9 +2450,9 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                 ),
 
                 // Divider
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 Divider(height: 1, color: Colors.grey.shade300),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
                 // Subtitle
                 Padding(
@@ -2068,7 +2638,7 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                 ),
 
                 // Action buttons
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

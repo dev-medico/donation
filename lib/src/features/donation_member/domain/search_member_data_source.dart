@@ -50,7 +50,7 @@ class SearchMemberDataSource extends DataGridSource {
         cells: row.getCells().map<Widget>((dataGridCell) {
       return Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(4.0),
         child: Text(
           dataGridCell.value.toString(),
           overflow: TextOverflow.ellipsis,

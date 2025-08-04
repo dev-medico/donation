@@ -204,6 +204,13 @@ final memberBloodTypeFilterProvider =
     StateProvider<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
 final memberRangeFilterProvider = StateProvider<String?>((ref) => null);
 
+// Additional search field providers
+final memberBirthDateSearchProvider = StateProvider<String>((ref) => '');
+final memberPhoneSearchProvider = StateProvider<String>((ref) => '');
+final memberFatherNameSearchProvider = StateProvider<String>((ref) => '');
+final memberBloodBankCardSearchProvider = StateProvider<String>((ref) => '');
+final memberIdSearchProvider = StateProvider<String>((ref) => '');
+
 // Separate filter providers for search member screen
 final searchMemberQueryProvider = StateProvider<String>((ref) => '');
 final searchMemberBloodTypeFilterProvider =
@@ -247,6 +254,48 @@ final filteredMemberListProvider = StateProvider<List<Member>>((ref) {
                         ?.toLowerCase()
                         .contains(searchQuery.toLowerCase()) ??
                     false))
+            .toList();
+      }
+
+      // Apply additional search filters
+      final birthDateSearch = ref.watch(memberBirthDateSearchProvider);
+      final phoneSearch = ref.watch(memberPhoneSearchProvider);
+      final fatherNameSearch = ref.watch(memberFatherNameSearchProvider);
+      final bloodBankCardSearch = ref.watch(memberBloodBankCardSearchProvider);
+      final memberIdSearch = ref.watch(memberIdSearchProvider);
+      
+      if (birthDateSearch.isNotEmpty) {
+        filtered = filtered
+            .where((member) =>
+                member.birthDate?.toLowerCase().contains(birthDateSearch.toLowerCase()) ?? false)
+            .toList();
+      }
+      
+      if (phoneSearch.isNotEmpty) {
+        filtered = filtered
+            .where((member) =>
+                member.phone?.toLowerCase().contains(phoneSearch.toLowerCase()) ?? false)
+            .toList();
+      }
+      
+      if (fatherNameSearch.isNotEmpty) {
+        filtered = filtered
+            .where((member) =>
+                member.fatherName?.toLowerCase().contains(fatherNameSearch.toLowerCase()) ?? false)
+            .toList();
+      }
+      
+      if (bloodBankCardSearch.isNotEmpty) {
+        filtered = filtered
+            .where((member) =>
+                member.bloodBankCard?.toLowerCase().contains(bloodBankCardSearch.toLowerCase()) ?? false)
+            .toList();
+      }
+      
+      if (memberIdSearch.isNotEmpty) {
+        filtered = filtered
+            .where((member) =>
+                member.memberId?.toLowerCase().contains(memberIdSearch.toLowerCase()) ?? false)
             .toList();
       }
 
@@ -491,6 +540,11 @@ void resetFilterProviders(WidgetRef ref) {
   ref.read(memberBloodTypeFilterProvider.notifier).state =
       'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
   ref.read(memberRangeFilterProvider.notifier).state = null;
+  ref.read(memberBirthDateSearchProvider.notifier).state = '';
+  ref.read(memberPhoneSearchProvider.notifier).state = '';
+  ref.read(memberFatherNameSearchProvider.notifier).state = '';
+  ref.read(memberBloodBankCardSearchProvider.notifier).state = '';
+  ref.read(memberIdSearchProvider.notifier).state = '';
 }
 
 // Function to reset search member filter providers
