@@ -4,6 +4,7 @@ import 'package:donation/utils/Colors.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/report_service.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
+import 'package:donation/src/features/finder/request_give_detail_screen.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
@@ -77,13 +78,36 @@ class _BloodRequestGiveChartScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "သွေးတောင်းခံ/လှူဒါန်းမှု အခြေအနေ",
-                  style: TextStyle(
-                    fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "သွေးတောင်းခံ/လှူဒါန်းမှု အခြေအနေ",
+                      style: TextStyle(
+                        fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RequestGiveDetailScreen(),
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.visibility, size: 16, color: primaryColor),
+                      label: Text(
+                        'အသေးစိတ်',
+                        style: TextStyle(fontSize: 12, color: primaryColor),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: Responsive.isMobile(context) ? 10 : 8),
                 Expanded(

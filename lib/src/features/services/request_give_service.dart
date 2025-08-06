@@ -152,4 +152,69 @@ class RequestGiveService extends BaseService {
       throw e;
     }
   }
+
+  Future<Map<String, dynamic>> getDetailedReport({
+    int? year,
+    int? month,
+  }) async {
+    final headers = await getAuthHeaders();
+    _updateLoadingStatus('Fetching detailed report...');
+
+    try {
+      final queryParams = <String, dynamic>{};
+      if (year != null) queryParams['year'] = year;
+      if (month != null) queryParams['month'] = month;
+
+      final response = await apiClient.get(
+        '$_basePath/detailed-report',
+        options: {'headers': headers},
+        queryParameters: queryParams,
+      );
+
+      _updateLoadingStatus('');
+      if (response.statusCode == 200) {
+        if (response.data != null && response.data!['status'] == 'ok') {
+          return response.data!['data'] as Map<String, dynamic>;
+        }
+        throw Exception('Invalid response format');
+      }
+      throw Exception('Failed to fetch detailed report');
+    } catch (e) {
+      print('Error fetching detailed report: $e');
+      _updateLoadingStatus('Error: $e');
+      throw e;
+    }
+  }
+
+  Future<Map<String, dynamic>> getOrCreateMonthly({
+    required int year,
+    required int month,
+  }) async {
+    final headers = await getAuthHeaders();
+    _updateLoadingStatus('Fetching monthly data...');
+
+    try {
+      final response = await apiClient.get(
+        '$_basePath/get-or-create-monthly',
+        options: {'headers': headers},
+        queryParameters: {
+          'year': year,
+          'month': month,
+        },
+      );
+
+      _updateLoadingStatus('');
+      if (response.statusCode == 200) {
+        if (response.data != null && response.data!['status'] == 'ok') {
+          return response.data!;
+        }
+        throw Exception('Invalid response format');
+      }
+      throw Exception('Failed to fetch monthly data');
+    } catch (e) {
+      print('Error fetching monthly data: $e');
+      _updateLoadingStatus('Error: $e');
+      throw e;
+    }
+  }
 }
