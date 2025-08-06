@@ -9,6 +9,7 @@ import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
 import 'package:donation/src/features/donation/blood_request_give_chart.dart';
 import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
+import 'package:donation/src/features/services/report_service.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -27,9 +28,31 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
   late int totalMember = 0;
   late int totalDonar = 0;
   late int totalDonation = 0;
+  late int totalPatient = 0;
   bool finance = false;
   List<DonationRecord> dataList = [];
   List<DonationRecord> data = [];
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboardStats();
+  }
+  
+  Future<void> _loadDashboardStats() async {
+    try {
+      final reportService = ref.read(reportServiceProvider);
+      final stats = await reportService.getDashboardStats();
+      
+      setState(() {
+        totalMember = stats['totalMember'] ?? 0;
+        totalDonation = stats['totalDonations'] ?? 0;
+        totalPatient = stats['totalPatient'] ?? 0;
+      });
+    } catch (e) {
+      print('Error loading dashboard stats: $e');
+    }
+  }
 
   callAPI(String after) {
     if (after.isEmpty) {
@@ -176,8 +199,8 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
                         index: 2,
                         color: primaryDark,
                         title: "လူနာစာရင်း",
-                        subtitle: "အသေးစိတ် ကြည့်မည်",
-                        amount: "",
+                        subtitle: "စုစုပေါင်း အရေအတွက်",
+                        amount: "${Utils.strToMM(totalPatient.toString())} ဦး",
                         amountColor: Colors.black,
                       ),
                     ],
@@ -288,8 +311,8 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
                             index: 2,
                             color: primaryDark,
                             title: "လူနာစာရင်း",
-                            subtitle: "အသေးစိတ် ကြည့်မည်",
-                            amount: "",
+                            subtitle: "စုစုပေါင်း အရေအတွက်",
+                            amount: "${Utils.strToMM(totalPatient.toString())} ဦး",
                             amountColor: Colors.black,
                           ),
                         ],

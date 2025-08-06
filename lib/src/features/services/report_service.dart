@@ -6,6 +6,26 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final reportServiceProvider = Provider<ReportService>((ref) => ReportService());
 
 class ReportService extends BaseService {
+  Future<Map<String, dynamic>> getDashboardStats() async {
+    try {
+      final apiClient = ApiClient();
+      final response = await apiClient.get<Map<String, dynamic>>(
+        '/report/dashboard',
+      );
+      
+      log('Dashboard stats response: ${response.data}');
+
+      if (response.data != null && response.data!['status'] == 'ok') {
+        return response.data!['data'];
+      } else {
+        throw Exception(
+            response.data?['message'] ?? 'API returned error status');
+      }
+    } catch (e) {
+      log('Error in getDashboardStats: $e');
+      throw Exception('Error loading dashboard stats: $e');
+    }
+  }
   Future<List<Map<String, dynamic>>> getDiseaseStats() async {
     try {
       final apiClient = ApiClient();

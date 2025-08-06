@@ -42,6 +42,18 @@ class Patient {
     this.donationCount,
   });
 
-  factory Patient.fromJson(Map<String, dynamic> json) => _$PatientFromJson(json);
+  factory Patient.fromJson(Map<String, dynamic> json) {
+    try {
+      print('Parsing patient JSON: $json');
+      final patient = _$PatientFromJson(json);
+      print('Successfully parsed patient: ${patient.patientName}');
+      return patient;
+    } catch (e) {
+      print('ERROR parsing patient JSON: $e');
+      print('JSON was: $json');
+      rethrow;
+    }
+  }
+  
   Map<String, dynamic> toJson() => _$PatientToJson(this);
 }

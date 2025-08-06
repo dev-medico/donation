@@ -90,6 +90,79 @@ The following API endpoints are already implemented in the backend:
 
 The request give functionality should now work end-to-end with the backend API.
 
+### Patient List Implementation (Latest)
+**Problem**: Patient list functionality was not working properly
+**Solution**: Implemented complete patient list feature with backend API and frontend integration
+
+**Backend Implementation**:
+- **File**: `donation_backend/controllers/DonationController.php`
+- **New Endpoint**: `GET /donation/patient-list?page=X&limit=Y&q=SEARCH&order=desc`
+- **Features**:
+  - Groups donations by unique patient names
+  - Returns latest donation info for each patient
+  - Includes donation count per patient
+  - Supports search by patient name, disease, hospital, or address
+  - PostgreSQL-compatible with ILIKE for case-insensitive search
+  - Includes member blood type information
+
+**Frontend Implementation**:
+- **Files Updated**:
+  - `lib/src/features/patient/patient_list_screen.dart` - Main patient list screen with search
+  - `lib/src/features/patient/models/patient.dart` - Patient data model
+  - `lib/src/features/patient/providers/patient_provider.dart` - State management
+  - `lib/src/features/services/patient_service.dart` - API service
+  - `lib/src/features/dashboard/dashboard.dart` - Dashboard patient count display
+
+- **Features Added**:
+  - Paginated patient list with infinite scroll
+  - Real-time search functionality
+  - Patient card showing:
+    - Name, age, address, disease
+    - Hospital, blood group
+    - Total donation count
+    - Latest donation date
+  - Tap on patient to view donation history
+  - Floating action button to add new patient (redirects to new donation screen)
+  - Dashboard integration showing total unique patient count
+
+**Dashboard Integration**:
+- **Backend**: Already had `/report/dashboard` endpoint with patient count
+- **Frontend**: 
+  - Added dashboard stats loading on init
+  - Display total patient count in dashboard card
+  - Uses existing report service for fetching stats
+
+**API Response Format (Patient List)**:
+```json
+{
+  "status": "ok",
+  "data": [
+    {
+      "patient_name": "John Doe",
+      "patient_age": "30",
+      "patient_address": "Yangon",
+      "patient_disease": "Anemia",
+      "hospital": "General Hospital",
+      "blood_group": "A+",
+      "latest_id": 123,
+      "latest_donation_date": "2024-01-15",
+      "donation_count": 5
+    }
+  ],
+  "total": 150,
+  "page": 0,
+  "limit": 20,
+  "hasMore": true
+}
+```
+
+**Testing Status**:
+- ✅ Backend patient-list endpoint implemented
+- ✅ Frontend patient list screen with search and pagination
+- ✅ Dashboard shows total patient count
+- ✅ Navigation to donation history and new donation
+- ✅ PostgreSQL compatibility with ILIKE search
+
 ### Latest Updates:
 **Chart Interaction Improvements**:
 - **Month Picker**: Changed from specific date to month picker for better UX
