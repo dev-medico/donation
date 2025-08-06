@@ -165,22 +165,32 @@ class RequestGiveService extends BaseService {
       if (year != null) queryParams['year'] = year;
       if (month != null) queryParams['month'] = month;
 
+      print('Fetching detailed report with params: $queryParams');
+      
       final response = await apiClient.get(
         '$_basePath/detailed-report',
         options: {'headers': headers},
         queryParameters: queryParams,
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+      
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
         if (response.data != null && response.data!['status'] == 'ok') {
           return response.data!['data'] as Map<String, dynamic>;
         }
-        throw Exception('Invalid response format');
+        // If status is not ok, check for error message
+        if (response.data != null && response.data!['status'] == 'error') {
+          throw Exception(response.data!['message'] ?? 'Unknown error from server');
+        }
+        throw Exception('Invalid response format: ${response.data}');
       }
-      throw Exception('Failed to fetch detailed report');
+      throw Exception('Failed to fetch detailed report: HTTP ${response.statusCode}');
     } catch (e) {
       print('Error fetching detailed report: $e');
+      print('Stack trace: ${StackTrace.current}');
       _updateLoadingStatus('Error: $e');
       throw e;
     }

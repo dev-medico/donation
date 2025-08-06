@@ -3,7 +3,7 @@ import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/report_service.dart';
-import 'package:donation/src/features/finder/request_give_detail_screen.dart';
+import 'package:donation/src/features/finder/request_give_detail_screen_new.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 final requestGiveStatsProvider =
@@ -88,7 +88,7 @@ class _BloodRequestGiveChartScreenState
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const RequestGiveDetailScreen(),
+                                    const RequestGiveDetailScreenNew(),
                               ),
                             );
                           },

@@ -5,10 +5,15 @@ import 'package:intl/intl.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
-// Provider for detailed report data
-final detailedReportProvider = FutureProvider.family<Map<String, dynamic>, Map<String, int?>>((ref, params) async {
+// Provider for detailed report data - using String key for proper caching
+final detailedReportProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, key) async {
+  // Parse the key to extract year and month
+  final parts = key.split('-');
+  final year = parts[0] != 'null' ? int.parse(parts[0]) : null;
+  final month = parts.length > 1 && parts[1] != 'null' ? int.parse(parts[1]) : null;
+  
   final service = ref.read(requestGiveServiceProvider);
-  return service.getDetailedReport(year: params['year'], month: params['month']);
+  return service.getDetailedReport(year: year, month: month);
 });
 
 class RequestGiveDetailScreen extends ConsumerStatefulWidget {
@@ -30,7 +35,12 @@ class _RequestGiveDetailScreenState extends ConsumerState<RequestGiveDetailScree
 
   @override
   Widget build(BuildContext context) {
-    final reportData = ref.watch(detailedReportProvider({'year': isYearlyView ? selectedYear : null, 'month': selectedMonth}));
+    // Create a unique key string for the provider
+    final providerKey = isYearlyView 
+        ? '$selectedYear-null'
+        : '$selectedYear-$selectedMonth';
+    
+    final reportData = ref.watch(detailedReportProvider(providerKey));
 
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
