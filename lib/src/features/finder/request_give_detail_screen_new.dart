@@ -7,13 +7,33 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 // Provider for detailed report data - using String key for proper caching
 final requestGiveReportProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, key) async {
-  // Parse the key to extract year and month
-  final parts = key.split('-');
-  final year = int.parse(parts[0]);
-  final month = parts.length > 1 && parts[1] != 'null' ? int.parse(parts[1]) : null;
-  
-  final service = ref.read(requestGiveServiceProvider);
-  return service.getDetailedReport(year: year, month: month);
+  try {
+    // Parse the key to extract year and month
+    final parts = key.split('-');
+    final year = int.parse(parts[0]);
+    final month = parts.length > 1 && parts[1] != 'null' ? int.parse(parts[1]) : null;
+    
+    print('Fetching report for year: $year, month: $month');
+    
+    final service = ref.read(requestGiveServiceProvider);
+    final result = await service.getDetailedReport(year: year, month: month);
+    
+    print('Report data received: $result');
+    
+    // If the result is empty, return default structure
+    if (result.isEmpty) {
+      return {
+        'monthlyData': [],
+        'yearlyTotal': {'totalrequest': 0, 'totalgive': 0},
+        'year': year,
+      };
+    }
+    
+    return result;
+  } catch (e) {
+    print('Error in requestGiveReportProvider: $e');
+    throw e;
+  }
 });
 
 class RequestGiveDetailScreenNew extends ConsumerStatefulWidget {
@@ -256,9 +276,13 @@ class _RequestGiveDetailScreenNewState extends ConsumerState<RequestGiveDetailSc
     final monthlyData = (data['monthlyData'] as List<dynamic>?) ?? [];
     final yearlyTotal = data['yearlyTotal'] ?? {};
     
-    // Ensure values are not null
-    final totalRequest = yearlyTotal['totalrequest'] ?? yearlyTotal['totalRequest'] ?? 0;
-    final totalGive = yearlyTotal['totalgive'] ?? yearlyTotal['totalGive'] ?? 0;
+    // Handle both uppercase and lowercase field names from API
+    final totalRequest = yearlyTotal['totalrequest'] ?? 
+                        yearlyTotal['totalRequest'] ?? 
+                        yearlyTotal['total_request'] ?? 0;
+    final totalGive = yearlyTotal['totalgive'] ?? 
+                     yearlyTotal['totalGive'] ?? 
+                     yearlyTotal['total_give'] ?? 0;
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(16),
