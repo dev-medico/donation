@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 // Provider for detailed report data
 final detailedReportProvider = FutureProvider.family<Map<String, dynamic>, Map<String, int?>>((ref, params) async {
@@ -161,7 +162,30 @@ class _RequestGiveDetailScreenState extends ConsumerState<RequestGiveDetailScree
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddRequestGiveDialog(),
+        backgroundColor: primaryColor,
+        child: Icon(Icons.add, color: Colors.white),
+        tooltip: 'အသစ်ထည့်မည်',
+      ),
     );
+  }
+
+  void _showAddRequestGiveDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => _AddRequestGiveDialog(
+        onAdded: () {
+          // Refresh the report data
+          ref.invalidate(detailedReportProvider);
+        },
+      ),
+    );
+    
+    if (result == true) {
+      // Refresh data if something was added
+      ref.invalidate(detailedReportProvider);
+    }
   }
 
   Widget _buildYearlyView(Map<String, dynamic> data) {
@@ -664,5 +688,198 @@ class _RequestGiveDetailScreenState extends ConsumerState<RequestGiveDetailScree
         ],
       ),
     );
+  }
+}
+
+// Add Request Give Dialog Widget
+class _AddRequestGiveDialog extends StatefulWidget {
+  final VoidCallback onAdded;
+
+  const _AddRequestGiveDialog({
+    required this.onAdded,
+  });
+
+  @override
+  State<_AddRequestGiveDialog> createState() => _AddRequestGiveDialogState();
+}
+
+class _AddRequestGiveDialogState extends State<_AddRequestGiveDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _requestController = TextEditingController();
+  final _giveController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('သွေးတောင်းခံ/လှူဒါန်းမှု မှတ်တမ်းအသစ်'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Month picker
+              InkWell(
+                onTap: () async {
+                  final picked = await showMonthPicker(
+                    context: context,
+                    initialDate: _selectedDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      _selectedDate = picked;
+                    });
+                  }
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        DateFormat('MMM yyyy').format(_selectedDate),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const Icon(Icons.calendar_month),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Request amount field
+              TextFormField(
+                controller: _requestController,
+                decoration: const InputDecoration(
+                  labelText: 'တောင်းခံသည့် အရေအတွက်',
+                  border: OutlineInputBorder(),
+                  suffixText: 'ကြိမ်',
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'ကိန်းဂဏန်းသာ ထည့်သွင်းပါ';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Give amount field
+              TextFormField(
+                controller: _giveController,
+                decoration: const InputDecoration(
+                  labelText: 'လှူဒါန်းခဲ့သည့် အရေအတွက်',
+                  border: OutlineInputBorder(),
+                  suffixText: 'ကြိမ်',
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'ကိန်းဂဏန်းသာ ထည့်သွင်းပါ';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isLoading ? null : () => Navigator.pop(context, false),
+          child: const Text('မလုပ်တော့ပါ'),
+        ),
+        Consumer(
+          builder: (context, ref, child) {
+            return ElevatedButton(
+              onPressed: _isLoading ? null : () => _submit(ref),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+              ),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'သိမ်းမည်',
+                      style: TextStyle(color: Colors.white),
+                    ),
+            );
+          }
+        ),
+      ],
+    );
+  }
+
+  Future<void> _submit(WidgetRef ref) async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final data = {
+        'request': int.parse(_requestController.text),
+        'give': int.parse(_giveController.text),
+        'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
+      };
+
+      // Call the API service to create request give
+      final service = ref.read(requestGiveServiceProvider);
+      await service.createRequestGive(data);
+
+      Navigator.pop(context, true);
+      widget.onAdded();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'သွေးတောင်းခံ/လှူဒါန်းမှု မှတ်တမ်း အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _requestController.dispose();
+    _giveController.dispose();
+    super.dispose();
   }
 }
