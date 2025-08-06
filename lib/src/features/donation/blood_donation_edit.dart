@@ -434,9 +434,30 @@ class _BloodDonationEditScreenState
                           ),
                         ),
                         suggestionsCallback: (pattern) {
-                          return townships.where((item) => item
-                              .toLowerCase()
-                              .contains(pattern.toLowerCase()));
+                          List<String> suggestions = [];
+                          
+                          // First, get မော်လမြိုင် townships
+                          var mawlamyineItems = townships.where((item) => 
+                            item.contains('မော်လမြိုင်'));
+                          
+                          // Then get other townships that match the pattern
+                          var otherItems = townships.where((item) => 
+                            !item.contains('မော်လမြိုင်') && 
+                            item.toLowerCase().contains(pattern.toLowerCase()));
+                          
+                          // If pattern is empty, show မော်လမြိုင် townships first
+                          if (pattern.isEmpty) {
+                            suggestions.addAll(mawlamyineItems);
+                            suggestions.addAll(otherItems.take(10 - suggestions.length));
+                          } else {
+                            // Filter မော်လမြိုင် townships by pattern
+                            var filteredMawlamyine = mawlamyineItems.where((item) =>
+                              item.toLowerCase().contains(pattern.toLowerCase()));
+                            suggestions.addAll(filteredMawlamyine);
+                            suggestions.addAll(otherItems);
+                          }
+                          
+                          return suggestions.take(10).toList();
                         },
                         itemBuilder: (context, String suggestion) {
                           return ListTile(

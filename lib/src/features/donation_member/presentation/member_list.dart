@@ -1313,6 +1313,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                         ))),
                 GridColumn(
                     columnName: 'သွေးအုပ်စု',
+                    width: 100,
                     label: Container(
                         color: primaryColor,
                         padding: const EdgeInsets.all(4.0),
@@ -1343,6 +1344,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                         ))),
                 GridColumn(
                     columnName: 'သွေးလှူမှုကြိမ်ရေ',
+                    width: 120,
                     label: Container(
                         color: primaryColor,
                         padding: const EdgeInsets.all(4.0),
@@ -2067,15 +2069,31 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                                   ),
                                 ),
                                 suggestionsCallback: (pattern) {
+                                  List<String> suggestions = [];
+                                  
+                                  // First, get မော်လမြိုင် townships
+                                  var mawlamyineItems = townships.where((item) => 
+                                    item.contains('မော်လမြိုင်'));
+                                  
+                                  // Then get other townships
+                                  var otherItems = townships.where((item) => 
+                                    !item.contains('မော်လမြိုင်'));
+                                  
                                   if (pattern.isEmpty) {
-                                    return townships.take(10).toList();
+                                    // Show မော်လမြိုင် townships first
+                                    suggestions.addAll(mawlamyineItems);
+                                    suggestions.addAll(otherItems.take(10 - suggestions.length));
+                                  } else {
+                                    // Filter by pattern but still prioritize မော်လမြိုင်
+                                    var filteredMawlamyine = mawlamyineItems.where((item) =>
+                                      item.toLowerCase().contains(pattern.toLowerCase()));
+                                    var filteredOthers = otherItems.where((item) =>
+                                      item.toLowerCase().contains(pattern.toLowerCase()));
+                                    suggestions.addAll(filteredMawlamyine);
+                                    suggestions.addAll(filteredOthers);
                                   }
-                                  return townships
-                                      .where((township) => township
-                                          .toLowerCase()
-                                          .contains(pattern.toLowerCase()))
-                                      .take(10)
-                                      .toList();
+                                  
+                                  return suggestions.take(10).toList();
                                 },
                                 itemBuilder: (context, String township) {
                                   return ListTile(

@@ -397,29 +397,52 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
         await rootBundle.loadString('assets/json/township.json');
     townshipResponse = TownshipResponse.fromJson(json.decode(response));
 
-    // Sort townships with Mawlamyine first
-    List<Datum> mawlamyineData = [];
-    List<Datum> otherData = [];
+    // Sort townships with Mon State first, then Mawlamyine specifically at the top
+    List<Datum> mawlamyineTownships = [];
+    List<Datum> otherMonStateTownships = [];
+    List<Datum> otherStateTownships = [];
 
     for (var element in townshipResponse.data!) {
-      if (element.town == 'မော်လမြိုင်' || element.town == 'Mawlamyine') {
-        mawlamyineData.add(element);
+      // Check if it's from Mon State
+      if (element.region == 'မွန်ပြည်နယ်' || element.region == 'Mon State') {
+        // Within Mon State, prioritize Mawlamyine township
+        if (element.township == 'မော်လမြိုင်' || element.township == 'Mawlamyine') {
+          mawlamyineTownships.add(element);
+        } else {
+          otherMonStateTownships.add(element);
+        }
       } else {
-        otherData.add(element);
+        otherStateTownships.add(element);
       }
     }
 
-    // Add Mawlamyine townships first, then others
-    datas.addAll(mawlamyineData);
-    datas.addAll(otherData);
+    // Add townships in order: Mawlamyine first, then other Mon State, then other states
+    datas.clear();
+    datas.addAll(mawlamyineTownships);
+    datas.addAll(otherMonStateTownships);
+    datas.addAll(otherStateTownships);
 
-    // Create townships list in the same order
+    // Create townships list in the same order (no duplicates)
     townships.clear();
+    Set<String> addedTownships = {};
     for (var element in datas) {
-      if (!townships.contains(element.township!)) {
+      if (!addedTownships.contains(element.township!)) {
         townships.add(element.township!);
+        addedTownships.add(element.township!);
       }
     }
+    
+    print('=== Township Initialization Debug ===');
+    print('Townships initialized (first 10): ${townships.take(10).join(", ")}');
+    print('Total townships: ${townships.length}');
+    print('Mawlamyine townships found: ${mawlamyineTownships.length}');
+    print('Other Mon State townships: ${otherMonStateTownships.length}');
+    print('Other State townships: ${otherStateTownships.length}');
+    print('First township in list: ${townships.isNotEmpty ? townships.first : "EMPTY"}');
+    if (townships.isNotEmpty && townships.first != 'မော်လမြိုင်') {
+      print('WARNING: First township is NOT မော်လမြိုင်! It is: ${townships.first}');
+    }
+    print('===================================');
   }
 
   @override
@@ -642,12 +665,34 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                           ),
                         ),
                         suggestionsCallback: (pattern) {
-                          return townships
-                              .where((township) => township
-                                  .toLowerCase()
-                                  .contains(pattern.toLowerCase()))
-                              .take(10)
-                              .toList();
+                          List<String> suggestions = [];
+                          
+                          if (pattern.isEmpty) {
+                            // When no pattern, ensure မော်လမြိုင် is first
+                            if (townships.contains('မော်လမြိုင်')) {
+                              suggestions.add('မော်လမြိုင်');
+                              suggestions.addAll(townships.where((t) => t != 'မော်လမြိုင်').take(9));
+                            } else {
+                              suggestions = townships.take(10).toList();
+                            }
+                          } else {
+                            // When filtering, still prioritize မော်လမြိုင် if it matches
+                            final filteredTownships = townships
+                                .where((township) => township
+                                    .toLowerCase()
+                                    .contains(pattern.toLowerCase()))
+                                .toList();
+                            
+                            // If မော်လမြိုင် matches, put it first
+                            if (filteredTownships.contains('မော်လမြိုင်')) {
+                              suggestions.add('မော်လမြိုင်');
+                              suggestions.addAll(filteredTownships.where((t) => t != 'မော်လမြိုင်').take(9));
+                            } else {
+                              suggestions = filteredTownships.take(10).toList();
+                            }
+                          }
+                          
+                          return suggestions;
                         },
                         itemBuilder: (context, String township) {
                           return ListTile(
@@ -1024,12 +1069,34 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                           ),
                         ),
                         suggestionsCallback: (pattern) {
-                          return townships
-                              .where((township) => township
-                                  .toLowerCase()
-                                  .contains(pattern.toLowerCase()))
-                              .take(10)
-                              .toList();
+                          List<String> suggestions = [];
+                          
+                          if (pattern.isEmpty) {
+                            // When no pattern, ensure မော်လမြိုင် is first
+                            if (townships.contains('မော်လမြိုင်')) {
+                              suggestions.add('မော်လမြိုင်');
+                              suggestions.addAll(townships.where((t) => t != 'မော်လမြိုင်').take(9));
+                            } else {
+                              suggestions = townships.take(10).toList();
+                            }
+                          } else {
+                            // When filtering, still prioritize မော်လမြိုင် if it matches
+                            final filteredTownships = townships
+                                .where((township) => township
+                                    .toLowerCase()
+                                    .contains(pattern.toLowerCase()))
+                                .toList();
+                            
+                            // If မော်လမြိုင် matches, put it first
+                            if (filteredTownships.contains('မော်လမြိုင်')) {
+                              suggestions.add('မော်လမြိုင်');
+                              suggestions.addAll(filteredTownships.where((t) => t != 'မော်လမြိုင်').take(9));
+                            } else {
+                              suggestions = filteredTownships.take(10).toList();
+                            }
+                          }
+                          
+                          return suggestions;
                         },
                         itemBuilder: (context, String township) {
                           return ListTile(
