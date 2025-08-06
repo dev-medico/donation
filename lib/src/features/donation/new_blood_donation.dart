@@ -100,7 +100,9 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     "အသည်းနှင့်ဆိုင်ရာရောဂါ",
     "အဆုတ်နှင့်ဆိုင်ရာရောဂါ",
     "နှလုံးနှင့်ဆိုင်ရာရောဂါ",
-    "မီးယပ်နှင့်သားဖွားဆိုင်ရာရောဂါ",
+    "သားအိမ်နှင့်ဆိုင်ရာရောဂါ",
+    "ကိုယ်ဝန်ဆောင်သွေးအားနည်း",
+    "လမပြည့်၊ ပေါင်မပြည့် မွေးဖွား",
     "ဆီးလမ်းကြောင်းနှင့်ဆိုင်ရာရောဂါ",
     "ကျောက်ကပ်နှင့်ဆိုင်ရာရောဂါ",
     "ဦးနှောက်နှင့်အာရုံကြောဆိုင်ရာရောဂါ",
@@ -394,9 +396,29 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     final String response =
         await rootBundle.loadString('assets/json/township.json');
     townshipResponse = TownshipResponse.fromJson(json.decode(response));
+
+    // Sort townships with Mawlamyine first
+    List<Datum> mawlamyineData = [];
+    List<Datum> otherData = [];
+
     for (var element in townshipResponse.data!) {
-      datas.add(element);
-      townships.add(element.township!);
+      if (element.town == 'မော်လမြိုင်' || element.town == 'Mawlamyine') {
+        mawlamyineData.add(element);
+      } else {
+        otherData.add(element);
+      }
+    }
+
+    // Add Mawlamyine townships first, then others
+    datas.addAll(mawlamyineData);
+    datas.addAll(otherData);
+
+    // Create townships list in the same order
+    townships.clear();
+    for (var element in datas) {
+      if (!townships.contains(element.township!)) {
+        townships.add(element.township!);
+      }
     }
   }
 
@@ -483,9 +505,10 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     }
                     // Normalize the search pattern for better Burmese text matching
                     final searchPattern = pattern.trim();
-                    
-                    print('Searching for: "$searchPattern" in ${cachedMembers.length} members');
-                    
+
+                    print(
+                        'Searching for: "$searchPattern" in ${cachedMembers.length} members');
+
                     final results = cachedMembers
                         .where((member) {
                           // Search in multiple fields for better results
@@ -495,17 +518,19 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                               member.memberId!.contains(searchPattern);
                           final phoneMatch = member.phone != null &&
                               member.phone!.contains(searchPattern);
-                          
+
                           // Debug specific member
-                          if (member.name != null && member.name!.contains('ကိုဝေယံ')) {
-                            print('Found ကိုဝေယံ - Checking match: name=$nameMatch, id=$memberIdMatch, phone=$phoneMatch');
+                          if (member.name != null &&
+                              member.name!.contains('ကိုဝေယံ')) {
+                            print(
+                                'Found ကိုဝေယံ - Checking match: name=$nameMatch, id=$memberIdMatch, phone=$phoneMatch');
                           }
-                          
+
                           return nameMatch || memberIdMatch || phoneMatch;
                         })
                         .take(300) // Increased to show more results
                         .toList();
-                        
+
                     print('Found ${results.length} matching members');
                     return results;
                   },
@@ -861,9 +886,10 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     }
                     // Normalize the search pattern for better Burmese text matching
                     final searchPattern = pattern.trim();
-                    
-                    print('Searching for: "$searchPattern" in ${cachedMembers.length} members');
-                    
+
+                    print(
+                        'Searching for: "$searchPattern" in ${cachedMembers.length} members');
+
                     final results = cachedMembers
                         .where((member) {
                           // Search in multiple fields for better results
@@ -873,17 +899,12 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                               member.memberId!.contains(searchPattern);
                           final phoneMatch = member.phone != null &&
                               member.phone!.contains(searchPattern);
-                          
-                          // Debug specific member
-                          if (member.name != null && member.name!.contains('ကိုဝေယံ')) {
-                            print('Found ကိုဝေယံ - Checking match: name=$nameMatch, id=$memberIdMatch, phone=$phoneMatch');
-                          }
-                          
+
                           return nameMatch || memberIdMatch || phoneMatch;
                         })
                         .take(300) // Increased to show more results
                         .toList();
-                        
+
                     print('Found ${results.length} matching members');
                     return results;
                   },
