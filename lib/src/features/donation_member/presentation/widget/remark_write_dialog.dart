@@ -4,6 +4,8 @@ import 'package:donation/src/features/donation_member/presentation/widget/common
 import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:donation/src/features/donation_member/data/member_repository.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 
 class RemarkWriteDialog extends ConsumerStatefulWidget {
   final Member? member;
@@ -16,6 +18,8 @@ class RemarkWriteDialog extends ConsumerStatefulWidget {
 class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
   TextEditingController remarkController = TextEditingController();
   bool checked = false;
+  bool isLoading = false;
+  final MemberRepository _repository = MemberRepository();
 
   @override
   void initState() {
@@ -34,16 +38,43 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Padding(
-          //   padding: const EdgeInsets.only(left: 12, bottom: 8),
-          //   child: ToggleSwitch(
-          //     checked: checked,
-          //     onChanged: (v) => setState(() => checked = v),
-          //     content: Text(checked ? 'Available' : 'Not Available'),
-          //   ),
-          // ),
+          Container(
+            margin: EdgeInsets.only(left: 12, right: 12, top: 20),
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: checked ? Colors.green.shade50 : Colors.red.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: checked ? Colors.green.shade200 : Colors.red.shade200,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  checked ? 'သွေးလှူနိုင်သည်' : 'သွေးမလှူနိုင်ပါ',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: checked ? Colors.green.shade700 : Colors.red.shade700,
+                  ),
+                ),
+                Switch(
+                  value: checked,
+                  onChanged: (value) {
+                    setState(() {
+                      checked = value;
+                    });
+                  },
+                  activeColor: Colors.green,
+                  inactiveThumbColor: Colors.red,
+                  inactiveTrackColor: Colors.red.shade200,
+                ),
+              ],
+            ),
+          ),
           SizedBox(
-            height: 24,
+            height: 20,
           ),
           Container(
             margin: EdgeInsets.only(left: 12, right: 12),
@@ -96,37 +127,111 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
                 const EdgeInsets.only(left: 15, bottom: 16, right: 15, top: 34),
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
-              onTap: () {
-                Navigator.pop(context);
-                // ref.watch(realmProvider)!.updateMember(widget.member!,
-                //     note: remarkController.text.toString(),
-                //     status: checked ? "available" : "not_available");
-              },
+              onTap: isLoading 
+                ? null 
+                : () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    
+                    try {
+                      // Create updated member with new status and note
+                      final updatedMember = Member(
+                        id: widget.member!.id,
+                        memberId: widget.member!.memberId,
+                        name: widget.member!.name,
+                        fatherName: widget.member!.fatherName,
+                        birthDate: widget.member!.birthDate,
+                        nrc: widget.member!.nrc,
+                        phone: widget.member!.phone,
+                        bloodBankCard: widget.member!.bloodBankCard,
+                        address: widget.member!.address,
+                        bloodType: widget.member!.bloodType,
+                        gender: widget.member!.gender,
+                        memberCount: widget.member!.memberCount,
+                        totalCount: widget.member!.totalCount,
+                        registerDate: widget.member!.registerDate,
+                        status: checked ? "available" : "not_available",
+                        lastDate: widget.member!.lastDate,
+                        note: remarkController.text.trim(),
+                      );
+                      
+                      // Update member via repository
+                      await _repository.updateMember(
+                        widget.member!.id.toString(), 
+                        updatedMember
+                      );
+                      
+                      // Refresh both member list and search list
+                      await ref.refresh(memberListProvider.future);
+                      
+                      // Also refresh the filtered search list if it exists
+                      if (ref.read(memberListProvider).hasValue) {
+                        final allMembers = ref.read(memberListProvider).value ?? [];
+                        ref.read(filteredSearchMemberListProvider.notifier).state = List.from(allMembers);
+                        
+                        // Update search filters to refresh the view
+                        updateSearchFilteredMembers(ref);
+                      }
+                      
+                      if (mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('အချက်အလက်များ သိမ်းဆည်းပြီးပါပြီ'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        setState(() {
+                          isLoading = false;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
               child: Align(
                   alignment: Alignment.center,
                   child: Padding(
                       padding: EdgeInsets.only(top: 8, bottom: 8, left: 30),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/images/remark.png",
-                            width: 24,
-                            height: 24,
-                          ),
-                          SizedBox(
-                            width: 30,
-                          ),
-                          Text(
-                            "မှတ်ချက်ရေးမည်",
-                            textScaleFactor: 1.0,
-                            style:
-                                TextStyle(fontSize: 16.0, color: Colors.black),
-                          ),
-                          SizedBox(
-                            width: 30,
-                          ),
-                        ],
+                      child: isLoading 
+                        ? Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                              ),
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                "assets/images/remark.png",
+                                width: 24,
+                                height: 24,
+                              ),
+                              SizedBox(
+                                width: 30,
+                              ),
+                              Text(
+                                "မှတ်ချက်သိမ်းမည်",
+                                style:
+                                    TextStyle(fontSize: 16.0, color: Colors.black),
+                              ),
+                              SizedBox(
+                                width: 30,
+                              ),
+                            ],
                       ))),
             ),
           )

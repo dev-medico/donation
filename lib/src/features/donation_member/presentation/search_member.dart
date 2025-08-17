@@ -438,7 +438,6 @@ class _SearchMemberListScreenState
           GridColumn(
               columnName: 'အမှတ်စဥ်',
               label: Container(
-                  width: MediaQuery.of(context).size.width * 0.3,
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
@@ -478,46 +477,6 @@ class _SearchMemberListScreenState
                     style: TextStyle(color: Colors.white),
                   ))),
           GridColumn(
-              columnName: 'မှတ်ပုံတင်အမှတ်',
-              label: Container(
-                  color: primaryColor,
-                  padding: const EdgeInsets.all(8.0),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'မှတ်ပုံတင်အမှတ်',
-                    style: TextStyle(color: Colors.white),
-                  ))),
-          GridColumn(
-              columnName: 'သွေးဘဏ်ကတ်',
-              label: Container(
-                  color: primaryColor,
-                  padding: const EdgeInsets.all(8.0),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'သွေးဘဏ်ကတ်',
-                    style: TextStyle(color: Colors.white),
-                  ))),
-          GridColumn(
-              columnName: 'သွေးလှူမှုကြိမ်ရေ',
-              label: Container(
-                  color: primaryColor,
-                  padding: const EdgeInsets.all(8.0),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'သွေးလှူမှုကြိမ်ရေ',
-                    style: TextStyle(color: Colors.white),
-                  ))),
-          GridColumn(
-              columnName: 'မွေးသက္ကရာဇ်',
-              label: Container(
-                  color: primaryColor,
-                  padding: const EdgeInsets.all(8.0),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'မွေးသက္ကရာဇ်',
-                    style: TextStyle(color: Colors.white),
-                  ))),
-          GridColumn(
               columnName: 'ဖုန်းနံပါတ်',
               label: Container(
                   color: primaryColor,
@@ -528,13 +487,35 @@ class _SearchMemberListScreenState
                     style: TextStyle(color: Colors.white),
                   ))),
           GridColumn(
-              columnName: 'နေရပ်လိပ်စာ',
+              columnName: 'နောက်ဆုံးလှူဒါန်းသည့်ရက်',
               label: Container(
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
                   child: const Text(
-                    'နေရပ်လိပ်စာ',
+                    'နောက်ဆုံးလှူဒါန်းသည့်ရက်',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'အခြေအနေ',
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'အခြေအနေ',
+                    style: TextStyle(color: Colors.white),
+                  ))),
+          GridColumn(
+              columnName: 'မှတ်ချက်',
+              minimumWidth: 100,
+              width: double.nan,  // This allows it to fit content
+              label: Container(
+                  color: primaryColor,
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'မှတ်ချက်',
                     style: TextStyle(color: Colors.white),
                   ))),
         ],

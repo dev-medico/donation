@@ -383,8 +383,7 @@ void updateFilteredMembers(WidgetRef ref) {
   if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
     filtered = filtered
         .where((member) =>
-            member.bloodType?.toLowerCase().contains(bloodType.toLowerCase()) ??
-            false)
+            member.bloodType?.toLowerCase().trim() == bloodType.toLowerCase().trim())
         .toList();
   }
 
@@ -433,8 +432,7 @@ void updateSearchFilteredMembers(WidgetRef ref) {
   if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
     filtered = filtered
         .where((member) =>
-            member.bloodType?.toLowerCase().contains(bloodType.toLowerCase()) ??
-            false)
+            member.bloodType?.toLowerCase().trim() == bloodType.toLowerCase().trim())
         .toList();
   }
 
