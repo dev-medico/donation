@@ -30,6 +30,7 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
   late TextEditingController memberCountController;
   String? selectedBloodType;
   String? selectedGender;
+  DateTime? selectedBirthDate;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -54,8 +55,38 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
     nameController = TextEditingController(text: widget.member.name ?? '');
     fatherNameController =
         TextEditingController(text: widget.member.fatherName ?? '');
-    birthDateController =
-        TextEditingController(text: widget.member.birthDate ?? '');
+    
+    // Parse existing birth date from various formats
+    if (widget.member.birthDate != null && widget.member.birthDate!.isNotEmpty) {
+      try {
+        // Try parsing 'd MMM yyyy' format (e.g., "24 Oct 1987")
+        selectedBirthDate = DateFormat('d MMM yyyy').tryParse(widget.member.birthDate!);
+        
+        // If that fails, try 'dd MMM yyyy' format
+        if (selectedBirthDate == null) {
+          selectedBirthDate = DateFormat('dd MMM yyyy').tryParse(widget.member.birthDate!);
+        }
+        
+        // If that fails, try 'yyyy-MM-dd' format
+        if (selectedBirthDate == null) {
+          selectedBirthDate = DateTime.tryParse(widget.member.birthDate!);
+        }
+        
+        // Set the display text
+        if (selectedBirthDate != null) {
+          birthDateController = TextEditingController(
+            text: DateFormat('dd MMM yyyy').format(selectedBirthDate!)
+          );
+        } else {
+          birthDateController = TextEditingController(text: widget.member.birthDate ?? '');
+        }
+      } catch (e) {
+        birthDateController = TextEditingController(text: widget.member.birthDate ?? '');
+      }
+    } else {
+      birthDateController = TextEditingController();
+    }
+    
     nrcController = TextEditingController(text: widget.member.nrc ?? '');
     phoneController = TextEditingController(text: widget.member.phone ?? '');
     bloodBankController =
@@ -92,13 +123,28 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
     });
 
     try {
+      // Convert birth date to Y-m-d format for backend
+      String? birthDateForBackend;
+      if (selectedBirthDate != null) {
+        birthDateForBackend = DateFormat('yyyy-MM-dd').format(selectedBirthDate!);
+      } else if (birthDateController.text.isNotEmpty) {
+        // Try to parse the text if date wasn't selected via picker
+        try {
+          final parsedDate = DateFormat('dd MMM yyyy').parse(birthDateController.text);
+          birthDateForBackend = DateFormat('yyyy-MM-dd').format(parsedDate);
+        } catch (e) {
+          // If parsing fails, send the original text
+          birthDateForBackend = birthDateController.text;
+        }
+      }
+
       // Create updated member object
       final updatedMember = Member(
         id: widget.member.id,
         memberId: widget.member.memberId,
         name: nameController.text,
         fatherName: fatherNameController.text,
-        birthDate: birthDateController.text,
+        birthDate: birthDateForBackend,
         nrc: nrcController.text,
         phone: phoneController.text,
         bloodBankCard: bloodBankController.text,
@@ -156,14 +202,15 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: selectedBirthDate ?? DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
 
     if (picked != null) {
       setState(() {
-        // Format date as 'dd MMM yyyy'
+        selectedBirthDate = picked;
+        // Format date as 'dd MMM yyyy' for display
         birthDateController.text = DateFormat('dd MMM yyyy').format(picked);
       });
     }

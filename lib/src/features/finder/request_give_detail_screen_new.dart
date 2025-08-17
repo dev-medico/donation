@@ -382,6 +382,11 @@ class _RequestGiveDetailScreenNewState
         yearlyTotal['totalGive'] ??
         yearlyTotal['total_give'] ??
         0;
+    
+    // Calculate percentage for yearly total
+    final yearlyPercentage = totalRequest > 0 
+        ? ((totalGive / totalRequest) * 100).toStringAsFixed(1) 
+        : '0.0';
 
     return SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -481,13 +486,27 @@ class _RequestGiveDetailScreenNewState
                         ],
                       ),
                       SizedBox(height: 8),
-                      Text(
-                        totalGive.toString(),
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            totalGive.toString(),
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            '($yearlyPercentage%)',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.green.shade700,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -569,6 +588,11 @@ class _RequestGiveDetailScreenNewState
                           0;
                       final give =
                           monthData['totalgive'] ?? monthData['totalGive'] ?? 0;
+                      
+                      // Calculate percentage for this month
+                      final monthlyPercentage = request > 0 
+                          ? ((give / request) * 100).toStringAsFixed(1) 
+                          : '0.0';
 
                       return ListTile(
                         onTap: () {
@@ -604,6 +628,22 @@ class _RequestGiveDetailScreenNewState
                             SizedBox(width: 4),
                             Text(give.toString(),
                                 style: TextStyle(color: Colors.green)),
+                            SizedBox(width: 16),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '$monthlyPercentage%',
+                                style: TextStyle(
+                                  color: Colors.blue.shade700,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                         trailing: IconButton(
@@ -620,12 +660,16 @@ class _RequestGiveDetailScreenNewState
 
   Widget _buildMonthlyView(
       Map<String, dynamic> data, int year, int monthIndex) {
-    final records = (data['records'] as List<dynamic>?) ?? [];
     final summary = data['summary'] ?? {};
     final month = monthIndex + 1;
 
     final totalRequest = summary['totalRequest'] ?? 0;
     final totalGive = summary['totalGive'] ?? 0;
+    
+    // Calculate percentage for monthly total
+    final monthlyPercentage = totalRequest > 0 
+        ? ((totalGive / totalRequest) * 100).toStringAsFixed(1) 
+        : '0.0';
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(16),
@@ -739,13 +783,27 @@ class _RequestGiveDetailScreenNewState
                               ],
                             ),
                             SizedBox(height: 8),
-                            Text(
-                              totalGive.toString(),
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
-                              ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  totalGive.toString(),
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '($monthlyPercentage%)',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.green.shade700,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -784,7 +842,7 @@ class _RequestGiveDetailScreenNewState
                 .toString()
             : '0');
 
-    final result = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('${monthsMM[selectedMonth - 1]} $selectedYear'),

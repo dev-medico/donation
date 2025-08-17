@@ -257,8 +257,8 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                                       // Reset filters after refreshing
                                       resetFilterProviders(ref);
                                       
-                                      // Show success message
-                                      if (result['message'] != null) {
+                                      // Show success message only if widget is still mounted
+                                      if (mounted && result['message'] != null) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(content: Text(result['message'])),
                                         );
