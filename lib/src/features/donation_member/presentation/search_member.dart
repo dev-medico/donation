@@ -38,6 +38,9 @@ class _SearchMemberListScreenState
     "AB (Rh -)",
     "O (Rh -)",
   ];
+  
+  List<String> years = [];
+  
   SearchMemberDataSource? memberDataDataSource;
   TextStyle tabStyle = const TextStyle(fontSize: 16);
 
@@ -47,6 +50,13 @@ class _SearchMemberListScreenState
   @override
   void initState() {
     super.initState();
+    // Generate years from 2020 to current year
+    final currentYear = DateTime.now().year;
+    for (int year = 2020; year <= currentYear; year++) {
+      years.add(year.toString());
+    }
+    years = years.reversed.toList(); // Most recent year first
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _resetAllFilters();
     });
@@ -67,6 +77,7 @@ class _SearchMemberListScreenState
     ref.read(searchMemberBloodTypeFilterProvider.notifier).state =
         "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
     ref.read(searchMemberQueryProvider.notifier).state = '';
+    ref.read(searchMemberDonationYearFilterProvider.notifier).state = DateTime.now().year.toString();
 
     // Force refresh of the filtered list with all members
     if (ref.read(memberListProvider).hasValue) {
@@ -91,6 +102,7 @@ class _SearchMemberListScreenState
     final membersAsync = ref.watch(memberListProvider);
     final filteredMembers = ref.watch(filteredSearchMemberListProvider);
     final selectedBloodType = ref.watch(searchMemberBloodTypeFilterProvider);
+    final selectedYear = ref.watch(searchMemberDonationYearFilterProvider);
 
     // Monitor filter state changes and update filtered list
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -166,56 +178,113 @@ class _SearchMemberListScreenState
                     margin: EdgeInsets.only(left: 20, right: 20),
                     child: Column(
                       children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          margin: const EdgeInsets.only(
-                            top: 20,
-                            left: 6,
-                          ),
-                          child: DropdownButtonFormField<String>(
-                            value: selectedBloodType,
-                            dropdownColor: Colors.white,
-                            focusColor: Colors.white,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              contentPadding: EdgeInsets.only(
-                                  top: 16, left: 20, bottom: 16, right: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            isExpanded: true,
-                            icon: const Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.black45,
-                            ),
-                            iconSize: 30,
-                            items: [
-                              DropdownMenuItem(
-                                value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                                child: Text(
-                                  "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                                  style: const TextStyle(fontSize: 14),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                  top: 20,
+                                  left: 6,
+                                  right: 6,
+                                ),
+                                child: DropdownButtonFormField<String>(
+                                  value: selectedBloodType,
+                                  dropdownColor: Colors.white,
+                                  focusColor: Colors.white,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.only(
+                                        top: 16, left: 20, bottom: 16, right: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  isExpanded: true,
+                                  icon: const Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Colors.black45,
+                                  ),
+                                  iconSize: 30,
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
+                                      child: Text(
+                                        "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                    ...bloodTypes
+                                        .map((item) => DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Text(
+                                                item,
+                                                style: const TextStyle(fontSize: 14),
+                                              ),
+                                            )),
+                                  ],
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      ref
+                                          .read(searchMemberBloodTypeFilterProvider
+                                              .notifier)
+                                          .state = value;
+                                    }
+                                  },
                                 ),
                               ),
-                              ...bloodTypes
-                                  .map((item) => DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(
-                                          item,
-                                          style: const TextStyle(fontSize: 14),
-                                        ),
-                                      )),
-                            ],
-                            onChanged: (value) {
-                              if (value != null) {
-                                ref
-                                    .read(searchMemberBloodTypeFilterProvider
-                                        .notifier)
-                                    .state = value;
-                              }
-                            },
-                          ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                  top: 20,
+                                  left: 6,
+                                  right: 6,
+                                ),
+                                child: DropdownButtonFormField<String?>(
+                                  value: selectedYear,
+                                  dropdownColor: Colors.white,
+                                  focusColor: Colors.white,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.only(
+                                        top: 16, left: 20, bottom: 16, right: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  isExpanded: true,
+                                  icon: const Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Colors.black45,
+                                  ),
+                                  iconSize: 30,
+                                  items: [
+                                    DropdownMenuItem<String?>(
+                                      value: null,
+                                      child: Text(
+                                        "နှစ်အားလုံး",
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                    ...years
+                                        .map((year) => DropdownMenuItem<String?>(
+                                              value: year,
+                                              child: Text(
+                                                "$year ခုနှစ်",
+                                                style: const TextStyle(fontSize: 14),
+                                              ),
+                                            )),
+                                  ],
+                                  onChanged: (value) {
+                                    ref
+                                        .read(searchMemberDonationYearFilterProvider
+                                            .notifier)
+                                        .state = value;
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         Container(
                           width: MediaQuery.of(context).size.width * 0.9,
@@ -281,7 +350,7 @@ class _SearchMemberListScreenState
                 : Row(
                     children: [
                       Container(
-                        width: MediaQuery.of(context).size.width / 5,
+                        width: MediaQuery.of(context).size.width / 6,
                         margin: const EdgeInsets.only(top: 28, left: 20),
                         child: DropdownButtonFormField<String>(
                           value: selectedBloodType,
@@ -329,7 +398,53 @@ class _SearchMemberListScreenState
                         ),
                       ),
                       Container(
-                        width: MediaQuery.of(context).size.width / 5,
+                        width: MediaQuery.of(context).size.width / 6,
+                        margin: const EdgeInsets.only(top: 28, left: 20),
+                        child: DropdownButtonFormField<String?>(
+                          value: selectedYear,
+                          dropdownColor: Colors.white,
+                          focusColor: Colors.white,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: EdgeInsets.only(
+                                top: 16, left: 20, bottom: 16, right: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          isExpanded: true,
+                          icon: const Icon(
+                            Icons.arrow_drop_down,
+                            color: Colors.black45,
+                          ),
+                          iconSize: 30,
+                          items: [
+                            DropdownMenuItem<String?>(
+                              value: null,
+                              child: Text(
+                                "နှစ်အားလုံး",
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                            ...years
+                                .map((year) => DropdownMenuItem<String?>(
+                                      value: year,
+                                      child: Text(
+                                        "$year ခုနှစ်",
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    )),
+                          ],
+                          onChanged: (value) {
+                            ref
+                                .read(searchMemberDonationYearFilterProvider
+                                    .notifier)
+                                .state = value;
+                          },
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width / 6,
                         margin:
                             const EdgeInsets.only(right: 40, top: 28, left: 20),
                         padding: const EdgeInsets.only(top: 8, bottom: 8),

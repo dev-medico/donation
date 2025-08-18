@@ -158,7 +158,8 @@ final memberErrorProvider = StateProvider<String?>((ref) => null);
 final memberListProvider = FutureProvider<List<Member>>((ref) {
   // Only fetch data without modifying any other state
   final repository = ref.read(memberRepositoryProvider);
-  return repository.getAllMembers(forceRefresh: false);
+  final donationYear = ref.watch(searchMemberDonationYearFilterProvider);
+  return repository.getAllMembers(forceRefresh: false, donationYear: donationYear);
 });
 
 // Add a separate function to handle loading state
@@ -215,6 +216,8 @@ final memberIdSearchProvider = StateProvider<String>((ref) => '');
 final searchMemberQueryProvider = StateProvider<String>((ref) => '');
 final searchMemberBloodTypeFilterProvider =
     StateProvider<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
+final searchMemberDonationYearFilterProvider = 
+    StateProvider<String?>((ref) => DateTime.now().year.toString());
 
 // Filtered members provider
 final filteredMemberListProvider = StateProvider<List<Member>>((ref) {
@@ -550,4 +553,5 @@ void resetSearchFilterProviders(WidgetRef ref) {
   ref.read(searchMemberQueryProvider.notifier).state = '';
   ref.read(searchMemberBloodTypeFilterProvider.notifier).state =
       'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
+  ref.read(searchMemberDonationYearFilterProvider.notifier).state = DateTime.now().year.toString();
 }
