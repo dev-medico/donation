@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/member_service.dart' as ms;
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/data/member_repository.dart';
-import 'package:flutter/widgets.dart';
+import 'package:donation/src/features/donation_member/data/search_member_repository.dart';
 
 typedef SearchParams = ({String? search, String? bloodType});
 typedef AgeRangeParams = ({int? start, int? end});
@@ -150,16 +150,35 @@ final memberRepositoryProvider = Provider<MemberRepository>((ref) {
   return MemberRepository();
 });
 
+// Search member repository provider
+final searchMemberRepositoryProvider = Provider<SearchMemberRepository>((ref) {
+  return SearchMemberRepository();
+});
+
 // Loading and error state providers
 final memberLoadingProvider = StateProvider<bool>((ref) => false);
 final memberErrorProvider = StateProvider<String?>((ref) => null);
 
 // Replace the existing memberListProvider with a simple data-only provider
-final memberListProvider = FutureProvider<List<Member>>((ref) {
+final memberListProvider = FutureProvider.autoDispose<List<Member>>((ref) {
   // Only fetch data without modifying any other state
   final repository = ref.read(memberRepositoryProvider);
+  // Member list should show all members without year filter
+  return repository.getAllMembers(forceRefresh: false);
+});
+
+// Separate provider for search member list with year filter
+final searchMemberListWithYearProvider = FutureProvider.autoDispose<List<Member>>((ref) {
+  final repository = ref.read(searchMemberRepositoryProvider);
   final donationYear = ref.watch(searchMemberDonationYearFilterProvider);
-  return repository.getAllMembers(forceRefresh: false, donationYear: donationYear);
+  final searchQuery = ref.watch(searchMemberQueryProvider);
+  final bloodType = ref.watch(searchMemberBloodTypeFilterProvider);
+  
+  return repository.searchMembers(
+    query: searchQuery.isEmpty ? null : searchQuery,
+    bloodType: (bloodType == 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' || bloodType.isEmpty) ? null : bloodType,
+    donationYear: donationYear,
+  );
 });
 
 // Add a separate function to handle loading state
@@ -220,7 +239,7 @@ final searchMemberDonationYearFilterProvider =
     StateProvider<String?>((ref) => DateTime.now().year.toString());
 
 // Filtered members provider
-final filteredMemberListProvider = StateProvider<List<Member>>((ref) {
+final filteredMemberListProvider = StateProvider.autoDispose<List<Member>>((ref) {
   final allMembersAsync = ref.watch(memberListProvider);
 
   return allMembersAsync.when(
@@ -327,48 +346,14 @@ final filteredMemberListProvider = StateProvider<List<Member>>((ref) {
   );
 });
 
-// Separate provider for search member screen
-final filteredSearchMemberListProvider = StateProvider<List<Member>>((ref) {
-  final allMembersAsync = ref.watch(memberListProvider);
+// Separate provider for search member screen - simply returns the search results
+final filteredSearchMemberListProvider = StateProvider.autoDispose<List<Member>>((ref) {
+  // The searchMemberListWithYearProvider already handles filtering
+  // This provider just returns the results for display
+  final allMembersAsync = ref.watch(searchMemberListWithYearProvider);
 
   return allMembersAsync.when(
-    data: (allMembers) {
-      final searchQuery = ref.watch(searchMemberQueryProvider);
-      final bloodType = ref.watch(searchMemberBloodTypeFilterProvider);
-
-      List<Member> filtered = List.from(allMembers);
-
-      // Apply search page filters
-      if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
-        filtered = filtered
-            .where((member) =>
-                member.bloodType
-                    ?.toLowerCase()
-                    .contains(bloodType.toLowerCase()) ??
-                false)
-            .toList();
-      }
-
-      if (searchQuery.isNotEmpty) {
-        filtered = filtered
-            .where((member) =>
-                (member.name
-                        ?.toLowerCase()
-                        .contains(searchQuery.toLowerCase()) ??
-                    false) ||
-                (member.memberId
-                        ?.toLowerCase()
-                        .contains(searchQuery.toLowerCase()) ??
-                    false) ||
-                (member.phone
-                        ?.toLowerCase()
-                        .contains(searchQuery.toLowerCase()) ??
-                    false))
-            .toList();
-      }
-
-      return filtered;
-    },
+    data: (members) => members,
     loading: () => [],
     error: (_, __) => [],
   );
@@ -426,34 +411,8 @@ void updateFilteredMembers(WidgetRef ref) {
 
 // Function to update filtered members for search screen
 void updateSearchFilteredMembers(WidgetRef ref) {
-  final allMembers = ref.read(memberListProvider).value ?? [];
-  final searchQuery = ref.read(searchMemberQueryProvider);
-  final bloodType = ref.read(searchMemberBloodTypeFilterProvider);
-
-  List<Member> filtered = List.from(allMembers);
-
-  if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
-    filtered = filtered
-        .where((member) =>
-            member.bloodType?.toLowerCase().trim() == bloodType.toLowerCase().trim())
-        .toList();
-  }
-
-  if (searchQuery.isNotEmpty) {
-    filtered = filtered
-        .where((member) =>
-            (member.name?.toLowerCase().contains(searchQuery.toLowerCase()) ??
-                false) ||
-            (member.memberId
-                    ?.toLowerCase()
-                    .contains(searchQuery.toLowerCase()) ??
-                false) ||
-            (member.phone?.toLowerCase().contains(searchQuery.toLowerCase()) ??
-                false))
-        .toList();
-  }
-
-  ref.read(filteredSearchMemberListProvider.notifier).state = filtered;
+  // The search is now handled by the API, so we just refresh the provider
+  ref.invalidate(searchMemberListWithYearProvider);
 }
 
 // Provider for the member loading status

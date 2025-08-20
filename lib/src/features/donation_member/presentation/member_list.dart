@@ -4,7 +4,7 @@ import 'dart:math';
 
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
-import 'package:donation/src/features/donation_member/domain/search_member_data_source.dart';
+import 'package:donation/src/features/donation_member/domain/member_list_data_source.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
 import 'package:donation/src/features/donation_member/presentation/new_member.dart';
@@ -55,7 +55,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     "AB (Rh -)",
     "O (Rh -)",
   ];
-  SearchMemberDataSource? memberDataDataSource;
+  MemberListDataSource? memberDataDataSource;
   TextStyle tabStyle = const TextStyle(fontSize: 16);
   final searchController = TextEditingController();
   final birthDateController = TextEditingController();
@@ -1241,7 +1241,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
   }
 
   Widget buildSimpleTable(List<Member> members) {
-    memberDataDataSource = SearchMemberDataSource(memberData: members);
+    memberDataDataSource = MemberListDataSource(memberData: members);
 
     return Container(
       margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 16 : 16),

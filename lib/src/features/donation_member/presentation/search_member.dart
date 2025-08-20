@@ -79,9 +79,9 @@ class _SearchMemberListScreenState
     ref.read(searchMemberQueryProvider.notifier).state = '';
     ref.read(searchMemberDonationYearFilterProvider.notifier).state = DateTime.now().year.toString();
 
-    // Force refresh of the filtered list with all members
-    if (ref.read(memberListProvider).hasValue) {
-      final allMembers = ref.read(memberListProvider).value ?? [];
+    // Force refresh of the filtered list with year-filtered members
+    if (ref.read(searchMemberListWithYearProvider).hasValue) {
+      final allMembers = ref.read(searchMemberListWithYearProvider).value ?? [];
       ref.read(filteredSearchMemberListProvider.notifier).state =
           List.from(allMembers);
     }
@@ -98,19 +98,11 @@ class _SearchMemberListScreenState
 
   @override
   Widget build(BuildContext context) {
-    // Watch all necessary providers
-    final membersAsync = ref.watch(memberListProvider);
+    // Watch all necessary providers - use the provider with year filter for search
+    final membersAsync = ref.watch(searchMemberListWithYearProvider);
     final filteredMembers = ref.watch(filteredSearchMemberListProvider);
     final selectedBloodType = ref.watch(searchMemberBloodTypeFilterProvider);
     final selectedYear = ref.watch(searchMemberDonationYearFilterProvider);
-
-    // Monitor filter state changes and update filtered list
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Only call this after the widget is built
-      if (membersAsync.hasValue) {
-        updateSearchFilteredMembers(ref);
-      }
-    });
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -164,7 +156,7 @@ class _SearchMemberListScreenState
               Text('Error: $error'),
               ElevatedButton(
                 onPressed: () {
-                  ref.refresh(memberListProvider);
+                  ref.invalidate(searchMemberListWithYearProvider);
                 },
                 child: Text('Retry'),
               ),
@@ -518,8 +510,8 @@ class _SearchMemberListScreenState
           // Reset all filters first
           _resetAllFilters();
 
-          // Then refresh member list
-          ref.refresh(memberListProvider);
+          // Then refresh member list with year filter
+          ref.invalidate(searchMemberListWithYearProvider);
         },
         child: const Icon(Icons.refresh),
       ),

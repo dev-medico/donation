@@ -32,8 +32,12 @@ class BloodRequestGiveChartScreen extends ConsumerStatefulWidget {
 }
 
 class _BloodRequestGiveChartScreenState
-    extends ConsumerState<BloodRequestGiveChartScreen> {
+    extends ConsumerState<BloodRequestGiveChartScreen> 
+    with AutomaticKeepAliveClientMixin {
   late TooltipBehavior _tooltip;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -42,7 +46,14 @@ class _BloodRequestGiveChartScreenState
   }
 
   @override
+  void dispose() {
+    _tooltip = TooltipBehavior(enable: false);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final requestGiveStats = ref.watch(requestGiveStatsProvider);
 
     return Container(
@@ -105,29 +116,33 @@ class _BloodRequestGiveChartScreenState
                     ),
                     SizedBox(height: Responsive.isMobile(context) ? 10 : 8),
                     Expanded(
-                      child: SfCartesianChart(
-                        primaryXAxis: CategoryAxis(),
-                        tooltipBehavior: _tooltip,
-                        legend: Legend(
-                          isVisible: true,
-                          position: LegendPosition.bottom,
+                      child: RepaintBoundary(
+                        child: SfCartesianChart(
+                          primaryXAxis: CategoryAxis(),
+                          tooltipBehavior: _tooltip,
+                          legend: Legend(
+                            isVisible: true,
+                            position: LegendPosition.bottom,
+                          ),
+                          series: <CartesianSeries>[
+                            ColumnSeries<ChartData, String>(
+                              name: 'တောင်းခံ',
+                              color: Colors.red,
+                              dataSource: chartData,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.y,
+                              animationDuration: 0,
+                            ),
+                            ColumnSeries<ChartData, String>(
+                              name: 'လှူဒါန်း',
+                              color: Colors.green,
+                              dataSource: chartData,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.y1,
+                              animationDuration: 0,
+                            ),
+                          ],
                         ),
-                        series: <CartesianSeries>[
-                          ColumnSeries<ChartData, String>(
-                            name: 'တောင်းခံ',
-                            color: Colors.red,
-                            dataSource: chartData,
-                            xValueMapper: (ChartData data, _) => data.x,
-                            yValueMapper: (ChartData data, _) => data.y,
-                          ),
-                          ColumnSeries<ChartData, String>(
-                            name: 'လှူဒါန်း',
-                            color: Colors.green,
-                            dataSource: chartData,
-                            xValueMapper: (ChartData data, _) => data.x,
-                            yValueMapper: (ChartData data, _) => data.y1,
-                          ),
-                        ],
                       ),
                     ),
                   ],

@@ -100,12 +100,7 @@ class MemberRepository {
   }
 
   // Method to get all members with caching
-  Future<List<Member>> getAllMembers({bool forceRefresh = false, String? donationYear}) async {
-    // For year-filtered requests, don't use cache
-    if (donationYear != null) {
-      return _fetchMembersWithFilters(donationYear: donationYear);
-    }
-    
+  Future<List<Member>> getAllMembers({bool forceRefresh = false}) async {
     // Check if cache is still valid (not expired and not forced to refresh)
     final bool isCacheValid = _memberListCache != null &&
         _memberListCacheTime != null &&
@@ -147,47 +142,6 @@ class MemberRepository {
       }
     } catch (e) {
       debugPrint('Error fetching all members: $e');
-      throw Exception('Failed to load members: $e');
-    }
-  }
-  
-  // Fetch members with year filter
-  Future<List<Member>> _fetchMembersWithFilters({String? donationYear}) async {
-    try {
-      debugPrint('Fetching members with donation year filter: $donationYear');
-      
-      Map<String, dynamic> queryParams = {
-        'q': '',
-        'page': 0,
-        'limit': 5000,
-      };
-      
-      if (donationYear != null) {
-        queryParams['donation_year'] = donationYear;
-      }
-      
-      final response = await _apiClient.get<Map<String, dynamic>>(
-          '$_baseUrl/index',
-          queryParameters: queryParams);
-
-      if (response.data == null) {
-        throw Exception('Invalid response data');
-      }
-
-      final jsonData = response.data!;
-
-      if (jsonData['status'] == 'ok' && jsonData['data'] is List) {
-        final List<Member> members = (jsonData['data'] as List)
-            .map((item) => Member.fromJson(item as Map<String, dynamic>))
-            .toList();
-
-        debugPrint('Fetched ${members.length} members with year filter');
-        return members;
-      } else {
-        throw Exception(jsonData['message'] ?? 'Failed to retrieve members');
-      }
-    } catch (e) {
-      debugPrint('Error fetching members with filters: $e');
       throw Exception('Failed to load members: $e');
     }
   }
