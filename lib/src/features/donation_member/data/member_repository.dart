@@ -150,7 +150,7 @@ class MemberRepository {
     try {
       debugPrint('Updating member with ID: $id');
 
-      final response = await _apiClient.put<Map<String, dynamic>>(
+      final response = await _apiClient.post<Map<String, dynamic>>(
         '$_baseUrl/update',
         queryParameters: {'id': id},
         data: member.toJson(),
