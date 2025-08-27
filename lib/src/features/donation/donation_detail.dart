@@ -236,7 +236,15 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    "${Utils.strToMM(data.patientAge.toString())}",
+                                    () {
+                                      final age = Utils.strToMM(data.patientAge.toString());
+                                      // Check if age already contains ရက်, လ, or နှစ်
+                                      if (age.contains('ရက်') || age.contains('လ') || age.contains('နှစ်')) {
+                                        return age;
+                                      }
+                                      // Add နှစ် if it's just a number
+                                      return "$age နှစ်";
+                                    }(),
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
