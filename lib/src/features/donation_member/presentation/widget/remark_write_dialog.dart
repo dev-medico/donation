@@ -165,14 +165,11 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
                       // Refresh both member list and search list
                       await ref.refresh(memberListProvider.future);
                       
-                      // Also refresh the filtered search list if it exists
-                      if (ref.read(memberListProvider).hasValue) {
-                        final allMembers = ref.read(memberListProvider).value ?? [];
-                        ref.read(filteredSearchMemberListProvider.notifier).state = List.from(allMembers);
-                        
-                        // Update search filters to refresh the view
-                        updateSearchFilteredMembers(ref);
-                      }
+                      // Invalidate the search member list provider to force refresh
+                      ref.invalidate(searchMemberListWithYearProvider);
+                      
+                      // This will trigger a re-fetch of the search member list
+                      // which will then update the filteredSearchMemberListProvider automatically
                       
                       if (mounted) {
                         Navigator.pop(context);
