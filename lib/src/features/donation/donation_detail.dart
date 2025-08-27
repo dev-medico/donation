@@ -236,7 +236,7 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    "${Utils.strToMM(data.patientAge.toString())} နှစ်",
+                                    "${Utils.strToMM(data.patientAge.toString())}",
                                     style: const TextStyle(
                                         fontSize: 14, color: Colors.black),
                                   ),
