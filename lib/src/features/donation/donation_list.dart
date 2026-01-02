@@ -29,6 +29,7 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
   int _yearSelected = 0;
   int _monthSelected = DateTime.now().month - 1;
   List<String> years = [
+    "2026",
     "2025",
     "2024",
     "2023",
