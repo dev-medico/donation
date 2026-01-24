@@ -298,7 +298,8 @@ class _MoneyDonorListScreenState extends ConsumerState<MoneyDonorListScreen> {
                         ))),
                 GridColumn(
                     columnName: 'name',
-                    width: Responsive.isMobile(context) ? 150 : 200,
+                    minimumWidth: Responsive.isMobile(context) ? 200 : 380,
+                    columnWidthMode: ColumnWidthMode.fill,
                     label: Container(
                         color: primaryColor,
                         padding: const EdgeInsets.all(8.0),

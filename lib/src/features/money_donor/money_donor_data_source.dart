@@ -69,7 +69,9 @@ class MoneyDonorDataSource extends DataGridSource {
         padding: padding,
         child: Text(
           value,
-          overflow: TextOverflow.ellipsis,
+          overflow: columnName == 'name' ? TextOverflow.visible : TextOverflow.ellipsis,
+          softWrap: columnName == 'name',
+          maxLines: columnName == 'name' ? 2 : 1,
           style: TextStyle(
             fontWeight: columnName == 'name' ? FontWeight.w600 : FontWeight.normal,
             fontSize: 13,

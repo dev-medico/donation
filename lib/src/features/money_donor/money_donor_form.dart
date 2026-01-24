@@ -1,6 +1,8 @@
 import 'package:donation/src/features/money_donor/models/money_donor.dart';
 import 'package:donation/src/features/money_donor/providers/money_donor_provider.dart';
+import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/tool_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -96,7 +98,10 @@ class _MoneyDonorFormScreenState extends ConsumerState<MoneyDonorFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = Responsive.isMobile(context);
+
     return Scaffold(
+      backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -133,20 +138,68 @@ class _MoneyDonorFormScreenState extends ConsumerState<MoneyDonorFormScreen> {
             ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'အမည် *',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+      body: SafeArea(
+        child: isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(12),
+            child: _buildFormCard(),
+          ),
+          _buildSaveButton(),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return SingleChildScrollView(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.all(20),
+                  child: _buildFormCard(),
                 ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _buildSaveButton(),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormCard() {
+    return Container(
+      padding: const EdgeInsets.only(bottom: 20, left: 4, right: 4, top: 8),
+      decoration: shadowDecoration(Colors.white),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Name field
+            Container(
+              margin: const EdgeInsets.only(left: 20, top: 24, bottom: 8, right: 20),
+              child: TextFormField(
+                controller: _nameController,
+                decoration: inputBoxDecoration('အမည် *'),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'အမည် ထည့်သွင်းပါ';
@@ -154,18 +207,20 @@ class _MoneyDonorFormScreenState extends ConsumerState<MoneyDonorFormScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
-              TextFormField(
+            ),
+            // Phone field
+            Container(
+              margin: const EdgeInsets.only(left: 20, top: 16, bottom: 8, right: 20),
+              child: TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'ဖုန်းနံပါတ်',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
-                ),
+                decoration: inputBoxDecoration('ဖုန်းနံပါတ်'),
                 keyboardType: TextInputType.phone,
               ),
-              const SizedBox(height: 16),
-              SwitchListTile(
+            ),
+            // Organization toggle
+            Container(
+              margin: const EdgeInsets.only(left: 8, top: 8, bottom: 8, right: 8),
+              child: SwitchListTile(
                 title: const Text('အဖွဲ့အစည်း'),
                 subtitle: Text(
                   _isOrganization ? 'အဖွဲ့အစည်း/ကုမ္ပဏီ' : 'လူပုဂ္ဂိုလ်',
@@ -177,40 +232,75 @@ class _MoneyDonorFormScreenState extends ConsumerState<MoneyDonorFormScreen> {
                 },
                 activeColor: primaryColor,
               ),
-              const SizedBox(height: 16),
-              TextFormField(
+            ),
+            // Address field
+            Container(
+              margin: const EdgeInsets.only(left: 20, top: 8, bottom: 8, right: 20),
+              child: TextFormField(
                 controller: _addressController,
-                decoration: const InputDecoration(
-                  labelText: 'လိပ်စာ',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.location_on),
-                ),
+                decoration: inputBoxDecoration('လိပ်စာ'),
                 maxLines: 2,
               ),
-              const SizedBox(height: 16),
-              TextFormField(
+            ),
+            // Note field
+            Container(
+              margin: const EdgeInsets.only(left: 20, top: 16, bottom: 8, right: 20),
+              decoration: const BoxDecoration(
+                color: Color(0xFFefefef),
+                borderRadius: BorderRadius.all(Radius.circular(12.0)),
+              ),
+              child: TextFormField(
                 controller: _noteController,
-                decoration: const InputDecoration(
-                  labelText: 'မှတ်ချက်',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.note),
-                ),
                 maxLines: 3,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _saveDonor,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(
-                  isEditing ? 'ပြင်ဆင်မည်' : 'သိမ်းဆည်းမည်',
-                  style: const TextStyle(fontSize: 16),
+                decoration: const InputDecoration(
+                  hintText: 'မှတ်ချက်',
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  contentPadding: EdgeInsets.only(left: 15, bottom: 8, top: 12, right: 15),
+                  hintStyle: TextStyle(fontSize: 15.0, color: Colors.grey),
                 ),
               ),
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return Container(
+      decoration: BoxDecoration(
+        color: primaryColor,
+        borderRadius: const BorderRadius.all(Radius.circular(12.0)),
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 15),
+      width: double.infinity,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _isLoading ? null : _saveDonor,
+        child: Align(
+          alignment: Alignment.center,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 12),
+            child: _isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Text(
+                    isEditing ? 'ပြင်ဆင်မည်' : 'သိမ်းဆည်းမည်',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.white,
+                    ),
+                  ),
           ),
         ),
       ),
