@@ -1,5 +1,37 @@
 # Claude Code Development Summary
 
+## Server Access Configuration
+
+### SSH Access to Production Server
+```bash
+# Server: redjuniors.mooo.com (54.206.49.166)
+# User: ubuntu
+# Key: ~/.ssh/id_ed25519
+
+ssh -i ~/.ssh/id_ed25519 ubuntu@54.206.49.166
+
+# Pull latest backend changes:
+cd /var/www/donation_backend && sudo git pull origin main
+
+# Run Yii commands:
+sudo php yii <command>
+```
+
+### Backend Deployment Steps
+1. Commit and push changes to GitHub
+2. SSH into server
+3. Navigate to `/var/www/donation_backend`
+4. Run `sudo git pull origin main`
+5. If needed: `sudo php yii cache/flush-all`
+
+### Database Management Commands
+```bash
+# Merge duplicate donors (run on server):
+sudo php yii merge-donors/dry-run  # Preview what will be merged
+sudo php yii merge-donors/merge    # Actually merge duplicates
+sudo php yii merge-donors/find     # List potential duplicates
+```
+
 ## Recent Changes Made
 
 ### 1. Donar List Screen API Optimization
