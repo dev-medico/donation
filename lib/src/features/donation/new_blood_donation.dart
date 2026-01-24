@@ -28,6 +28,8 @@ import 'package:donation/src/features/donation/providers/donation_providers.dart
 import 'package:donation/src/features/services/member_service.dart'
     as member_services;
 import 'package:donation/src/features/services/donation_service.dart';
+import 'package:donation/src/features/patient/models/patient.dart';
+import 'package:donation/src/features/patient/providers/patient_provider.dart';
 
 class NewBloodDonationScreen extends ConsumerStatefulWidget {
   NewBloodDonationScreen({Key? key}) : super(key: key);
@@ -48,6 +50,11 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
   bool isSwitched = false;
   String operatorImg = "";
   Member? selectedMember;
+
+  // Patient selection state
+  Patient? selectedPatient;
+  bool isNewPatient = true; // Toggle: true = new patient, false = existing
+  final patientSearchController = TextEditingController();
 
   String donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
   DateTime? donationDateDetail;
@@ -146,6 +153,68 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     // Add listeners to address controllers to update UI when they change
     quarterController.addListener(_addressFieldsChanged);
     townController.addListener(_addressFieldsChanged);
+
+    // Add listener to clear patient selection when user manually edits name
+    nameController.addListener(_onPatientNameChanged);
+  }
+
+  @override
+  void dispose() {
+    nameController.removeListener(_onPatientNameChanged);
+    quarterController.removeListener(_addressFieldsChanged);
+    townController.removeListener(_addressFieldsChanged);
+    patientSearchController.dispose();
+    super.dispose();
+  }
+
+  // Handle patient name changes to clear selection when user manually edits
+  void _onPatientNameChanged() {
+    if (!isNewPatient && selectedPatient != null) {
+      // If user manually edits the name, clear the selection
+      if (nameController.text != selectedPatient!.name) {
+        setState(() {
+          selectedPatient = null;
+          isNewPatient = true; // Switch back to new patient mode
+          patientSearchController.clear();
+        });
+      }
+    }
+  }
+
+  // Fill patient data when an existing patient is selected
+  void _fillPatientData(Patient patient) {
+    setState(() {
+      selectedPatient = patient;
+      patientSearchController.text = patient.name ?? '';
+      nameController.text = patient.name ?? '';
+      ageController.text = patient.age ?? '';
+      // Parse address if format is "quarter၊township"
+      _parseAndFillAddress(patient.address);
+    });
+  }
+
+  // Parse and fill address fields from patient's stored address
+  void _parseAndFillAddress(String? address) {
+    if (address == null || address.isEmpty) return;
+    final parts = address.split('၊');
+    if (parts.length >= 2) {
+      quarterController.text = parts[0].trim();
+      townController.text = parts[1].trim();
+    } else {
+      townController.text = address;
+    }
+  }
+
+  // Clear patient selection and switch to new patient mode
+  void _clearPatientSelection() {
+    setState(() {
+      selectedPatient = null;
+      patientSearchController.clear();
+      nameController.clear();
+      ageController.clear();
+      quarterController.clear();
+      townController.clear();
+    });
   }
 
   // Handle changes to address fields
@@ -316,6 +385,28 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     final String formattedAddress =
         "$quarter${quarter.isNotEmpty ? '၊' : ''}$township";
 
+    // Handle patient ID - use existing patient or create new one
+    int? patientId = selectedPatient?.id;
+
+    // If new patient mode and no selection, create patient first
+    if (isNewPatient && selectedPatient == null && name.isNotEmpty) {
+      try {
+        final patientService = ref.read(patientServiceProvider);
+        final newPatient = await patientService.createPatient({
+          'name': name,
+          'age': age,
+          'address': formattedAddress,
+          'gender': '', // Optional - not collected in this form
+        });
+        patientId = newPatient.id;
+        print('Created new patient with ID: $patientId');
+      } catch (e) {
+        // Handle error - continue without patient_id if creation fails
+        print('Failed to create patient: $e');
+        // Don't block donation creation if patient creation fails
+      }
+    }
+
     final donationData = {
       'member': selectedMember != null ? selectedMember!.id : null,
       'member_id': selectedMember != null ? selectedMember!.memberId : "",
@@ -339,6 +430,8 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       'patient_name': name,
       // Set owner_id to be the same as member_id as required by the server
       'owner_id': selectedMember != null ? selectedMember!.memberId : "",
+      // Add patient ID reference if available
+      'patient_id': patientId,
     };
 
     try {
@@ -385,8 +478,11 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     quarterController.clear();
     townController.clear();
     memberController.clear();
+    patientSearchController.clear();
     setState(() {
       selectedMember = null;
+      selectedPatient = null;
+      isNewPatient = true;
       donationDateDetail = null;
       donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
     });
@@ -609,14 +705,158 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'လူနာအချက်အလက်',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                // Header row with toggle
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'လူနာအချက်အလက်',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    // Toggle between New and Existing patient
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isNewPatient = true;
+                                _clearPatientSelection();
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isNewPatient
+                                    ? primaryColor
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'အသစ်',
+                                style: TextStyle(
+                                  color: isNewPatient
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isNewPatient = false;
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: !isNewPatient
+                                    ? primaryColor
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'ရှိပြီးသား',
+                                style: TextStyle(
+                                  color: !isNewPatient
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 16),
+
+                // Patient search field (only show when existing mode)
+                if (!isNewPatient) ...[
+                  TypeAheadField<Patient>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: patientSearchController,
+                      decoration: InputDecoration(
+                        labelText: 'လူနာရှာဖွေရန်',
+                        hintText: 'အမည် သို့မဟုတ် ဖုန်းဖြင့် ရှာပါ',
+                        border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    suggestionsCallback: (pattern) async {
+                      if (pattern.isEmpty) return [];
+                      final service = ref.read(patientServiceProvider);
+                      return await service.searchPatients(pattern);
+                    },
+                    itemBuilder: (context, Patient patient) {
+                      return ListTile(
+                        title: Text(patient.name ?? ''),
+                        subtitle: Text(
+                            '${patient.age ?? ''} - ${patient.address ?? ''}'),
+                        dense: true,
+                      );
+                    },
+                    onSuggestionSelected: (Patient patient) {
+                      _fillPatientData(patient);
+                    },
+                  ),
+                  if (selectedPatient != null) ...[
+                    SizedBox(height: 12),
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green[200]!),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_circle,
+                              color: Colors.green[700], size: 20),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
+                              style: TextStyle(
+                                color: Colors.green[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close, size: 18),
+                            onPressed: () {
+                              setState(() {
+                                isNewPatient = true;
+                                _clearPatientSelection();
+                              });
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: 12),
+                ],
+
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(
@@ -1013,14 +1253,158 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'လူနာအချက်အလက်',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                // Header row with toggle
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'လူနာအချက်အလက်',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    // Toggle between New and Existing patient
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isNewPatient = true;
+                                _clearPatientSelection();
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isNewPatient
+                                    ? primaryColor
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'အသစ်',
+                                style: TextStyle(
+                                  color: isNewPatient
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isNewPatient = false;
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: !isNewPatient
+                                    ? primaryColor
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'ရှိပြီးသား',
+                                style: TextStyle(
+                                  color: !isNewPatient
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 16),
+
+                // Patient search field (only show when existing mode)
+                if (!isNewPatient) ...[
+                  TypeAheadField<Patient>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: patientSearchController,
+                      decoration: InputDecoration(
+                        labelText: 'လူနာရှာဖွေရန်',
+                        hintText: 'အမည် သို့မဟုတ် ဖုန်းဖြင့် ရှာပါ',
+                        border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    suggestionsCallback: (pattern) async {
+                      if (pattern.isEmpty) return [];
+                      final service = ref.read(patientServiceProvider);
+                      return await service.searchPatients(pattern);
+                    },
+                    itemBuilder: (context, Patient patient) {
+                      return ListTile(
+                        title: Text(patient.name ?? ''),
+                        subtitle: Text(
+                            '${patient.age ?? ''} - ${patient.address ?? ''}'),
+                        dense: true,
+                      );
+                    },
+                    onSuggestionSelected: (Patient patient) {
+                      _fillPatientData(patient);
+                    },
+                  ),
+                  if (selectedPatient != null) ...[
+                    SizedBox(height: 12),
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green[200]!),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_circle,
+                              color: Colors.green[700], size: 20),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
+                              style: TextStyle(
+                                color: Colors.green[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close, size: 18),
+                            onPressed: () {
+                              setState(() {
+                                isNewPatient = true;
+                                _clearPatientSelection();
+                              });
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: 12),
+                ],
+
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(
