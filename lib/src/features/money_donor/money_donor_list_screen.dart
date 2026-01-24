@@ -1,29 +1,29 @@
 import 'dart:async';
 
-import 'package:donation/src/features/patient/models/patient.dart';
-import 'package:donation/src/features/patient/providers/patient_provider.dart';
-import 'package:donation/src/features/patient/patient_data_source.dart';
-import 'package:donation/src/features/patient/patient_form.dart';
-import 'package:donation/src/features/patient/patient_detail_screen.dart';
+import 'package:donation/src/features/money_donor/models/money_donor.dart';
+import 'package:donation/src/features/money_donor/providers/money_donor_provider.dart';
+import 'package:donation/src/features/money_donor/money_donor_data_source.dart';
+import 'package:donation/src/features/money_donor/money_donor_form.dart';
+import 'package:donation/src/features/money_donor/money_donor_detail_screen.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-class PatientListScreen extends ConsumerStatefulWidget {
-  const PatientListScreen({super.key});
-  static const routeName = "/patient-list";
+class MoneyDonorListScreen extends ConsumerStatefulWidget {
+  const MoneyDonorListScreen({super.key});
+  static const routeName = "/money-donor-list";
 
   @override
-  ConsumerState<PatientListScreen> createState() => _PatientListScreenState();
+  ConsumerState<MoneyDonorListScreen> createState() => _MoneyDonorListScreenState();
 }
 
-class _PatientListScreenState extends ConsumerState<PatientListScreen> {
+class _MoneyDonorListScreenState extends ConsumerState<MoneyDonorListScreen> {
   static const _pageSize = 20;
   String _searchQuery = '';
-  PatientDataSource? _patientDataSource;
-  List<Patient> _allPatients = [];
+  MoneyDonorDataSource? _donorDataSource;
+  List<MoneyDonor> _allDonors = [];
   bool _isInitialLoad = true;
   Timer? _debounceTimer;
   final TextEditingController _searchController = TextEditingController();
@@ -47,22 +47,22 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
 
   Future<void> _fetchPage(int pageKey) async {
     try {
-      final result = await ref.read(patientServiceProvider).getPatients(
+      final result = await ref.read(moneyDonorServiceProvider).getMoneyDonors(
         page: pageKey,
         limit: _pageSize,
         q: _searchQuery,
       );
 
-      final patients = result['patients'] as List<Patient>;
+      final donors = result['donors'] as List<MoneyDonor>;
       final hasMore = result['hasMore'] as bool;
 
       if (pageKey == 0) {
-        _allPatients = patients;
+        _allDonors = donors;
       } else {
-        _allPatients.addAll(patients);
+        _allDonors.addAll(donors);
       }
 
-      _patientDataSource = PatientDataSource(patientData: _allPatients);
+      _donorDataSource = MoneyDonorDataSource(donorData: _allDonors);
 
       setState(() {
         _isInitialLoad = false;
@@ -84,7 +84,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
 
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
       _searchQuery = query;
-      _allPatients.clear();
+      _allDonors.clear();
       _currentPage = 0;
       _hasMore = true;
       _fetchPage(0);
@@ -99,22 +99,22 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     super.dispose();
   }
 
-  void _showPatientDetail(Patient patient) {
-    if (patient.id != null) {
+  void _showDonorDetail(MoneyDonor donor) {
+    if (donor.id != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PatientDetailScreen(patientId: patient.id!),
+          builder: (context) => MoneyDonorDetailScreen(donorId: donor.id!),
         ),
       );
     }
   }
 
-  void _showCreatePatientForm() {
+  void _showCreateDonorForm() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PatientFormScreen(
+        builder: (context) => MoneyDonorFormScreen(
           onSaved: () {
             _fetchPage(0);
           },
@@ -123,12 +123,12 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     );
   }
 
-  void _showEditPatientForm(Patient patient) {
+  void _showEditDonorForm(MoneyDonor donor) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PatientFormScreen(
-          patient: patient,
+        builder: (context) => MoneyDonorFormScreen(
+          donor: donor,
           onSaved: () {
             _fetchPage(0);
           },
@@ -137,14 +137,14 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     );
   }
 
-  Future<void> _deletePatient(Patient patient) async {
-    if (patient.id == null) return;
+  Future<void> _deleteDonor(MoneyDonor donor) async {
+    if (donor.id == null) return;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('အတည်ပြုပါ'),
-        content: Text('${patient.name} ကို ဖျက်ရန် သေချာပါသလား?'),
+        content: Text('${donor.name} ကို ဖျက်ရန် သေချာပါသလား?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -161,7 +161,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
 
     if (confirmed == true) {
       try {
-        final success = await ref.read(patientServiceProvider).deletePatient(patient.id!);
+        final success = await ref.read(moneyDonorServiceProvider).deleteMoneyDonor(donor.id!);
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('အောင်မြင်စွာ ဖျက်ပြီးပါပြီ')),
@@ -192,12 +192,12 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
         ),
         centerTitle: true,
         title: const Text(
-          "လူနာစာရင်း",
+          "ငွေအလှူရှင်များ",
           style: TextStyle(fontSize: 17, color: Colors.white),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showCreatePatientForm,
+        onPressed: _showCreateDonorForm,
         backgroundColor: primaryColor,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -220,7 +220,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
           return TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'လူနာအမည်၊ ဖုန်း သို့မဟုတ် လိပ်စာဖြင့် ရှာဖွေရန်',
+              hintText: 'အမည်၊ ဖုန်း သို့မဟုတ် လိပ်စာဖြင့် ရှာဖွေရန်',
               prefixIcon: const Icon(Icons.search),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
@@ -249,13 +249,13 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
   }
 
   Widget _buildTableView() {
-    if (_isInitialLoad && _patientDataSource == null) {
+    if (_isInitialLoad && _donorDataSource == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_patientDataSource == null && _allPatients.isEmpty) {
+    if (_donorDataSource == null && _allDonors.isEmpty) {
       return const Center(
-        child: Text('လူနာမတွေ့ပါ'),
+        child: Text('ငွေအလှူရှင်မတွေ့ပါ'),
       );
     }
 
@@ -268,15 +268,15 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
               right: Responsive.isMobile(context) ? 8 : 16,
             ),
             child: SfDataGrid(
-              source: _patientDataSource!,
+              source: _donorDataSource!,
               verticalScrollController: _scrollController,
               onCellTap: (details) {
                 if (details.rowColumnIndex.rowIndex == 0) return;
 
-                final patientIndex = details.rowColumnIndex.rowIndex - 1;
-                if (patientIndex < _allPatients.length) {
-                  final patient = _allPatients[patientIndex];
-                  _showPatientDetail(patient);
+                final donorIndex = details.rowColumnIndex.rowIndex - 1;
+                if (donorIndex < _allDonors.length) {
+                  final donor = _allDonors[donorIndex];
+                  _showDonorDetail(donor);
                 }
               },
               gridLinesVisibility: GridLinesVisibility.both,
@@ -318,38 +318,28 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ))),
                 GridColumn(
-                    columnName: 'gender',
-                    width: 80,
+                    columnName: 'type',
+                    width: 100,
                     label: Container(
                         color: primaryColor,
                         padding: const EdgeInsets.all(8.0),
                         alignment: Alignment.center,
                         child: const Text(
-                          'ကျား/မ',
+                          'အမျိုးအစား',
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ))),
                 GridColumn(
-                    columnName: 'age',
-                    width: 80,
+                    columnName: 'totalAmount',
+                    width: 130,
                     label: Container(
                         color: primaryColor,
                         padding: const EdgeInsets.all(8.0),
                         alignment: Alignment.center,
                         child: const Text(
-                          'အသက်',
+                          'စုစုပေါင်း',
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ))),
                 if (!Responsive.isMobile(context)) ...[
-                  GridColumn(
-                      columnName: 'address',
-                      label: Container(
-                          color: primaryColor,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'လိပ်စာ',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ))),
                   GridColumn(
                       columnName: 'donationCount',
                       width: 100,
@@ -359,6 +349,16 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
                           alignment: Alignment.center,
                           child: const Text(
                             'လှူဒါန်းမှု',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ))),
+                  GridColumn(
+                      columnName: 'address',
+                      label: Container(
+                          color: primaryColor,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'လိပ်စာ',
                             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ))),
                 ],

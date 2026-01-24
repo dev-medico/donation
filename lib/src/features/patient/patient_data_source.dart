@@ -1,29 +1,18 @@
 import 'package:donation/src/features/patient/models/patient.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:donation/utils/utils.dart';
 
 class PatientDataSource extends DataGridSource {
   PatientDataSource({required List<Patient> patientData}) {
     _patientData = patientData
         .map<DataGridRow>((patient) => DataGridRow(cells: [
-              DataGridCell<String>(
-                  columnName: 'လူနာအမည်', value: patient.patientName ?? ''),
-              DataGridCell<String>(
-                  columnName: 'အသက်', value: patient.patientAge ?? ''),
-              DataGridCell<String>(
-                  columnName: 'ရောဂါ', value: patient.patientDisease ?? ''),
-              DataGridCell<String>(
-                  columnName: 'ဆေးရုံ', value: patient.hospital ?? ''),
-              DataGridCell<String>(
-                  columnName: 'သွေးအုပ်စု', value: patient.bloodGroup ?? ''),
-              DataGridCell<String>(
-                  columnName: 'လိပ်စာ', value: patient.patientAddress ?? ''),
-              DataGridCell<int>(
-                  columnName: 'လှူဒါန်းမှု', value: patient.donationCount ?? 0),
-              DataGridCell<String>(
-                  columnName: 'နောက်ဆုံးလှူဒါန်းသည့်ရက်',
-                  value: _formatDate(patient.latestDonationDate)),
+              DataGridCell<int>(columnName: 'id', value: patient.id ?? 0),
+              DataGridCell<String>(columnName: 'name', value: patient.name ?? ''),
+              DataGridCell<String>(columnName: 'phone', value: patient.phone ?? ''),
+              DataGridCell<String>(columnName: 'gender', value: _getGenderDisplay(patient.gender)),
+              DataGridCell<String>(columnName: 'age', value: patient.age ?? ''),
+              DataGridCell<String>(columnName: 'address', value: patient.address ?? ''),
+              DataGridCell<int>(columnName: 'donationCount', value: patient.donationCount ?? 0),
             ]))
         .toList();
   }
@@ -33,28 +22,41 @@ class PatientDataSource extends DataGridSource {
   @override
   List<DataGridRow> get rows => _patientData;
 
+  String _getGenderDisplay(String? gender) {
+    if (gender == null || gender.isEmpty) return '-';
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return 'ကျား';
+      case 'female':
+        return 'မ';
+      default:
+        return gender;
+    }
+  }
+
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((dataGridCell) {
       final columnName = dataGridCell.columnName;
       final value = dataGridCell.value.toString();
-      
-      // Special handling for blood group column
-      if (columnName == 'သွေးအုပ်စု' && value.isNotEmpty && value != '-') {
+
+      // Special handling for gender column
+      if (columnName == 'gender' && value.isNotEmpty && value != '-') {
+        final isMale = value == 'ကျား';
         return Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.all(4.0),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.red.shade100,
+              color: isMale ? Colors.blue.shade100 : Colors.pink.shade100,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               value,
               style: TextStyle(
-                color: Colors.red.shade700,
+                color: isMale ? Colors.blue.shade700 : Colors.pink.shade700,
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
               ),
@@ -63,18 +65,16 @@ class PatientDataSource extends DataGridSource {
           ),
         );
       }
-      
+
       // Determine alignment based on column type
       Alignment alignment = Alignment.centerLeft;
-      if (columnName == 'အသက်' || columnName == 'လှူဒါန်းမှု') {
-        alignment = Alignment.center;
-      } else if (columnName == 'နောက်ဆုံးလှူဒါန်းသည့်ရက်') {
+      if (columnName == 'id' || columnName == 'age' || columnName == 'donationCount') {
         alignment = Alignment.center;
       }
 
       // Add padding based on column
       EdgeInsets padding = const EdgeInsets.all(8.0);
-      if (columnName == 'လိပ်စာ' || columnName == 'ရောဂါ') {
+      if (columnName == 'address') {
         padding = const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0);
       }
 
@@ -85,23 +85,11 @@ class PatientDataSource extends DataGridSource {
           value,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontWeight: columnName == 'လူနာအမည်'
-                ? FontWeight.w600
-                : FontWeight.normal,
+            fontWeight: columnName == 'name' ? FontWeight.w600 : FontWeight.normal,
             fontSize: 13,
           ),
         ),
       );
     }).toList());
-  }
-
-  String _formatDate(String? dateStr) {
-    if (dateStr == null || dateStr.isEmpty) return '-';
-    try {
-      final date = DateTime.parse(dateStr);
-      return '${date.day}/${date.month}/${date.year}';
-    } catch (e) {
-      return dateStr;
-    }
   }
 }

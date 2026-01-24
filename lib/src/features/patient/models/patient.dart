@@ -4,56 +4,32 @@ part 'patient.g.dart';
 
 @JsonSerializable()
 class Patient {
-  @JsonKey(name: 'patient_name')
-  final String? patientName;
-  
-  @JsonKey(name: 'patient_age')
-  final String? patientAge;
-  
-  @JsonKey(name: 'patient_address')
-  final String? patientAddress;
-  
-  @JsonKey(name: 'patient_disease')
-  final String? patientDisease;
-  
-  final String? hospital;
-  
-  @JsonKey(name: 'blood_group')
-  final String? bloodGroup;
-  
-  @JsonKey(name: 'latest_id')
-  final int? latestId;
-  
-  @JsonKey(name: 'latest_donation_date')
-  final String? latestDonationDate;
-  
+  final int? id;
+  final String? name;
+  final String? phone;
+  final String? address;
+  final String? age;
+  final String? gender;
+  @JsonKey(name: 'medical_notes')
+  final String? medicalNotes;
   @JsonKey(name: 'donation_count')
   final int? donationCount;
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
 
   Patient({
-    this.patientName,
-    this.patientAge,
-    this.patientAddress,
-    this.patientDisease,
-    this.hospital,
-    this.bloodGroup,
-    this.latestId,
-    this.latestDonationDate,
+    this.id,
+    this.name,
+    this.phone,
+    this.address,
+    this.age,
+    this.gender,
+    this.medicalNotes,
     this.donationCount,
+    this.createdAt,
   });
 
-  factory Patient.fromJson(Map<String, dynamic> json) {
-    try {
-      print('Parsing patient JSON: $json');
-      final patient = _$PatientFromJson(json);
-      print('Successfully parsed patient: ${patient.patientName}');
-      return patient;
-    } catch (e) {
-      print('ERROR parsing patient JSON: $e');
-      print('JSON was: $json');
-      rethrow;
-    }
-  }
-  
+  factory Patient.fromJson(Map<String, dynamic> json) => _$PatientFromJson(json);
+
   Map<String, dynamic> toJson() => _$PatientToJson(this);
 }

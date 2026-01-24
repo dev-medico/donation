@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:donation/main.dart';
+import 'package:donation/src/features/auth/login.dart';
 
 class ApiClient {
   static final ApiClient _instance = ApiClient._internal();
@@ -91,6 +93,19 @@ class ApiClient {
       if (response.statusCode == 0) {
         throw NetworkException(
             'CORS error: Server is not allowing cross-origin requests. Status code: 0');
+      }
+
+      // Handle 401 Unauthorized - redirect to login
+      if (response.statusCode == 401) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('token');
+        await prefs.remove('name');
+        await prefs.remove('phone');
+        navigatorKey.currentState?.pushNamedAndRemoveUntil(
+          LoginScreen.routeName,
+          (route) => false,
+        );
+        throw ApiException(401, 'Session expired');
       }
 
       // Check for error status codes

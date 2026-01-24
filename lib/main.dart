@@ -19,6 +19,9 @@ import 'src/settings/settings_service.dart';
 
 int id = 0;
 
+/// Global navigator key for redirecting from anywhere (e.g., 401 handling)
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 //     FlutterLocalNotificationsPlugin();
 

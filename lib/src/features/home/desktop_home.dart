@@ -14,6 +14,8 @@ import 'package:donation/src/features/feed/feed_main.dart';
 import 'package:donation/src/features/finder/report_new.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
+import 'package:donation/src/features/money_donor/money_donor_list_screen.dart';
+import 'package:donation/src/features/patient/patient_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/utils/tool_widgets.dart';
@@ -35,8 +37,10 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'သွေးလှူရှင် ရှာမည်',
     'အဖွဲ့ဝင် စာရင်း',
     'သွေးလှူမှု မှတ်တမ်း',
+    'လူနာစာရင်း',
     'ထူးခြားဖြစ်စဥ်',
     'ရ/သုံး ငွေစာရင်း',
+    'ငွေအလှူရှင်များ',
     'Log Out(V 1.3.8)'
   ];
   List<String> icons = [
@@ -44,8 +48,10 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'assets/images/search_list.png',
     'assets/images/members.png',
     'assets/images/donations.png',
+    'assets/images/info.png',
     'assets/images/special_case.png',
     'assets/images/finance.png',
+    'assets/images/card.png',
     'assets/images/settings.png',
   ];
 
@@ -59,9 +65,11 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
       SearchMemberListScreen(), // Search Blood Donors
       MemberListScreen(), // Member List
       const DonationListScreen(), // Donation List
+      const PatientListScreen(), // Patient List
       const SpecialEventListScreen(), // Special Events
       const DonarListScreen(), // Finance - Donar List with tabs
-      Container(), // Posts/Notifications
+      const MoneyDonorListScreen(), // Money Donors
+      Container(), // Logout placeholder
     ];
   }
 

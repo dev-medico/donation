@@ -33,7 +33,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/$1",
+      "dest": "/index.html",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",

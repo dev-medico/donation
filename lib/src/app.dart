@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:donation/main.dart';
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/realm/schemas.dart';
 import 'package:donation/src/features/donar/donar_list_new.dart';
@@ -12,6 +13,9 @@ import 'package:donation/src/features/donation_member/presentation/member_list_b
 import 'package:donation/src/features/home/desktop_home.dart';
 import 'package:donation/src/features/home/home.dart';
 import 'package:donation/src/features/patient/patient_list_screen.dart';
+import 'package:donation/src/features/patient/patient_detail_screen.dart';
+import 'package:donation/src/features/money_donor/money_donor_list_screen.dart';
+import 'package:donation/src/features/money_donor/money_donor_detail_screen.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -205,6 +209,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     // var currentUser = ref.watch(realmProvider);
 
     return MaterialApp(
+      navigatorKey: navigatorKey,
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
@@ -257,6 +262,15 @@ class _MyAppState extends ConsumerState<MyApp> {
                 
               case PatientListScreen.routeName:
                 return const PatientListScreen();
+
+              case PatientDetailScreen.routeName:
+                return const PatientDetailScreen(patientId: 0);
+
+              case MoneyDonorListScreen.routeName:
+                return const MoneyDonorListScreen();
+
+              case MoneyDonorDetailScreen.routeName:
+                return const MoneyDonorDetailScreen(donorId: 0);
 
               // Todo - Uncomment when ready
               // case MemberListBackupScreen.routeName:
