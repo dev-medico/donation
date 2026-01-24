@@ -108,7 +108,7 @@ class _MoneyDonorFormScreenState extends ConsumerState<MoneyDonorFormScreen> {
           ),
         ),
         title: Text(
-          isEditing ? 'ငွေအလှူရှင်အချက်အလက် ပြင်ဆင်ရန်' : 'ငွေအလှူရှင်အသစ် ထည့်သွင်းရန်',
+          isEditing ? 'အလှူရှင်အချက်အလက် ပြင်ဆင်ရန်' : 'အလှူရှင်အသစ် ထည့်သွင်းရန်',
           style: const TextStyle(fontSize: 17, color: Colors.white),
         ),
         actions: [

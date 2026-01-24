@@ -40,7 +40,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'လူနာစာရင်း',
     'ထူးခြားဖြစ်စဥ်',
     'ရ/သုံး ငွေစာရင်း',
-    'ငွေအလှူရှင်များ',
+    'အလှူရှင်များ',
     'Log Out(V 1.3.8)'
   ];
   List<String> icons = [

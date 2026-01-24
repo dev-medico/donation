@@ -192,7 +192,7 @@ class _MoneyDonorListScreenState extends ConsumerState<MoneyDonorListScreen> {
         ),
         centerTitle: true,
         title: const Text(
-          "ငွေအလှူရှင်များ",
+          "အလှူရှင်များ",
           style: TextStyle(fontSize: 17, color: Colors.white),
         ),
       ),
@@ -255,7 +255,7 @@ class _MoneyDonorListScreenState extends ConsumerState<MoneyDonorListScreen> {
 
     if (_donorDataSource == null && _allDonors.isEmpty) {
       return const Center(
-        child: Text('ငွေအလှူရှင်မတွေ့ပါ'),
+        child: Text('အလှူရှင်မတွေ့ပါ'),
       );
     }
 
@@ -293,11 +293,12 @@ class _MoneyDonorListScreenState extends ConsumerState<MoneyDonorListScreen> {
                         padding: const EdgeInsets.all(8.0),
                         alignment: Alignment.center,
                         child: const Text(
-                          'ID',
+                          'စဥ်',
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ))),
                 GridColumn(
                     columnName: 'name',
+                    width: Responsive.isMobile(context) ? 150 : 200,
                     label: Container(
                         color: primaryColor,
                         padding: const EdgeInsets.all(8.0),
@@ -315,17 +316,6 @@ class _MoneyDonorListScreenState extends ConsumerState<MoneyDonorListScreen> {
                         alignment: Alignment.center,
                         child: const Text(
                           'ဖုန်း',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ))),
-                GridColumn(
-                    columnName: 'type',
-                    width: 100,
-                    label: Container(
-                        color: primaryColor,
-                        padding: const EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        child: const Text(
-                          'အမျိုးအစား',
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ))),
                 GridColumn(
@@ -348,11 +338,12 @@ class _MoneyDonorListScreenState extends ConsumerState<MoneyDonorListScreen> {
                           padding: const EdgeInsets.all(8.0),
                           alignment: Alignment.center,
                           child: const Text(
-                            'လှူဒါန်းမှု',
+                            'အကြိမ်',
                             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ))),
                   GridColumn(
                       columnName: 'address',
+                      minimumWidth: 200,
                       label: Container(
                           color: primaryColor,
                           padding: const EdgeInsets.all(8.0),

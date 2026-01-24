@@ -10,7 +10,6 @@ class MoneyDonorDataSource extends DataGridSource {
               DataGridCell<int>(columnName: 'id', value: donor.id ?? 0),
               DataGridCell<String>(columnName: 'name', value: donor.name ?? ''),
               DataGridCell<String>(columnName: 'phone', value: donor.phone ?? ''),
-              DataGridCell<String>(columnName: 'type', value: _getTypeDisplay(donor.isOrganization)),
               DataGridCell<String>(columnName: 'totalAmount', value: _formatAmount(donor.totalAmount)),
               DataGridCell<int>(columnName: 'donationCount', value: donor.donationCount ?? 0),
               DataGridCell<String>(columnName: 'address', value: donor.address ?? ''),
@@ -22,11 +21,6 @@ class MoneyDonorDataSource extends DataGridSource {
 
   @override
   List<DataGridRow> get rows => _donorData;
-
-  String _getTypeDisplay(bool? isOrganization) {
-    if (isOrganization == null) return '-';
-    return isOrganization ? 'အဖွဲ့အစည်း' : 'လူပုဂ္ဂိုလ်';
-  }
 
   String _formatAmount(double? amount) {
     if (amount == null) return '0';
@@ -41,31 +35,6 @@ class MoneyDonorDataSource extends DataGridSource {
       final columnName = dataGridCell.columnName;
       final value = dataGridCell.value.toString();
 
-      // Special handling for type column
-      if (columnName == 'type' && value.isNotEmpty && value != '-') {
-        final isOrg = value == 'အဖွဲ့အစည်း';
-        return Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(4.0),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: isOrg ? Colors.purple.shade100 : Colors.green.shade100,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              value,
-              style: TextStyle(
-                color: isOrg ? Colors.purple.shade700 : Colors.green.shade700,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        );
-      }
-
       // Special handling for total amount column
       if (columnName == 'totalAmount') {
         return Container(
@@ -73,10 +42,10 @@ class MoneyDonorDataSource extends DataGridSource {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             '$value ကျပ်',
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 13,
-              color: Colors.green,
+              color: Colors.green[700],
             ),
             overflow: TextOverflow.ellipsis,
           ),

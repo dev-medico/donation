@@ -2,9 +2,11 @@ import 'package:donation/src/features/money_donor/models/money_donor.dart';
 import 'package:donation/src/features/money_donor/providers/money_donor_provider.dart';
 import 'package:donation/src/features/money_donor/money_donor_form.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:donation/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MoneyDonorDetailScreen extends ConsumerStatefulWidget {
   final int donorId;
@@ -22,6 +24,7 @@ class MoneyDonorDetailScreen extends ConsumerStatefulWidget {
 
 class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen> {
   MoneyDonor? _donor;
+  List<dynamic> _donations = [];
   bool _isLoading = true;
   String? _error;
 
@@ -39,8 +42,20 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
 
     try {
       final donor = await ref.read(moneyDonorServiceProvider).getMoneyDonor(widget.donorId);
+
+      // Try to load donation history
+      List<dynamic> donations = [];
+      try {
+        final report = await ref.read(moneyDonorServiceProvider).getReport(widget.donorId);
+        donations = report['donations'] ?? [];
+      } catch (e) {
+        // If report fails, continue without donation history
+        print('Failed to load donation history: $e');
+      }
+
       setState(() {
         _donor = donor;
+        _donations = donations;
         _isLoading = false;
       });
     } catch (e) {
@@ -128,7 +143,7 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
           ),
         ),
         title: const Text(
-          'ငွေအလှူရှင်အချက်အလက်',
+          'အလှူရှင်အချက်အလက်',
           style: TextStyle(fontSize: 17, color: Colors.white),
         ),
         actions: [
@@ -170,7 +185,7 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
     }
 
     if (_donor == null) {
-      return const Center(child: Text('ငွေအလှူရှင်မတွေ့ပါ'));
+      return const Center(child: Text('အလှူရှင်မတွေ့ပါ'));
     }
 
     return SingleChildScrollView(
@@ -178,9 +193,7 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoCard(),
-          const SizedBox(height: 16),
-          _buildDonationSummary(),
+          _buildSummaryCard(),
           const SizedBox(height: 16),
           _buildDonationHistorySection(),
         ],
@@ -188,25 +201,33 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
     );
   }
 
-  Widget _buildInfoCard() {
-    final isOrg = _donor!.isOrganization ?? false;
-
-    return Card(
-      elevation: 2,
+  Widget _buildSummaryCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Name and contact info
             Row(
               children: [
                 CircleAvatar(
-                  radius: 30,
-                  backgroundColor: isOrg ? Colors.purple.shade100 : Colors.green.shade100,
+                  radius: 28,
+                  backgroundColor: Colors.green.shade100,
                   child: Icon(
-                    isOrg ? Icons.business : Icons.person,
-                    size: 30,
-                    color: isOrg ? Colors.purple.shade700 : Colors.green.shade700,
+                    Icons.person,
+                    size: 28,
+                    color: Colors.green.shade700,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -217,159 +238,397 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
                       Text(
                         _donor!.name ?? 'အမည်မသိ',
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 4),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isOrg ? Colors.purple.shade100 : Colors.green.shade100,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          isOrg ? 'အဖွဲ့အစည်း' : 'လူပုဂ္ဂိုလ်',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isOrg ? Colors.purple.shade700 : Colors.green.shade700,
-                            fontWeight: FontWeight.bold,
+                      if (_donor!.phone != null && _donor!.phone!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Row(
+                            children: [
+                              Icon(Icons.phone, size: 14, color: Colors.grey[600]),
+                              const SizedBox(width: 4),
+                              Text(
+                                _donor!.phone!,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
+                      if (_donor!.address != null && _donor!.address!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  _donor!.address!,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
               ],
             ),
-            const Divider(height: 32),
-            if (_donor!.phone != null && _donor!.phone!.isNotEmpty)
-              _buildInfoRow(Icons.phone, 'ဖုန်း', _donor!.phone!),
-            _buildInfoRow(Icons.location_on, 'လိပ်စာ', _donor!.address ?? '-'),
-            if (_donor!.note != null && _donor!.note!.isNotEmpty)
-              _buildInfoRow(Icons.note, 'မှတ်ချက်', _donor!.note!),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildDonationSummary() {
-    return Card(
-      elevation: 2,
-      color: Colors.green.shade50,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                children: [
-                  Icon(Icons.monetization_on, size: 40, color: Colors.green.shade700),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${_formatAmount(_donor!.totalAmount)} ကျပ်',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.shade700,
+            const SizedBox(height: 16),
+
+            // Summary stats row
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.monetization_on,
+                              color: Colors.green[700],
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'စုစုပေါင်း',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.green[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          '${_formatAmount(_donor!.totalAmount)} ကျပ်',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green[700],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    'စုစုပေါင်းလှူဒါန်းမှု',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 1,
-              height: 80,
-              color: Colors.grey[300],
-            ),
-            Expanded(
-              child: Column(
-                children: [
-                  Icon(Icons.receipt_long, size: 40, color: primaryColor),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${_donor!.donationCount ?? 0}',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.receipt_long,
+                              color: primaryColor,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'အကြိမ်',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          '${_donor!.donationCount ?? 0}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    'လှူဒါန်းမှုအကြိမ်',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+
+            if (_donor!.note != null && _donor!.note!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.note, size: 14, color: Colors.grey[600]),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _donor!.note!,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 20, color: Colors.grey[600]),
-          const SizedBox(width: 12),
-          SizedBox(
-            width: 80,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
 
   Widget _buildDonationHistorySection() {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'လှူဒါန်းမှုမှတ်တမ်း',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section header
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.green.withOpacity(0.1),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
             ),
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                'လှူဒါန်းမှုမှတ်တမ်း ${_donor!.donationCount ?? 0} ခု ရှိပါသည်',
-                style: TextStyle(color: Colors.grey[600]),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  Icons.volunteer_activism,
+                  size: 18,
+                  color: Colors.green[700],
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              Text(
+                'လှူဒါန်းမှုမှတ်တမ်း',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[700],
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${_donations.length}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[700],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Table content
+        _buildDonationsList(),
+      ],
+    );
+  }
+
+  Widget _buildDonationsList() {
+    if (_donations.isEmpty) {
+      return Container(
+        height: 120,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+          ),
+          border: Border.all(color: Colors.green.withOpacity(0.2)),
+        ),
+        child: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('လှူဒါန်းမှုမှတ်တမ်း မရှိသေးပါ'),
+          ),
+        ),
+      );
+    }
+
+    final dataSource = _DonationHistoryDataSource(donationData: _donations);
+
+    return Container(
+      height: _donations.length > 5 ? 300 : (_donations.length * 50 + 50).toDouble(),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
+        border: Border.all(color: Colors.green.withOpacity(0.2)),
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
+        child: SfDataGrid(
+          source: dataSource,
+          gridLinesVisibility: GridLinesVisibility.both,
+          headerGridLinesVisibility: GridLinesVisibility.both,
+          columnWidthMode: Responsive.isMobile(context)
+              ? ColumnWidthMode.auto
+              : ColumnWidthMode.fill,
+          columns: <GridColumn>[
+            GridColumn(
+                columnName: 'no',
+                width: 60,
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'စဥ်',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ))),
+            GridColumn(
+                columnName: 'date',
+                width: 120,
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'ရက်စွဲ',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ))),
+            GridColumn(
+                columnName: 'amount',
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'အလှူငွေ',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ))),
           ],
         ),
       ),
     );
+  }
+}
+
+// Data source for donation history table
+class _DonationHistoryDataSource extends DataGridSource {
+  _DonationHistoryDataSource({required List<dynamic> donationData}) {
+    _donationData = donationData
+        .asMap()
+        .entries
+        .map<DataGridRow>((entry) {
+          final index = entry.key;
+          final donation = entry.value;
+          return DataGridRow(cells: [
+            DataGridCell<int>(columnName: 'no', value: index + 1),
+            DataGridCell<String>(columnName: 'date', value: _formatDate(donation['date'])),
+            DataGridCell<String>(columnName: 'amount', value: _formatAmount(donation['amount'])),
+          ]);
+        })
+        .toList();
+  }
+
+  List<DataGridRow> _donationData = [];
+
+  @override
+  List<DataGridRow> get rows => _donationData;
+
+  String _formatDate(dynamic date) {
+    if (date == null) return '-';
+    try {
+      if (date is String) {
+        final parsed = DateTime.parse(date);
+        return DateFormat('dd MMM yyyy').format(parsed);
+      }
+      return date.toString();
+    } catch (e) {
+      return date.toString();
+    }
+  }
+
+  String _formatAmount(dynamic amount) {
+    if (amount == null) return '0';
+    final formatter = NumberFormat('#,###');
+    if (amount is int) {
+      return formatter.format(amount);
+    } else if (amount is double) {
+      return formatter.format(amount);
+    }
+    return amount.toString();
+  }
+
+  @override
+  DataGridRowAdapter? buildRow(DataGridRow row) {
+    return DataGridRowAdapter(
+        cells: row.getCells().map<Widget>((dataGridCell) {
+      final columnName = dataGridCell.columnName;
+      final value = dataGridCell.value.toString();
+
+      if (columnName == 'amount') {
+        return Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            '$value ကျပ်',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              color: Colors.green[700],
+            ),
+          ),
+        );
+      }
+
+      return Container(
+        alignment: columnName == 'no' ? Alignment.center : Alignment.centerLeft,
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          value,
+          style: const TextStyle(fontSize: 13),
+        ),
+      );
+    }).toList());
   }
 }
