@@ -6,14 +6,20 @@ import 'package:intl/intl.dart';
 class MoneyDonorDataSource extends DataGridSource {
   MoneyDonorDataSource({required List<MoneyDonor> donorData}) {
     _donorData = donorData
-        .map<DataGridRow>((donor) => DataGridRow(cells: [
-              DataGridCell<int>(columnName: 'id', value: donor.id ?? 0),
-              DataGridCell<String>(columnName: 'name', value: donor.name ?? ''),
-              DataGridCell<String>(columnName: 'phone', value: donor.phone ?? ''),
-              DataGridCell<String>(columnName: 'totalAmount', value: _formatAmount(donor.totalAmount)),
-              DataGridCell<int>(columnName: 'donationCount', value: donor.donationCount ?? 0),
-              DataGridCell<String>(columnName: 'address', value: donor.address ?? ''),
-            ]))
+        .asMap()
+        .entries
+        .map<DataGridRow>((entry) {
+          final index = entry.key;
+          final donor = entry.value;
+          return DataGridRow(cells: [
+            DataGridCell<int>(columnName: 'id', value: index + 1), // Show row number instead of actual ID
+            DataGridCell<String>(columnName: 'name', value: donor.name ?? ''),
+            DataGridCell<String>(columnName: 'phone', value: donor.phone ?? ''),
+            DataGridCell<String>(columnName: 'totalAmount', value: _formatAmount(donor.totalAmount)),
+            DataGridCell<int>(columnName: 'donationCount', value: donor.donationCount ?? 0),
+            DataGridCell<String>(columnName: 'address', value: donor.address ?? ''),
+          ]);
+        })
         .toList();
   }
 
