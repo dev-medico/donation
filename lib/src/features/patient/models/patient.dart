@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:donation/src/features/donation/models/donation.dart';
 
 part 'patient.g.dart';
 
@@ -16,6 +17,8 @@ class Patient {
   final int? donationCount;
   @JsonKey(name: 'created_at')
   final String? createdAt;
+  @JsonKey(includeFromJson: true, includeToJson: false)
+  final List<Donation>? donations;
 
   Patient({
     this.id,
@@ -27,9 +30,31 @@ class Patient {
     this.medicalNotes,
     this.donationCount,
     this.createdAt,
+    this.donations,
   });
 
-  factory Patient.fromJson(Map<String, dynamic> json) => _$PatientFromJson(json);
+  factory Patient.fromJson(Map<String, dynamic> json) {
+    // Parse donations manually since Donation uses a custom fromJson
+    List<Donation>? donationsList;
+    if (json['donations'] != null) {
+      donationsList = (json['donations'] as List)
+          .map((d) => Donation.fromJson(d as Map<String, dynamic>))
+          .toList();
+    }
+
+    return Patient(
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      phone: json['phone'] as String?,
+      address: json['address'] as String?,
+      age: json['age'] as String?,
+      gender: json['gender'] as String?,
+      medicalNotes: json['medical_notes'] as String?,
+      donationCount: json['donation_count'] as int?,
+      createdAt: json['created_at'] as String?,
+      donations: donationsList,
+    );
+  }
 
   Map<String, dynamic> toJson() => _$PatientToJson(this);
 }
