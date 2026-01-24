@@ -32,6 +32,60 @@
       }
     },
     {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "src": "/icons/(.*)",
+      "dest": "/icons/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "src": "/(.*\\.json)$",
+      "dest": "/$1",
+      "headers": {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "src": "/(.*\\.wasm)$",
+      "dest": "/$1",
+      "headers": {
+        "Content-Type": "application/wasm",
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "src": "/(.*\\.(png|jpg|jpeg|gif|ico|svg|webp))$",
+      "dest": "/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "src": "/(.*\\.(ttf|otf|woff|woff2))$",
+      "dest": "/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "src": "/(.*\\.(css|html))$",
+      "dest": "/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html",
       "headers": {
