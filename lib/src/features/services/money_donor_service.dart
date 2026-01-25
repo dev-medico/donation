@@ -80,7 +80,8 @@ class MoneyDonorService extends BaseService {
   /// Update existing money donor
   Future<MoneyDonor> updateMoneyDonor(int id, Map<String, dynamic> donorData) async {
     final response = await apiClient.post(
-      '/money-donor/update/$id',
+      '/money-donor/update',
+      queryParameters: {'id': id.toString()},
       data: donorData,
     );
 
@@ -96,7 +97,10 @@ class MoneyDonorService extends BaseService {
 
   /// Delete money donor
   Future<bool> deleteMoneyDonor(int id) async {
-    final response = await apiClient.post('/money-donor/delete/$id');
+    final response = await apiClient.post(
+      '/money-donor/delete',
+      queryParameters: {'id': id.toString()},
+    );
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = response.data;
