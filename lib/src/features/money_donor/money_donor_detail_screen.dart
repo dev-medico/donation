@@ -571,6 +571,7 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
       ),
       child: SfDataGrid(
         source: dataSource,
+        columnWidthMode: ColumnWidthMode.fill,
         gridLinesVisibility: GridLinesVisibility.horizontal,
         headerGridLinesVisibility: GridLinesVisibility.none,
         rowHeight: 52,
@@ -608,7 +609,7 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
                   ))),
           GridColumn(
               columnName: 'amount',
-              width: 140,
+              columnWidthMode: ColumnWidthMode.fill,
               label: Container(
                   color: primaryColor,
                   padding: const EdgeInsets.all(8.0),
