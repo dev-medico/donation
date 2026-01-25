@@ -185,4 +185,52 @@ class DonarRecordService extends BaseService {
       throw e;
     }
   }
+
+  /// Search for unique donor names matching the query
+  Future<List<String>> searchDonorNames(String query) async {
+    final headers = await getAuthHeaders();
+
+    try {
+      final queryParams = {
+        'q': query,
+        'limit': 20,
+      };
+
+      final response = await apiClient.get(
+        '$_basePath/search-names',
+        options: {'headers': headers},
+        queryParameters: queryParams,
+      );
+
+      if (response.statusCode == 200) {
+        if (response.data != null && response.data!['data'] != null) {
+          final names = response.data!['data'] as List<dynamic>;
+          return names.map((n) => n.toString()).toList();
+        }
+        return [];
+      }
+      return [];
+    } catch (e) {
+      print('Error searching donor names: $e');
+      // Fallback: search from all records locally
+      return [];
+    }
+  }
+
+  /// Get all unique donor names (for local search fallback)
+  Future<List<String>> getUniqueDonorNames() async {
+    try {
+      final records = await getDonarRecords(limit: 1000);
+      final names = records
+          .map((r) => r['name']?.toString() ?? '')
+          .where((n) => n.isNotEmpty)
+          .toSet()
+          .toList();
+      names.sort();
+      return names;
+    } catch (e) {
+      print('Error getting unique donor names: $e');
+      return [];
+    }
+  }
 }
