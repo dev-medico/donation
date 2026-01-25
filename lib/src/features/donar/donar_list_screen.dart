@@ -1642,15 +1642,15 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
     });
 
     try {
-      final data = {
+      final data = <String, dynamic>{
         'name': _nameController.text,
         'amount': int.parse(_amountController.text),
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
       };
 
       // Add money_donor_id if a donor was selected
-      if (_isDonor && _selectedMoneyDonor != null) {
-        data['money_donor_id'] = _selectedMoneyDonor!.id;
+      if (_isDonor && _selectedMoneyDonor?.id != null) {
+        data['money_donor_id'] = _selectedMoneyDonor!.id!;
       }
 
       if (_isDonor) {
