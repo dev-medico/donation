@@ -6,6 +6,7 @@ import 'package:donation/src/features/services/donar_record_service.dart';
 import 'package:donation/src/features/services/expense_record_service.dart';
 import 'package:donation/src/features/money_donor/models/money_donor.dart';
 import 'package:donation/src/features/money_donor/providers/money_donor_provider.dart';
+import 'package:donation/src/features/money_donor/money_donor_form.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -1091,9 +1092,15 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
                           leading: const Icon(Icons.add_circle, color: Colors.green),
                           title: const Text('အလှူရှင်အသစ် ထည့်ရန်'),
                           onTap: () {
-                            setState(() {
-                              _showMoneyDonorForm = true;
-                            });
+                            // Close the dialog first
+                            Navigator.of(context).pop();
+                            // Navigate to money donor form
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MoneyDonorFormScreen(),
+                              ),
+                            );
                           },
                         ),
                       ],
