@@ -8,6 +8,8 @@ import 'package:donation/src/features/services/expense_record_service.dart';
 import 'package:donation/src/features/services/donation_service.dart';
 import 'package:donation/src/features/donation/models/donation.dart';
 import 'package:donation/src/features/donation/donation_detail.dart';
+import 'package:donation/src/features/money_donor/models/money_donor.dart';
+import 'package:donation/src/features/money_donor/providers/money_donor_provider.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
@@ -1373,52 +1375,23 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
   bool _isDonor = true;
   bool _isLoading = false;
 
-  // Cached donor names for search
-  List<String> _cachedDonorNames = [];
-  bool _isLoadingNames = false;
+  // Selected money donor
+  MoneyDonor? _selectedMoneyDonor;
+  bool _showMoneyDonorForm = false;
 
   @override
   void initState() {
     super.initState();
-    _loadDonorNames();
-  }
-
-  Future<void> _loadDonorNames() async {
-    setState(() {
-      _isLoadingNames = true;
-    });
-
-    try {
-      final service = ref.read(donarRecordServiceProvider);
-      final names = await service.getUniqueDonorNames();
-      setState(() {
-        _cachedDonorNames = names;
-        _isLoadingNames = false;
-      });
-    } catch (e) {
-      print('Error loading donor names: $e');
-      setState(() {
-        _isLoadingNames = false;
-      });
-    }
-  }
-
-  List<String> _filterDonorNames(String pattern) {
-    if (pattern.isEmpty) {
-      return _cachedDonorNames.take(10).toList();
-    }
-    return _cachedDonorNames
-        .where((name) => name.toLowerCase().contains(pattern.toLowerCase()))
-        .take(20)
-        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title:
-          Text(_isDonor ? 'အလှူရှင် မှတ်တမ်းအသစ်' : 'အသုံးစရိတ် မှတ်တမ်းအသစ်'),
-      content: SingleChildScrollView(
+    return Stack(
+      children: [
+        AlertDialog(
+          title:
+              Text(_isDonor ? 'အလှူရှင် မှတ်တမ်းအသစ်' : 'အသုံးစရိတ် မှတ်တမ်းအသစ်'),
+          content: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
@@ -1458,44 +1431,76 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
 
               // Name field - use TypeAhead for donors, regular TextField for expenses
               if (_isDonor)
-                TypeAheadFormField<String>(
+                TypeAheadFormField<MoneyDonor>(
                   textFieldConfiguration: TextFieldConfiguration(
                     controller: _nameController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'အလှူရှင် အမည်',
-                      hintText: 'အမည်ရိုက်ထည့်ပါ သို့မဟုတ် ရွေးချယ်ပါ',
-                      border: const OutlineInputBorder(),
-                      suffixIcon: _isLoadingNames
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: Padding(
-                                padding: EdgeInsets.all(12),
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                            )
-                          : const Icon(Icons.search),
+                      hintText: 'ရှာဖွေရန် အမည်ရိုက်ထည့်ပါ',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.search),
                     ),
                   ),
-                  suggestionsCallback: (pattern) {
-                    return _filterDonorNames(pattern);
+                  suggestionsCallback: (pattern) async {
+                    if (pattern.isEmpty) return [];
+                    try {
+                      final service = ref.read(moneyDonorServiceProvider);
+                      return await service.searchMoneyDonors(pattern);
+                    } catch (e) {
+                      print('Error searching donors: $e');
+                      return [];
+                    }
                   },
-                  itemBuilder: (context, String suggestion) {
+                  itemBuilder: (context, MoneyDonor donor) {
                     return ListTile(
-                      title: Text(suggestion),
+                      title: Row(
+                        children: [
+                          Expanded(child: Text(donor.name ?? '')),
+                          if (donor.isOrganization == true)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Text(
+                                'အဖွဲ့အစည်း',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      subtitle: donor.phone != null ? Text(donor.phone!) : null,
                       dense: true,
                     );
                   },
-                  onSuggestionSelected: (String suggestion) {
-                    _nameController.text = suggestion;
+                  onSuggestionSelected: (MoneyDonor donor) {
+                    setState(() {
+                      _selectedMoneyDonor = donor;
+                      _nameController.text = donor.name ?? '';
+                    });
                   },
                   noItemsFoundBuilder: (context) {
-                    return const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text(
-                        'မတွေ့ပါ - အမည်အသစ်ထည့်နိုင်ပါသည်',
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                    return Column(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Text('မတွေ့ပါ'),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.add_circle, color: Colors.green),
+                          title: const Text('အလှူရှင်အသစ် ထည့်ရန်'),
+                          onTap: () {
+                            setState(() {
+                              _showMoneyDonorForm = true;
+                            });
+                          },
+                        ),
+                      ],
                     );
                   },
                   validator: (value) {
@@ -1607,6 +1612,25 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
                 ),
         ),
       ],
+        ),
+
+        // Money donor form overlay
+        if (_showMoneyDonorForm)
+          MoneyDonorFormDialog(
+            onSaved: (MoneyDonor newDonor) {
+              setState(() {
+                _selectedMoneyDonor = newDonor;
+                _nameController.text = newDonor.name ?? '';
+                _showMoneyDonorForm = false;
+              });
+            },
+            onCancel: () {
+              setState(() {
+                _showMoneyDonorForm = false;
+              });
+            },
+          ),
+      ],
     );
   }
 
@@ -1623,6 +1647,11 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
         'amount': int.parse(_amountController.text),
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
       };
+
+      // Add money_donor_id if a donor was selected
+      if (_isDonor && _selectedMoneyDonor != null) {
+        data['money_donor_id'] = _selectedMoneyDonor!.id;
+      }
 
       if (_isDonor) {
         final service = ref.read(donarRecordServiceProvider);
@@ -1664,5 +1693,245 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
     _nameController.dispose();
     _amountController.dispose();
     super.dispose();
+  }
+}
+
+// Money Donor Form Dialog Widget for inline creation
+class MoneyDonorFormDialog extends ConsumerStatefulWidget {
+  final Function(MoneyDonor) onSaved;
+  final VoidCallback onCancel;
+
+  const MoneyDonorFormDialog({
+    Key? key,
+    required this.onSaved,
+    required this.onCancel,
+  }) : super(key: key);
+
+  @override
+  ConsumerState<MoneyDonorFormDialog> createState() => _MoneyDonorFormDialogState();
+}
+
+class _MoneyDonorFormDialogState extends ConsumerState<MoneyDonorFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _noteController = TextEditingController();
+  bool _isOrganization = false;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveDonor() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final data = {
+        'name': _nameController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'address': _addressController.text.trim(),
+        'note': _noteController.text.trim(),
+        'is_organization': _isOrganization,
+      };
+
+      final service = ref.read(moneyDonorServiceProvider);
+      final newDonor = await service.createMoneyDonor(data);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('အလှူရှင်အသစ် အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        widget.onSaved(newDonor);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('သိမ်းဆည်းရန် မအောင်မြင်ပါ: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black54,
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          constraints: const BoxConstraints(maxWidth: 500),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_add, color: Colors.white),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'အလှူရှင်အသစ် ထည့်သွင်းရန်',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: widget.onCancel,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Form content
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Name field
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            labelText: 'အမည် *',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'အမည် ထည့်သွင်းပါ';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Phone field
+                        TextFormField(
+                          controller: _phoneController,
+                          decoration: const InputDecoration(
+                            labelText: 'ဖုန်းနံပါတ်',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.phone,
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Organization toggle
+                        SwitchListTile(
+                          title: const Text('အဖွဲ့အစည်း'),
+                          subtitle: Text(
+                            _isOrganization ? 'အဖွဲ့အစည်း/ကုမ္ပဏီ' : 'လူပုဂ္ဂိုလ်',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                          value: _isOrganization,
+                          onChanged: (value) {
+                            setState(() => _isOrganization = value);
+                          },
+                          activeColor: primaryColor,
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Address field
+                        TextFormField(
+                          controller: _addressController,
+                          decoration: const InputDecoration(
+                            labelText: 'လိပ်စာ',
+                            border: OutlineInputBorder(),
+                          ),
+                          maxLines: 2,
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Note field
+                        TextFormField(
+                          controller: _noteController,
+                          decoration: const InputDecoration(
+                            labelText: 'မှတ်ချက်',
+                            border: OutlineInputBorder(),
+                          ),
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Action buttons
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: _isLoading ? null : widget.onCancel,
+                      child: const Text('မလုပ်တော့ပါ'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _saveDonor,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'သိမ်းမည်',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
