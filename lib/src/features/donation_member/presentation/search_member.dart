@@ -147,26 +147,11 @@ class _SearchMemberListScreenState
                   color: Colors.white)),
         ),
       ),
-      body: membersAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error: $error'),
-              ElevatedButton(
-                onPressed: () {
-                  ref.invalidate(searchMemberListWithYearProvider);
-                },
-                child: Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-        data: (members) => Stack(
-          children: [
-            Responsive.isMobile(context)
-                ? Container(
+      body: Column(
+        children: [
+          // Filter section - always visible
+          Responsive.isMobile(context)
+              ? Container(
                     margin: EdgeInsets.only(left: 20, right: 20),
                     child: Column(
                       children: [
@@ -339,7 +324,7 @@ class _SearchMemberListScreenState
                       ],
                     ),
                   )
-                : Row(
+              : Row(
                     children: [
                       Container(
                         width: MediaQuery.of(context).size.width / 6,
@@ -494,15 +479,47 @@ class _SearchMemberListScreenState
                       ),
                     ],
                   ),
-            Container(
-              margin: EdgeInsets.only(
-                  left: 20.0,
-                  top: Responsive.isMobile(context) ? 160 : 100,
-                  bottom: 12),
-              child: buildSimpleTable(filteredMembers),
+          // Table section with loading overlay
+          Expanded(
+            child: membersAsync.when(
+              loading: () => Stack(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(left: 20.0, right: 20, top: 20, bottom: 12),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(color: primaryColor),
+                          const SizedBox(height: 16),
+                          Text('Loading...', style: TextStyle(color: Colors.grey[600])),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              error: (error, stack) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Error: $error'),
+                    ElevatedButton(
+                      onPressed: () {
+                        ref.invalidate(searchMemberListWithYearProvider);
+                      },
+                      child: Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+              data: (members) => Container(
+                margin: EdgeInsets.only(left: 20.0, right: 20, top: 20, bottom: 12),
+                child: buildSimpleTable(filteredMembers),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
@@ -521,9 +538,7 @@ class _SearchMemberListScreenState
   Widget buildSimpleTable(List<Member> members) {
     memberDataDataSource = SearchMemberDataSource(memberData: members);
 
-    return Container(
-      margin: EdgeInsets.only(right: Responsive.isMobile(context) ? 20 : 20),
-      child: SfDataGrid(
+    return SfDataGrid(
         source: memberDataDataSource!,
         onCellTap: (details) async {
           if (details.rowColumnIndex.rowIndex == 0) return;
@@ -626,7 +641,6 @@ class _SearchMemberListScreenState
                     style: TextStyle(color: Colors.white),
                   ))),
         ],
-      ),
-    );
+      );
   }
 }
