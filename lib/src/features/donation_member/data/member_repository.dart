@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:donation/core/api/api_client.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
+import 'package:donation/src/features/donation_member/domain/member_range.dart';
 import 'package:donation/src/features/donation_member/domain/donation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -188,6 +189,98 @@ class MemberRepository {
     } catch (e) {
       debugPrint('Error in updateMember: $e');
       throw Exception('Failed to update member: $e');
+    }
+  }
+
+  /// Fetches range options from the API
+  /// Returns a list of MemberRange objects for the dropdown
+  Future<List<MemberRange>> getMemberRanges({String? bloodType}) async {
+    try {
+      debugPrint('Fetching member ranges${bloodType != null ? " for blood type: $bloodType" : ""}');
+
+      final queryParams = <String, dynamic>{};
+      if (bloodType != null && bloodType.isNotEmpty) {
+        queryParams['blood_type'] = bloodType;
+      }
+
+      final response = await _apiClient.get<Map<String, dynamic>>(
+        '$_baseUrl/ranges',
+        queryParameters: queryParams,
+      );
+
+      if (response.data == null) {
+        throw Exception('Invalid response data');
+      }
+
+      final jsonData = response.data!;
+
+      if (jsonData['status'] == 'ok' && jsonData['data'] != null) {
+        final data = jsonData['data'] as Map<String, dynamic>;
+        final rangesData = data['ranges'] as List;
+        final ranges = rangesData
+            .map((item) => MemberRange.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        debugPrint('Fetched ${ranges.length} ranges, total members: ${data['totalMembers']}');
+        return ranges;
+      } else {
+        throw Exception(jsonData['message'] ?? 'Failed to retrieve ranges');
+      }
+    } catch (e) {
+      debugPrint('Error fetching member ranges: $e');
+      throw Exception('Failed to load member ranges: $e');
+    }
+  }
+
+  /// Fetches members for a specific range
+  /// Used for lazy loading when a range is selected
+  Future<List<Member>> getMembersByRange({
+    required String rangeStart,
+    required String rangeEnd,
+    String? query,
+    String? bloodType,
+  }) async {
+    try {
+      debugPrint('Fetching members for range: $rangeStart to $rangeEnd');
+
+      final queryParams = <String, dynamic>{
+        'page': 0,
+        'limit': 100, // Should be enough for 50 members per range
+        'range_start': rangeStart,
+        'range_end': rangeEnd,
+      };
+
+      if (query != null && query.isNotEmpty) {
+        queryParams['q'] = query;
+      }
+      if (bloodType != null && bloodType.isNotEmpty) {
+        queryParams['blood_type'] = bloodType;
+      }
+
+      final response = await _apiClient.get<Map<String, dynamic>>(
+        '$_baseUrl/index',
+        queryParameters: queryParams,
+      );
+
+      if (response.data == null) {
+        throw Exception('Invalid response data');
+      }
+
+      final jsonData = response.data!;
+
+      if (jsonData['status'] == 'ok' && jsonData['data'] is List) {
+        final members = (jsonData['data'] as List)
+            .map((item) => Member.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        debugPrint('Fetched ${members.length} members for range');
+        return members;
+      } else {
+        throw Exception(jsonData['message'] ?? 'Failed to retrieve members');
+      }
+    } catch (e) {
+      debugPrint('Error fetching members by range: $e');
+      throw Exception('Failed to load members: $e');
     }
   }
 }

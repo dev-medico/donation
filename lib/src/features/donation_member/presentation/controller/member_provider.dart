@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/member_service.dart' as ms;
 import 'package:donation/src/features/donation_member/domain/member.dart';
+import 'package:donation/src/features/donation_member/domain/member_range.dart';
 import 'package:donation/src/features/donation_member/data/member_repository.dart';
 import 'package:donation/src/features/donation_member/data/search_member_repository.dart';
 
@@ -223,6 +224,60 @@ final memberSearchQueryProvider = StateProvider<String>((ref) => '');
 final memberBloodTypeFilterProvider =
     StateProvider<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
 final memberRangeFilterProvider = StateProvider<String?>((ref) => null);
+
+// =====================================================
+// NEW: Optimized Range-based Providers for Lazy Loading
+// =====================================================
+
+/// Selected MemberRange object (instead of String)
+final selectedMemberRangeProvider = StateProvider<MemberRange?>((ref) => null);
+
+/// Fetch ranges from API - this returns quickly with just range metadata
+final memberRangesProvider = FutureProvider.autoDispose<List<MemberRange>>((ref) async {
+  final repository = ref.read(memberRepositoryProvider);
+  final bloodType = ref.watch(memberBloodTypeFilterProvider);
+
+  return repository.getMemberRanges(
+    bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+  );
+});
+
+/// Fetch members only for the selected range (lazy loading)
+/// Returns empty list if no range is selected
+final rangedMemberListProvider = FutureProvider.autoDispose<List<Member>>((ref) async {
+  final selectedRange = ref.watch(selectedMemberRangeProvider);
+
+  // If no range selected, return empty list
+  if (selectedRange == null) {
+    return [];
+  }
+
+  final repository = ref.read(memberRepositoryProvider);
+  final searchQuery = ref.watch(memberSearchQueryProvider);
+  final bloodType = ref.watch(memberBloodTypeFilterProvider);
+
+  return repository.getMembersByRange(
+    rangeStart: selectedRange.start,
+    rangeEnd: selectedRange.end,
+    query: searchQuery.isNotEmpty ? searchQuery : null,
+    bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+  );
+});
+
+/// Total member count from ranges API
+final totalMemberCountProvider = FutureProvider.autoDispose<int>((ref) async {
+  final repository = ref.read(memberRepositoryProvider);
+  final bloodType = ref.watch(memberBloodTypeFilterProvider);
+
+  try {
+    final ranges = await repository.getMemberRanges(
+      bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+    );
+    return ranges.fold<int>(0, (sum, range) => sum + range.count);
+  } catch (e) {
+    return 0;
+  }
+});
 
 // Additional search field providers
 final memberBirthDateSearchProvider = StateProvider<String>((ref) => '');
@@ -500,6 +555,7 @@ void resetFilterProviders(WidgetRef ref) {
   ref.read(memberBloodTypeFilterProvider.notifier).state =
       'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
   ref.read(memberRangeFilterProvider.notifier).state = null;
+  ref.read(selectedMemberRangeProvider.notifier).state = null; // Reset new range provider
   ref.read(memberBirthDateSearchProvider.notifier).state = '';
   ref.read(memberPhoneSearchProvider.notifier).state = '';
   ref.read(memberFatherNameSearchProvider.notifier).state = '';

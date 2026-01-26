@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
+import 'package:donation/src/features/donation_member/domain/member_range.dart';
 import 'package:donation/src/features/donation_member/domain/member_list_data_source.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
@@ -28,11 +29,6 @@ import 'package:flutter/services.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 
-// Provider for MemberRepository
-final memberRepositoryProvider = Provider<MemberRepository>((ref) {
-  return MemberRepository();
-});
-
 class MemberListScreen extends ConsumerStatefulWidget {
   static const routeName = "/members";
   final bool fromHome;
@@ -44,7 +40,7 @@ class MemberListScreen extends ConsumerStatefulWidget {
 }
 
 class _MemberListScreenState extends ConsumerState<MemberListScreen> {
-  List<String> ranges = [];
+  // Blood types list - remains constant
   List<String> bloodTypes = [
     "A (Rh +)",
     "B (Rh +)",
@@ -65,7 +61,6 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
   final memberIdController = TextEditingController();
 
   Timer? _debounceTimer;
-  bool _showLoadingStatus = true;
   bool _isAdvancedSearchExpanded = false;
 
   @override
@@ -76,151 +71,26 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     });
   }
 
-  void _initializeData() async {
-    // Use the loadMembersProvider to handle loading states
-    try {
-      final members = await ref.read(loadMembersProvider)(false);
+  void _initializeData() {
+    // Reset filter states - NO longer fetching all members
+    ref.read(memberBloodTypeFilterProvider.notifier).state =
+        "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
+    ref.read(memberSearchQueryProvider.notifier).state = '';
+    ref.read(selectedMemberRangeProvider.notifier).state = null;
 
-      // Set filtered members initially to all members
-      ref.read(filteredMemberListProvider.notifier).state = members;
-
-      // Generate ranges
-      getRanges(members);
-
-      // Set default filter states
-      ref.read(memberBloodTypeFilterProvider.notifier).state =
-          "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
-      ref.read(memberSearchQueryProvider.notifier).state = '';
-      ref.read(memberRangeFilterProvider.notifier).state = null;
-
-      // Clear the search controller
-      searchController.clear();
-    } catch (e) {
-      dev.log("Error loading member data: $e");
-    }
+    // Clear the search controller
+    searchController.clear();
   }
 
-  void getRanges(List<Member> data) {
-    ranges.clear();
-    if (data.isEmpty) return;
-
-    final sortedData = List<Member>.from(data)
-      ..sort((a, b) => (a.memberId ?? '').compareTo(b.memberId ?? ''));
-
-    for (int i = 0; i < sortedData.length; i += 50) {
-      final endIndex =
-          i + 49 < sortedData.length ? i + 49 : sortedData.length - 1;
-      if (sortedData[i].memberId != null &&
-          sortedData[endIndex].memberId != null) {
-        ranges.add(
-            "${sortedData[i].memberId!} မှ ${sortedData[endIndex].memberId!}");
-      }
-    }
-
-    print('Generated ${ranges.length} ranges');
-
-    // Force UI refresh with new ranges
-    setState(() {});
+  // Refresh ranges when blood type filter changes
+  void _refreshRanges() {
+    ref.invalidate(memberRangesProvider);
+    ref.read(selectedMemberRangeProvider.notifier).state = null;
   }
 
-  void _filterMembers() {
-    final allMembers = ref.read(memberListProvider).value ?? [];
-    if (allMembers.isEmpty) return;
-
-    List<Member> filtered = List.from(allMembers);
-    final selectedBloodType = ref.read(memberBloodTypeFilterProvider);
-    final searchKey = ref.read(memberSearchQueryProvider);
-    final selectedRange = ref.read(memberRangeFilterProvider);
-    
-    // Advanced search filters
-    final birthDateSearch = ref.read(memberBirthDateSearchProvider);
-    final phoneSearch = ref.read(memberPhoneSearchProvider);
-    final fatherNameSearch = ref.read(memberFatherNameSearchProvider);
-    final bloodBankCardSearch = ref.read(memberBloodBankCardSearchProvider);
-    final memberIdSearch = ref.read(memberIdSearchProvider);
-
-    if (selectedBloodType != "သွေးအုပ်စုဖြင့် ရှာဖွေမည်") {
-      filtered = filtered
-          .where((member) =>
-              member.bloodType != null && member.bloodType == selectedBloodType)
-          .toList();
-    }
-
-    if (searchKey.isNotEmpty) {
-      filtered = filtered
-          .where((member) =>
-              (member.name?.toLowerCase().contains(searchKey.toLowerCase()) ??
-                  false) ||
-              (member.memberId
-                      ?.toLowerCase()
-                      .contains(searchKey.toLowerCase()) ??
-                  false) ||
-              (member.phone?.toLowerCase().contains(searchKey.toLowerCase()) ??
-                  false))
-          .toList();
-    }
-
-    // Apply advanced search filters
-    if (birthDateSearch.isNotEmpty) {
-      filtered = filtered
-          .where((member) =>
-              member.birthDate?.toLowerCase().contains(birthDateSearch.toLowerCase()) ??
-              false)
-          .toList();
-    }
-
-    if (phoneSearch.isNotEmpty) {
-      filtered = filtered
-          .where((member) =>
-              member.phone?.toLowerCase().contains(phoneSearch.toLowerCase()) ??
-                  false)
-          .toList();
-    }
-
-    if (fatherNameSearch.isNotEmpty) {
-      filtered = filtered
-          .where((member) =>
-              member.fatherName?.toLowerCase().contains(fatherNameSearch.toLowerCase()) ??
-              false)
-          .toList();
-    }
-
-    if (bloodBankCardSearch.isNotEmpty) {
-      filtered = filtered
-          .where((member) =>
-              member.bloodBankCard?.toLowerCase().contains(bloodBankCardSearch.toLowerCase()) ??
-              false)
-          .toList();
-    }
-
-    if (memberIdSearch.isNotEmpty) {
-      filtered = filtered
-          .where((member) =>
-              member.memberId?.toLowerCase().contains(memberIdSearch.toLowerCase()) ??
-              false)
-          .toList();
-    }
-
-    if (selectedRange != null &&
-        selectedRange.isNotEmpty &&
-        ranges.contains(selectedRange)) {
-      final rangeParts = selectedRange.split(' မှ ');
-      if (rangeParts.length == 2) {
-        final startId = rangeParts[0];
-        final endId = rangeParts[1];
-
-        final startIndex =
-            filtered.indexWhere((member) => member.memberId == startId);
-        final endIndex =
-            filtered.indexWhere((member) => member.memberId == endId);
-
-        if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
-          filtered = filtered.sublist(startIndex, endIndex + 1);
-        }
-      }
-    }
-
-    ref.read(filteredMemberListProvider.notifier).state = filtered;
+  // Refresh member list for the selected range
+  void _refreshMembers() {
+    ref.invalidate(rangedMemberListProvider);
   }
 
   @override
@@ -237,11 +107,11 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final membersAsync = ref.watch(memberListProvider);
-    final filteredMembers = ref.watch(filteredMemberListProvider);
+    // Watch the API-based providers
+    final rangesAsync = ref.watch(memberRangesProvider);
+    final membersAsync = ref.watch(rangedMemberListProvider);
     final selectedBloodType = ref.watch(memberBloodTypeFilterProvider);
-    final selectedRange = ref.watch(memberRangeFilterProvider);
-    final isLoading = ref.watch(memberLoadingProvider);
+    final selectedRange = ref.watch(selectedMemberRangeProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -291,13 +161,14 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
               color: Colors.white,
             ),
             onPressed: () {
-              ref.read(refreshMembersProvider)();
+              // Refresh ranges and members
+              ref.invalidate(memberRangesProvider);
+              ref.invalidate(rangedMemberListProvider);
             },
           ),
         ],
       ),
-      body: _buildBody(isLoading, membersAsync, filteredMembers,
-          selectedBloodType, selectedRange),
+      body: _buildBody(rangesAsync, membersAsync, selectedBloodType, selectedRange),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         onPressed: () {
@@ -323,24 +194,17 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
               // Reset all filters
               resetFilterProviders(ref);
 
-              // Refresh the member list and regenerate ranges
-              ref.read(refreshMembersProvider)().then((_) {
-                // Regenerate ranges with the updated member list
-                final members = ref.read(memberListProvider).value ?? [];
-                getRanges(members);
+              // Refresh ranges from API
+              ref.invalidate(memberRangesProvider);
 
-                // Re-apply the filter
-                _filterMembers();
-
-                // Show success message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content:
-                        Text('အဖွဲ့၀င်အသစ် ထည့်သွင်းခြင်း အောင်မြင်ပါသည်။'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              });
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content:
+                      Text('အဖွဲ့၀င်အသစ် ထည့်သွင်းခြင်း အောင်မြင်ပါသည်။'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
             }
           });
         },
@@ -350,44 +214,40 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
   }
 
   Widget _buildBody(
-      bool isLoading,
+      AsyncValue<List<MemberRange>> rangesAsync,
       AsyncValue<List<Member>> membersAsync,
-      List<Member> filteredMembers,
       String selectedBloodType,
-      String? selectedRange) {
-    if (isLoading && _showLoadingStatus) {
-      return Center(
+      MemberRange? selectedRange) {
+    // Handle ranges loading/error state
+    return rangesAsync.when(
+      loading: () => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 8),
             Text(
-              'အဖွဲ့၀င်များ ရယူနေပါသည်။ ခေတ္တစောင့်ဆိုင်းပေးပါ။',
+              'အဖွဲ့၀င် အုပ်စုများ ရယူနေပါသည်...',
               style: TextStyle(fontSize: 14, color: Colors.grey[700]),
             )
           ],
         ),
-      );
-    } else if (membersAsync.hasError) {
-      return Center(
+      ),
+      error: (error, _) => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.error_outline, color: Colors.red, size: 48),
             SizedBox(height: 8),
             Text(
-              'အမှား - ${membersAsync.error}',
+              'အမှား - $error',
               style: TextStyle(fontSize: 16, color: Colors.red[700]),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () {
-                setState(() {
-                  _showLoadingStatus = true;
-                });
-                ref.invalidate(memberListProvider);
+                ref.invalidate(memberRangesProvider);
               },
               icon: Icon(Icons.refresh),
               label: Text('ပြန်လည်ကြိုးစားမည်'),
@@ -398,15 +258,24 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
             ),
           ],
         ),
-      );
-    } else {
-      return _buildMainContent(
-          filteredMembers, selectedBloodType, selectedRange ?? "");
-    }
+      ),
+      data: (ranges) {
+        // Handle members based on whether a range is selected
+        return membersAsync.when(
+          loading: () => _buildMainContent(ranges, [], selectedBloodType, selectedRange, isLoading: true),
+          error: (error, _) => _buildMainContent(ranges, [], selectedBloodType, selectedRange, error: error.toString()),
+          data: (members) => _buildMainContent(ranges, members, selectedBloodType, selectedRange),
+        );
+      },
+    );
   }
 
-  Widget _buildMainContent(List<Member> filteredMembers,
-      String selectedBloodType, String selectedRange) {
+  Widget _buildMainContent(
+      List<MemberRange> ranges,
+      List<Member> members,
+      String selectedBloodType,
+      MemberRange? selectedRange,
+      {bool isLoading = false, String? error}) {
     return Column(
       children: [
         // Filters section with scroll
@@ -427,10 +296,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                               width: MediaQuery.of(context).size.width / 2.3,
                               margin: const EdgeInsets.only(top: 12, right: 4),
                               child: ranges.isNotEmpty
-                                  ? DropdownButtonFormField<String>(
-                                      value: ranges.contains(selectedRange)
-                                          ? selectedRange
-                                          : null,
+                                  ? DropdownButtonFormField<MemberRange>(
+                                      value: selectedRange,
                                       dropdownColor: Colors.white,
                                       focusColor: Colors.white,
                                       decoration: InputDecoration(
@@ -457,7 +324,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                       ),
                                       iconSize: 30,
                                       items: [
-                                        DropdownMenuItem(
+                                        DropdownMenuItem<MemberRange>(
                                           value: null,
                                           child: Text(
                                             "အမှတ်စဥ် အလိုက်ကြည့်မည်",
@@ -465,10 +332,10 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                           ),
                                         ),
                                         ...ranges.map(
-                                            (item) => DropdownMenuItem<String>(
+                                            (item) => DropdownMenuItem<MemberRange>(
                                                   value: item,
                                                   child: Text(
-                                                    item,
+                                                    "${item.label} (${item.count})",
                                                     style: const TextStyle(
                                                       fontSize: 14,
                                                     ),
@@ -477,10 +344,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                       ],
                                       onChanged: (value) {
                                         ref
-                                            .read(memberRangeFilterProvider
+                                            .read(selectedMemberRangeProvider
                                                 .notifier)
                                             .state = value;
-                                        _filterMembers();
                                       },
                                     )
                                   : Container(
@@ -491,7 +357,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                       ),
                                       child: Center(
                                         child: Text(
-                                          "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                          "အမှတ်စဥ် မရှိပါ",
                                           style: TextStyle(
                                               fontSize: 13,
                                               color: Colors.grey[700]),
@@ -553,7 +419,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                         .read(memberBloodTypeFilterProvider
                                             .notifier)
                                         .state = value;
-                                    _filterMembers();
+                                    // Refresh ranges based on new blood type
+                                    _refreshRanges();
                                   }
                                 },
                               ),
@@ -588,6 +455,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                           .read(memberSearchQueryProvider
                                               .notifier)
                                           .state = val;
+                                      // Refresh members with new search query
+                                      _refreshMembers();
                                     });
                                   },
                                   decoration: InputDecoration(
@@ -682,7 +551,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                           memberPhoneSearchProvider
                                                               .notifier)
                                                       .state = val;
-                                                  _filterMembers();
+                                                  _refreshMembers();
                                                 },
                                               ),
                                             ),
@@ -697,7 +566,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                           memberFatherNameSearchProvider
                                                               .notifier)
                                                       .state = val;
-                                                  _filterMembers();
+                                                  _refreshMembers();
                                                 },
                                               ),
                                             ),
@@ -717,7 +586,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                           memberBloodBankCardSearchProvider
                                                               .notifier)
                                                       .state = val;
-                                                  _filterMembers();
+                                                  _refreshMembers();
                                                 },
                                               ),
                                             ),
@@ -731,7 +600,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                       .read(memberIdSearchProvider
                                                           .notifier)
                                                       .state = val;
-                                                  _filterMembers();
+                                                  _refreshMembers();
                                                 },
                                               ),
                                             ),
@@ -748,7 +617,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                     memberBirthDateSearchProvider
                                                         .notifier)
                                                 .state = val;
-                                            _filterMembers();
+                                            _refreshMembers();
                                           },
                                         ),
                                         SizedBox(height: 12),
@@ -786,7 +655,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                   .read(memberIdSearchProvider
                                                       .notifier)
                                                   .state = '';
-                                              _filterMembers();
+                                              _refreshMembers();
                                             },
                                             icon:
                                                 Icon(Icons.clear_all, size: 20),
@@ -817,10 +686,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           height: 50,
                           margin: const EdgeInsets.only(top: 28, left: 24),
                           child: ranges.isNotEmpty
-                              ? DropdownButtonFormField<String>(
-                                  value: ranges.contains(selectedRange)
-                                      ? selectedRange
-                                      : null,
+                              ? DropdownButtonFormField<MemberRange>(
+                                  value: selectedRange,
                                   dropdownColor: Colors.white,
                                   focusColor: Colors.white,
                                   decoration: InputDecoration(
@@ -845,7 +712,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                   ),
                                   iconSize: 30,
                                   items: [
-                                    DropdownMenuItem(
+                                    DropdownMenuItem<MemberRange>(
                                       value: null,
                                       child: Text(
                                         "အမှတ်စဥ် အလိုက်ကြည့်မည်",
@@ -853,10 +720,10 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                       ),
                                     ),
                                     ...ranges
-                                        .map((item) => DropdownMenuItem<String>(
+                                        .map((item) => DropdownMenuItem<MemberRange>(
                                               value: item,
                                               child: Text(
-                                                item,
+                                                "${item.label} (${item.count})",
                                                 style: const TextStyle(
                                                   fontSize: 14,
                                                 ),
@@ -866,9 +733,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                   onChanged: (value) {
                                     ref
                                         .read(
-                                            memberRangeFilterProvider.notifier)
+                                            selectedMemberRangeProvider.notifier)
                                         .state = value;
-                                    _filterMembers();
                                   },
                                 )
                               : Container(
@@ -880,7 +746,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(12.0),
                                       child: Text(
-                                        "အမှတ်စဥ် အလိုက်ကြည့်မည်",
+                                        "အမှတ်စဥ် မရှိပါ",
                                         style: TextStyle(
                                             fontSize: 14,
                                             color: Colors.grey[700]),
@@ -943,7 +809,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                     .read(
                                         memberBloodTypeFilterProvider.notifier)
                                     .state = value;
-                                _filterMembers();
+                                _refreshRanges();
                               }
                             },
                             onSaved: (value) {},
@@ -970,7 +836,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                 ref
                                     .read(memberSearchQueryProvider.notifier)
                                     .state = val;
-                                _filterMembers();
+                                _refreshMembers();
                               });
                             },
                             decoration: InputDecoration(
@@ -1066,7 +932,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                 .read(memberPhoneSearchProvider
                                                     .notifier)
                                                 .state = val;
-                                            _filterMembers();
+                                            _refreshMembers();
                                           },
                                         ),
                                       ),
@@ -1081,7 +947,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                     memberFatherNameSearchProvider
                                                         .notifier)
                                                 .state = val;
-                                            _filterMembers();
+                                            _refreshMembers();
                                           },
                                         ),
                                       ),
@@ -1096,7 +962,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                     memberBloodBankCardSearchProvider
                                                         .notifier)
                                                 .state = val;
-                                            _filterMembers();
+                                            _refreshMembers();
                                           },
                                         ),
                                       ),
@@ -1114,7 +980,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                 .read(memberIdSearchProvider
                                                     .notifier)
                                                 .state = val;
-                                            _filterMembers();
+                                            _refreshMembers();
                                           },
                                         ),
                                       ),
@@ -1129,7 +995,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                     memberBirthDateSearchProvider
                                                         .notifier)
                                                 .state = val;
-                                            _filterMembers();
+                                            _refreshMembers();
                                           },
                                         ),
                                       ),
@@ -1168,7 +1034,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                                   .read(memberIdSearchProvider
                                                       .notifier)
                                                   .state = '';
-                                              _filterMembers();
+                                              _refreshMembers();
                                             },
                                             icon:
                                                 Icon(Icons.clear_all, size: 20),
@@ -1193,15 +1059,91 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
         ),
         // Add spacing between search UI and table
         SizedBox(height: 12),
-        // Data table - outside of SingleChildScrollView
+        // Data table - shows prompt when no range selected
         Expanded(
           child: Container(
             margin: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8),
-            child: buildSimpleTable(filteredMembers),
+            child: _buildTableContent(members, selectedRange, isLoading, error),
           ),
         ),
       ],
     );
+  }
+
+  /// Build table content based on state
+  Widget _buildTableContent(List<Member> members, MemberRange? selectedRange, bool isLoading, String? error) {
+    // Show error message if there's an error
+    if (error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, color: Colors.red, size: 48),
+            SizedBox(height: 8),
+            Text(
+              'အမှား - $error',
+              style: TextStyle(fontSize: 16, color: Colors.red[700]),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: () {
+                ref.invalidate(rangedMemberListProvider);
+              },
+              icon: Icon(Icons.refresh),
+              label: Text('ပြန်လည်ကြိုးစားမည်'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show loading indicator when loading members for a range
+    if (isLoading && selectedRange != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 8),
+            Text(
+              'အဖွဲ့၀င်များ ရယူနေပါသည်...',
+              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+            )
+          ],
+        ),
+      );
+    }
+
+    // Show prompt to select a range if no range selected
+    if (selectedRange == null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.list_alt, size: 64, color: Colors.grey[400]),
+            SizedBox(height: 16),
+            Text(
+              'အမှတ်စဥ် အုပ်စုတစ်ခု ရွေးချယ်ပါ',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'အဖွဲ့၀င်များကို ကြည့်ရှုရန် အမှတ်စဥ် dropdown မှ ရွေးချယ်ပါ',
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show the data table with members
+    return buildSimpleTable(members);
   }
 
   Widget _buildSearchField(String label, TextEditingController controller,
@@ -1262,14 +1204,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                     ),
                   )
                       .then((_) {
-                    // When returning from detail screen, refresh data and clear filters
-                    resetFilterProviders(ref);
+                    // When returning from detail screen, refresh ranges and clear filters
+                    ref.invalidate(memberRangesProvider);
+                    ref.invalidate(rangedMemberListProvider);
 
                     // Clear search field
                     searchController.clear();
-
-                    // Refresh data
-                    ref.read(refreshMembersProvider)();
                   });
                 }
               },
