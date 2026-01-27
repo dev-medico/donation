@@ -87,9 +87,10 @@ class DonarRecordService extends BaseService {
 
     try {
       final response = await apiClient.post(
-        '$_basePath/update/$id',
+        '$_basePath/update',
         data: data,
         options: {'headers': headers},
+        queryParameters: {'id': id},
       );
 
       _updateLoadingStatus('Donar record updated successfully!');
@@ -110,8 +111,9 @@ class DonarRecordService extends BaseService {
 
     try {
       final response = await apiClient.post(
-        '$_basePath/delete/$id',
+        '$_basePath/delete',
         options: {'headers': headers},
+        queryParameters: {'id': id},
       );
 
       _updateLoadingStatus('Donar record deleted successfully!');
