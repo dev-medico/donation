@@ -9,7 +9,7 @@ class DonarDataSource extends DataGridSource {
     for (int i = 0; i < donarData.length; i++) {
       final donar = donarData[i];
       final date = DateTime.parse(donar['date']);
-      
+
       _donarData.add(DataGridRow(cells: [
         DataGridCell<String>(
             columnName: 'စဥ်',
@@ -19,10 +19,15 @@ class DonarDataSource extends DataGridSource {
             value: DateFormat('dd MMM yyyy').format(date)),
         DataGridCell<String>(
             columnName: 'အမည်',
-            value: donar['name'] ?? ''),
+            value: (donar['moneyDonor'] != null && donar['moneyDonor']['name'] != null)
+                ? donar['moneyDonor']['name']
+                : (donar['name'] ?? '')),
         DataGridCell<String>(
             columnName: 'အလှူငွေ',
             value: '${Utils.strToMM(donar['amount'].toString())} ကျပ်'),
+        DataGridCell<String>(
+            columnName: 'edit',
+            value: ''),
       ]));
     }
   }
@@ -36,6 +41,17 @@ class DonarDataSource extends DataGridSource {
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
+      if (e.columnName == 'edit') {
+        return Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(4.0),
+          child: Icon(
+            Icons.edit_outlined,
+            size: 16,
+            color: Colors.grey[500],
+          ),
+        );
+      }
       final bool isAmount = e.columnName == 'အလှူငွေ' || e.columnName == 'စဥ်';
       return Container(
         alignment: isAmount ? Alignment.centerRight : Alignment.centerLeft,
@@ -58,7 +74,7 @@ class ExpenseDataSource extends DataGridSource {
     for (int i = 0; i < expenseData.length; i++) {
       final expense = expenseData[i];
       final date = DateTime.parse(expense['date']);
-      
+
       _expenseData.add(DataGridRow(cells: [
         DataGridCell<String>(
             columnName: 'စဥ်',
@@ -72,6 +88,9 @@ class ExpenseDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'အသုံးစရိတ်',
             value: '${Utils.strToMM(expense['amount'].toString())} ကျပ်'),
+        DataGridCell<String>(
+            columnName: 'edit',
+            value: ''),
       ]));
     }
   }
@@ -85,6 +104,17 @@ class ExpenseDataSource extends DataGridSource {
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
+      if (e.columnName == 'edit') {
+        return Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(4.0),
+          child: Icon(
+            Icons.edit_outlined,
+            size: 16,
+            color: Colors.grey[500],
+          ),
+        );
+      }
       final bool isAmount = e.columnName == 'အသုံးစရိတ်' || e.columnName == 'စဥ်';
       return Container(
         alignment: isAmount ? Alignment.centerRight : Alignment.centerLeft,

@@ -232,6 +232,54 @@ class MemberRepository {
     }
   }
 
+  /// Check if a member exists with the given criteria
+  Future<Map<String, dynamic>> checkMemberExists(String name,
+      {String? fatherName, String? bloodType}) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'name': name,
+      };
+
+      if (fatherName != null && fatherName.isNotEmpty) {
+        queryParams['father_name'] = fatherName;
+      }
+
+      if (bloodType != null && bloodType != "သွေးအုပ်စု") {
+        queryParams['blood_type'] = bloodType;
+      }
+
+      final response = await _apiClient.get<Map<String, dynamic>>(
+        '$_baseUrl/check-exists',
+        queryParameters: queryParams,
+      );
+
+      if (response.data != null && response.data!['status'] == 'ok') {
+        final exists = response.data!['exists'] as bool;
+        final List<dynamic> membersData = response.data!['members'] ?? [];
+        final members =
+            membersData.map((item) => Member.fromJson(item)).toList();
+
+        return {
+          'exists': exists,
+          'members': members,
+        };
+      } else {
+        return {
+          'exists': false,
+          'members': <Member>[],
+          'error': 'Failed to check member existence',
+        };
+      }
+    } catch (e) {
+      debugPrint('Error checking member existence: $e');
+      return {
+        'exists': false,
+        'members': <Member>[],
+        'error': e.toString(),
+      };
+    }
+  }
+
   /// Fetches members for a specific range
   /// Used for lazy loading when a range is selected
   Future<List<Member>> getMembersByRange({

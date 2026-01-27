@@ -675,6 +675,18 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                       'အလှူငွေ',
                       style: TextStyle(color: Colors.white),
                     ))),
+            GridColumn(
+                columnName: 'edit',
+                width: 50,
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.more_horiz,
+                      color: Colors.white,
+                      size: 16,
+                    ))),
           ],
         ),
       ),
@@ -772,6 +784,18 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                     child: const Text(
                       'အသုံးစရိတ်',
                       style: TextStyle(color: Colors.white),
+                    ))),
+            GridColumn(
+                columnName: 'edit',
+                width: 50,
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.more_horiz,
+                      color: Colors.white,
+                      size: 16,
                     ))),
           ],
         ),
@@ -936,16 +960,52 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
   }
 
   void _showEditDonorDialog(dynamic donor) {
-    // TODO: Implement edit donor dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Edit donor feature coming soon')),
+    showDialog(
+      context: context,
+      builder: (context) => _EditDonorRecordDialog(
+        donor: donor,
+        year: int.parse(years[_yearSelected]),
+        onUpdated: () async {
+          final month = _monthSelected + 1;
+          donorsByMonth.remove(month);
+          setState(() { isLoading = true; });
+          try {
+            await _loadMonthData(month);
+            final selectedYear = int.parse(years[_yearSelected]);
+            ref.invalidate(yearlyReportProvider(selectedYear));
+            final reportData =
+                await ref.read(yearlyReportProvider(selectedYear).future);
+            _calculateBalances(reportData);
+          } finally {
+            setState(() { isLoading = false; });
+          }
+        },
+      ),
     );
   }
 
   void _showEditExpenseDialog(dynamic expense) {
-    // TODO: Implement edit expense dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Edit expense feature coming soon')),
+    showDialog(
+      context: context,
+      builder: (context) => _EditExpenseRecordDialog(
+        expense: expense,
+        year: int.parse(years[_yearSelected]),
+        onUpdated: () async {
+          final month = _monthSelected + 1;
+          expensesByMonth.remove(month);
+          setState(() { isLoading = true; });
+          try {
+            await _loadMonthData(month);
+            final selectedYear = int.parse(years[_yearSelected]);
+            ref.invalidate(yearlyReportProvider(selectedYear));
+            final reportData =
+                await ref.read(yearlyReportProvider(selectedYear).future);
+            _calculateBalances(reportData);
+          } finally {
+            setState(() { isLoading = false; });
+          }
+        },
+      ),
     );
   }
 }
@@ -1536,5 +1596,670 @@ class _MoneyDonorFormDialogState extends ConsumerState<MoneyDonorFormDialog> {
         ),
       ),
     );
+  }
+}
+
+// Edit Donor Record Dialog
+class _EditDonorRecordDialog extends ConsumerStatefulWidget {
+  final dynamic donor;
+  final int year;
+  final Future<void> Function() onUpdated;
+
+  const _EditDonorRecordDialog({
+    required this.donor,
+    required this.year,
+    required this.onUpdated,
+  });
+
+  @override
+  ConsumerState<_EditDonorRecordDialog> createState() =>
+      _EditDonorRecordDialogState();
+}
+
+class _EditDonorRecordDialogState
+    extends ConsumerState<_EditDonorRecordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _amountController = TextEditingController();
+  late DateTime _selectedDate;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController.text = widget.donor['amount']?.toString() ?? '';
+    _selectedDate = DateTime.parse(widget.donor['date']);
+  }
+
+  String get _donorName {
+    if (widget.donor['moneyDonor'] != null &&
+        widget.donor['moneyDonor']['name'] != null) {
+      return widget.donor['moneyDonor']['name'];
+    }
+    return widget.donor['name'] ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [primaryColor, primaryDark],
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.edit, color: Colors.white, size: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Text(
+                      'အလှူမှတ်တမ်း ပြင်ဆင်ရန်',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(Icons.close, color: Colors.white, size: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Body
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Donor name (read-only)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.06),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.green.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                Icons.person,
+                                size: 16,
+                                color: Colors.green[700],
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'အလှူရှင်',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.green[700],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _donorName,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // Amount field
+                      TextFormField(
+                        controller: _amountController,
+                        decoration: InputDecoration(
+                          labelText: 'ငွေပမာဏ',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          suffixText: 'ကျပ်',
+                          prefixIcon: const Icon(Icons.attach_money),
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return 'ကိန်းဂဏန်းသာ ထည့်သွင်းပါ';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // Date picker
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: _selectedDate,
+                            firstDate: DateTime(widget.year, 1, 1),
+                            lastDate: DateTime(widget.year, 12, 31),
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              _selectedDate = picked;
+                            });
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 14),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey[400]!),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.calendar_today,
+                                  size: 20, color: Colors.grey[600]),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'ရက်စွဲ',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    DateFormat('dd MMM yyyy')
+                                        .format(_selectedDate),
+                                    style: const TextStyle(fontSize: 15),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Actions
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed:
+                          _isLoading ? null : () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        side: BorderSide(color: Colors.grey[300]!),
+                      ),
+                      child: const Text('မလုပ်တော့ပါ'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'သိမ်းမည်',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final data = <String, dynamic>{
+        'amount': int.parse(_amountController.text),
+        'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
+      };
+
+      final service = ref.read(donarRecordServiceProvider);
+      await service.updateDonarRecord(
+          widget.donor['id'].toString(), data);
+
+      if (mounted) {
+        Navigator.pop(context);
+        widget.onUpdated();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('အလှူမှတ်တမ်း အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('ပြင်ဆင်ရန် မအောင်မြင်ပါ: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+}
+
+// Edit Expense Record Dialog
+class _EditExpenseRecordDialog extends ConsumerStatefulWidget {
+  final dynamic expense;
+  final int year;
+  final Future<void> Function() onUpdated;
+
+  const _EditExpenseRecordDialog({
+    required this.expense,
+    required this.year,
+    required this.onUpdated,
+  });
+
+  @override
+  ConsumerState<_EditExpenseRecordDialog> createState() =>
+      _EditExpenseRecordDialogState();
+}
+
+class _EditExpenseRecordDialogState
+    extends ConsumerState<_EditExpenseRecordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _amountController = TextEditingController();
+  late DateTime _selectedDate;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.expense['name'] ?? '';
+    _amountController.text = widget.expense['amount']?.toString() ?? '';
+    _selectedDate = DateTime.parse(widget.expense['date']);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [primaryColor, primaryDark],
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.edit, color: Colors.white, size: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Text(
+                      'အသုံးစရိတ် ပြင်ဆင်ရန်',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(Icons.close, color: Colors.white, size: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Body
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name field (editable for expenses)
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          labelText: 'အကြောင်းအရာ',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          prefixIcon: const Icon(Icons.description),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // Amount field
+                      TextFormField(
+                        controller: _amountController,
+                        decoration: InputDecoration(
+                          labelText: 'ငွေပမာဏ',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          suffixText: 'ကျပ်',
+                          prefixIcon: const Icon(Icons.attach_money),
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return 'ကိန်းဂဏန်းသာ ထည့်သွင်းပါ';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // Date picker
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: _selectedDate,
+                            firstDate: DateTime(widget.year, 1, 1),
+                            lastDate: DateTime(widget.year, 12, 31),
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              _selectedDate = picked;
+                            });
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 14),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey[400]!),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.calendar_today,
+                                  size: 20, color: Colors.grey[600]),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'ရက်စွဲ',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    DateFormat('dd MMM yyyy')
+                                        .format(_selectedDate),
+                                    style: const TextStyle(fontSize: 15),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Actions
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed:
+                          _isLoading ? null : () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        side: BorderSide(color: Colors.grey[300]!),
+                      ),
+                      child: const Text('မလုပ်တော့ပါ'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'သိမ်းမည်',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final data = <String, dynamic>{
+        'name': _nameController.text,
+        'amount': int.parse(_amountController.text),
+        'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
+      };
+
+      final service = ref.read(expenseRecordServiceProvider);
+      await service.updateExpenseRecord(
+          widget.expense['id'].toString(), data);
+
+      if (mounted) {
+        Navigator.pop(context);
+        widget.onUpdated();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('အသုံးစရိတ် အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('ပြင်ဆင်ရန် မအောင်မြင်ပါ: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _amountController.dispose();
+    super.dispose();
   }
 }
