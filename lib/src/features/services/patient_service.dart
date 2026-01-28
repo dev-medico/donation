@@ -84,7 +84,8 @@ class PatientService extends BaseService {
   /// Update existing patient
   Future<Patient> updatePatient(int id, Map<String, dynamic> patientData) async {
     final response = await apiClient.post(
-      '/patient/update/$id',
+      '/patient/update',
+      queryParameters: {'id': id.toString()},
       data: patientData,
     );
 
@@ -100,7 +101,10 @@ class PatientService extends BaseService {
 
   /// Delete patient
   Future<bool> deletePatient(int id) async {
-    final response = await apiClient.post('/patient/delete/$id');
+    final response = await apiClient.post(
+      '/patient/delete',
+      queryParameters: {'id': id.toString()},
+    );
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = response.data;
