@@ -53,7 +53,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
   // Patient selection state
   Patient? selectedPatient;
-  bool isNewPatient = true; // Toggle: true = new patient, false = existing
   final patientSearchController = TextEditingController();
 
   String donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
@@ -169,12 +168,11 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
   // Handle patient name changes to clear selection when user manually edits
   void _onPatientNameChanged() {
-    if (!isNewPatient && selectedPatient != null) {
+    if (selectedPatient != null) {
       // If user manually edits the name, clear the selection
       if (nameController.text != selectedPatient!.name) {
         setState(() {
           selectedPatient = null;
-          isNewPatient = true; // Switch back to new patient mode
           patientSearchController.clear();
         });
       }
@@ -385,27 +383,8 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     final String formattedAddress =
         "$quarter${quarter.isNotEmpty ? '၊' : ''}$township";
 
-    // Handle patient ID - use existing patient or create new one
+    // Use selected patient ID if available
     int? patientId = selectedPatient?.id;
-
-    // If new patient mode and no selection, create patient first
-    if (isNewPatient && selectedPatient == null && name.isNotEmpty) {
-      try {
-        final patientService = ref.read(patientServiceProvider);
-        final newPatient = await patientService.createPatient({
-          'name': name,
-          'age': age,
-          'address': formattedAddress,
-          'gender': '', // Optional - not collected in this form
-        });
-        patientId = newPatient.id;
-        print('Created new patient with ID: $patientId');
-      } catch (e) {
-        // Handle error - continue without patient_id if creation fails
-        print('Failed to create patient: $e');
-        // Don't block donation creation if patient creation fails
-      }
-    }
 
     final donationData = {
       'member': selectedMember != null ? selectedMember!.id : null,
@@ -482,7 +461,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     setState(() {
       selectedMember = null;
       selectedPatient = null;
-      isNewPatient = true;
       donationDateDetail = null;
       donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
     });
@@ -705,157 +683,79 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header row with toggle
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'လူနာအချက်အလက်',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    // Toggle between New and Existing patient
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isNewPatient = true;
-                                _clearPatientSelection();
-                              });
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: isNewPatient
-                                    ? primaryColor
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'အသစ်',
-                                style: TextStyle(
-                                  color: isNewPatient
-                                      ? Colors.white
-                                      : Colors.black87,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isNewPatient = false;
-                              });
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: !isNewPatient
-                                    ? primaryColor
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'ရှိပြီးသား',
-                                style: TextStyle(
-                                  color: !isNewPatient
-                                      ? Colors.white
-                                      : Colors.black87,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                Text(
+                  'လူနာအချက်အလက်',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 16),
 
-                // Patient search field (only show when existing mode)
-                if (!isNewPatient) ...[
-                  TypeAheadField<Patient>(
-                    textFieldConfiguration: TextFieldConfiguration(
-                      controller: patientSearchController,
-                      decoration: InputDecoration(
-                        labelText: 'လူနာရှာဖွေရန်',
-                        hintText: 'အမည် သို့မဟုတ် ဖုန်းဖြင့် ရှာပါ',
-                        border: OutlineInputBorder(),
-                        suffixIcon: Icon(Icons.search),
-                      ),
+                // Patient search field
+                TypeAheadField<Patient>(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: patientSearchController,
+                    decoration: InputDecoration(
+                      labelText: 'လူနာရှာဖွေရန်',
+                      hintText: 'အမည် သို့မဟုတ် ဖုန်းဖြင့် ရှာပါ',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.search),
                     ),
-                    suggestionsCallback: (pattern) async {
-                      if (pattern.isEmpty) return [];
-                      final service = ref.read(patientServiceProvider);
-                      return await service.searchPatients(pattern);
-                    },
-                    itemBuilder: (context, Patient patient) {
-                      return ListTile(
-                        title: Text(patient.name ?? ''),
-                        subtitle: Text(
-                            '${patient.age ?? ''} - ${patient.address ?? ''}'),
-                        dense: true,
-                      );
-                    },
-                    onSuggestionSelected: (Patient patient) {
-                      _fillPatientData(patient);
-                    },
                   ),
-                  if (selectedPatient != null) ...[
-                    SizedBox(height: 12),
-                    Container(
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.green[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.green[200]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.check_circle,
-                              color: Colors.green[700], size: 20),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
-                              style: TextStyle(
-                                color: Colors.green[700],
-                                fontWeight: FontWeight.w500,
-                              ),
+                  suggestionsCallback: (pattern) async {
+                    if (pattern.isEmpty) return [];
+                    final service = ref.read(patientServiceProvider);
+                    return await service.searchPatients(pattern);
+                  },
+                  itemBuilder: (context, Patient patient) {
+                    return ListTile(
+                      title: Text(patient.name ?? ''),
+                      subtitle: Text(
+                          '${patient.age ?? ''} - ${patient.address ?? ''}'),
+                      dense: true,
+                    );
+                  },
+                  onSuggestionSelected: (Patient patient) {
+                    _fillPatientData(patient);
+                  },
+                ),
+                if (selectedPatient != null) ...[
+                  SizedBox(height: 12),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.green[200]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle,
+                            color: Colors.green[700], size: 20),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
+                            style: TextStyle(
+                              color: Colors.green[700],
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.close, size: 18),
-                            onPressed: () {
-                              setState(() {
-                                isNewPatient = true;
-                                _clearPatientSelection();
-                              });
-                            },
-                            padding: EdgeInsets.zero,
-                            constraints: BoxConstraints(),
-                          ),
-                        ],
-                      ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close, size: 18),
+                          onPressed: () {
+                            _clearPatientSelection();
+                          },
+                          padding: EdgeInsets.zero,
+                          constraints: BoxConstraints(),
+                        ),
+                      ],
                     ),
-                  ],
-                  SizedBox(height: 12),
+                  ),
                 ],
+                SizedBox(height: 12),
 
                 TextField(
                   controller: nameController,
@@ -1253,157 +1153,79 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header row with toggle
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'လူနာအချက်အလက်',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    // Toggle between New and Existing patient
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isNewPatient = true;
-                                _clearPatientSelection();
-                              });
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: isNewPatient
-                                    ? primaryColor
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'အသစ်',
-                                style: TextStyle(
-                                  color: isNewPatient
-                                      ? Colors.white
-                                      : Colors.black87,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isNewPatient = false;
-                              });
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: !isNewPatient
-                                    ? primaryColor
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'ရှိပြီးသား',
-                                style: TextStyle(
-                                  color: !isNewPatient
-                                      ? Colors.white
-                                      : Colors.black87,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                Text(
+                  'လူနာအချက်အလက်',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 16),
 
-                // Patient search field (only show when existing mode)
-                if (!isNewPatient) ...[
-                  TypeAheadField<Patient>(
-                    textFieldConfiguration: TextFieldConfiguration(
-                      controller: patientSearchController,
-                      decoration: InputDecoration(
-                        labelText: 'လူနာရှာဖွေရန်',
-                        hintText: 'အမည် သို့မဟုတ် ဖုန်းဖြင့် ရှာပါ',
-                        border: OutlineInputBorder(),
-                        suffixIcon: Icon(Icons.search),
-                      ),
+                // Patient search field
+                TypeAheadField<Patient>(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: patientSearchController,
+                    decoration: InputDecoration(
+                      labelText: 'လူနာရှာဖွေရန်',
+                      hintText: 'အမည် သို့မဟုတ် ဖုန်းဖြင့် ရှာပါ',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.search),
                     ),
-                    suggestionsCallback: (pattern) async {
-                      if (pattern.isEmpty) return [];
-                      final service = ref.read(patientServiceProvider);
-                      return await service.searchPatients(pattern);
-                    },
-                    itemBuilder: (context, Patient patient) {
-                      return ListTile(
-                        title: Text(patient.name ?? ''),
-                        subtitle: Text(
-                            '${patient.age ?? ''} - ${patient.address ?? ''}'),
-                        dense: true,
-                      );
-                    },
-                    onSuggestionSelected: (Patient patient) {
-                      _fillPatientData(patient);
-                    },
                   ),
-                  if (selectedPatient != null) ...[
-                    SizedBox(height: 12),
-                    Container(
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.green[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.green[200]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.check_circle,
-                              color: Colors.green[700], size: 20),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
-                              style: TextStyle(
-                                color: Colors.green[700],
-                                fontWeight: FontWeight.w500,
-                              ),
+                  suggestionsCallback: (pattern) async {
+                    if (pattern.isEmpty) return [];
+                    final service = ref.read(patientServiceProvider);
+                    return await service.searchPatients(pattern);
+                  },
+                  itemBuilder: (context, Patient patient) {
+                    return ListTile(
+                      title: Text(patient.name ?? ''),
+                      subtitle: Text(
+                          '${patient.age ?? ''} - ${patient.address ?? ''}'),
+                      dense: true,
+                    );
+                  },
+                  onSuggestionSelected: (Patient patient) {
+                    _fillPatientData(patient);
+                  },
+                ),
+                if (selectedPatient != null) ...[
+                  SizedBox(height: 12),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.green[200]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle,
+                            color: Colors.green[700], size: 20),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
+                            style: TextStyle(
+                              color: Colors.green[700],
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.close, size: 18),
-                            onPressed: () {
-                              setState(() {
-                                isNewPatient = true;
-                                _clearPatientSelection();
-                              });
-                            },
-                            padding: EdgeInsets.zero,
-                            constraints: BoxConstraints(),
-                          ),
-                        ],
-                      ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close, size: 18),
+                          onPressed: () {
+                            _clearPatientSelection();
+                          },
+                          padding: EdgeInsets.zero,
+                          constraints: BoxConstraints(),
+                        ),
+                      ],
                     ),
-                  ],
-                  SizedBox(height: 12),
+                  ),
                 ],
+                SizedBox(height: 12),
 
                 TextField(
                   controller: nameController,
