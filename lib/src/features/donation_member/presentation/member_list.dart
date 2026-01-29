@@ -78,19 +78,121 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     ref.read(memberSearchQueryProvider.notifier).state = '';
     ref.read(selectedMemberRangeProvider.notifier).state = null;
 
+    // Reset pagination state
+    resetPaginationState(ref);
+
     // Clear the search controller
     searchController.clear();
+
+    // Load initial page
+    _loadInitialPage();
+  }
+
+  /// Load initial page of members
+  Future<void> _loadInitialPage() async {
+    final selectedRange = ref.read(selectedMemberRangeProvider);
+
+    // Only load paginated data if no range is selected
+    if (selectedRange != null) return;
+
+    final repository = ref.read(memberRepositoryProvider);
+    final searchQuery = ref.read(memberSearchQueryProvider);
+    final bloodType = ref.read(memberBloodTypeFilterProvider);
+
+    try {
+      final result = await repository.getMembersPaginated(
+        page: 0,
+        limit: 50,
+        query: searchQuery.isNotEmpty ? searchQuery : null,
+        bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+      );
+
+      final members = result['members'] as List<Member>;
+      final hasMore = result['hasMore'] as bool;
+
+      ref.read(accumulatedMembersProvider.notifier).state = members;
+      ref.read(memberHasMoreProvider.notifier).state = hasMore;
+      ref.read(memberPageProvider.notifier).state = 0;
+    } catch (e) {
+      dev.log('Error loading initial page: $e');
+    }
+  }
+
+  /// Load more members for infinite scroll
+  Future<void> _loadMore() async {
+    final selectedRange = ref.read(selectedMemberRangeProvider);
+    final isLoadingMore = ref.read(memberIsLoadingMoreProvider);
+    final hasMore = ref.read(memberHasMoreProvider);
+
+    // Don't load more if a range is selected, already loading, or no more data
+    if (selectedRange != null || isLoadingMore || !hasMore) return;
+
+    ref.read(memberIsLoadingMoreProvider.notifier).state = true;
+
+    final repository = ref.read(memberRepositoryProvider);
+    final searchQuery = ref.read(memberSearchQueryProvider);
+    final bloodType = ref.read(memberBloodTypeFilterProvider);
+    final currentPage = ref.read(memberPageProvider);
+
+    try {
+      final result = await repository.getMembersPaginated(
+        page: currentPage + 1,
+        limit: 50,
+        query: searchQuery.isNotEmpty ? searchQuery : null,
+        bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+      );
+
+      final newMembers = result['members'] as List<Member>;
+      final moreAvailable = result['hasMore'] as bool;
+
+      // Append new members to existing list
+      final currentMembers = ref.read(accumulatedMembersProvider);
+      ref.read(accumulatedMembersProvider.notifier).state = [
+        ...currentMembers,
+        ...newMembers,
+      ];
+      ref.read(memberHasMoreProvider.notifier).state = moreAvailable;
+      ref.read(memberPageProvider.notifier).state = currentPage + 1;
+
+      dev.log('Loaded page ${currentPage + 1}, total members: ${currentMembers.length + newMembers.length}, hasMore: $moreAvailable');
+    } catch (e) {
+      dev.log('Error loading more members: $e');
+    } finally {
+      ref.read(memberIsLoadingMoreProvider.notifier).state = false;
+    }
+  }
+
+  /// Handle scroll notification for infinite scroll
+  bool _handleScrollNotification(ScrollNotification notification) {
+    if (notification is ScrollEndNotification) {
+      final metrics = notification.metrics;
+      if (metrics.pixels >= metrics.maxScrollExtent - 200) {
+        _loadMore();
+      }
+    }
+    return false;
   }
 
   // Refresh ranges when blood type filter changes
   void _refreshRanges() {
     ref.invalidate(memberRangesProvider);
     ref.read(selectedMemberRangeProvider.notifier).state = null;
+    // Reset pagination and reload
+    resetPaginationState(ref);
+    _loadInitialPage();
   }
 
-  // Refresh member list for the selected range
+  // Refresh member list for the selected range or reload paginated data
   void _refreshMembers() {
-    ref.invalidate(rangedMemberListProvider);
+    final selectedRange = ref.read(selectedMemberRangeProvider);
+    if (selectedRange != null) {
+      // If a range is selected, use the existing provider
+      ref.invalidate(rangedMemberListProvider);
+    } else {
+      // Otherwise, reset pagination and reload
+      resetPaginationState(ref);
+      _loadInitialPage();
+    }
   }
 
   @override
@@ -112,6 +214,11 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     final membersAsync = ref.watch(rangedMemberListProvider);
     final selectedBloodType = ref.watch(memberBloodTypeFilterProvider);
     final selectedRange = ref.watch(selectedMemberRangeProvider);
+
+    // Watch pagination state
+    final accumulatedMembers = ref.watch(accumulatedMembersProvider);
+    final isLoadingMore = ref.watch(memberIsLoadingMoreProvider);
+    final hasMore = ref.watch(memberHasMoreProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -161,14 +268,23 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
               color: Colors.white,
             ),
             onPressed: () {
-              // Refresh ranges and members
+              // Refresh ranges
               ref.invalidate(memberRangesProvider);
-              ref.invalidate(rangedMemberListProvider);
+
+              // If a range is selected, refresh the range provider
+              final selectedRange = ref.read(selectedMemberRangeProvider);
+              if (selectedRange != null) {
+                ref.invalidate(rangedMemberListProvider);
+              } else {
+                // Reset pagination and reload
+                resetPaginationState(ref);
+                _loadInitialPage();
+              }
             },
           ),
         ],
       ),
-      body: _buildBody(rangesAsync, membersAsync, selectedBloodType, selectedRange),
+      body: _buildBody(rangesAsync, membersAsync, selectedBloodType, selectedRange, accumulatedMembers, isLoadingMore, hasMore),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         onPressed: () {
@@ -217,7 +333,10 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
       AsyncValue<List<MemberRange>> rangesAsync,
       AsyncValue<List<Member>> membersAsync,
       String selectedBloodType,
-      MemberRange? selectedRange) {
+      MemberRange? selectedRange,
+      List<Member> accumulatedMembers,
+      bool isLoadingMore,
+      bool hasMore) {
     // Handle ranges loading/error state
     return rangesAsync.when(
       loading: () => Center(
@@ -260,11 +379,26 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
         ),
       ),
       data: (ranges) {
-        // Handle members based on whether a range is selected
-        return membersAsync.when(
-          loading: () => _buildMainContent(ranges, [], selectedBloodType, selectedRange, isLoading: true),
-          error: (error, _) => _buildMainContent(ranges, [], selectedBloodType, selectedRange, error: error.toString()),
-          data: (members) => _buildMainContent(ranges, members, selectedBloodType, selectedRange),
+        // If a range is selected, use rangedMemberListProvider
+        if (selectedRange != null) {
+          return membersAsync.when(
+            loading: () => _buildMainContent(ranges, [], selectedBloodType, selectedRange, isLoading: true, isLoadingMore: false, hasMore: false),
+            error: (error, _) => _buildMainContent(ranges, [], selectedBloodType, selectedRange, error: error.toString(), isLoadingMore: false, hasMore: false),
+            data: (members) => _buildMainContent(ranges, members, selectedBloodType, selectedRange, isLoadingMore: false, hasMore: false),
+          );
+        }
+
+        // Otherwise, use accumulated members with pagination
+        // Show loading only if no accumulated members yet
+        final isInitialLoading = accumulatedMembers.isEmpty && !isLoadingMore;
+        return _buildMainContent(
+          ranges,
+          accumulatedMembers,
+          selectedBloodType,
+          selectedRange,
+          isLoading: isInitialLoading && membersAsync.isLoading,
+          isLoadingMore: isLoadingMore,
+          hasMore: hasMore,
         );
       },
     );
@@ -275,7 +409,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
       List<Member> members,
       String selectedBloodType,
       MemberRange? selectedRange,
-      {bool isLoading = false, String? error}) {
+      {bool isLoading = false, String? error, bool isLoadingMore = false, bool hasMore = false}) {
     return Column(
       children: [
         // Filters section with scroll
@@ -347,6 +481,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                             .read(selectedMemberRangeProvider
                                                 .notifier)
                                             .state = value;
+                                        // When selecting a range, clear pagination
+                                        // When deselecting (null), reload paginated data
+                                        if (value == null) {
+                                          resetPaginationState(ref);
+                                          _loadInitialPage();
+                                        }
                                       },
                                     )
                                   : Container(
@@ -735,6 +875,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                         .read(
                                             selectedMemberRangeProvider.notifier)
                                         .state = value;
+                                    // When selecting a range, clear pagination
+                                    // When deselecting (null), reload paginated data
+                                    if (value == null) {
+                                      resetPaginationState(ref);
+                                      _loadInitialPage();
+                                    }
                                   },
                                 )
                               : Container(
@@ -1063,7 +1209,36 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
         Expanded(
           child: Container(
             margin: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8),
-            child: _buildTableContent(members, selectedRange, isLoading, error),
+            child: Column(
+              children: [
+                Expanded(
+                  child: _buildTableContent(members, selectedRange, isLoading, error, isLoadingMore, hasMore),
+                ),
+                // Loading more indicator
+                if (isLoadingMore)
+                  Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'နောက်ထပ် အဖွဲ့၀င်များ ရယူနေပါသည်...',
+                          style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ],
@@ -1071,7 +1246,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
   }
 
   /// Build table content based on state
-  Widget _buildTableContent(List<Member> members, MemberRange? selectedRange, bool isLoading, String? error) {
+  Widget _buildTableContent(List<Member> members, MemberRange? selectedRange, bool isLoading, String? error, bool isLoadingMore, bool hasMore) {
     // Show error message if there's an error
     if (error != null) {
       return Center(
@@ -1088,7 +1263,12 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
             SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () {
-                ref.invalidate(rangedMemberListProvider);
+                if (selectedRange != null) {
+                  ref.invalidate(rangedMemberListProvider);
+                } else {
+                  resetPaginationState(ref);
+                  _loadInitialPage();
+                }
               },
               icon: Icon(Icons.refresh),
               label: Text('ပြန်လည်ကြိုးစားမည်'),
@@ -1119,7 +1299,32 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
       );
     }
 
-    // Show the data table with members
+    // Show empty state if no members
+    if (members.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.people_outline, color: Colors.grey[400], size: 64),
+            SizedBox(height: 16),
+            Text(
+              'အဖွဲ့၀င် မရှိပါ',
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show the data table with members wrapped in NotificationListener for pagination
+    // Only enable pagination scroll detection if no range is selected
+    if (selectedRange == null) {
+      return NotificationListener<ScrollNotification>(
+        onNotification: _handleScrollNotification,
+        child: buildSimpleTable(members),
+      );
+    }
+
     return buildSimpleTable(members);
   }
 

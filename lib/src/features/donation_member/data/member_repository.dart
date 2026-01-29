@@ -329,6 +329,66 @@ class MemberRepository {
     }
   }
 
+  /// Fetches members with pagination support
+  /// Returns a map with 'members' list and 'hasMore' flag
+  Future<Map<String, dynamic>> getMembersPaginated({
+    int page = 0,
+    int limit = 50,
+    String? query,
+    String? bloodType,
+  }) async {
+    try {
+      debugPrint('Fetching members page $page (limit: $limit)');
+
+      final queryParams = <String, dynamic>{
+        'page': page,
+        'limit': limit,
+      };
+
+      if (query != null && query.isNotEmpty) {
+        queryParams['q'] = query;
+      }
+      if (bloodType != null && bloodType.isNotEmpty) {
+        queryParams['blood_type'] = bloodType;
+      }
+
+      final response = await _apiClient.get<Map<String, dynamic>>(
+        '$_baseUrl/index',
+        queryParameters: queryParams,
+      );
+
+      if (response.data == null) {
+        throw Exception('Invalid response data');
+      }
+
+      final jsonData = response.data!;
+
+      if (jsonData['status'] == 'ok' && jsonData['data'] is List) {
+        final members = (jsonData['data'] as List)
+            .map((item) => Member.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        // Calculate hasMore based on total or response length
+        final total = jsonData['total'] as int?;
+        final hasMore = total != null
+            ? (page + 1) * limit < total
+            : members.length >= limit;
+
+        debugPrint('Fetched ${members.length} members (page $page), hasMore: $hasMore');
+        return {
+          'members': members,
+          'hasMore': hasMore,
+          'total': total ?? 0,
+        };
+      } else {
+        throw Exception(jsonData['message'] ?? 'Failed to retrieve members');
+      }
+    } catch (e) {
+      debugPrint('Error fetching members page $page: $e');
+      throw Exception('Failed to load members: $e');
+    }
+  }
+
   /// Fetches members for a specific range
   /// Used for lazy loading when a range is selected
   Future<List<Member>> getMembersByRange({

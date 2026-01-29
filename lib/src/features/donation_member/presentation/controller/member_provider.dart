@@ -232,6 +232,22 @@ final memberRangeFilterProvider = StateProvider<String?>((ref) => null);
 /// Selected MemberRange object (instead of String)
 final selectedMemberRangeProvider = StateProvider<MemberRange?>((ref) => null);
 
+// =====================================================
+// Pagination State Providers for Infinite Scroll
+// =====================================================
+
+/// Current page for pagination (0-indexed)
+final memberPageProvider = StateProvider<int>((ref) => 0);
+
+/// Whether there are more members to load
+final memberHasMoreProvider = StateProvider<bool>((ref) => true);
+
+/// Whether currently loading more members
+final memberIsLoadingMoreProvider = StateProvider<bool>((ref) => false);
+
+/// Accumulated members list for pagination
+final accumulatedMembersProvider = StateProvider<List<Member>>((ref) => []);
+
 /// Fetch ranges from API - this returns quickly with just range metadata
 final memberRangesProvider = FutureProvider.autoDispose<List<MemberRange>>((ref) async {
   final repository = ref.read(memberRepositoryProvider);
@@ -565,6 +581,16 @@ void resetFilterProviders(WidgetRef ref) {
   ref.read(memberFatherNameSearchProvider.notifier).state = '';
   ref.read(memberBloodBankCardSearchProvider.notifier).state = '';
   ref.read(memberIdSearchProvider.notifier).state = '';
+  // Reset pagination state
+  resetPaginationState(ref);
+}
+
+// Function to reset pagination state
+void resetPaginationState(WidgetRef ref) {
+  ref.read(memberPageProvider.notifier).state = 0;
+  ref.read(memberHasMoreProvider.notifier).state = true;
+  ref.read(memberIsLoadingMoreProvider.notifier).state = false;
+  ref.read(accumulatedMembersProvider.notifier).state = [];
 }
 
 // Function to reset search member filter providers
