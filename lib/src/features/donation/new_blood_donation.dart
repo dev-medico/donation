@@ -53,7 +53,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
   // Patient selection state
   Patient? selectedPatient;
-  final patientSearchController = TextEditingController();
 
   String donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
   DateTime? donationDateDetail;
@@ -162,7 +161,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     nameController.removeListener(_onPatientNameChanged);
     quarterController.removeListener(_addressFieldsChanged);
     townController.removeListener(_addressFieldsChanged);
-    patientSearchController.dispose();
     super.dispose();
   }
 
@@ -173,7 +171,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       if (nameController.text != selectedPatient!.name) {
         setState(() {
           selectedPatient = null;
-          patientSearchController.clear();
         });
       }
     }
@@ -183,7 +180,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
   void _fillPatientData(Patient patient) {
     setState(() {
       selectedPatient = patient;
-      patientSearchController.text = patient.name ?? '';
       nameController.text = patient.name ?? '';
       ageController.text = patient.age ?? '';
       // Parse address if format is "quarter၊township"
@@ -207,7 +203,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
   void _clearPatientSelection() {
     setState(() {
       selectedPatient = null;
-      patientSearchController.clear();
       nameController.clear();
       ageController.clear();
       quarterController.clear();
@@ -457,7 +452,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     quarterController.clear();
     townController.clear();
     memberController.clear();
-    patientSearchController.clear();
     setState(() {
       selectedMember = null;
       selectedPatient = null;
@@ -692,13 +686,13 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Patient search field
+                // Patient name field with autocomplete
                 TypeAheadField<Patient>(
                   textFieldConfiguration: TextFieldConfiguration(
-                    controller: patientSearchController,
+                    controller: nameController,
                     decoration: InputDecoration(
-                      labelText: 'လူနာရှာဖွေရန်',
-                      hintText: 'အမည် သို့မဟုတ် ဖုန်းဖြင့် ရှာပါ',
+                      labelText: 'လူနာအမည်',
+                      hintText: 'အမည်ဖြင့် ရှာပါ',
                       border: OutlineInputBorder(),
                       suffixIcon: Icon(Icons.search),
                     ),
@@ -755,15 +749,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     ),
                   ),
                 ],
-                SizedBox(height: 12),
-
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    labelText: 'လူနာအမည်',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
                 SizedBox(height: 12),
                 TextField(
                   controller: ageController,
@@ -1162,13 +1147,13 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Patient search field
+                // Patient name field with autocomplete
                 TypeAheadField<Patient>(
                   textFieldConfiguration: TextFieldConfiguration(
-                    controller: patientSearchController,
+                    controller: nameController,
                     decoration: InputDecoration(
-                      labelText: 'လူနာရှာဖွေရန်',
-                      hintText: 'အမည် သို့မဟုတ် ဖုန်းဖြင့် ရှာပါ',
+                      labelText: 'လူနာအမည်',
+                      hintText: 'အမည်ဖြင့် ရှာပါ',
                       border: OutlineInputBorder(),
                       suffixIcon: Icon(Icons.search),
                     ),
@@ -1225,15 +1210,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     ),
                   ),
                 ],
-                SizedBox(height: 12),
-
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    labelText: 'လူနာအမည်',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
                 SizedBox(height: 12),
                 TextField(
                   controller: ageController,
