@@ -625,7 +625,14 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
             if (details.rowColumnIndex.rowIndex > 0) {
               final index = details.rowColumnIndex.rowIndex - 1;
               if (index < donors.length) {
-                _showEditDonorDialog(donors[index]);
+                final columnIndex = details.rowColumnIndex.columnIndex;
+                if (columnIndex == 5) {
+                  // delete column
+                  _confirmDeleteDonor(donors[index]);
+                } else if (columnIndex == 4) {
+                  // edit column
+                  _showEditDonorDialog(donors[index]);
+                }
               }
             }
           },
@@ -683,7 +690,19 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                     padding: const EdgeInsets.all(8.0),
                     alignment: Alignment.center,
                     child: const Icon(
-                      Icons.more_horiz,
+                      Icons.edit_outlined,
+                      color: Colors.white,
+                      size: 16,
+                    ))),
+            GridColumn(
+                columnName: 'delete',
+                width: 50,
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.delete_outline,
                       color: Colors.white,
                       size: 16,
                     ))),
@@ -735,7 +754,14 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
             if (details.rowColumnIndex.rowIndex > 0) {
               final index = details.rowColumnIndex.rowIndex - 1;
               if (index < expenses.length) {
-                _showEditExpenseDialog(expenses[index]);
+                final columnIndex = details.rowColumnIndex.columnIndex;
+                if (columnIndex == 5) {
+                  // delete column
+                  _confirmDeleteExpense(expenses[index]);
+                } else if (columnIndex == 4) {
+                  // edit column
+                  _showEditExpenseDialog(expenses[index]);
+                }
               }
             }
           },
@@ -793,7 +819,19 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                     padding: const EdgeInsets.all(8.0),
                     alignment: Alignment.center,
                     child: const Icon(
-                      Icons.more_horiz,
+                      Icons.edit_outlined,
+                      color: Colors.white,
+                      size: 16,
+                    ))),
+            GridColumn(
+                columnName: 'delete',
+                width: 50,
+                label: Container(
+                    color: primaryColor,
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.delete_outline,
                       color: Colors.white,
                       size: 16,
                     ))),
@@ -957,6 +995,98 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
         },
       ),
     );
+  }
+
+  void _confirmDeleteDonor(dynamic donor) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('အတည်ပြုပါ'),
+        content: const Text('ဤအလှူမှတ်တမ်းကို ဖျက်လိုပါသလား?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('မလုပ်တော့ပါ'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('ဖျက်မည်', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final service = ref.read(donarRecordServiceProvider);
+        await service.deleteDonarRecord(donor['id'].toString());
+        // Refresh data
+        final month = _monthSelected + 1;
+        donorsByMonth.remove(month);
+        setState(() { isLoading = true; });
+        await _loadMonthData(month);
+        final selectedYear = int.parse(years[_yearSelected]);
+        ref.invalidate(yearlyReportProvider(selectedYear));
+        final reportData = await ref.read(yearlyReportProvider(selectedYear).future);
+        _calculateBalances(reportData);
+        setState(() { isLoading = false; });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('အလှူမှတ်တမ်း အောင်မြင်စွာ ဖျက်ပြီးပါပြီ'), backgroundColor: Colors.green),
+        );
+      } catch (e) {
+        setState(() { isLoading = false; });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('ဖျက်ရန် မအောင်မြင်ပါ: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  void _confirmDeleteExpense(dynamic expense) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('အတည်ပြုပါ'),
+        content: const Text('ဤအသုံးစရိတ်မှတ်တမ်းကို ဖျက်လိုပါသလား?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('မလုပ်တော့ပါ'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('ဖျက်မည်', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final service = ref.read(expenseRecordServiceProvider);
+        await service.deleteExpenseRecord(expense['id'].toString());
+        // Refresh data
+        final month = _monthSelected + 1;
+        expensesByMonth.remove(month);
+        setState(() { isLoading = true; });
+        await _loadMonthData(month);
+        final selectedYear = int.parse(years[_yearSelected]);
+        ref.invalidate(yearlyReportProvider(selectedYear));
+        final reportData = await ref.read(yearlyReportProvider(selectedYear).future);
+        _calculateBalances(reportData);
+        setState(() { isLoading = false; });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('အသုံးစရိတ်မှတ်တမ်း အောင်မြင်စွာ ဖျက်ပြီးပါပြီ'), backgroundColor: Colors.green),
+        );
+      } catch (e) {
+        setState(() { isLoading = false; });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('ဖျက်ရန် မအောင်မြင်ပါ: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   void _showEditDonorDialog(dynamic donor) {

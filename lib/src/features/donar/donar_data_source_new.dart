@@ -28,6 +28,9 @@ class DonarDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'edit',
             value: ''),
+        DataGridCell<String>(
+            columnName: 'delete',
+            value: ''),
       ]));
     }
   }
@@ -49,6 +52,17 @@ class DonarDataSource extends DataGridSource {
             Icons.edit_outlined,
             size: 16,
             color: Colors.grey[500],
+          ),
+        );
+      }
+      if (e.columnName == 'delete') {
+        return Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(4.0),
+          child: Icon(
+            Icons.delete_outline,
+            size: 16,
+            color: Colors.red[400],
           ),
         );
       }
@@ -91,6 +105,9 @@ class ExpenseDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'edit',
             value: ''),
+        DataGridCell<String>(
+            columnName: 'delete',
+            value: ''),
       ]));
     }
   }
@@ -112,6 +129,17 @@ class ExpenseDataSource extends DataGridSource {
             Icons.edit_outlined,
             size: 16,
             color: Colors.grey[500],
+          ),
+        );
+      }
+      if (e.columnName == 'delete') {
+        return Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(4.0),
+          child: Icon(
+            Icons.delete_outline,
+            size: 16,
+            color: Colors.red[400],
           ),
         );
       }
