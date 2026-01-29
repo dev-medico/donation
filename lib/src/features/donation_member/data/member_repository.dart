@@ -280,6 +280,55 @@ class MemberRepository {
     }
   }
 
+  /// Fetches initial members with a limit (for when no range is selected)
+  /// Supports search query and blood type filtering
+  Future<List<Member>> getInitialMembers({
+    int limit = 50,
+    String? query,
+    String? bloodType,
+  }) async {
+    try {
+      debugPrint('Fetching initial $limit members');
+
+      final queryParams = <String, dynamic>{
+        'page': 0,
+        'limit': limit,
+      };
+
+      if (query != null && query.isNotEmpty) {
+        queryParams['q'] = query;
+      }
+      if (bloodType != null && bloodType.isNotEmpty) {
+        queryParams['blood_type'] = bloodType;
+      }
+
+      final response = await _apiClient.get<Map<String, dynamic>>(
+        '$_baseUrl/index',
+        queryParameters: queryParams,
+      );
+
+      if (response.data == null) {
+        throw Exception('Invalid response data');
+      }
+
+      final jsonData = response.data!;
+
+      if (jsonData['status'] == 'ok' && jsonData['data'] is List) {
+        final members = (jsonData['data'] as List)
+            .map((item) => Member.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        debugPrint('Fetched ${members.length} initial members');
+        return members;
+      } else {
+        throw Exception(jsonData['message'] ?? 'Failed to retrieve members');
+      }
+    } catch (e) {
+      debugPrint('Error fetching initial members: $e');
+      throw Exception('Failed to load members: $e');
+    }
+  }
+
   /// Fetches members for a specific range
   /// Used for lazy loading when a range is selected
   Future<List<Member>> getMembersByRange({

@@ -243,19 +243,23 @@ final memberRangesProvider = FutureProvider.autoDispose<List<MemberRange>>((ref)
 });
 
 /// Fetch members only for the selected range (lazy loading)
-/// Returns empty list if no range is selected
+/// Returns initial 50 members if no range is selected (with search support)
 final rangedMemberListProvider = FutureProvider.autoDispose<List<Member>>((ref) async {
   final selectedRange = ref.watch(selectedMemberRangeProvider);
-
-  // If no range selected, return empty list
-  if (selectedRange == null) {
-    return [];
-  }
-
   final repository = ref.read(memberRepositoryProvider);
   final searchQuery = ref.watch(memberSearchQueryProvider);
   final bloodType = ref.watch(memberBloodTypeFilterProvider);
 
+  // If no range selected, show initial 50 members (with search support)
+  if (selectedRange == null) {
+    return repository.getInitialMembers(
+      limit: 50,
+      query: searchQuery.isNotEmpty ? searchQuery : null,
+      bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+    );
+  }
+
+  // Otherwise fetch for selected range
   return repository.getMembersByRange(
     rangeStart: selectedRange.start,
     rangeEnd: selectedRange.end,

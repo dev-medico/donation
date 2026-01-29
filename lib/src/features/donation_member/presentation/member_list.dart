@@ -1102,8 +1102,8 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
       );
     }
 
-    // Show loading indicator when loading members for a range
-    if (isLoading && selectedRange != null) {
+    // Show loading indicator when loading members
+    if (isLoading) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1114,29 +1114,6 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
               'အဖွဲ့၀င်များ ရယူနေပါသည်...',
               style: TextStyle(fontSize: 14, color: Colors.grey[700]),
             )
-          ],
-        ),
-      );
-    }
-
-    // Show prompt to select a range if no range selected
-    if (selectedRange == null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.list_alt, size: 64, color: Colors.grey[400]),
-            SizedBox(height: 16),
-            Text(
-              'အမှတ်စဥ် အုပ်စုတစ်ခု ရွေးချယ်ပါ',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey[700]),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'အဖွဲ့၀င်များကို ကြည့်ရှုရန် အမှတ်စဥ် dropdown မှ ရွေးချယ်ပါ',
-              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-              textAlign: TextAlign.center,
-            ),
           ],
         ),
       );
