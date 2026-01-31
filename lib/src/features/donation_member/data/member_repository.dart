@@ -382,19 +382,26 @@ class MemberRepository {
       // Add individual search parameters
       if (phone != null && phone.isNotEmpty) {
         queryParams['phone'] = phone;
+        debugPrint('Adding phone filter: $phone');
       }
       if (fatherName != null && fatherName.isNotEmpty) {
         queryParams['father_name'] = fatherName;
+        debugPrint('Adding father_name filter: $fatherName');
       }
       if (bloodBankCard != null && bloodBankCard.isNotEmpty) {
         queryParams['blood_bank_card'] = bloodBankCard;
+        debugPrint('Adding blood_bank_card filter: $bloodBankCard');
       }
       if (memberIdSearch != null && memberIdSearch.isNotEmpty) {
         queryParams['member_id_search'] = memberIdSearch;
+        debugPrint('Adding member_id_search filter: $memberIdSearch');
       }
       if (birthDate != null && birthDate.isNotEmpty) {
         queryParams['birth_date'] = birthDate;
+        debugPrint('Adding birth_date filter: $birthDate');
       }
+
+      debugPrint('API call queryParams: $queryParams');
 
       final response = await _apiClient.get<Map<String, dynamic>>(
         '$_baseUrl/index',
@@ -418,7 +425,7 @@ class MemberRepository {
             ? (page + 1) * limit < total
             : members.length >= limit;
 
-        debugPrint('Fetched ${members.length} members (page $page), hasMore: $hasMore');
+        debugPrint('Fetched ${members.length} members (page $page), hasMore: $hasMore, total: $total');
         return {
           'members': members,
           'hasMore': hasMore,
