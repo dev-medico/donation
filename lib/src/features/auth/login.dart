@@ -438,9 +438,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   saveLogin(LoginResponse response) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     log(response.data.toString());
-    prefs.setString("token", response.data!.accessToken.toString());
-    prefs.setString("name", response.data!.name!.toString());
-    prefs.setString("phone", response.data!.phone.toString());
+    prefs.setString("token", response.data?.accessToken?.toString() ?? '');
+    prefs.setString("name", response.data?.name?.toString() ?? '');
+    prefs.setString("phone", response.data?.phone?.toString() ?? '');
     Navigator.pushNamedAndRemoveUntil(
         context, HomeScreen.routeName, (Route<dynamic> route) => false);
   }
