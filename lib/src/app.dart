@@ -16,7 +16,6 @@ import 'package:donation/src/features/patient/patient_list_screen.dart';
 import 'package:donation/src/features/patient/patient_detail_screen.dart';
 import 'package:donation/src/features/money_donor/money_donor_list_screen.dart';
 import 'package:donation/src/features/money_donor/money_donor_detail_screen.dart';
-import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
