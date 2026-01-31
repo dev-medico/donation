@@ -286,6 +286,12 @@ class MemberRepository {
     int limit = 50,
     String? query,
     String? bloodType,
+    // Individual search parameters for server-side filtering
+    String? phone,
+    String? fatherName,
+    String? bloodBankCard,
+    String? memberIdSearch,
+    String? birthDate,
   }) async {
     try {
       debugPrint('Fetching initial $limit members');
@@ -300,6 +306,22 @@ class MemberRepository {
       }
       if (bloodType != null && bloodType.isNotEmpty) {
         queryParams['blood_type'] = bloodType;
+      }
+      // Add individual search parameters
+      if (phone != null && phone.isNotEmpty) {
+        queryParams['phone'] = phone;
+      }
+      if (fatherName != null && fatherName.isNotEmpty) {
+        queryParams['father_name'] = fatherName;
+      }
+      if (bloodBankCard != null && bloodBankCard.isNotEmpty) {
+        queryParams['blood_bank_card'] = bloodBankCard;
+      }
+      if (memberIdSearch != null && memberIdSearch.isNotEmpty) {
+        queryParams['member_id_search'] = memberIdSearch;
+      }
+      if (birthDate != null && birthDate.isNotEmpty) {
+        queryParams['birth_date'] = birthDate;
       }
 
       final response = await _apiClient.get<Map<String, dynamic>>(
@@ -336,6 +358,12 @@ class MemberRepository {
     int limit = 50,
     String? query,
     String? bloodType,
+    // Individual search parameters for server-side filtering
+    String? phone,
+    String? fatherName,
+    String? bloodBankCard,
+    String? memberIdSearch,
+    String? birthDate,
   }) async {
     try {
       debugPrint('Fetching members page $page (limit: $limit)');
@@ -350,6 +378,22 @@ class MemberRepository {
       }
       if (bloodType != null && bloodType.isNotEmpty) {
         queryParams['blood_type'] = bloodType;
+      }
+      // Add individual search parameters
+      if (phone != null && phone.isNotEmpty) {
+        queryParams['phone'] = phone;
+      }
+      if (fatherName != null && fatherName.isNotEmpty) {
+        queryParams['father_name'] = fatherName;
+      }
+      if (bloodBankCard != null && bloodBankCard.isNotEmpty) {
+        queryParams['blood_bank_card'] = bloodBankCard;
+      }
+      if (memberIdSearch != null && memberIdSearch.isNotEmpty) {
+        queryParams['member_id_search'] = memberIdSearch;
+      }
+      if (birthDate != null && birthDate.isNotEmpty) {
+        queryParams['birth_date'] = birthDate;
       }
 
       final response = await _apiClient.get<Map<String, dynamic>>(
@@ -396,6 +440,12 @@ class MemberRepository {
     required String rangeEnd,
     String? query,
     String? bloodType,
+    // Individual search parameters for server-side filtering
+    String? phone,
+    String? fatherName,
+    String? bloodBankCard,
+    String? memberIdSearch,
+    String? birthDate,
   }) async {
     try {
       debugPrint('Fetching members for range: $rangeStart to $rangeEnd');
@@ -412,6 +462,22 @@ class MemberRepository {
       }
       if (bloodType != null && bloodType.isNotEmpty) {
         queryParams['blood_type'] = bloodType;
+      }
+      // Add individual search parameters
+      if (phone != null && phone.isNotEmpty) {
+        queryParams['phone'] = phone;
+      }
+      if (fatherName != null && fatherName.isNotEmpty) {
+        queryParams['father_name'] = fatherName;
+      }
+      if (bloodBankCard != null && bloodBankCard.isNotEmpty) {
+        queryParams['blood_bank_card'] = bloodBankCard;
+      }
+      if (memberIdSearch != null && memberIdSearch.isNotEmpty) {
+        queryParams['member_id_search'] = memberIdSearch;
+      }
+      if (birthDate != null && birthDate.isNotEmpty) {
+        queryParams['birth_date'] = birthDate;
       }
 
       final response = await _apiClient.get<Map<String, dynamic>>(

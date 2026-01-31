@@ -266,12 +266,24 @@ final rangedMemberListProvider = FutureProvider.autoDispose<List<Member>>((ref) 
   final searchQuery = ref.watch(memberSearchQueryProvider);
   final bloodType = ref.watch(memberBloodTypeFilterProvider);
 
+  // Watch individual search providers for server-side filtering
+  final phoneSearch = ref.watch(memberPhoneSearchProvider);
+  final fatherNameSearch = ref.watch(memberFatherNameSearchProvider);
+  final bloodBankCardSearch = ref.watch(memberBloodBankCardSearchProvider);
+  final memberIdSearch = ref.watch(memberIdSearchProvider);
+  final birthDateSearch = ref.watch(memberBirthDateSearchProvider);
+
   // If no range selected, show initial 50 members (with search support)
   if (selectedRange == null) {
     return repository.getInitialMembers(
       limit: 50,
       query: searchQuery.isNotEmpty ? searchQuery : null,
       bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+      phone: phoneSearch.isNotEmpty ? phoneSearch : null,
+      fatherName: fatherNameSearch.isNotEmpty ? fatherNameSearch : null,
+      bloodBankCard: bloodBankCardSearch.isNotEmpty ? bloodBankCardSearch : null,
+      memberIdSearch: memberIdSearch.isNotEmpty ? memberIdSearch : null,
+      birthDate: birthDateSearch.isNotEmpty ? birthDateSearch : null,
     );
   }
 
@@ -281,6 +293,11 @@ final rangedMemberListProvider = FutureProvider.autoDispose<List<Member>>((ref) 
     rangeEnd: selectedRange.end,
     query: searchQuery.isNotEmpty ? searchQuery : null,
     bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+    phone: phoneSearch.isNotEmpty ? phoneSearch : null,
+    fatherName: fatherNameSearch.isNotEmpty ? fatherNameSearch : null,
+    bloodBankCard: bloodBankCardSearch.isNotEmpty ? bloodBankCardSearch : null,
+    memberIdSearch: memberIdSearch.isNotEmpty ? memberIdSearch : null,
+    birthDate: birthDateSearch.isNotEmpty ? birthDateSearch : null,
   );
 });
 

@@ -99,12 +99,24 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     final searchQuery = ref.read(memberSearchQueryProvider);
     final bloodType = ref.read(memberBloodTypeFilterProvider);
 
+    // Read individual search parameters
+    final phoneSearch = ref.read(memberPhoneSearchProvider);
+    final fatherNameSearch = ref.read(memberFatherNameSearchProvider);
+    final bloodBankCardSearch = ref.read(memberBloodBankCardSearchProvider);
+    final memberIdSearch = ref.read(memberIdSearchProvider);
+    final birthDateSearch = ref.read(memberBirthDateSearchProvider);
+
     try {
       final result = await repository.getMembersPaginated(
         page: 0,
         limit: 50,
         query: searchQuery.isNotEmpty ? searchQuery : null,
         bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+        phone: phoneSearch.isNotEmpty ? phoneSearch : null,
+        fatherName: fatherNameSearch.isNotEmpty ? fatherNameSearch : null,
+        bloodBankCard: bloodBankCardSearch.isNotEmpty ? bloodBankCardSearch : null,
+        memberIdSearch: memberIdSearch.isNotEmpty ? memberIdSearch : null,
+        birthDate: birthDateSearch.isNotEmpty ? birthDateSearch : null,
       );
 
       final members = result['members'] as List<Member>;
@@ -134,12 +146,24 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     final bloodType = ref.read(memberBloodTypeFilterProvider);
     final currentPage = ref.read(memberPageProvider);
 
+    // Read individual search parameters
+    final phoneSearch = ref.read(memberPhoneSearchProvider);
+    final fatherNameSearch = ref.read(memberFatherNameSearchProvider);
+    final bloodBankCardSearch = ref.read(memberBloodBankCardSearchProvider);
+    final memberIdSearch = ref.read(memberIdSearchProvider);
+    final birthDateSearch = ref.read(memberBirthDateSearchProvider);
+
     try {
       final result = await repository.getMembersPaginated(
         page: currentPage + 1,
         limit: 50,
         query: searchQuery.isNotEmpty ? searchQuery : null,
         bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
+        phone: phoneSearch.isNotEmpty ? phoneSearch : null,
+        fatherName: fatherNameSearch.isNotEmpty ? fatherNameSearch : null,
+        bloodBankCard: bloodBankCardSearch.isNotEmpty ? bloodBankCardSearch : null,
+        memberIdSearch: memberIdSearch.isNotEmpty ? memberIdSearch : null,
+        birthDate: birthDateSearch.isNotEmpty ? birthDateSearch : null,
       );
 
       final newMembers = result['members'] as List<Member>;
