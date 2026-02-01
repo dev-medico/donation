@@ -11,6 +11,8 @@ class Patient {
   final String? address;
   final String? age;
   final String? gender;
+  @JsonKey(name: 'blood_type')
+  final String? bloodType;
   @JsonKey(name: 'medical_notes')
   final String? medicalNotes;
   @JsonKey(name: 'donation_count')
@@ -27,6 +29,7 @@ class Patient {
     this.address,
     this.age,
     this.gender,
+    this.bloodType,
     this.medicalNotes,
     this.donationCount,
     this.createdAt,
@@ -49,6 +52,7 @@ class Patient {
       address: json['address'] as String?,
       age: json['age'] as String?,
       gender: json['gender'] as String?,
+      bloodType: json['blood_type'] as String?,
       medicalNotes: json['medical_notes'] as String?,
       donationCount: json['donation_count'] as int?,
       createdAt: json['created_at'] as String?,

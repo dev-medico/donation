@@ -10,6 +10,7 @@ class PatientDataSource extends DataGridSource {
               DataGridCell<String>(columnName: 'name', value: patient.name ?? ''),
               DataGridCell<String>(columnName: 'phone', value: patient.phone ?? ''),
               DataGridCell<String>(columnName: 'gender', value: _getGenderDisplay(patient.gender)),
+              DataGridCell<String>(columnName: 'bloodType', value: patient.bloodType ?? '-'),
               DataGridCell<String>(columnName: 'age', value: patient.age ?? ''),
               DataGridCell<String>(columnName: 'address', value: patient.address ?? ''),
               DataGridCell<int>(columnName: 'donationCount', value: patient.donationCount ?? 0),
@@ -57,6 +58,30 @@ class PatientDataSource extends DataGridSource {
               value,
               style: TextStyle(
                 color: isMale ? Colors.blue.shade700 : Colors.pink.shade700,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        );
+      }
+
+      // Special handling for blood type column
+      if (columnName == 'bloodType' && value.isNotEmpty && value != '-') {
+        return Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(4.0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.red.shade100,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              value,
+              style: TextStyle(
+                color: Colors.red.shade700,
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
               ),

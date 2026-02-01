@@ -35,7 +35,19 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
   final _ageController = TextEditingController();
   final _medicalNotesController = TextEditingController();
   String? _selectedGender;
+  String? _selectedBloodType;
   bool _isLoading = false;
+
+  static const List<String> bloodTypes = [
+    "A (Rh +)",
+    "B (Rh +)",
+    "AB (Rh +)",
+    "O (Rh +)",
+    "A (Rh -)",
+    "B (Rh -)",
+    "AB (Rh -)",
+    "O (Rh -)",
+  ];
 
   // Township data
   late TownshipResponse townshipResponse;
@@ -58,6 +70,7 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
       _ageController.text = widget.patient!.age ?? '';
       _medicalNotesController.text = widget.patient!.medicalNotes ?? '';
       _selectedGender = widget.patient!.gender;
+      _selectedBloodType = widget.patient!.bloodType;
       // Parse address into quarter and township
       _parseAndFillAddress(widget.patient!.address);
     }
@@ -145,6 +158,7 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
         'address': address,
         'age': _ageController.text.trim(),
         'gender': _selectedGender,
+        'blood_type': _selectedBloodType,
         if (isEditing) 'medical_notes': _medicalNotesController.text.trim(),
       };
 
@@ -325,6 +339,34 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
                 ],
                 onChanged: (value) {
                   setState(() => _selectedGender = value);
+                },
+              ),
+            ),
+            // Blood type dropdown
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(left: 20, top: 16, bottom: 8, right: 20),
+              child: DropdownButtonFormField<String>(
+                value: _selectedBloodType,
+                decoration: InputDecoration(
+                  labelText: 'သွေးအုပ်စု',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.grey, width: 1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: primaryColor, width: 1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding: const EdgeInsets.only(left: 20, right: 12, bottom: 4, top: 4),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                items: bloodTypes
+                    .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() => _selectedBloodType = value);
                 },
               ),
             ),

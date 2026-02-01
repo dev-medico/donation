@@ -329,6 +329,17 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ))),
                 GridColumn(
+                    columnName: 'bloodType',
+                    width: 100,
+                    label: Container(
+                        color: primaryColor,
+                        padding: const EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'သွေးအုပ်စု',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ))),
+                GridColumn(
                     columnName: 'age',
                     width: 80,
                     label: Container(

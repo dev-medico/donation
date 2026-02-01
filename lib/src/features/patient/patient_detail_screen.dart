@@ -286,6 +286,8 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
               'ကျား/မ',
               _patient!.gender == 'male' ? 'ကျား' : (_patient!.gender == 'female' ? 'မ' : '-'),
             ),
+            if (_patient!.bloodType != null && _patient!.bloodType!.isNotEmpty)
+              _buildInfoRow(Icons.bloodtype, 'သွေးအုပ်စု', _patient!.bloodType!),
             _buildInfoRow(Icons.location_on, 'လိပ်စာ', _patient!.address ?? '-'),
             if (_patient!.medicalNotes != null && _patient!.medicalNotes!.isNotEmpty)
               _buildInfoRow(Icons.medical_information, 'ကျန်းမာရေးမှတ်တမ်း', _patient!.medicalNotes!),
