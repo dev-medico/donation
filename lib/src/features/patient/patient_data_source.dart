@@ -5,8 +5,13 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 class PatientDataSource extends DataGridSource {
   PatientDataSource({required List<Patient> patientData}) {
     _patientData = patientData
-        .map<DataGridRow>((patient) => DataGridRow(cells: [
-              DataGridCell<int>(columnName: 'id', value: patient.id ?? 0),
+        .asMap()
+        .entries
+        .map<DataGridRow>((entry) {
+          final index = entry.key;
+          final patient = entry.value;
+          return DataGridRow(cells: [
+              DataGridCell<int>(columnName: 'no', value: index + 1), // Serial number starts from 1
               DataGridCell<String>(columnName: 'name', value: patient.name ?? ''),
               DataGridCell<String>(columnName: 'phone', value: patient.phone ?? ''),
               DataGridCell<String>(columnName: 'gender', value: _getGenderDisplay(patient.gender)),
@@ -14,7 +19,8 @@ class PatientDataSource extends DataGridSource {
               DataGridCell<String>(columnName: 'age', value: patient.age ?? ''),
               DataGridCell<String>(columnName: 'address', value: patient.address ?? ''),
               DataGridCell<int>(columnName: 'donationCount', value: patient.donationCount ?? 0),
-            ]))
+            ]);
+        })
         .toList();
   }
 
@@ -93,7 +99,7 @@ class PatientDataSource extends DataGridSource {
 
       // Determine alignment based on column type
       Alignment alignment = Alignment.centerLeft;
-      if (columnName == 'id' || columnName == 'age' || columnName == 'donationCount') {
+      if (columnName == 'no' || columnName == 'age' || columnName == 'donationCount') {
         alignment = Alignment.center;
       }
 

@@ -104,7 +104,12 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PatientDetailScreen(patientId: patient.id!),
+          builder: (context) => PatientDetailScreen(
+            patientId: patient.id!,
+            onChanged: () {
+              _fetchPage(0); // Refresh list when patient is edited or deleted
+            },
+          ),
         ),
       );
     }
@@ -286,14 +291,14 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
                   : ColumnWidthMode.fitByCellValue,
               columns: <GridColumn>[
                 GridColumn(
-                    columnName: 'id',
+                    columnName: 'no',
                     width: 60,
                     label: Container(
                         color: primaryColor,
                         padding: const EdgeInsets.all(8.0),
                         alignment: Alignment.center,
                         child: const Text(
-                          'ID',
+                          'No',
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ))),
                 GridColumn(

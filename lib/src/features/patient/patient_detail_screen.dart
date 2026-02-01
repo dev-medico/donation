@@ -12,10 +12,12 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class PatientDetailScreen extends ConsumerStatefulWidget {
   final int patientId;
+  final VoidCallback? onChanged;
 
   const PatientDetailScreen({
     super.key,
     required this.patientId,
+    this.onChanged,
   });
 
   static const routeName = "/patient-detail";
@@ -65,6 +67,7 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
           patient: _patient,
           onSaved: () {
             _loadPatient();
+            widget.onChanged?.call(); // Notify list to refresh
           },
         ),
       ),
@@ -100,6 +103,7 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('အောင်မြင်စွာ ဖျက်ပြီးပါပြီ')),
           );
+          widget.onChanged?.call(); // Notify list to refresh
           Navigator.pop(context);
         }
       } catch (e) {
