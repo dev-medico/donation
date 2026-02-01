@@ -704,7 +704,27 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                   },
                   itemBuilder: (context, Patient patient) {
                     return ListTile(
-                      title: Text(patient.name ?? ''),
+                      title: Row(
+                        children: [
+                          Expanded(child: Text(patient.name ?? '')),
+                          if (patient.bloodType != null && patient.bloodType!.isNotEmpty)
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade100,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                patient.bloodType!,
+                                style: TextStyle(
+                                  color: Colors.red.shade700,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                       subtitle: Text(
                           '${patient.age ?? ''} - ${patient.address ?? ''}'),
                       dense: true,
@@ -729,12 +749,36 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                             color: Colors.green[700], size: 20),
                         SizedBox(width: 8),
                         Expanded(
-                          child: Text(
-                            'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
-                            style: TextStyle(
-                              color: Colors.green[700],
-                              fontWeight: FontWeight.w500,
-                            ),
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
+                                  style: TextStyle(
+                                    color: Colors.green[700],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              if (selectedPatient!.bloodType != null && selectedPatient!.bloodType!.isNotEmpty) ...[
+                                SizedBox(width: 8),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade100,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    selectedPatient!.bloodType!,
+                                    style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                         IconButton(
@@ -1165,7 +1209,27 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                   },
                   itemBuilder: (context, Patient patient) {
                     return ListTile(
-                      title: Text(patient.name ?? ''),
+                      title: Row(
+                        children: [
+                          Expanded(child: Text(patient.name ?? '')),
+                          if (patient.bloodType != null && patient.bloodType!.isNotEmpty)
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade100,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                patient.bloodType!,
+                                style: TextStyle(
+                                  color: Colors.red.shade700,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                       subtitle: Text(
                           '${patient.age ?? ''} - ${patient.address ?? ''}'),
                       dense: true,
@@ -1190,12 +1254,36 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                             color: Colors.green[700], size: 20),
                         SizedBox(width: 8),
                         Expanded(
-                          child: Text(
-                            'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
-                            style: TextStyle(
-                              color: Colors.green[700],
-                              fontWeight: FontWeight.w500,
-                            ),
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  'ရွေးချယ်ထားသည်: ${selectedPatient!.name}',
+                                  style: TextStyle(
+                                    color: Colors.green[700],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              if (selectedPatient!.bloodType != null && selectedPatient!.bloodType!.isNotEmpty) ...[
+                                SizedBox(width: 8),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade100,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    selectedPatient!.bloodType!,
+                                    style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                         IconButton(
