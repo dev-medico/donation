@@ -13,18 +13,17 @@ final yearlyReportProvider = FutureProvider.family<YearlyReportData, int>((ref, 
     final donarStats = await donarService.getMonthlyStats(year: year);
     final expenseStats = await expenseService.getMonthlyStats(year: year);
     
-    // Calculate opening balance from previous year's data
-    final previousYearStats = await donarService.getYearlyStats(
-      startYear: year - 1,
+    // Opening balance = cumulative (donations - expenses) across ALL prior years,
+    // not just year-1. Otherwise carry-forward from years before N-1 is lost.
+    final priorYearStats = await donarService.getYearlyStats(
       endYear: year - 1,
     );
-    
+
     int openingBalance = 0;
-    if (previousYearStats.isNotEmpty) {
-      final prevYearData = previousYearStats.first;
-      final prevDonation = prevYearData['total_donation'] ?? 0;
-      final prevExpense = prevYearData['total_expense'] ?? 0;
-      openingBalance = (prevDonation - prevExpense).toInt();
+    for (final stat in priorYearStats) {
+      final num donation = (stat['total_donation'] ?? 0) as num;
+      final num expense = (stat['total_expense'] ?? 0) as num;
+      openingBalance += (donation - expense).toInt();
     }
     
     // Process monthly data
