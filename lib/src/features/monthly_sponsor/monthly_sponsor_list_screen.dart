@@ -191,19 +191,16 @@ class _MonthlySponsorListScreenState
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
         title: Text(s.name ?? '-',
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-        subtitle: Row(
-          children: [
-            if ((s.phone ?? '').isNotEmpty) ...[
-              Icon(Icons.phone, size: 13, color: Colors.grey[500]),
-              const SizedBox(width: 3),
-              Text(s.phone!,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-              const SizedBox(width: 10),
-            ],
-            Text('${s.donationCount ?? 0} လ',
-                style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-          ],
-        ),
+        subtitle: (s.phone ?? '').isEmpty
+            ? null
+            : Row(
+                children: [
+                  Icon(Icons.phone, size: 13, color: Colors.grey[500]),
+                  const SizedBox(width: 3),
+                  Text(s.phone!,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                ],
+              ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
