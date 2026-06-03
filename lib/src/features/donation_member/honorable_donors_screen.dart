@@ -43,33 +43,31 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
   }
 
   Future<void> _pickAndUpload(Member m) async {
+    // Capture the messenger up-front so we never look it up via a context that
+    // may have deactivated across the await gap.
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final picker = ImagePicker();
-      final picked = await picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1200,
-        imageQuality: 85,
-      );
+      // No maxWidth/imageQuality: desktop (macOS) implementations can reject
+      // those; the backend validates + the CDN handles delivery.
+      final picked = await picker.pickImage(source: ImageSource.gallery);
       if (picked == null) return;
       final bytes = await picked.readAsBytes();
       var filename = picked.name;
       if (!filename.contains('.')) filename = 'photo.jpg';
 
-      setState(() => _uploadingId = m.id);
+      if (mounted) setState(() => _uploadingId = m.id);
       await ref
           .read(memberServiceProvider)
           .uploadMemberPhoto(m.id.toString(), bytes, filename);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(content: Text('ဓာတ်ပုံ တင်ပြီးပါပြီ')),
       );
       _refresh();
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('ဓာတ်ပုံ တင်၍ မရပါ — $e')),
-        );
-      }
+      messenger.showSnackBar(
+        SnackBar(content: Text('ဓာတ်ပုံ တင်၍ မရပါ — $e')),
+      );
     } finally {
       if (mounted) setState(() => _uploadingId = null);
     }
