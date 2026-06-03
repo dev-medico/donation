@@ -1157,6 +1157,8 @@ class _AddRecordDialog extends ConsumerStatefulWidget {
 class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _prefixController = TextEditingController();
+  final _suffixController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   bool _isDonor = true;
@@ -1217,7 +1219,15 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
               const SizedBox(height: 16),
 
               // Name field - use TypeAhead for donors, regular TextField for expenses
-              if (_isDonor)
+              if (_isDonor) ...[
+                TextFormField(
+                  controller: _prefixController,
+                  decoration: const InputDecoration(
+                    labelText: 'ရှေ့ဆက် (Prefix)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 TypeAheadFormField<MoneyDonor>(
                   textFieldConfiguration: TextFieldConfiguration(
                     controller: _nameController,
@@ -1302,7 +1312,16 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
                     }
                     return null;
                   },
-                )
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _suffixController,
+                  decoration: const InputDecoration(
+                    labelText: 'နောက်ဆက် (Suffix)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ]
               else
                 TextFormField(
                   controller: _nameController,
@@ -1435,8 +1454,19 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
     });
 
     try {
+      // Combine prefix + name + suffix for the donor name, space-separated
+      // (empty parts skipped). Expenses use the name as-is.
+      final name = _nameController.text.trim();
+      String combinedName = name;
+      if (_isDonor) {
+        final prefix = _prefixController.text.trim();
+        final suffix = _suffixController.text.trim();
+        combinedName =
+            [prefix, name, suffix].where((p) => p.isNotEmpty).join(' ');
+      }
+
       final data = <String, dynamic>{
-        'name': _nameController.text,
+        'name': combinedName,
         'amount': int.parse(_amountController.text),
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
       };
@@ -1484,6 +1514,8 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
   @override
   void dispose() {
     _nameController.dispose();
+    _prefixController.dispose();
+    _suffixController.dispose();
     _amountController.dispose();
     super.dispose();
   }

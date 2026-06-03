@@ -1,4 +1,5 @@
 import 'package:donation/src/features/patient/models/patient.dart';
+import 'package:donation/utils/age_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -16,7 +17,7 @@ class PatientDataSource extends DataGridSource {
               DataGridCell<String>(columnName: 'phone', value: patient.phone ?? ''),
               DataGridCell<String>(columnName: 'gender', value: _getGenderDisplay(patient.gender)),
               DataGridCell<String>(columnName: 'bloodType', value: patient.bloodType ?? '-'),
-              DataGridCell<String>(columnName: 'age', value: patient.age ?? ''),
+              DataGridCell<String>(columnName: 'age', value: displayAge(patient.birthDate, fallbackAge: patient.age, detailed: false)),
               DataGridCell<String>(columnName: 'address', value: patient.address ?? ''),
               DataGridCell<int>(columnName: 'donationCount', value: patient.donationCount ?? 0),
             ]);

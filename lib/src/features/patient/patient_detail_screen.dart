@@ -5,6 +5,7 @@ import 'package:donation/src/features/donation/models/donation.dart';
 import 'package:donation/src/features/donation/donation_detail.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/age_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -284,7 +285,8 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
               ],
             ),
             const Divider(height: 32),
-            _buildInfoRow(Icons.cake, 'အသက်', _patient!.age ?? '-'),
+            _buildInfoRow(Icons.cake, 'အသက်',
+                displayAge(_patient!.birthDate, fallbackAge: _patient!.age, empty: '-')),
             _buildInfoRow(
               Icons.wc,
               'ကျား/မ',

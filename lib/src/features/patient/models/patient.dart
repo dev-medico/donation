@@ -9,7 +9,12 @@ class Patient {
   final String? name;
   final String? phone;
   final String? address;
+  final String? township;
+  final String? ward;
+  final String? village;
   final String? age;
+  @JsonKey(name: 'birth_date')
+  final String? birthDate;
   final String? gender;
   @JsonKey(name: 'blood_type')
   final String? bloodType;
@@ -27,7 +32,11 @@ class Patient {
     this.name,
     this.phone,
     this.address,
+    this.township,
+    this.ward,
+    this.village,
     this.age,
+    this.birthDate,
     this.gender,
     this.bloodType,
     this.medicalNotes,
@@ -50,7 +59,11 @@ class Patient {
       name: json['name'] as String?,
       phone: json['phone'] as String?,
       address: json['address'] as String?,
+      township: json['township'] as String?,
+      ward: json['ward'] as String?,
+      village: json['village'] as String?,
       age: json['age'] as String?,
+      birthDate: json['birth_date'] as String?,
       gender: json['gender'] as String?,
       bloodType: json['blood_type'] as String?,
       medicalNotes: json['medical_notes'] as String?,
