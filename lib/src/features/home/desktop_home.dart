@@ -15,6 +15,7 @@ import 'package:donation/src/features/finder/report_new.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:donation/src/features/money_donor/money_donor_list_screen.dart';
+import 'package:donation/src/features/monthly_sponsor/monthly_sponsor_list_screen.dart';
 import 'package:donation/src/features/patient/patient_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,6 +42,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'ထူးခြားဖြစ်စဥ်',
     'ရ/သုံး ငွေစာရင်း',
     'အလှူရှင်များ',
+    'လစဥ်ထောက်ပြံ့သူများ',
     'Log Out(V 1.3.8)'
   ];
   List<String> icons = [
@@ -52,6 +54,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'assets/images/special_case.png',
     'assets/images/finance.png',
     'assets/images/card.png',
+    'assets/images/finance.png',
     'assets/images/settings.png',
   ];
 
@@ -69,6 +72,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
       const SpecialEventListScreen(), // Special Events
       const DonarListScreen(), // Finance - Donar List with tabs
       const MoneyDonorListScreen(), // Money Donors
+      const MonthlySponsorListScreen(), // Monthly Sponsors
       Container(), // Logout placeholder
     ];
   }

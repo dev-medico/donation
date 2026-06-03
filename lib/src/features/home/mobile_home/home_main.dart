@@ -12,6 +12,7 @@ import 'package:donation/src/features/finder/report_new.dart';
 import 'package:donation/src/features/home/mobile_home/home_menu.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/features/special_event/special_event_list.dart';
+import 'package:donation/src/features/monthly_sponsor/monthly_sponsor_list_screen.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -66,6 +67,9 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
     DonarListScreen(
       fromHome: true,
     ),
+
+    // Monthly Sponsors
+    const MonthlySponsorListScreen(),
   ];
 
   @override
