@@ -59,28 +59,27 @@ class _MonthlySponsorFormScreenState
       } else {
         await service.createSponsor(data);
       }
+      widget.onSaved?.call();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(isEditing
                 ? 'အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ'
                 : 'အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ')));
-        widget.onSaved?.call();
-        Navigator.pop(context);
+        Navigator.pop(context, true); // signal the list to refresh
       }
     } catch (e) {
       if (mounted) {
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('မအောင်မြင်ပါ — $e')));
       }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff2f2f2),
+      backgroundColor: const Color(0xfff4f4f6),
       appBar: AppBar(
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -96,67 +95,88 @@ class _MonthlySponsorFormScreenState
           isEditing ? 'ထောက်ပံ့သူ ပြင်ဆင်ရန်' : 'ထောက်ပံ့သူ အသစ်',
           style: const TextStyle(fontSize: 17, color: Colors.white),
         ),
-        actions: [
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Center(
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
-                ),
-              ),
-            )
-          else
-            IconButton(
-                icon: const Icon(Icons.save, color: Colors.white),
-                onPressed: _save),
-        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: Container(
-            padding: const EdgeInsets.only(bottom: 20, left: 4, right: 4, top: 8),
-            decoration: shadowDecoration(Colors.white),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-                    child: TextFormField(
-                      controller: _nameController,
-                      decoration: inputBoxDecoration('အမည် *'),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'အမည် ထည့်သွင်းပါ'
-                          : null,
-                    ),
+          child: Column(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.only(bottom: 20, left: 4, right: 4, top: 8),
+                decoration: shadowDecoration(Colors.white),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+                        child: TextFormField(
+                          controller: _nameController,
+                          decoration: inputBoxDecoration('အမည် *'),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'အမည် ထည့်သွင်းပါ'
+                              : null,
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                        child: TextFormField(
+                          controller: _phoneController,
+                          decoration: inputBoxDecoration('ဖုန်းနံပါတ်'),
+                          keyboardType: TextInputType.phone,
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                        child: TextFormField(
+                          controller: _noteController,
+                          maxLines: 3,
+                          decoration: inputBoxDecoration('မှတ်ချက်').copyWith(
+                            alignLabelWithHint: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 16),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                    child: TextFormField(
-                      controller: _phoneController,
-                      decoration: inputBoxDecoration('ဖုန်းနံပါတ်'),
-                      keyboardType: TextInputType.phone,
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                    child: TextFormField(
-                      controller: _noteController,
-                      decoration: inputBoxDecoration('မှတ်ချက်'),
-                      maxLines: 3,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(height: 22),
+              _buildSaveButton(),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: _isLoading ? null : _save,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          disabledBackgroundColor: primaryColor.withOpacity(0.6),
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          elevation: 0,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        icon: _isLoading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.white))
+            : const Icon(Icons.save_outlined, color: Colors.white, size: 20),
+        label: Text(
+          isEditing ? 'ပြင်ဆင်မည်' : 'သိမ်းဆည်းမည်',
+          style: const TextStyle(
+              fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
     );

@@ -51,10 +51,10 @@ class _MonthlySponsorListScreenState
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            MonthlySponsorFormScreen(sponsor: sponsor, onSaved: _refresh),
+        builder: (_) => MonthlySponsorFormScreen(sponsor: sponsor),
       ),
     );
+    _refresh(); // pop back -> refresh the list (reflects create/edit)
   }
 
   Future<void> _openDetail(MonthlySponsor s) async {
@@ -112,7 +112,7 @@ class _MonthlySponsorListScreenState
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
-        title: const Text('လစဥ်ထောက်ပြံ့သူများ',
+        title: const Text('လစဥ်ထောက်ပံ့သူများ',
             style: TextStyle(fontSize: 16, color: Colors.white)),
       ),
       floatingActionButton: FloatingActionButton(
