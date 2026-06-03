@@ -39,7 +39,12 @@ class _MonthlySponsorListScreenState
         .toList();
   }
 
-  void _refresh() => setState(() => _future = _load());
+  void _refresh() {
+    if (!mounted) return;
+    setState(() {
+      _future = _load();
+    });
+  }
 
   @override
   void dispose() {

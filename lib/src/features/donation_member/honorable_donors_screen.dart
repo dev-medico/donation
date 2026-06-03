@@ -35,7 +35,12 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
         .toList();
   }
 
-  void _refresh() => setState(() => _future = _load());
+  void _refresh() {
+    if (!mounted) return;
+    setState(() {
+      _future = _load();
+    });
+  }
 
   Future<void> _pickAndUpload(Member m) async {
     try {

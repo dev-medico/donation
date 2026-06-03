@@ -32,7 +32,12 @@ class _MonthlySponsorDetailScreenState
   Future<MonthlySponsor> _load() =>
       ref.read(monthlySponsorServiceProvider).getSponsor(widget.sponsorId);
 
-  void _refresh() => setState(() => _future = _load());
+  void _refresh() {
+    if (!mounted) return;
+    setState(() {
+      _future = _load();
+    });
+  }
 
   String _fmtFullDate(String? raw) {
     final d = DateTime.tryParse(raw ?? '');
