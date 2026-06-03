@@ -8,6 +8,7 @@ import 'package:donation/src/features/donation/donation_detail.dart';
 import 'package:donation/src/features/donation/models/donation.dart';
 import 'package:donation/src/features/donation/new_blood_donation.dart';
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
+import 'package:donation/src/features/donation_member/honorable_donors_screen.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/home/mobile_home/humberger.dart';
 import 'package:donation/src/features/services/donation_service.dart';
@@ -133,6 +134,23 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   fontSize: Responsive.isMobile(context) ? 15 : 16,
                   color: Colors.white)),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(top: 4, right: 8),
+            child: IconButton(
+              tooltip: 'ဂုဏ်ထူးဆောင် အလှူရှင်များ',
+              icon: const Icon(Icons.emoji_events, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HonorableDonorsScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       body: Container(
         margin: EdgeInsets.all(Responsive.isMobile(context) ? 8 : 24),

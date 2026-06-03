@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'dart:math';
+import 'dart:typed_data';
+
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/services/base_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/core/api/api_client.dart';
-import 'dart:math';
+import 'package:http/http.dart' as http;
 
 final memberLoadingStatusProvider = StateProvider<String>((ref) => '');
 final memberServiceProvider =
@@ -83,6 +87,22 @@ class MemberService extends BaseService {
       _updateLoadingStatus('Error: $e');
       return allMembers;
     }
+  }
+
+  /// Members with more than [min] total blood donations, ordered most -> least.
+  Future<List<dynamic>> getHonorableDonors({int min = 30}) async {
+    final headers = await getAuthHeaders();
+    final response = await apiClient.get(
+      '$_basePath/honorable-donors',
+      queryParameters: {'min': min},
+      options: {'headers': headers},
+    );
+    if (response.statusCode == 200 &&
+        response.data != null &&
+        response.data!['data'] != null) {
+      return response.data!['data'] as List<dynamic>;
+    }
+    return [];
   }
 
   Future<Map<String, dynamic>> getMemberById(String id) async {
@@ -222,5 +242,32 @@ class MemberService extends BaseService {
       options: {'headers': headers},
     );
     return response.data!['data'] as List<dynamic>;
+  }
+
+  /// Upload a member's profile photo (multipart) to the backend, which stores
+  /// it on DigitalOcean Spaces and returns the public URL.
+  Future<String> uploadMemberPhoto(
+      String id, Uint8List bytes, String filename) async {
+    final token = await getToken();
+    final uri =
+        Uri.parse('https://redjuniors.mooo.com/member/upload-photo?id=$id');
+    final request = http.MultipartRequest('POST', uri);
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+    request.files.add(
+      http.MultipartFile.fromBytes('photo', bytes, filename: filename),
+    );
+
+    final streamed = await request.send();
+    final resp = await http.Response.fromStream(streamed);
+    if (resp.statusCode == 200) {
+      final data = jsonDecode(resp.body) as Map<String, dynamic>;
+      if (data['status'] == 'ok' && data['url'] != null) {
+        return data['url'] as String;
+      }
+      throw Exception(data['message'] ?? 'Upload failed');
+    }
+    throw Exception('Upload failed (${resp.statusCode})');
   }
 }

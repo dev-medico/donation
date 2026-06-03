@@ -16,6 +16,7 @@ class Member {
   final String? registerDate;
   final String? memberCount;
   final String? totalCount;
+  final String? profileUrl;
 
   Member({
     this.id,
@@ -35,6 +36,7 @@ class Member {
     this.registerDate,
     this.memberCount,
     this.totalCount,
+    this.profileUrl,
   });
 
   factory Member.fromJson(Map<String, dynamic> json) {
@@ -56,6 +58,7 @@ class Member {
       registerDate: json['register_date'],
       memberCount: json['member_count'],
       totalCount: json['total_count'],
+      profileUrl: json['profile_url'],
     );
   }
 
@@ -78,6 +81,7 @@ class Member {
       'register_date': registerDate,
       'member_count': memberCount,
       'total_count': totalCount,
+      'profile_url': profileUrl,
     };
   }
 }
