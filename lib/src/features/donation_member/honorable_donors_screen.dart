@@ -3,8 +3,8 @@ import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/services/member_service.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 
 /// Honorable donors: members who have donated blood more than 30 times,
 /// ordered most -> least.
@@ -20,6 +20,9 @@ class HonorableDonorsScreen extends ConsumerStatefulWidget {
 class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
   late Future<List<Member>> _future;
   dynamic _uploadingId;
+  // Local messenger so snackbars never look up a deactivated Scaffold from the
+  // surrounding desktop shell.
+  final _messengerKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {
@@ -43,16 +46,21 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
   }
 
   Future<void> _pickAndUpload(Member m) async {
-    // Capture the messenger up-front so we never look it up via a context that
-    // may have deactivated across the await gap.
-    final messenger = ScaffoldMessenger.of(context);
     try {
-      final picker = ImagePicker();
-      // No maxWidth/imageQuality: desktop (macOS) implementations can reject
-      // those; the backend validates + the CDN handles delivery.
-      final picked = await picker.pickImage(source: ImageSource.gallery);
-      if (picked == null) return;
-      final bytes = await picked.readAsBytes();
+      // A plain file picker (no camera) — works on web and every platform.
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        withData: true, // load bytes (required on web)
+      );
+      if (result == null || result.files.isEmpty) return;
+      final picked = result.files.first;
+      final bytes = picked.bytes;
+      if (bytes == null) {
+        _messengerKey.currentState?.showSnackBar(
+          const SnackBar(content: Text('ဖိုင် ဖတ်၍ မရပါ')),
+        );
+        return;
+      }
       var filename = picked.name;
       if (!filename.contains('.')) filename = 'photo.jpg';
 
@@ -60,12 +68,12 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
       await ref
           .read(memberServiceProvider)
           .uploadMemberPhoto(m.id.toString(), bytes, filename);
-      messenger.showSnackBar(
+      _messengerKey.currentState?.showSnackBar(
         const SnackBar(content: Text('ဓာတ်ပုံ တင်ပြီးပါပြီ')),
       );
       _refresh();
     } catch (e) {
-      messenger.showSnackBar(
+      _messengerKey.currentState?.showSnackBar(
         SnackBar(content: Text('ဓာတ်ပုံ တင်၍ မရပါ — $e')),
       );
     } finally {
@@ -75,7 +83,9 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ScaffoldMessenger(
+      key: _messengerKey,
+      child: Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(
         flexibleSpace: Container(
@@ -126,7 +136,7 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
           );
         },
       ),
-    );
+    ));
   }
 
   Widget _donorTile(Member m, int rank) {
