@@ -631,7 +631,17 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
 // Data source for donation history table
 class _DonationHistoryDataSource extends DataGridSource {
   _DonationHistoryDataSource({required List<dynamic> donationData}) {
-    _donationData = donationData
+    // Show earliest donations first (ascending by date)
+    final sortedDonations = List<dynamic>.from(donationData)
+      ..sort((a, b) {
+        final dateA = _parseDate(a is Map ? a['date'] : null);
+        final dateB = _parseDate(b is Map ? b['date'] : null);
+        if (dateA == null && dateB == null) return 0;
+        if (dateA == null) return 1;
+        if (dateB == null) return -1;
+        return dateA.compareTo(dateB);
+      });
+    _donationData = sortedDonations
         .asMap()
         .entries
         .map<DataGridRow>((entry) {
@@ -650,6 +660,15 @@ class _DonationHistoryDataSource extends DataGridSource {
 
   @override
   List<DataGridRow> get rows => _donationData;
+
+  static DateTime? _parseDate(dynamic date) {
+    if (date == null) return null;
+    if (date is DateTime) return date;
+    if (date is String) {
+      return DateTime.tryParse(date);
+    }
+    return null;
+  }
 
   String _formatDate(dynamic date) {
     if (date == null) return '-';
