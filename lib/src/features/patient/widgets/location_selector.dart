@@ -8,28 +8,32 @@ class LocationValue {
   final String placeName; // ward or village name
   final String? placeType; // 'ward' | 'village' | null
   final String? group; // town (ward) or village-tract (village)
+  final String street; // house / street / sub-quarter (free text)
 
   const LocationValue({
     this.township = '',
     this.placeName = '',
     this.placeType,
     this.group,
+    this.street = '',
   });
 
   String get ward => placeType == 'ward' ? placeName : '';
   String get village => placeType == 'village' ? placeName : '';
 
   /// Flat, human-readable address kept backward-compatible with the existing
-  /// `address` column. Order: ward/village ၊ township.
+  /// `address` column. Order: house/street ၊ ward/village ၊ township.
   String get combinedAddress {
-    final parts = [placeName.trim(), township.trim()]
+    final parts = [street.trim(), placeName.trim(), township.trim()]
         .where((p) => p.isNotEmpty)
         .toList();
     return parts.join('၊');
   }
 
   bool get isEmpty =>
-      township.trim().isEmpty && placeName.trim().isEmpty;
+      township.trim().isEmpty &&
+      placeName.trim().isEmpty &&
+      street.trim().isEmpty;
 }
 
 /// Cascading Township -> Quarter(ward)/Village selector.
@@ -53,6 +57,7 @@ class LocationSelector extends StatefulWidget {
 
 class _LocationSelectorState extends State<LocationSelector> {
   final _repo = TownshipDetailRepository.instance;
+  final _streetController = TextEditingController();
 
   late String _township;
   late String _placeName;
@@ -66,6 +71,7 @@ class _LocationSelectorState extends State<LocationSelector> {
     _placeName = widget.initial.placeName;
     _placeType = widget.initial.placeType;
     _group = widget.initial.group;
+    _streetController.text = widget.initial.street;
 
     _repo.ensureLoaded().then((_) {
       if (!mounted) return;
@@ -82,12 +88,19 @@ class _LocationSelectorState extends State<LocationSelector> {
     });
   }
 
+  @override
+  void dispose() {
+    _streetController.dispose();
+    super.dispose();
+  }
+
   void _emit() {
     widget.onChanged(LocationValue(
       township: _township.trim(),
       placeName: _placeName.trim(),
       placeType: _placeType,
       group: _group,
+      street: _streetController.text.trim(),
     ));
   }
 
@@ -281,6 +294,7 @@ class _LocationSelectorState extends State<LocationSelector> {
     final combined = LocationValue(
       township: _township,
       placeName: _placeName,
+      street: _streetController.text,
     ).combinedAddress;
 
     return Column(
@@ -302,6 +316,23 @@ class _LocationSelectorState extends State<LocationSelector> {
               : 'ရပ်ကွက် / ကျေးရွာ ရွေးပါ',
           onTap: _pickPlace,
           enabled: _township.trim().isNotEmpty,
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _streetController,
+          decoration: InputDecoration(
+            labelText: 'အိမ်/လမ်း/ရပ်ကွက်ငယ်',
+            labelStyle: const TextStyle(fontSize: 14, color: Colors.black),
+            filled: true,
+            fillColor: const Color(0xFFefefef),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: const BorderSide(),
+            ),
+          ),
+          onChanged: (_) => setState(_emit),
         ),
         if (combined.isNotEmpty)
           Container(
