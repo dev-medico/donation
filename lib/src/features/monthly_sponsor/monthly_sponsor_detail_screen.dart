@@ -246,7 +246,8 @@ class _MonthlySponsorDetailScreenState
               );
             }
             final s = snap.data!;
-            final donations = s.donations ?? [];
+            final donations = [...(s.donations ?? [])]
+              ..sort((a, b) => (a.date ?? '').compareTo(b.date ?? ''));
             return RefreshIndicator(
               onRefresh: () async => _refresh(),
               child: ListView(
