@@ -55,6 +55,16 @@ class LocationSelector extends StatefulWidget {
   State<LocationSelector> createState() => _LocationSelectorState();
 }
 
+/// Outcome of the searchable picker sheet: either a chosen list [item] or a
+/// free-typed [custom] value that is not present in the bundled dataset.
+class _SheetResult<T> {
+  final T? item;
+  final String? custom;
+  const _SheetResult.item(this.item) : custom = null;
+  const _SheetResult.custom(this.custom) : item = null;
+  bool get isCustom => custom != null;
+}
+
 class _LocationSelectorState extends State<LocationSelector> {
   final _repo = TownshipDetailRepository.instance;
   final _streetController = TextEditingController();
@@ -107,7 +117,7 @@ class _LocationSelectorState extends State<LocationSelector> {
   Future<void> _pickTownship() async {
     await _repo.ensureLoaded();
     if (!mounted) return;
-    final selected = await _showSearchSheet<String>(
+    final result = await _showSearchSheet<String>(
       title: 'မြို့နယ် ရွေးပါ',
       items: _repo.townshipNames,
       labelFor: (t) => t,
@@ -115,17 +125,18 @@ class _LocationSelectorState extends State<LocationSelector> {
         final d = _repo.township(t);
         return d == null ? null : '${d.district} • ${d.state}';
       },
+      customHint: 'ကို ကိုယ်တိုင်ထည့်မည်',
     );
-    if (selected != null) {
-      setState(() {
-        _township = selected;
-        // Township changed -> reset dependent place selection.
-        _placeName = '';
-        _placeType = null;
-        _group = null;
-      });
-      _emit();
-    }
+    if (result == null) return;
+    final township = result.isCustom ? result.custom! : result.item as String;
+    setState(() {
+      _township = township;
+      // Township changed -> reset dependent place selection.
+      _placeName = '';
+      _placeType = null;
+      _group = null;
+    });
+    _emit();
   }
 
   Future<void> _pickPlace() async {
@@ -133,29 +144,119 @@ class _LocationSelectorState extends State<LocationSelector> {
     await _repo.ensureLoaded();
     if (!mounted) return;
     final places = _repo.placesFor(_township.trim());
-    final selected = await _showSearchSheet<PlaceEntry>(
+    final result = await _showSearchSheet<PlaceEntry>(
       title: 'ရပ်ကွက် / ကျေးရွာ ရွေးပါ',
       items: places,
       labelFor: (p) => p.name,
       subtitleFor: (p) => '${p.typeLabelMm} • ${p.group}',
+      customHint: 'ကို ကိုယ်တိုင်ထည့်မည်',
     );
-    if (selected != null) {
+    if (result == null) return;
+    if (result.isCustom) {
+      if (!mounted) return;
+      // A hand-typed place still needs a ward/village type for the structured
+      // columns, so confirm the name and type before applying it.
+      final custom = await _promptCustomPlace(result.custom!);
+      if (custom == null) return;
+      setState(() {
+        _placeName = custom.name;
+        _placeType = custom.type;
+        _group = null; // not part of the bundled dataset
+      });
+    } else {
+      final selected = result.item as PlaceEntry;
       setState(() {
         _placeName = selected.name;
         _placeType = selected.type;
         _group = selected.group;
       });
-      _emit();
     }
+    _emit();
   }
 
-  Future<T?> _showSearchSheet<T>({
+  /// Ask the user to confirm a hand-typed ward/village name and whether it is a
+  /// ward (ရပ်ကွက်) or a village (ကျေးရွာ). Returns null if cancelled.
+  Future<({String name, String type})?> _promptCustomPlace(
+      String initialName) async {
+    final controller = TextEditingController(text: initialName.trim());
+    String type = 'ward';
+    final result = await showDialog<({String name, String type})>(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setLocal) {
+            return AlertDialog(
+              title: const Text('ရပ်ကွက် / ကျေးရွာ ကိုယ်တိုင်ထည့်ရန်'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: 'အမည်',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('အမျိုးအစား',
+                      style: TextStyle(fontSize: 13, color: Colors.black54)),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      ChoiceChip(
+                        label: const Text('ရပ်ကွက်'),
+                        selected: type == 'ward',
+                        onSelected: (_) => setLocal(() => type = 'ward'),
+                      ),
+                      ChoiceChip(
+                        label: const Text('ကျေးရွာ'),
+                        selected: type == 'village',
+                        onSelected: (_) => setLocal(() => type = 'village'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('မလုပ်တော့ပါ'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    final name = controller.text.trim();
+                    if (name.isEmpty) return;
+                    Navigator.pop(ctx, (name: name, type: type));
+                  },
+                  child: const Text('ထည့်မည်'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    controller.dispose();
+    return result;
+  }
+
+  Future<_SheetResult<T>?> _showSearchSheet<T>({
     required String title,
     required List<T> items,
     required String Function(T) labelFor,
     String? Function(T)? subtitleFor,
+    String? customHint,
   }) {
-    return showModalBottomSheet<T>(
+    return showModalBottomSheet<_SheetResult<T>>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
@@ -166,12 +267,19 @@ class _LocationSelectorState extends State<LocationSelector> {
         String query = '';
         return StatefulBuilder(
           builder: (ctx, setSheetState) {
-            final q = query.trim().toLowerCase();
+            final typed = query.trim();
+            final q = typed.toLowerCase();
             final filtered = q.isEmpty
                 ? items
                 : items
                     .where((e) => labelFor(e).toLowerCase().contains(q))
                     .toList();
+            // Offer to add the typed value when it is not already an exact
+            // match, so townships / wards missing from the dataset can still be
+            // entered by hand.
+            final showCustom = customHint != null &&
+                typed.isNotEmpty &&
+                !items.any((e) => labelFor(e).trim().toLowerCase() == q);
             return Padding(
               padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
               child: SizedBox(
@@ -220,14 +328,39 @@ class _LocationSelectorState extends State<LocationSelector> {
                     ),
                     const SizedBox(height: 8),
                     Expanded(
-                      child: filtered.isEmpty
+                      child: (filtered.isEmpty && !showCustom)
                           ? Center(
-                              child: Text('မတွေ့ပါ',
-                                  style: TextStyle(color: Colors.grey[600])))
+                              child: Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Text(
+                                  customHint != null
+                                      ? 'ရှာဖွေ၍ မတွေ့ပါက အမည်ရိုက်ထည့်ပြီး အသစ်ထည့်နိုင်သည်'
+                                      : 'မတွေ့ပါ',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                              ),
+                            )
                           : ListView.builder(
-                              itemCount: filtered.length,
+                              itemCount:
+                                  filtered.length + (showCustom ? 1 : 0),
                               itemBuilder: (ctx, i) {
-                                final item = filtered[i];
+                                if (showCustom && i == 0) {
+                                  return ListTile(
+                                    dense: true,
+                                    leading: Icon(Icons.add_circle_outline,
+                                        color: primaryColor),
+                                    title: Text(
+                                      '「$typed」 $customHint',
+                                      style: TextStyle(
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    onTap: () => Navigator.pop(
+                                        ctx, _SheetResult<T>.custom(typed)),
+                                  );
+                                }
+                                final item = filtered[showCustom ? i - 1 : i];
                                 final sub = subtitleFor?.call(item);
                                 return ListTile(
                                   dense: true,
@@ -236,7 +369,8 @@ class _LocationSelectorState extends State<LocationSelector> {
                                       ? null
                                       : Text(sub,
                                           style: const TextStyle(fontSize: 11)),
-                                  onTap: () => Navigator.pop(ctx, item),
+                                  onTap: () => Navigator.pop(
+                                      ctx, _SheetResult<T>.item(item)),
                                 );
                               },
                             ),

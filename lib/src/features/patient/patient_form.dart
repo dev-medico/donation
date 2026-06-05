@@ -1,5 +1,6 @@
 import 'package:donation/src/features/patient/models/patient.dart';
 import 'package:donation/src/features/patient/providers/patient_provider.dart';
+import 'package:donation/src/features/services/patient_service.dart';
 import 'package:donation/src/features/patient/widgets/age_input.dart';
 import 'package:donation/src/features/patient/widgets/location_selector.dart';
 import 'package:donation/responsive.dart';
@@ -154,7 +155,15 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
       if (isEditing) {
         await service.updatePatient(widget.patient!.id!, data);
       } else {
-        await service.createPatient(data);
+        try {
+          await service.createPatient(data);
+        } on DuplicatePatientException catch (dup) {
+          // Same name + township + ward/village already exists. Let the user
+          // see the match and choose whether this is really a new patient.
+          final addAnyway = await _confirmAddDuplicate(dup.existing) ?? false;
+          if (!addAnyway) return; // stay on the form; finally resets loading
+          await service.createPatient(data, force: true);
+        }
       }
 
       if (mounted) {
@@ -179,6 +188,73 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  /// Warn that an identical patient already exists and ask whether to add this
+  /// one anyway. Returns true when the user chooses to proceed.
+  Future<bool?> _confirmAddDuplicate(Patient existing) {
+    final name = (existing.name ?? '').trim();
+    final address = (existing.address ?? '').trim();
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('ဤလူနာ ရှိပြီးသား ဖြစ်နေပါသည်'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'အမည်၊ မြို့နယ်နှင့် ရပ်ကွက်/ကျေးရွာ တူညီသော လူနာ စာရင်းတွင် ရှိနှင့်ပြီး ဖြစ်ပါသည်။',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFf5f5f5),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name.isEmpty ? '-' : name,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  if (address.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      address,
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text('ထပ်မံ ထည့်သွင်းလိုပါသလား?',
+                style: TextStyle(fontSize: 14)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('မထည့်တော့ပါ'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('ထပ်မံထည့်မည်'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
