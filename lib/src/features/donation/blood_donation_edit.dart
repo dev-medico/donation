@@ -225,19 +225,28 @@ class _BloodDonationEditScreenState
     setState(() {
       selectedPatient = null;
       patientSearchController.clear();
+      // Undo the field sync too, so the kept patient_id and the displayed
+      // name/age/address stay consistent with the original record.
+      _restoreOriginalPatientFields();
     });
   }
 
-  void initializeData() async {
-    // Initialize form with existing donation data
+  void _restoreOriginalPatientFields() {
     nameController.text = widget.data.patientName ?? "";
     ageController.text = widget.data.patientAge ?? "";
-
+    quarterController.text = "";
+    townController.text = "";
     if (widget.data.patientAddress != null) {
       final addressParts = widget.data.patientAddress!.split("၊");
       quarterController.text = addressParts.isNotEmpty ? addressParts[0] : "";
       townController.text = addressParts.length > 1 ? addressParts[1] : "";
     }
+    setRegion(townController.text);
+  }
+
+  void initializeData() async {
+    // Initialize form with existing donation data
+    _restoreOriginalPatientFields();
 
     hospitalController.text = widget.data.hospital ?? "";
     diseaseController.text = widget.data.patientDisease ?? "";
@@ -252,8 +261,6 @@ class _BloodDonationEditScreenState
     setState(() {
       switchNew = true;
     });
-
-    setRegion(townController.text);
 
     // Load township data
     final String response =
