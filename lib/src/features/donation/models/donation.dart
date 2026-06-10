@@ -17,6 +17,7 @@ class Donation {
   final Member? memberObj;
   final String? date;
   final String ownerId;
+  final int? patientId;
 
   Donation({
     required this.id,
@@ -35,6 +36,7 @@ class Donation {
     this.memberObj,
     this.date,
     this.ownerId = '',
+    this.patientId,
   });
 
   factory Donation.fromJson(Map<String, dynamic> json) {
@@ -71,6 +73,9 @@ class Donation {
           : null,
       date: json['date'] as String?,
       ownerId: json['owner_id'] as String? ?? '',
+      patientId: json['patient_id'] is int
+          ? json['patient_id'] as int
+          : int.tryParse(json['patient_id']?.toString() ?? ''),
     );
   }
 
@@ -92,6 +97,7 @@ class Donation {
       'memberObj': memberObj?.toJson(),
       'date': date,
       'owner_id': ownerId,
+      'patient_id': patientId,
     };
   }
 
@@ -112,6 +118,7 @@ class Donation {
     Member? memberObj,
     String? date,
     String? ownerId,
+    int? patientId,
   }) {
     return Donation(
       id: id ?? this.id,
@@ -130,6 +137,7 @@ class Donation {
       memberObj: memberObj ?? this.memberObj,
       date: date ?? this.date,
       ownerId: ownerId ?? this.ownerId,
+      patientId: patientId ?? this.patientId,
     );
   }
 }

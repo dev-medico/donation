@@ -17,6 +17,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
+import 'package:donation/src/features/patient/models/patient.dart';
+import 'package:donation/src/features/patient/providers/patient_provider.dart';
 import 'package:donation/src/features/services/member_service.dart'
     as member_services;
 import 'package:donation/src/features/services/donation_service.dart';
@@ -42,6 +44,13 @@ class _BloodDonationEditScreenState
   final townController = TextEditingController();
   final hospitalController = TextEditingController();
   final diseaseController = TextEditingController();
+  final patientSearchController = TextEditingController();
+
+  // Patient re-selection state: the patient currently linked to this record
+  // (loaded via patient_id) and the patient newly chosen from the typeahead.
+  Patient? linkedPatient;
+  Patient? selectedPatient;
+  bool linkedPatientLoading = false;
 
   String operatorImg = "";
   String donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
@@ -120,7 +129,103 @@ class _BloodDonationEditScreenState
   @override
   void initState() {
     super.initState();
+    nameController.addListener(_onPatientNameEdited);
     initializeData();
+    _loadLinkedPatient();
+  }
+
+  @override
+  void dispose() {
+    nameController.removeListener(_onPatientNameEdited);
+    nameController.dispose();
+    ageController.dispose();
+    quarterController.dispose();
+    townController.dispose();
+    hospitalController.dispose();
+    diseaseController.dispose();
+    patientSearchController.dispose();
+    super.dispose();
+  }
+
+  /// Load the patient currently linked to this donation (if any) so the user
+  /// can see which patient record the donation points to before changing it.
+  Future<void> _loadLinkedPatient() async {
+    final patientId = widget.data.patientId;
+    if (patientId == null) return;
+    setState(() {
+      linkedPatientLoading = true;
+    });
+    try {
+      final patient =
+          await ref.read(patientServiceProvider).getPatient(patientId);
+      if (!mounted) return;
+      setState(() {
+        linkedPatient = patient;
+        linkedPatientLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        linkedPatientLoading = false;
+      });
+    }
+  }
+
+  // If the user manually edits the name after picking a patient, drop the new
+  // selection so the saved patient_id always matches the displayed name.
+  void _onPatientNameEdited() {
+    if (selectedPatient != null &&
+        nameController.text != (selectedPatient!.name ?? '')) {
+      setState(() {
+        selectedPatient = null;
+      });
+    }
+  }
+
+  void _selectPatient(Patient patient) {
+    setState(() {
+      selectedPatient = patient;
+      patientSearchController.text = patient.name ?? '';
+      nameController.text = patient.name ?? '';
+      if ((patient.age ?? '').isNotEmpty) {
+        ageController.text = patient.age!;
+      }
+      _fillAddressFromPatient(patient);
+    });
+  }
+
+  void _fillAddressFromPatient(Patient patient) {
+    final ward = (patient.ward ?? '').trim();
+    final village = (patient.village ?? '').trim();
+    final township = (patient.township ?? '').trim();
+    final place = ward.isNotEmpty ? ward : village;
+    if (township.isNotEmpty || place.isNotEmpty) {
+      quarterController.text = place;
+      townController.text = township;
+    } else {
+      // Older patient records only carry the combined address, where the
+      // township is the last "၊"-separated part.
+      final parts = (patient.address ?? '')
+          .split('၊')
+          .map((p) => p.trim())
+          .where((p) => p.isNotEmpty)
+          .toList();
+      if (parts.length >= 2) {
+        quarterController.text = parts.sublist(0, parts.length - 1).join('၊');
+        townController.text = parts.last;
+      } else if (parts.length == 1) {
+        quarterController.text = '';
+        townController.text = parts.first;
+      }
+    }
+    setRegion(townController.text);
+  }
+
+  void _clearSelectedPatient() {
+    setState(() {
+      selectedPatient = null;
+      patientSearchController.clear();
+    });
   }
 
   void initializeData() async {
@@ -201,6 +306,8 @@ class _BloodDonationEditScreenState
         'member_id': widget.data.memberId ?? '',
         'member': widget.data.member.toString(),
         'owner_id': widget.data.memberId ?? '',
+        // Re-link to the newly selected patient, or keep the existing link.
+        'patient_id': selectedPatient?.id ?? widget.data.patientId,
       };
 
       print('Sending donation update data to API: $updateData');
@@ -312,6 +419,247 @@ class _BloodDonationEditScreenState
     );
   }
 
+  Widget _bloodTypeChip(String bloodType) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.red.shade100,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        bloodType,
+        style: TextStyle(
+          color: Colors.red.shade700,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
+  /// One-line summary used in the picker and status boxes so patients with
+  /// the same name remain distinguishable: age + address.
+  String _patientSubtitle(Patient patient) {
+    return [
+      if ((patient.age ?? '').isNotEmpty) 'အသက် ${patient.age}',
+      if ((patient.address ?? '').isNotEmpty) patient.address!,
+    ].join(' • ');
+  }
+
+  /// Shows which patient record this donation is linked to right now:
+  /// green = newly re-selected patient, blue = existing link, amber = none.
+  Widget _patientLinkStatusBox() {
+    if (selectedPatient != null) {
+      final patient = selectedPatient!;
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.green[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.green[200]!),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.check_circle, color: Colors.green[700], size: 20),
+            SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          'ပြောင်းရွေးထားသည်: ${patient.name ?? ''}',
+                          style: TextStyle(
+                            color: Colors.green[700],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if ((patient.bloodType ?? '').isNotEmpty) ...[
+                        SizedBox(width: 8),
+                        _bloodTypeChip(patient.bloodType!),
+                      ],
+                    ],
+                  ),
+                  if (_patientSubtitle(patient).isNotEmpty) ...[
+                    SizedBox(height: 4),
+                    Text(
+                      _patientSubtitle(patient),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.green[900],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.close, size: 18),
+              tooltip: 'ပြောင်းရွေးမှု ပယ်ဖျက်မည်',
+              onPressed: _clearSelectedPatient,
+              padding: EdgeInsets.zero,
+              constraints: BoxConstraints(),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (linkedPatientLoading) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            SizedBox(width: 8),
+            Text(
+              'ချိတ်ဆက်ထားသော လူနာကို ရှာနေသည်...',
+              style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (linkedPatient != null) {
+      final patient = linkedPatient!;
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.blue[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.blue[200]!),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.link, color: Colors.blue[700], size: 20),
+            SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          'လက်ရှိချိတ်ဆက်ထားသော လူနာ: ${patient.name ?? ''}',
+                          style: TextStyle(
+                            color: Colors.blue[700],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if ((patient.bloodType ?? '').isNotEmpty) ...[
+                        SizedBox(width: 8),
+                        _bloodTypeChip(patient.bloodType!),
+                      ],
+                    ],
+                  ),
+                  if (_patientSubtitle(patient).isNotEmpty) ...[
+                    SizedBox(height: 4),
+                    Text(
+                      _patientSubtitle(patient),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue[900],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.amber[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.amber[200]!),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.amber[800], size: 20),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'လူနာစာရင်းနှင့် ချိတ်ဆက်မထားသေးပါ။ အောက်တွင် ရှာ၍ ရွေးချယ်နိုင်ပါသည်။',
+              style: TextStyle(fontSize: 13, color: Colors.amber[900]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Typeahead that searches the patient list by name, blood type or address
+  /// and re-links this donation to the chosen patient.
+  Widget _patientPickerField() {
+    return TypeAheadField<Patient>(
+      textFieldConfiguration: TextFieldConfiguration(
+        controller: patientSearchController,
+        decoration: InputDecoration(
+          labelText: 'လူနာ ပြောင်းရွေးရန် ရှာပါ',
+          hintText: 'အမည် / သွေးအုပ်စု / လိပ်စာ ဖြင့်ရှာပါ',
+          border: OutlineInputBorder(),
+          suffixIcon: Icon(Icons.person_search),
+        ),
+      ),
+      suggestionsCallback: (pattern) async {
+        final service = ref.read(patientServiceProvider);
+        return await service.searchPatients(pattern.trim());
+      },
+      itemBuilder: (context, Patient patient) {
+        return ListTile(
+          dense: true,
+          title: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  patient.name ?? '',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+              if ((patient.bloodType ?? '').isNotEmpty)
+                _bloodTypeChip(patient.bloodType!),
+            ],
+          ),
+          subtitle: Text(
+            _patientSubtitle(patient),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      },
+      noItemsFoundBuilder: (context) => Padding(
+        padding: EdgeInsets.all(12),
+        child: Text('လူနာ မတွေ့ပါ'),
+      ),
+      onSuggestionSelected: _selectPatient,
+    );
+  }
+
   Widget _buildEditForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,6 +733,10 @@ class _BloodDonationEditScreenState
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                SizedBox(height: 16),
+                _patientLinkStatusBox(),
+                SizedBox(height: 12),
+                _patientPickerField(),
                 SizedBox(height: 16),
                 TextField(
                   controller: nameController,
