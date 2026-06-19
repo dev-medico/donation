@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animated_widgets/animated_widgets.dart';
+import 'package:donation/core/api/api_client.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/feed/feed_main.dart';
 import 'package:donation/src/features/home/home.dart';
@@ -45,6 +46,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         if (name == "") {
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
         } else {
+          // Restoring an existing session: open the same grace window used
+          // after a fresh login so the home screen's first authenticated
+          // request can't bounce us straight back to the login page.
+          ApiClient.markLoggedIn();
           Navigator.pushReplacementNamed(context, HomeScreen.routeName);
         }
       } else {

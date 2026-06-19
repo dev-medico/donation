@@ -219,7 +219,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                       const Padding(
                         padding: EdgeInsets.only(right: 8.0),
                         child: Text(
-                          'V 1.1.0',
+                          'V 1.4.1',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.black,

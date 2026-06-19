@@ -22,11 +22,22 @@ class LocationValue {
   String get village => placeType == 'village' ? placeName : '';
 
   /// Flat, human-readable address kept backward-compatible with the existing
-  /// `address` column. Order: house/street ၊ ward/village ၊ township.
+  /// `address` column. Order: house/street ၊ ward/village ၊ town (မြို့) ၊
+  /// township.
+  ///
+  /// The town is included for wards that carry it so a ward like
+  /// "အမှတ်(၁)ရပ်ကွက်" is not mistaken for one in a different town. It is the
+  /// only place the town persists, since there is no dedicated town column.
   String get combinedAddress {
-    final parts = [street.trim(), placeName.trim(), township.trim()]
-        .where((p) => p.isNotEmpty)
-        .toList();
+    final town = (group ?? '').trim();
+    final includeTown =
+        placeType == 'ward' && town.isNotEmpty && town != placeName.trim();
+    final parts = [
+      street.trim(),
+      placeName.trim(),
+      if (includeTown) town,
+      township.trim(),
+    ].where((p) => p.isNotEmpty).toList();
     return parts.join('၊');
   }
 
@@ -85,13 +96,20 @@ class _LocationSelectorState extends State<LocationSelector> {
 
     _repo.ensureLoaded().then((_) {
       if (!mounted) return;
-      if (_placeType == null &&
-          _placeName.trim().isNotEmpty &&
-          _township.trim().isNotEmpty) {
-        final p = _repo.findPlace(_township.trim(), _placeName.trim());
-        if (p != null) {
-          _placeType = p.type;
-          _group = p.group;
+      // Backfill structured place metadata the flat columns don't carry.
+      if (_placeName.trim().isNotEmpty && _township.trim().isNotEmpty) {
+        if (_placeType == null) {
+          final p = _repo.findPlace(_township.trim(), _placeName.trim());
+          if (p != null) {
+            _placeType = p.type;
+            _group = p.group;
+          }
+        } else if (_group == null && _placeType == 'ward') {
+          // Show the town (မြို့) for an existing ward when it is unambiguous;
+          // wards whose name repeats across towns need an explicit re-pick.
+          final town =
+              _repo.unambiguousTownForWard(_township.trim(), _placeName.trim());
+          if (town.isNotEmpty) _group = town;
         }
       }
       setState(() {});
@@ -428,6 +446,8 @@ class _LocationSelectorState extends State<LocationSelector> {
     final combined = LocationValue(
       township: _township,
       placeName: _placeName,
+      placeType: _placeType,
+      group: _group,
       street: _streetController.text,
     ).combinedAddress;
 

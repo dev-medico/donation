@@ -43,7 +43,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'ရ/သုံး ငွေစာရင်း',
     'အလှူရှင်များ',
     'လစဥ်ထောက်ပံ့သူများ',
-    'Log Out(V 1.3.8)'
+    'Log Out(V 1.4.1)'
   ];
   List<String> icons = [
     'assets/images/dashboard.png',

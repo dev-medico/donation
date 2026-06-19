@@ -189,13 +189,19 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
   // Parse and fill address fields from patient's stored address
   void _parseAndFillAddress(String? address) {
-    if (address == null || address.isEmpty) return;
-    final parts = address.split('၊');
+    if (address == null || address.trim().isEmpty) return;
+    final parts = address
+        .split('၊')
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toList();
     if (parts.length >= 2) {
-      quarterController.text = parts[0].trim();
-      townController.text = parts[1].trim();
-    } else {
-      townController.text = address;
+      // Keep everything before the township together so the town (မြို့)
+      // carried in the patient's address is not dropped.
+      quarterController.text = parts.sublist(0, parts.length - 1).join('၊');
+      townController.text = parts.last;
+    } else if (parts.length == 1) {
+      townController.text = parts.first;
     }
   }
 

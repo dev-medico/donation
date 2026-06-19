@@ -10,6 +10,18 @@ class ApiClient {
   late final Duration _timeout;
   late final Map<String, String> _defaultHeaders;
 
+  /// Timestamp of the most recent successful login. Used to avoid bouncing the
+  /// user back to the login screen when an early post-login request races
+  /// session setup and returns 401. See the 401 handling in [_handleRequest].
+  static DateTime? _lastLoginAt;
+
+  /// Call right after a successful login + token persistence so the 401 handler
+  /// can tell a genuine session expiry apart from a transient race during the
+  /// first authenticated requests (e.g. the home dashboard load on iPad).
+  static void markLoggedIn() {
+    _lastLoginAt = DateTime.now();
+  }
+
   factory ApiClient() {
     return _instance;
   }
@@ -33,7 +45,9 @@ class ApiClient {
     // Add auth token if available
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    if (token != null) {
+    // Only attach the header when we actually have a token. Sending an empty
+    // "Bearer " is guaranteed to be rejected with 401 by the backend.
+    if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
     }
 
@@ -95,8 +109,22 @@ class ApiClient {
             'CORS error: Server is not allowing cross-origin requests. Status code: 0');
       }
 
-      // Handle 401 Unauthorized - redirect to login
+      // Handle 401 Unauthorized
       if (response.statusCode == 401) {
+        // If we *just* logged in, a 401 here is almost certainly an early
+        // request racing session setup (e.g. the home dashboard load that
+        // fires from initState). Do NOT wipe the session and bounce back to
+        // the login screen — keep the session and let the calling screen show
+        // its own empty/error state. This is the iPad "logs in, shows content
+        // for a fraction of a second, then returns to login" App Store bug.
+        final lastLogin = _lastLoginAt;
+        final justLoggedIn = lastLogin != null &&
+            DateTime.now().difference(lastLogin) < const Duration(seconds: 10);
+        if (justLoggedIn) {
+          throw ApiException(401, 'Session expired');
+        }
+
+        // Genuine session expiry: clear credentials and return to login.
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('token');
         await prefs.remove('name');

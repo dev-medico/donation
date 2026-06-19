@@ -1,6 +1,4 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:developer';
-
 import 'package:donation/realm/app_services.dart';
 import 'package:donation/realm/realm_services.dart';
 import 'package:donation/src/features/auth/otp.dart';
@@ -12,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:donation/core/api/api_client.dart';
 import 'package:donation/data/response/login_response/login_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
@@ -414,11 +413,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         password.text.toString(),
       );
 
+      // Persist + validate the session BEFORE navigating to Home, so the home
+      // screen's first authenticated request always carries a valid token.
+      // (Previously this navigated before the token was written, and a missing
+      // token caused the first call to 401 and bounce straight back to login.)
+      await saveLogin(response);
+
       setState(() {
         _isLoading = false;
       });
-
-      await saveLogin(response);
 
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
@@ -435,13 +438,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  saveLogin(LoginResponse response) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    log(response.data.toString());
-    prefs.setString("token", response.data?.accessToken?.toString() ?? '');
-    prefs.setString("name", response.data?.name?.toString() ?? '');
-    prefs.setString("phone", response.data?.phone?.toString() ?? '');
-    Navigator.pushNamedAndRemoveUntil(
-        context, HomeScreen.routeName, (Route<dynamic> route) => false);
+  Future<void> saveLogin(LoginResponse response) async {
+    final token = response.data?.accessToken?.toString() ?? '';
+    final name = response.data?.name?.toString() ?? '';
+    final phone = response.data?.phone?.toString() ?? '';
+
+    // Never enter the app without a real token. If the response is missing the
+    // access token, treat it as a failed login (show an error) instead of
+    // silently navigating to Home where the first API call would 401 and bounce
+    // the user back to the login page.
+    if (token.isEmpty) {
+      throw Exception('Login failed. Please try again.');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    // Await the writes so the token is fully persisted before any authenticated
+    // request reads it.
+    await prefs.setString("token", token);
+    await prefs.setString("name", name);
+    await prefs.setString("phone", phone);
+
+    // Open a short grace window so an early post-login 401 (racing session
+    // setup) does not bounce us back to login. Navigation is handled by the
+    // caller after this completes.
+    ApiClient.markLoggedIn();
   }
 }

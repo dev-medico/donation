@@ -195,28 +195,25 @@ class _BloodDonationEditScreenState
   }
 
   void _fillAddressFromPatient(Patient patient) {
-    final ward = (patient.ward ?? '').trim();
-    final village = (patient.village ?? '').trim();
-    final township = (patient.township ?? '').trim();
-    final place = ward.isNotEmpty ? ward : village;
-    if (township.isNotEmpty || place.isNotEmpty) {
-      quarterController.text = place;
-      townController.text = township;
+    // The patient's flat address carries the full ward ၊ town ၊ township, so
+    // keep everything before the township together so the town (မြို့) is not
+    // dropped. Fall back to the structured columns only when there is no usable
+    // flat address.
+    final parts = (patient.address ?? '')
+        .split('၊')
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toList();
+    if (parts.length >= 2) {
+      quarterController.text = parts.sublist(0, parts.length - 1).join('၊');
+      townController.text = parts.last;
     } else {
-      // Older patient records only carry the combined address, where the
-      // township is the last "၊"-separated part.
-      final parts = (patient.address ?? '')
-          .split('၊')
-          .map((p) => p.trim())
-          .where((p) => p.isNotEmpty)
-          .toList();
-      if (parts.length >= 2) {
-        quarterController.text = parts.sublist(0, parts.length - 1).join('၊');
-        townController.text = parts.last;
-      } else if (parts.length == 1) {
-        quarterController.text = '';
-        townController.text = parts.first;
-      }
+      final ward = (patient.ward ?? '').trim();
+      final village = (patient.village ?? '').trim();
+      final township = (patient.township ?? '').trim();
+      quarterController.text = ward.isNotEmpty ? ward : village;
+      townController.text =
+          township.isNotEmpty ? township : (parts.isNotEmpty ? parts.first : '');
     }
     setRegion(townController.text);
   }
@@ -236,10 +233,18 @@ class _BloodDonationEditScreenState
     ageController.text = widget.data.patientAge ?? "";
     quarterController.text = "";
     townController.text = "";
-    if (widget.data.patientAddress != null) {
-      final addressParts = widget.data.patientAddress!.split("၊");
-      quarterController.text = addressParts.isNotEmpty ? addressParts[0] : "";
-      townController.text = addressParts.length > 1 ? addressParts[1] : "";
+    final parts = (widget.data.patientAddress ?? "")
+        .split("၊")
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toList();
+    if (parts.length >= 2) {
+      // Keep everything before the township together so the town (မြို့) is
+      // preserved in the full ward ၊ town ၊ township address.
+      quarterController.text = parts.sublist(0, parts.length - 1).join('၊');
+      townController.text = parts.last;
+    } else if (parts.length == 1) {
+      townController.text = parts.first;
     }
     setRegion(townController.text);
   }

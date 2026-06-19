@@ -128,4 +128,22 @@ class TownshipDetailRepository {
     }
     return null;
   }
+
+  /// The town (မြို့) a ward belongs to, but only when it is unambiguous within
+  /// the township. Some townships reuse ward names — e.g. "အမှတ်(၁)ရပ်ကွက်"
+  /// exists under several towns — so the town cannot be inferred from the ward
+  /// name alone; in that case (and for villages / unknown wards) this returns ''.
+  String unambiguousTownForWard(String township, String ward) {
+    final places = _byTownship[township.trim()]?.places;
+    if (places == null) return '';
+    final w = ward.trim();
+    String? town;
+    for (final p in places) {
+      if (p.isWard && p.name == w) {
+        if (town != null && town != p.group) return ''; // ambiguous
+        town = p.group;
+      }
+    }
+    return town ?? '';
+  }
 }

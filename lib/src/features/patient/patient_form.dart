@@ -82,42 +82,55 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
     final ward = (p.ward ?? '').trim();
     final village = (p.village ?? '').trim();
 
-    // Parse the flat address into up to [street, place, township].
-    String aStreet = '', aPlace = '', aTownship = '';
     final parts = (p.address ?? '')
         .split('၊')
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty)
         .toList();
-    if (parts.length >= 3) {
-      aTownship = parts.last;
-      aPlace = parts[parts.length - 2];
-      aStreet = parts.sublist(0, parts.length - 2).join('၊');
-    } else if (parts.length == 2) {
-      aPlace = parts[0];
-      aTownship = parts[1];
-    } else if (parts.length == 1) {
-      aTownship = parts[0];
-    }
 
-    // Prefer structured columns (post-migration) for township/place; the
-    // house/street is only carried in the flat address.
+    // Prefer structured columns (post-migration) for township/place. The
+    // house/street and the town (မြို့) are the only pieces not held in a
+    // column, so recover them from the flat address relative to the known place:
+    // everything before the place is the street, and a segment sitting between
+    // the place and the final township part is the town.
     if (township.isNotEmpty || ward.isNotEmpty || village.isNotEmpty) {
       final isWard = ward.isNotEmpty;
+      String placeName = isWard ? ward : village;
+      String street = '';
+      String? town;
+      if (placeName.isNotEmpty) {
+        final idx = parts.indexOf(placeName);
+        if (idx >= 0) {
+          if (idx > 0) street = parts.sublist(0, idx).join('၊');
+          if (idx + 1 < parts.length - 1) town = parts[idx + 1];
+        }
+      } else if (parts.length >= 2) {
+        // Township column only: take the place from the flat address.
+        placeName = parts[parts.length - 2];
+        street = parts.sublist(0, parts.length - 2).join('၊');
+      }
       return LocationValue(
-        township: township.isNotEmpty ? township : aTownship,
-        placeName: isWard ? ward : (village.isNotEmpty ? village : aPlace),
+        township: township.isNotEmpty
+            ? township
+            : (parts.isNotEmpty ? parts.last : ''),
+        placeName: placeName,
         placeType: isWard ? 'ward' : (village.isNotEmpty ? 'village' : null),
-        street: aStreet,
+        group: town,
+        street: street,
       );
     }
-    if (aTownship.isEmpty && aPlace.isEmpty && aStreet.isEmpty) {
-      return const LocationValue();
+
+    // No structured columns (older records): best-effort parse of the flat
+    // address as [street?, place, township].
+    if (parts.isEmpty) return const LocationValue();
+    if (parts.length == 1) return LocationValue(township: parts.first);
+    if (parts.length == 2) {
+      return LocationValue(placeName: parts.first, township: parts.last);
     }
     return LocationValue(
-      township: aTownship,
-      placeName: aPlace,
-      street: aStreet,
+      street: parts.sublist(0, parts.length - 2).join('၊'),
+      placeName: parts[parts.length - 2],
+      township: parts.last,
     );
   }
 
