@@ -480,6 +480,14 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
         },
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,
+        // Grow rows to fit their content. Long Myanmar names (e.g.
+        // "မဝင့်ရွှေသဇင်အောင်") wrap onto a second line; without this the fixed
+        // row height clips the wrapped part so the name looks cut off.
+        onQueryRowHeight: (details) {
+          if (details.rowIndex == 0) return 56.0; // header
+          final h = details.getIntrinsicRowHeight(details.rowIndex);
+          return h < 49.0 ? 49.0 : h;
+        },
         columnWidthMode: Responsive.isMobile(context)
             ? ColumnWidthMode.auto
             : ColumnWidthMode.fitByCellValue,

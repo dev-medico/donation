@@ -43,19 +43,22 @@ class Utils {
   }
 
   static bool isNumeric(String? s) {
-    bool exist = false;
-    List<String> match = ["၀", "၁", "၂", "၃", "၄", "၅", "၆", "၇", "၈", "၉"];
-    for (int i = 0; i < match.length; i++) {
-      if (s!.contains(match[i])) {
-        exist = true;
-        break;
-      }
-    }
-    if (exist) return true;
-    if (s == null) {
+    if (s == null) return false;
+    final t = s.trim();
+    if (t.isEmpty) return false;
+    // Treat a value as numeric only when EVERY character is a digit (Myanmar
+    // ၀-၉ or ASCII 0-9) or a decimal separator. A mere embedded digit must not
+    // count, otherwise text such as an address containing "(၁)" is wrongly
+    // detected as a number and right-aligned in the data grid.
+    const myanmarDigits = "၀၁၂၃၄၅၆၇၈၉";
+    for (final ch in t.split('')) {
+      if (myanmarDigits.contains(ch)) continue;
+      final code = ch.codeUnitAt(0);
+      if (code >= 0x30 && code <= 0x39) continue; // ASCII 0-9
+      if (ch == '.' || ch == ',') continue;
       return false;
     }
-    return double.tryParse(s) != null;
+    return true;
   }
 
   static String getPostTime2(DateTime date) {

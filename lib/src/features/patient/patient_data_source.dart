@@ -113,9 +113,10 @@ class PatientDataSource extends DataGridSource {
       return Container(
         alignment: alignment,
         padding: padding,
+        // No ellipsis: let long Myanmar names/addresses wrap so they stay fully
+        // visible. The grid grows the row to fit via onQueryRowHeight.
         child: Text(
           value,
-          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontWeight: columnName == 'name' ? FontWeight.w600 : FontWeight.normal,
             fontSize: 13,

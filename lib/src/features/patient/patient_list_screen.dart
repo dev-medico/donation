@@ -286,6 +286,13 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
               },
               gridLinesVisibility: GridLinesVisibility.both,
               headerGridLinesVisibility: GridLinesVisibility.both,
+              // Grow rows to fit wrapped content so long Myanmar names/addresses
+              // are not clipped by a fixed row height.
+              onQueryRowHeight: (details) {
+                if (details.rowIndex == 0) return 56.0; // header
+                final h = details.getIntrinsicRowHeight(details.rowIndex);
+                return h < 49.0 ? 49.0 : h;
+              },
               columnWidthMode: Responsive.isMobile(context)
                   ? ColumnWidthMode.auto
                   : ColumnWidthMode.fitByCellValue,
