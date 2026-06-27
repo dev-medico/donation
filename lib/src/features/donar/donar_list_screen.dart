@@ -638,6 +638,11 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
           },
           gridLinesVisibility: GridLinesVisibility.both,
           headerGridLinesVisibility: GridLinesVisibility.both,
+          onQueryRowHeight: (details) {
+            if (details.rowIndex == 0) return 56.0;
+            final height = details.getIntrinsicRowHeight(details.rowIndex);
+            return height < 49.0 ? 49.0 : height;
+          },
           columnWidthMode: Responsive.isMobile(context)
               ? ColumnWidthMode.auto
               : ColumnWidthMode.fitByCellValue,
@@ -1781,6 +1786,7 @@ class _EditDonorRecordDialog extends ConsumerStatefulWidget {
 class _EditDonorRecordDialogState
     extends ConsumerState<_EditDonorRecordDialog> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _amountController = TextEditingController();
   late DateTime _selectedDate;
   bool _isLoading = false;
@@ -1789,16 +1795,9 @@ class _EditDonorRecordDialogState
   @override
   void initState() {
     super.initState();
+    _nameController.text = displayDonorRecordName(widget.donor);
     _amountController.text = widget.donor['amount']?.toString() ?? '';
     _selectedDate = DateTime.parse(widget.donor['date']);
-  }
-
-  String get _donorName {
-    if (widget.donor['moneyDonor'] != null &&
-        widget.donor['moneyDonor']['name'] != null) {
-      return widget.donor['moneyDonor']['name'];
-    }
-    return widget.donor['name'] ?? '';
   }
 
   @override
@@ -1869,57 +1868,23 @@ class _EditDonorRecordDialogState
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Donor name (read-only)
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Colors.green.withOpacity(0.2),
+                      TextFormField(
+                        controller: _nameController,
+                        minLines: 1,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          labelText: 'အလှူရှင် အမည်',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
+                          prefixIcon: const Icon(Icons.person),
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Icon(
-                                Icons.person,
-                                size: 16,
-                                color: Colors.green[700],
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'အလှူရှင်',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.green[700],
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    _donorName,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
+                          }
+                          return null;
+                        },
                       ),
 
                       const SizedBox(height: 18),
@@ -2165,6 +2130,7 @@ class _EditDonorRecordDialogState
 
     try {
       final data = <String, dynamic>{
+        'name': _nameController.text.trim(),
         'amount': int.parse(_amountController.text),
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
       };
@@ -2203,6 +2169,7 @@ class _EditDonorRecordDialogState
 
   @override
   void dispose() {
+    _nameController.dispose();
     _amountController.dispose();
     super.dispose();
   }

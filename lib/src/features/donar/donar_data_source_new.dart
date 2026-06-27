@@ -3,6 +3,21 @@ import 'package:donation/utils/utils.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:intl/intl.dart';
 
+String displayDonorRecordName(dynamic donor) {
+  if (donor is! Map) return '';
+
+  final recordName = donor['name']?.toString().trim() ?? '';
+  if (recordName.isNotEmpty) return recordName;
+
+  final moneyDonor = donor['moneyDonor'];
+  if (moneyDonor is Map) {
+    final donorName = moneyDonor['name']?.toString().trim() ?? '';
+    if (donorName.isNotEmpty) return donorName;
+  }
+
+  return '';
+}
+
 class DonarDataSource extends DataGridSource {
   /// Creates the donar data source class with required details.
   DonarDataSource({required List<dynamic> donarData}) {
@@ -19,9 +34,7 @@ class DonarDataSource extends DataGridSource {
             value: DateFormat('dd MMM yyyy').format(date)),
         DataGridCell<String>(
             columnName: 'အမည်',
-            value: (donar['moneyDonor'] != null && donar['moneyDonor']['name'] != null)
-                ? donar['moneyDonor']['name']
-                : (donar['name'] ?? '')),
+            value: displayDonorRecordName(donar)),
         DataGridCell<String>(
             columnName: 'အလှူငွေ',
             value: '${Utils.strToMM(donar['amount'].toString())} ကျပ်'),
@@ -72,6 +85,7 @@ class DonarDataSource extends DataGridSource {
         padding: const EdgeInsets.all(8.0),
         child: Text(
           e.value.toString(),
+          softWrap: true,
           style: TextStyle(
             color: e.columnName == 'အလှူငွေ' ? Colors.green[700] : null,
             fontWeight: e.columnName == 'အလှူငွေ' ? FontWeight.bold : null,
