@@ -28,7 +28,7 @@ class ApiClient {
 
   ApiClient._internal() {
     // _baseUrl = 'http://donation_backend.test/';
-    _baseUrl = 'https://redjuniors.mooo.com/';
+    _baseUrl = 'https://207-180-244-55.sslip.io/';
     _timeout = const Duration(seconds: 30);
     _defaultHeaders = {
       'Accept': 'application/json',

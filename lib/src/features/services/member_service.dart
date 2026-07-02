@@ -250,7 +250,7 @@ class MemberService extends BaseService {
       String id, Uint8List bytes, String filename) async {
     final token = await getToken();
     final uri =
-        Uri.parse('https://redjuniors.mooo.com/member/upload-photo?id=$id');
+        Uri.parse('https://207-180-244-55.sslip.io/member/upload-photo?id=$id');
     final request = http.MultipartRequest('POST', uri);
     if (token != null && token.isNotEmpty) {
       request.headers['Authorization'] = 'Bearer $token';
