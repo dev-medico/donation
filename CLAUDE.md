@@ -2,27 +2,32 @@
 
 ## Server Access Configuration
 
-### SSH Access to Production Server
+### SSH Access to Production Server (Contabo, since 2026-07-02)
 ```bash
-# Server: redjuniors.mooo.com (54.206.49.166)
-# User: ubuntu
-# Key: ~/.ssh/id_ed25519
+# Server: 207.180.244.55 (shared Contabo VPS: medico, hello7, property, donation, ...)
+# User: root (key auth already configured)
 
-ssh -i ~/.ssh/id_ed25519 ubuntu@54.206.49.166
+ssh root@207.180.244.55
 
 # Pull latest backend changes:
-cd /var/www/donation_backend && sudo git pull origin main
+cd /var/www/donation_backend && git pull origin main
 
 # Run Yii commands:
-sudo php yii <command>
+php yii <command>
 ```
+
+- API base URL used by this app: `https://207-180-244-55.sslip.io/`
+- Direct HTTP (testing only): `http://207.180.244.55:8087/`
+- DB: PostgreSQL 16 on localhost, db `donation`, role `donation_user`
+  (config/db.php on the server is git skip-worktree — edit it there, not via git)
+- The old AWS server (redjuniors.mooo.com / 54.206.49.166) is decommissioned.
 
 ### Backend Deployment Steps
 1. Commit and push changes to GitHub
-2. SSH into server
+2. SSH into server: `ssh root@207.180.244.55`
 3. Navigate to `/var/www/donation_backend`
-4. Run `sudo git pull origin main`
-5. If needed: `sudo php yii cache/flush-all`
+4. Run `git pull origin main`
+5. If needed: `php yii cache/flush-all`
 
 ### Database Management Commands
 ```bash
