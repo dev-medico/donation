@@ -1,9 +1,10 @@
 import 'package:donation/src/features/services/base_service.dart';
 import 'package:donation/src/features/patient/models/patient.dart';
 
-/// Thrown when the server reports that a patient with the same name, township
-/// and ward/village already exists. Carries the matching record so the UI can
-/// show it and let the user decide whether to add the patient anyway.
+/// Thrown when the server reports that a patient with the same name, blood
+/// type, township and ward/village already exists (all must match). Carries
+/// the matching record so the UI can show it and let the user decide whether
+/// to add the patient anyway.
 class DuplicatePatientException implements Exception {
   final Patient existing;
   final String message;
@@ -25,6 +26,8 @@ class PatientService extends BaseService {
     final queryParams = <String, dynamic>{
       'page': page.toString(),
       'limit': limit.toString(),
+      // Keep the first-created patient at the top of the list.
+      'order': 'asc',
     };
 
     if (q.isNotEmpty) {
@@ -79,9 +82,10 @@ class PatientService extends BaseService {
 
   /// Create new patient.
   ///
-  /// The server rejects a patient whose name + township + ward/village match an
-  /// existing record by returning `status: 'duplicate'`, which surfaces here as
-  /// a [DuplicatePatientException]. Pass [force] = true to skip that guard and
+  /// The server rejects a patient whose name + blood type + township +
+  /// ward/village ALL match an existing record by returning
+  /// `status: 'duplicate'`, which surfaces here as a
+  /// [DuplicatePatientException]. Pass [force] = true to skip that guard and
   /// create the patient regardless (a genuinely different, same-named person).
   Future<Patient> createPatient(
     Map<String, dynamic> patientData, {

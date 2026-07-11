@@ -141,7 +141,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
       );
 
       setState(() {
-        donorsByMonth[month] = donors;
+        donorsByMonth[month] = sortRecordsByDateAscending(donors);
         expensesByMonth[month] = expenses;
       });
     } catch (e) {

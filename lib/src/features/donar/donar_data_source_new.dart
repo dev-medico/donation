@@ -18,6 +18,41 @@ String displayDonorRecordName(dynamic donor) {
   return '';
 }
 
+/// Return finance records in chronological order without mutating the API
+/// response. The record ID is only a tie-breaker; an edited date must determine
+/// where the row appears.
+List<dynamic> sortRecordsByDateAscending(Iterable<dynamic> records) {
+  final sorted = List<dynamic>.from(records);
+  sorted.sort((left, right) {
+    final leftDate = _recordDate(left);
+    final rightDate = _recordDate(right);
+
+    if (leftDate == null && rightDate == null) {
+      return _recordId(left).compareTo(_recordId(right));
+    }
+    if (leftDate == null) return 1;
+    if (rightDate == null) return -1;
+
+    final dateComparison = leftDate.compareTo(rightDate);
+    if (dateComparison != 0) return dateComparison;
+    return _recordId(left).compareTo(_recordId(right));
+  });
+  return sorted;
+}
+
+DateTime? _recordDate(dynamic record) {
+  if (record is! Map) return null;
+  final value = record['date']?.toString().trim() ?? '';
+  return value.isEmpty ? null : DateTime.tryParse(value);
+}
+
+int _recordId(dynamic record) {
+  if (record is! Map) return 0;
+  final value = record['id'];
+  if (value is int) return value;
+  return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
 class DonarDataSource extends DataGridSource {
   /// Creates the donar data source class with required details.
   DonarDataSource({required List<dynamic> donarData}) {

@@ -24,6 +24,96 @@ class PatientFormScreen extends ConsumerStatefulWidget {
   ConsumerState<PatientFormScreen> createState() => _PatientFormScreenState();
 }
 
+/// Identifying details shown when a possible duplicate patient is found.
+///
+/// Same-name patients can legitimately live in the same ward or village. Keep
+/// the warning, but show enough information for staff to decide whether the
+/// existing record belongs to the person they are entering.
+class DuplicatePatientSummaryCard extends StatelessWidget {
+  final Patient patient;
+
+  const DuplicatePatientSummaryCard({
+    super.key,
+    required this.patient,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final name = (patient.name ?? '').trim();
+    final age = displayAge(
+      patient.birthDate,
+      fallbackAge: patient.age,
+      detailed: true,
+      empty: '-',
+    );
+    final bloodType = (patient.bloodType ?? '').trim();
+    final address = (patient.address ?? '').trim();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            name.isEmpty ? '-' : name,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          _DuplicatePatientDetailRow(label: 'အသက်', value: age),
+          const SizedBox(height: 4),
+          _DuplicatePatientDetailRow(
+            label: 'သွေးအုပ်စု',
+            value: bloodType.isEmpty ? '-' : bloodType,
+          ),
+          const SizedBox(height: 4),
+          _DuplicatePatientDetailRow(
+            label: 'လိပ်စာ',
+            value: address.isEmpty ? '-' : address,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DuplicatePatientDetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _DuplicatePatientDetailRow({
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 86,
+          child: Text(
+            '$label:',
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade800),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -171,8 +261,9 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
         try {
           await service.createPatient(data);
         } on DuplicatePatientException catch (dup) {
-          // Same name + township + ward/village already exists. Let the user
-          // see the match and choose whether this is really a new patient.
+          // A patient matching on ALL of name + blood type + township +
+          // ward/village already exists. Let the user see the match and
+          // choose whether this is really a new patient.
           final addAnyway = await _confirmAddDuplicate(dup.existing) ?? false;
           if (!addAnyway) return; // stay on the form; finally resets loading
           await service.createPatient(data, force: true);
@@ -203,54 +294,29 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
     }
   }
 
-  /// Warn that an identical patient already exists and ask whether to add this
-  /// one anyway. Returns true when the user chooses to proceed.
+  /// Warn that a potentially matching patient exists and ask whether to add
+  /// this one anyway. Returns true when the user chooses to proceed.
   Future<bool?> _confirmAddDuplicate(Patient existing) {
-    final name = (existing.name ?? '').trim();
-    final address = (existing.address ?? '').trim();
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('ဤလူနာ ရှိပြီးသား ဖြစ်နေပါသည်'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'အမည်၊ မြို့နယ်နှင့် ရပ်ကွက်/ကျေးရွာ တူညီသော လူနာ စာရင်းတွင် ရှိနှင့်ပြီး ဖြစ်ပါသည်။',
-              style: TextStyle(fontSize: 14),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFf5f5f5),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
+        title: const Text('အလားတူ လူနာ ရှိနေပါသည်'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'အမည်၊ သွေးအုပ်စု၊ မြို့နယ်နှင့် ရပ်ကွက်/ကျေးရွာ အားလုံး တူညီသော လူနာ ရှိနေပါသည်။ အောက်ပါအချက်များကို တိုက်ဆိုင်စစ်ဆေးပါ။',
+                style: TextStyle(fontSize: 14),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name.isEmpty ? '-' : name,
-                    style: const TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                  if (address.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      address,
-                      style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text('ထပ်မံ ထည့်သွင်းလိုပါသလား?',
-                style: TextStyle(fontSize: 14)),
-          ],
+              const SizedBox(height: 12),
+              DuplicatePatientSummaryCard(patient: existing),
+              const SizedBox(height: 12),
+              const Text('ထပ်မံ ထည့်သွင်းလိုပါသလား?',
+                  style: TextStyle(fontSize: 14)),
+            ],
+          ),
         ),
         actions: [
           TextButton(
