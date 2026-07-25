@@ -107,9 +107,6 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime date = DateTime.now().toLocal();
-    String dateFormat = DateFormat('dd MMM yyyy ( EEEE )').format(date);
-
     return Scaffold(
       //backgroundColor: Colors.white,
       appBar: AppBar(

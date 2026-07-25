@@ -92,7 +92,7 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
             ),
           );
           // Refresh the list after returning from new donation screen
-          ref.refresh(donationsByMonthYearProvider((
+          ref.invalidate(donationsByMonthYearProvider((
             month: _monthSelected + 1,
             year: int.parse(years[_yearSelected])
           )));
@@ -471,7 +471,7 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                             data: donation,
                           )));
               // Refresh the list after returning from detail screen
-              ref.refresh(donationsByMonthYearProvider((
+              ref.invalidate(donationsByMonthYearProvider((
                 month: _monthSelected + 1,
                 year: int.parse(years[_yearSelected])
               )));

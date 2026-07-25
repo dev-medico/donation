@@ -3,7 +3,6 @@ import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/extensions.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar(

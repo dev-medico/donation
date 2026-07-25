@@ -576,7 +576,6 @@ class _PatientDonationDataSource extends DataGridSource {
     required List<Donation> donationData,
     required this.onRowTap,
   }) {
-    _donationData = donationData;
     _dataGridRows = donationData
         .asMap()
         .entries
@@ -594,7 +593,6 @@ class _PatientDonationDataSource extends DataGridSource {
         .toList();
   }
 
-  List<Donation> _donationData = [];
   List<DataGridRow> _dataGridRows = [];
 
   @override

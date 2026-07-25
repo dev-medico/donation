@@ -162,7 +162,10 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
                         updatedMember
                       );
                       
-                      // Refresh both member list and search list
+                      // Refresh both member list and search list. Awaited only
+                      // so the re-fetch finishes before we pop; the refreshed
+                      // value itself isn't needed here.
+                      // ignore: unused_result
                       await ref.refresh(memberListProvider.future);
                       
                       // Invalidate the search member list provider to force refresh

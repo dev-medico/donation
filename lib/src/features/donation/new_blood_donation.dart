@@ -1,26 +1,16 @@
 import 'dart:convert';
-import 'dart:developer';
 
 // import 'package:donation/realm/realm_services.dart';
 // import 'package:donation/realm/schemas.dart' hide Donation;
-import 'package:donation/src/providers/providers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:donation/data/repository/repository.dart';
-import 'package:donation/data/response/member_response.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
-import 'package:donation/data/response/xata_member_list_response.dart';
-import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
-import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:donation/src/features/donation/models/donation.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/domain/member_repository.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
@@ -32,8 +22,7 @@ import 'package:donation/src/features/patient/models/patient.dart';
 import 'package:donation/src/features/patient/providers/patient_provider.dart';
 
 class NewBloodDonationScreen extends ConsumerStatefulWidget {
-  NewBloodDonationScreen({Key? key}) : super(key: key);
-  int selectedIndex = 0;
+  const NewBloodDonationScreen({Key? key}) : super(key: key);
 
   @override
   NewBloodDonationState createState() => NewBloodDonationState();
@@ -449,23 +438,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       Utils.messageDialog("သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nမအောင်မြင်ပါ - $e",
           context, "အိုကေ", Colors.red);
     }
-  }
-
-  // Reset the form fields
-  void _resetForm() {
-    nameController.clear();
-    ageController.clear();
-    diseaseController.clear();
-    hospitalController.clear();
-    quarterController.clear();
-    townController.clear();
-    memberController.clear();
-    setState(() {
-      selectedMember = null;
-      selectedPatient = null;
-      donationDateDetail = null;
-      donationDate = "လှူဒါန်းသည့် ရက်စွဲ ရွေးမည်";
-    });
   }
 
   void initial() async {

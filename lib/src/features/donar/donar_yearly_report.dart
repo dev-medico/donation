@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
-import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/tool_widgets.dart';
 import 'package:donation/utils/utils.dart';
 
 class DonationYearlyReport extends StatelessWidget {
-  int openingBalance;
-  List<int>? monthlyDonation;
-  List<int>? monthlyExpense;
-  int? closingBalance;
-  int? totalExpense;
-  int? totalDonationAmount;
-  int? selectedYear;
+  final int openingBalance;
+  final List<int>? monthlyDonation;
+  final List<int>? monthlyExpense;
+  final int? closingBalance;
+  final int? totalExpense;
+  final int? totalDonationAmount;
+  final int? selectedYear;
   DonationYearlyReport(
       {Key? key,
       required this.openingBalance,

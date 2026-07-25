@@ -17,9 +17,8 @@ import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class MemberEditNewStyleScreen extends StatefulWidget {
-  MemberData data;
+  final MemberData data;
   MemberEditNewStyleScreen({Key? key, required this.data}) : super(key: key);
-  int selectedIndex = 0;
 
   @override
   MemberEditState createState() => MemberEditState(data);

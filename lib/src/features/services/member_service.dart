@@ -1,11 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/services/base_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:donation/core/api/api_client.dart';
 import 'package:http/http.dart' as http;
 
 final memberLoadingStatusProvider = StateProvider<String>((ref) => '');
@@ -14,11 +11,6 @@ final memberServiceProvider =
 
 class MemberService extends BaseService {
   final ProviderRef? ref;
-
-  // Cache for member data
-  List<dynamic>? _cachedMembers;
-  DateTime? _lastFetchTime;
-  final Duration _cacheValidityDuration = const Duration(minutes: 10);
 
   MemberService([this.ref]);
 

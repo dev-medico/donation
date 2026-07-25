@@ -123,59 +123,6 @@ class _MoneyDonorListScreenState extends ConsumerState<MoneyDonorListScreen> {
     );
   }
 
-  void _showEditDonorForm(MoneyDonor donor) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MoneyDonorFormScreen(
-          donor: donor,
-          onSaved: () {
-            _fetchPage(0);
-          },
-        ),
-      ),
-    );
-  }
-
-  Future<void> _deleteDonor(MoneyDonor donor) async {
-    if (donor.id == null) return;
-
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('အတည်ပြုပါ'),
-        content: Text('${donor.name} ကို ဖျက်ရန် သေချာပါသလား?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('မလုပ်ပါ'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('ဖျက်မည်'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      try {
-        final success = await ref.read(moneyDonorServiceProvider).deleteMoneyDonor(donor.id!);
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('အောင်မြင်စွာ ဖျက်ပြီးပါပြီ')),
-          );
-          _fetchPage(0);
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('ဖျက်ရန် မအောင်မြင်ပါ: $e')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

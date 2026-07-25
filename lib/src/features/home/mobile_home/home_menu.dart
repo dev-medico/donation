@@ -1,9 +1,6 @@
-import 'package:donation/realm/realm_services.dart';
-import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -79,7 +76,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  userName ?? "User",
+                  userName,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -87,7 +84,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  role ?? "Member",
+                  role,
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.red.shade700,

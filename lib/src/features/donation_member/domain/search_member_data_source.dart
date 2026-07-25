@@ -95,10 +95,8 @@ class SearchMemberDataSource extends DataGridSource {
         }
       }
       
-      if (date != null) {
-        // Format as "yyyy MMM dd" (e.g., "2024 May 08")
-        return DateFormat('yyyy MMM dd').format(date);
-      }
+      // Format as "yyyy MMM dd" (e.g., "2024 May 08")
+      return DateFormat('yyyy MMM dd').format(date);
     } catch (e) {
       // If parsing fails, return original
     }

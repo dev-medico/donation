@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/services/member_service.dart';
-import 'package:donation/repositories/member_repository.dart';
 import 'package:donation/providers/member_provider.dart';
 
 final memberServiceProvider = Provider<MemberService>((ref) {

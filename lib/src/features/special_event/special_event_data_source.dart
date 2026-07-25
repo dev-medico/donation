@@ -15,7 +15,9 @@ class SpecialEventDataSource extends DataGridSource {
         final dateString = event['date'].toString();
         if (dateString.contains(' ')) {
           try {
-            final date = DateFormat('dd MMM yyyy').parse(dateString);
+            // Only used to validate the "dd MMM yyyy" shape — throws into the
+            // catch below when the string is in some other format.
+            DateFormat('dd MMM yyyy').parse(dateString);
             dateStr = dateString;
           } catch (e) {
             final date = DateTime.parse(dateString);

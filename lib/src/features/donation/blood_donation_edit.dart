@@ -2,25 +2,17 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/services.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:donation/src/features/donation/models/donation.dart';
 import 'package:donation/data/response/township_response/datum.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
-import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
-import 'package:donation/utils/tool_widgets.dart';
-import 'package:donation/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
-import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/patient/models/patient.dart';
 import 'package:donation/src/features/patient/providers/patient_provider.dart';
-import 'package:donation/src/features/services/member_service.dart'
-    as member_services;
 import 'package:donation/src/features/services/donation_service.dart';
 
 class BloodDonationEditScreen extends ConsumerStatefulWidget {
@@ -402,36 +394,6 @@ class _BloodDonationEditScreenState
   // Formatted address getter for preview
   String get formattedAddress =>
       "${quarterController.text}${quarterController.text.isNotEmpty ? '၊' : ''}${townController.text}";
-
-  // Helper method for displaying info rows in member details
-  Widget _infoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              '$label:',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                color: Colors.black87,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _bloodTypeChip(String bloodType) {
     return Container(

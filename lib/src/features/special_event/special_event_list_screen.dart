@@ -368,155 +368,6 @@ class _SpecialEventListScreenState
     );
   }
 
-  Widget _buildEventCard(Map<String, dynamic> event) {
-    DateTime date;
-    String formattedDate;
-
-    try {
-      // Try to parse the date - handle different formats
-      final dateStr = event['date'].toString();
-
-      // Check if it's already in the format we want to display
-      if (dateStr.contains(' ')) {
-        // If it contains space, it might be in format like "24 Feb 2022"
-        // Try to parse it directly
-        try {
-          date = DateFormat('dd MMM yyyy').parse(dateStr);
-          formattedDate = dateStr;
-        } catch (e) {
-          // If that fails, try other formats
-          date = DateTime.parse(dateStr);
-          formattedDate = DateFormat('dd MMM yyyy').format(date);
-        }
-      } else {
-        // Standard ISO format
-        date = DateTime.parse(dateStr);
-        formattedDate = DateFormat('dd MMM yyyy').format(date);
-      }
-    } catch (e) {
-      // If all parsing fails, use current date as fallback
-      date = DateTime.now();
-      formattedDate = 'Invalid date';
-    }
-
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          _showEventDetails(event);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      event['lab_name'] ?? 'Unknown Lab',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      formattedDate,
-                      style: TextStyle(
-                        color: primaryColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  _buildTestInfo('Haemoglobin', event['haemoglobin']),
-                  const SizedBox(width: 16),
-                  _buildTestInfo('HBs Ag', event['hbs_ag']),
-                  const SizedBox(width: 16),
-                  _buildTestInfo('HCV Ab', event['hcv_ab']),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _buildTestInfo('MP ICT', event['mp_ict']),
-                  const SizedBox(width: 16),
-                  _buildTestInfo('Retro', event['retro_test']),
-                  const SizedBox(width: 16),
-                  _buildTestInfo('VDRL', event['vdrl_test']),
-                ],
-              ),
-              const Divider(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Total Tests',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  Text(
-                    event['total'].toString(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTestInfo(String label, dynamic value) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value?.toString() ?? '0',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showEventDetails(Map<String, dynamic> event) {
     // Parse date safely
     String dateDisplay;
@@ -524,7 +375,9 @@ class _SpecialEventListScreenState
       final dateStr = event['date'].toString();
       if (dateStr.contains(' ')) {
         try {
-          final date = DateFormat('dd MMM yyyy').parse(dateStr);
+          // Only used to validate the "dd MMM yyyy" shape — throws into the
+          // catch below when the string is in some other format.
+          DateFormat('dd MMM yyyy').parse(dateStr);
           dateDisplay = dateStr;
         } catch (e) {
           final date = DateTime.parse(dateStr);

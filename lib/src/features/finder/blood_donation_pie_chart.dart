@@ -59,12 +59,7 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
   List<DonationModel>? donations;
   List<String>? _positionList;
   List<String>? _connectorLineList;
-  late String _selectedPosition;
-  late String _connectorLine;
   late bool isZeroVisible;
-  late ChartDataLabelPosition _labelPosition;
-  late ConnectorType _connectorType;
-  late String _selectedOverflowMode;
   late OverflowMode _overflowMode;
   List<String>? _overflowModeList;
   TooltipBehavior? _tooltipBehavior;
@@ -195,14 +190,9 @@ class _BloodDonationPieChartState extends ConsumerState<BloodDonationPieChart> {
 
   @override
   void initState() {
-    _selectedPosition = 'outside';
-    _connectorLine = 'curve';
     isZeroVisible = false;
     _positionList = <String>['outside', 'inside'].toList();
     _connectorLineList = <String>['curve', 'line'].toList();
-    _labelPosition = ChartDataLabelPosition.outside;
-    _connectorType = ConnectorType.curve;
-    _selectedOverflowMode = 'none';
     _overflowMode = OverflowMode.none;
     _overflowModeList = <String>['shift', 'none', 'hide', 'trim'].toList();
     _tooltipBehavior =

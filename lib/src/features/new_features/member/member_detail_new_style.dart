@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 
 class MemberDetailNewStyleScreen extends StatefulWidget {
   static const routeName = '/member-detail';
-  MemberData data;
+  final MemberData data;
   MemberDetailNewStyleScreen({Key? key, required this.data}) : super(key: key);
 
   @override

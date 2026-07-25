@@ -128,59 +128,6 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     );
   }
 
-  void _showEditPatientForm(Patient patient) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PatientFormScreen(
-          patient: patient,
-          onSaved: () {
-            _fetchPage(0);
-          },
-        ),
-      ),
-    );
-  }
-
-  Future<void> _deletePatient(Patient patient) async {
-    if (patient.id == null) return;
-
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('အတည်ပြုပါ'),
-        content: Text('${patient.name} ကို ဖျက်ရန် သေချာပါသလား?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('မလုပ်ပါ'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('ဖျက်မည်'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      try {
-        final success = await ref.read(patientServiceProvider).deletePatient(patient.id!);
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('အောင်မြင်စွာ ဖျက်ပြီးပါပြီ')),
-          );
-          _fetchPage(0);
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('ဖျက်ရန် မအောင်မြင်ပါ: $e')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

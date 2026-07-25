@@ -3,7 +3,9 @@ import 'package:donation/src/features/donation/models/donation.dart';
 
 part 'patient.g.dart';
 
-@JsonSerializable()
+// `createFactory: false` because [Patient.fromJson] is hand-written below (it
+// parses the nested donations list, which the generator can't do here).
+@JsonSerializable(createFactory: false)
 class Patient {
   final int? id;
   final String? name;

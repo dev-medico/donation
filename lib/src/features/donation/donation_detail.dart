@@ -13,7 +13,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/donation_service.dart';
 
 class DonationDetailScreen extends ConsumerStatefulWidget {
-  Donation data;
+  final Donation data;
   DonationDetailScreen({
     Key? key,
     required this.data,
@@ -1104,7 +1104,7 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                             ),
                           ).then((_) {
                             // Refresh data when returning from edit screen
-                            ref.refresh(donationsByMonthYearProvider((
+                            ref.invalidate(donationsByMonthYearProvider((
                               month: int.parse(DateTime.now().month.toString()),
                               year: int.parse(DateTime.now().year.toString())
                             )));

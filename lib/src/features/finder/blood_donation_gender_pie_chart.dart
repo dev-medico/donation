@@ -1,5 +1,3 @@
-/// Package imports
-import 'dart:math';
 
 import 'package:donation/src/features/finder/common_chart_data.dart';
 import 'package:donation/src/features/services/report_service.dart';
@@ -43,12 +41,7 @@ class _BloodDonationGenderPieChartState
   List<DonationModel> donations = [];
   List<String>? _positionList;
   List<String>? _connectorLineList;
-  late String _selectedPosition;
-  late String _connectorLine;
   late bool isZeroVisible;
-  late ChartDataLabelPosition _labelPosition;
-  late ConnectorType _connectorType;
-  late String _selectedOverflowMode;
   late OverflowMode _overflowMode;
   List<String>? _overflowModeList;
   TooltipBehavior? _tooltipBehavior;
@@ -80,7 +73,6 @@ class _BloodDonationGenderPieChartState
                 (d) => d['patient_gender'] == 'female',
                 orElse: () => {'quantity': 0, 'percentage': 0});
             final averageAge = data['averageAge'] as int;
-            final totalDonations = data['totalDonations'] as int;
             final totalMembers = data['totalMembers'] as int;
             final ageRanges = Map<String, int>.from(data['ageRanges']);
 
@@ -162,44 +154,6 @@ class _BloodDonationGenderPieChartState
     );
   }
 
-  SfCircularChart _buildGenderPieChart(List<Map<String, dynamic>> genderData) {
-    List<ChartData> dataList = [];
-
-    genderData.forEach((data) {
-      dataList.add(ChartData(
-        x: "${data['patient_gender'] == 'male' ? 'ကျား' : 'မ'} - ${data['quantity']}",
-        y: data['percentage'] as int,
-      ));
-    });
-
-    return SfCircularChart(
-      tooltipBehavior: _tooltipBehavior,
-      legend: Legend(
-        isVisible: true,
-        isResponsive: true,
-      ),
-      series: <CircularSeries<ChartData, String>>[
-        DoughnutSeries<ChartData, String>(
-          dataSource: dataList,
-          enableTooltip: true,
-          radius: '80%',
-          dataLabelSettings: DataLabelSettings(
-              isVisible: true,
-              labelIntersectAction: LabelIntersectAction.none,
-              overflowMode: _overflowMode,
-              showZeroValue: !isZeroVisible ? true : false,
-              labelPosition: ChartDataLabelPosition.outside,
-              connectorLineSettings:
-                  ConnectorLineSettings(type: ConnectorType.line)),
-          pointColorMapper: (datum, index) =>
-              index == 0 ? Colors.blue : Colors.pink,
-          xValueMapper: (ChartData data, _) => data.x,
-          yValueMapper: (ChartData data, _) => data.y,
-        )
-      ],
-    );
-  }
-
   SfCircularChart _buildAgeGroupPieChart(
       Map<String, int> ageRanges, int totalMembers) {
     List<ChartData> dataList = [];
@@ -251,14 +205,9 @@ class _BloodDonationGenderPieChartState
 
   @override
   void initState() {
-    _selectedPosition = 'outside';
-    _connectorLine = 'curve';
     isZeroVisible = false;
     _positionList = <String>['outside', 'inside'].toList();
     _connectorLineList = <String>['curve', 'line'].toList();
-    _labelPosition = ChartDataLabelPosition.outside;
-    _connectorType = ConnectorType.curve;
-    _selectedOverflowMode = 'none';
     _overflowMode = OverflowMode.none;
     _overflowModeList = <String>['shift', 'none', 'hide', 'trim'].toList();
     _tooltipBehavior =
