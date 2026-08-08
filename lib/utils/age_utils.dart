@@ -65,6 +65,24 @@ AgeParts ageFromBirthDate(DateTime birthDate, {DateTime? on}) {
   return AgeParts(years: years, months: months, days: days);
 }
 
+/// Replace Myanmar digits (၀-၉, U+1040–U+1049) with ASCII 0-9.
+///
+/// Staff keyboards (Myanmar3 layouts) emit Myanmar digits on the number row,
+/// and legacy patient records store ages that way (e.g. "၅၄"), which
+/// `int.tryParse` cannot read.
+String normalizeMyanmarDigits(String input) {
+  const zero = 0x1040; // ၀
+  final buffer = StringBuffer();
+  for (final unit in input.codeUnits) {
+    if (unit >= zero && unit <= zero + 9) {
+      buffer.writeCharCode(0x30 + (unit - zero));
+    } else {
+      buffer.writeCharCode(unit);
+    }
+  }
+  return buffer.toString();
+}
+
 /// Parse an ISO `yyyy-MM-dd` (or full ISO datetime) string into a date, or null.
 DateTime? parseBirthDate(String? value) {
   if (value == null) return null;

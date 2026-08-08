@@ -128,6 +128,9 @@ class _AgeInputState extends State<AgeInput> {
       controller: c,
       keyboardType: TextInputType.number,
       inputFormatters: [
+        // Myanmar keyboards type ၀-၉; convert instead of silently rejecting,
+        // otherwise the field cannot be typed into at all.
+        const _MyanmarDigitsFormatter(),
         FilteringTextInputFormatter.digitsOnly,
         LengthLimitingTextInputFormatter(3),
       ],
@@ -144,5 +147,19 @@ class _AgeInputState extends State<AgeInput> {
       ),
       onChanged: (_) => _recomputeFromParts(),
     );
+  }
+}
+
+/// Maps Myanmar digits to ASCII as they are typed. The mapping is 1:1 per
+/// UTF-16 code unit, so the selection and composing ranges stay valid.
+class _MyanmarDigitsFormatter extends TextInputFormatter {
+  const _MyanmarDigitsFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final normalized = normalizeMyanmarDigits(newValue.text);
+    if (normalized == newValue.text) return newValue;
+    return newValue.copyWith(text: normalized);
   }
 }

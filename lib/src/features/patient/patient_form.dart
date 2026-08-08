@@ -158,8 +158,9 @@ class _PatientFormScreenState extends ConsumerState<PatientFormScreen> {
       _birthDate = parseBirthDate(p.birthDate);
       // Older records have only a numeric `age` string -> approximate the birth
       // date from it so editing keeps the age and starts persisting a real date.
+      // Legacy ages may be written in Myanmar digits (e.g. "၅၄").
       if (_birthDate == null) {
-        final years = int.tryParse((p.age ?? '').trim());
+        final years = int.tryParse(normalizeMyanmarDigits((p.age ?? '').trim()));
         if (years != null && years > 0) {
           _birthDate = birthDateFromAge(years: years);
         }
