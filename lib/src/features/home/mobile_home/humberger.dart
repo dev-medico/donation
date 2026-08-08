@@ -12,20 +12,24 @@ class Humberger extends StatelessWidget {
       height: AppBar().preferredSize.height - 12,
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppBar().preferredSize.height),
-          child: Center(
-              child: Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: SvgPicture.asset(
-              "assets/images/menu_humberger.svg",
-              width: 20,
-              color: Colors.white,
-            ),
-          )),
-          onTap: () {
-            onTap.call();
-          },
+        child: Semantics(
+          label: 'မီနူး',
+          button: true,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppBar().preferredSize.height),
+            child: Center(
+                child: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: SvgPicture.asset(
+                "assets/images/menu_humberger.svg",
+                width: 20,
+                color: Colors.white,
+              ),
+            )),
+            onTap: () {
+              onTap.call();
+            },
+          ),
         ),
       ),
     );

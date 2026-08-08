@@ -10,6 +10,8 @@ import 'package:donation/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:donation/utils/age_utils.dart';
+import 'package:donation/src/ui/blood_chip.dart';
 
 class PatientListScreen extends ConsumerStatefulWidget {
   const PatientListScreen({super.key});
@@ -166,7 +168,9 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
 
   Widget _buildSearchBar() {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: Responsive.isMobile(context)
+          ? const EdgeInsets.fromLTRB(12, 10, 12, 6)
+          : const EdgeInsets.all(16.0),
       child: StatefulBuilder(
         builder: (context, setState) {
           return TextField(
@@ -200,6 +204,83 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     );
   }
 
+  /// Compact phone rows: blood chip, name over age/gender/address, donation
+  /// count. Shares [_scrollController] so infinite scroll keeps working.
+  Widget _buildMobilePatientList() {
+    return ListView.separated(
+      controller: _scrollController,
+      padding: const EdgeInsets.only(left: 12, right: 12, bottom: 88),
+      itemCount: _allPatients.length,
+      separatorBuilder: (_, __) =>
+          Divider(height: 1, thickness: 0.5, color: Colors.grey[200]),
+      itemBuilder: (context, index) {
+        final patient = _allPatients[index];
+        // detailed:true carries its own unit (နှစ်/လ/ရက်); legacy fallback
+        // strings may already include one (e.g. "20 ရက်"), so append nothing.
+        final age = displayAge(patient.birthDate, fallbackAge: patient.age);
+        final gender = patient.gender == 'male'
+            ? 'ကျား'
+            : patient.gender == 'female'
+                ? 'မ'
+                : '';
+        final secondary = [
+          if (age.isNotEmpty) age,
+          if (gender.isNotEmpty) gender,
+          if ((patient.address ?? '').trim().isNotEmpty)
+            patient.address!.trim(),
+        ].join(' · ');
+        final count = patient.donationCount ?? 0;
+        return InkWell(
+          onTap: () => _showPatientDetail(patient),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 9),
+            child: Row(
+              children: [
+                BloodChip(bloodType: patient.bloodType),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        patient.name ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      if (secondary.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          secondary,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (count > 0) ...[
+                  const SizedBox(width: 6),
+                  Text(
+                    '$count ကြိမ်',
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: primaryColor),
+                  ),
+                ],
+                Icon(Icons.chevron_right, size: 18, color: Colors.grey[400]),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildTableView() {
     if (_isInitialLoad && _patientDataSource == null) {
       return const Center(child: CircularProgressIndicator());
@@ -208,6 +289,19 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     if (_patientDataSource == null && _allPatients.isEmpty) {
       return const Center(
         child: Text('လူနာမတွေ့ပါ'),
+      );
+    }
+
+    if (Responsive.isMobile(context)) {
+      return Column(
+        children: [
+          Expanded(child: _buildMobilePatientList()),
+          if (_isLoadingMore)
+            Container(
+              padding: const EdgeInsets.all(12.0),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+        ],
       );
     }
 

@@ -30,10 +30,9 @@ class DashboardCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Expanded(
       child: Container(
+        // Phones use a uniform height so the 2-column grid rows line up.
         height: Responsive.isMobile(context)
-            ? amount == ""
-                ? MediaQuery.of(context).size.height / 9
-                : MediaQuery.of(context).size.height / 6
+            ? 96
             : amount == ""
                 ? MediaQuery.of(context).size.height * 0.11
                 : MediaQuery.of(context).size.height * 0.2,
@@ -76,39 +75,52 @@ class DashboardCard extends ConsumerWidget {
               }
             },
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Spacer(),
                   Text(
                     title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 15 : 16,
+                      fontSize: Responsive.isMobile(context) ? 14 : 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Spacer(),
-                  Responsive.isMobile(context)
-                      ? Container()
-                      : Text(
-                          subtitle,
-                          style: TextStyle(
-                            fontSize: Responsive.isMobile(context) ? 13 : 14,
-                          ),
-                        ),
-                  const SizedBox(
-                    height: 4,
-                  ),
-                  amount != ""
-                      ? Text(
-                          amount,
-                          style: TextStyle(
-                              fontSize: Responsive.isMobile(context) ? 16 : 17,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        )
-                      : Container(),
+                  const SizedBox(height: 6),
+                  // Desktop keeps subtitle + figure. Phones get one second
+                  // line — the figure when there is one, otherwise the
+                  // subtitle as a grey hint — so the 2-column grid reads
+                  // evenly.
+                  if (!Responsive.isMobile(context) && subtitle != "") ...[
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                  if (amount != "")
+                    Text(
+                      amount,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: Responsive.isMobile(context) ? 15 : 17,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    )
+                  else if (Responsive.isMobile(context) && subtitle != "")
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
                   const Spacer(),
                 ],
               ),

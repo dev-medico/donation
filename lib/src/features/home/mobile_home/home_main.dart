@@ -1,4 +1,5 @@
 import 'package:donation/src/features/dashboard/dashboard.dart';
+import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/donation_member/presentation/search_member.dart';
@@ -42,10 +43,9 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
       fromHome: true,
     ),
 
-    // Donation List - using placeholder for now
-    Center(
-      child: Text('သွေးလှူမှု မှတ်တမ်း ကြည့်ရှုခြင်း လုပ်ဆောင်နေဆဲ ဖြစ်ပါသည်။',
-          style: TextStyle(fontSize: 16)),
+    // Donation List
+    DonationListScreen(
+      fromHome: true,
     ),
 
     // Special Events
@@ -59,7 +59,7 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
     ),
 
     // Monthly Sponsors
-    const MonthlySponsorListScreen(),
+    const MonthlySponsorListScreen(fromHome: true),
   ];
 
   @override

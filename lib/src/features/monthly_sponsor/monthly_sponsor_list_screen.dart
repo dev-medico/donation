@@ -6,9 +6,12 @@ import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:donation/responsive.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 
 class MonthlySponsorListScreen extends ConsumerStatefulWidget {
-  const MonthlySponsorListScreen({super.key});
+  const MonthlySponsorListScreen({super.key, this.fromHome = false});
+  final bool fromHome;
   static const routeName = '/monthly-sponsor-list';
 
   @override
@@ -116,6 +119,14 @@ class _MonthlySponsorListScreenState
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                tooltip: 'မီနူး',
+                onPressed: () =>
+                    ref.read(drawerControllerProvider)?.toggle?.call(),
+              )
+            : null,
         centerTitle: true,
         title: const Text('လစဥ်ထောက်ပံ့သူများ',
             style: TextStyle(fontSize: 16, color: Colors.white)),

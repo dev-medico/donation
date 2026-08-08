@@ -15,6 +15,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:donation/src/features/donar/donar_data_source_new.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 
 class DonarListScreen extends ConsumerStatefulWidget {
   const DonarListScreen({Key? key, this.fromHome = false}) : super(key: key);
@@ -167,30 +168,39 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: widget.fromHome
-          ? null
-          : AppBar(
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [primaryColor, primaryDark],
-                  ),
-                ),
-              ),
-              centerTitle: true,
-              title: const Text(
-                "ရ/သုံး ငွေစာရင်း",
-                style: TextStyle(fontSize: 17, color: Colors.white),
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.calendar_today, color: Colors.white),
-                  onPressed: _showYearlyReport,
-                ),
-              ],
+      // Always show the app bar — as a home tab it previously had none, which
+      // left phones without any way to reach the menu (swipe only).
+      appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [primaryColor, primaryDark],
             ),
+          ),
+        ),
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                tooltip: 'မီနူး',
+                onPressed: () =>
+                    ref.read(drawerControllerProvider)?.toggle?.call(),
+              )
+            : null,
+        centerTitle: true,
+        title: const Text(
+          "ရ/သုံး ငွေစာရင်း",
+          style: TextStyle(fontSize: 17, color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_today, color: Colors.white),
+            tooltip: 'နှစ်ချုပ် စာရင်း',
+            onPressed: _showYearlyReport,
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           Column(
@@ -603,6 +613,16 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
       );
     }
 
+    if (Responsive.isMobile(context)) {
+      return _buildMobileLedgerList(
+        donors,
+        accent: Colors.green,
+        nameOf: (r) => displayDonorRecordName(r),
+        onEdit: (r) => _showEditDonorDialog(r),
+        onDelete: (r) => _confirmDeleteDonor(r),
+      );
+    }
+
     final dataSource = DonarDataSource(donarData: donors);
 
     return Container(
@@ -717,6 +737,97 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
     );
   }
 
+  /// Compact phone ledger rows shared by donors (green) and expenses (red):
+  /// name over date, colored amount, small edit/delete actions.
+  Widget _buildMobileLedgerList(
+    List<dynamic> records, {
+    required Color accent,
+    required String Function(dynamic) nameOf,
+    required void Function(dynamic) onEdit,
+    required void Function(dynamic) onDelete,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
+        border: Border.all(color: accent.withOpacity(0.2)),
+      ),
+      child: ListView.separated(
+        padding: EdgeInsets.zero,
+        itemCount: records.length,
+        separatorBuilder: (_, __) =>
+            Divider(height: 1, thickness: 0.5, color: Colors.grey[200]),
+        itemBuilder: (context, index) {
+          final record = records[index];
+          String dateStr = '';
+          try {
+            dateStr = DateFormat('dd MMM')
+                .format(DateTime.parse(record['date'].toString()));
+          } catch (_) {}
+          final amount = (record['amount'] ?? 0).toString();
+          return Padding(
+            padding: const EdgeInsets.only(left: 10, right: 2),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        nameOf(record),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 13.5, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        dateStr,
+                        style:
+                            TextStyle(fontSize: 11.5, color: Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '${Utils.strToMM(amount)} ကျပ်',
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: accent),
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit_outlined,
+                      size: 17, color: Colors.grey[500]),
+                  tooltip: 'ပြင်မည်',
+                  visualDensity: VisualDensity.compact,
+                  constraints:
+                      const BoxConstraints(minWidth: 36, minHeight: 36),
+                  padding: EdgeInsets.zero,
+                  onPressed: () => onEdit(record),
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete_outline,
+                      size: 17, color: Colors.grey[500]),
+                  tooltip: 'ဖျက်မည်',
+                  visualDensity: VisualDensity.compact,
+                  constraints:
+                      const BoxConstraints(minWidth: 36, minHeight: 36),
+                  padding: EdgeInsets.zero,
+                  onPressed: () => onDelete(record),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildExpensesList(List<dynamic> expenses, int month) {
     if (expenses.isEmpty) {
       return Container(
@@ -734,6 +845,16 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
             child: Text('ဤလအတွက် အသုံးစရိတ်မှတ်တမ်း မရှိသေးပါ'),
           ),
         ),
+      );
+    }
+
+    if (Responsive.isMobile(context)) {
+      return _buildMobileLedgerList(
+        expenses,
+        accent: Colors.red,
+        nameOf: (r) => (r['name'] ?? '').toString(),
+        onEdit: (r) => _showEditExpenseDialog(r),
+        onDelete: (r) => _confirmDeleteExpense(r),
       );
     }
 

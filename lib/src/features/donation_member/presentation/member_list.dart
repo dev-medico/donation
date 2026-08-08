@@ -7,6 +7,7 @@ import 'package:donation/src/features/donation_member/domain/member_range.dart';
 import 'package:donation/src/features/donation_member/domain/member_list_data_source.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/member_detail.dart';
+import 'package:donation/src/ui/blood_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/member_service.dart'
@@ -18,6 +19,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:donation/data/response/township_response/township_response.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 
 class MemberListScreen extends ConsumerStatefulWidget {
   static const routeName = "/members";
@@ -250,8 +252,11 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                 padding: const EdgeInsets.only(top: 4, left: 8),
                 child: IconButton(
                   icon: Icon(Icons.menu),
+                  tooltip: 'မီနူး',
                   onPressed: () {
-                    Scaffold.of(context).openDrawer();
+                    // Home tabs live inside the zoom drawer, not a scaffold
+                    // drawer (that one is an empty placeholder).
+                    ref.read(drawerControllerProvider)?.toggle?.call();
                   },
                 ),
               )
@@ -452,31 +457,32 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                         isDense: true,
                                         fillColor: Colors.white,
                                         contentPadding: EdgeInsets.only(
-                                            top: 16,
-                                            left: 20,
-                                            bottom: 16,
-                                            right: 12),
+                                            top: 10,
+                                            left: 12,
+                                            bottom: 10,
+                                            right: 6),
                                         border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(12),
+                                              BorderRadius.circular(10),
                                         ),
                                       ),
                                       isExpanded: true,
                                       hint: const Text(
-                                        "အမှတ်စဥ် အလိုက်ကြည့်မည်",
-                                        style: TextStyle(fontSize: 13),
+                                        "အမှတ်စဥ် အုပ်စု",
+                                        style: TextStyle(fontSize: 12.5),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       icon: const Icon(
                                         Icons.arrow_drop_down,
                                         color: Colors.black45,
                                       ),
-                                      iconSize: 30,
+                                      iconSize: 22,
                                       items: [
                                         DropdownMenuItem<MemberRange>(
                                           value: null,
                                           child: Text(
-                                            "အမှတ်စဥ် အလိုက်ကြည့်မည်",
-                                            style: TextStyle(fontSize: 13),
+                                            "အမှတ်စဥ် အုပ်စု",
+                                            style: TextStyle(fontSize: 12.5),
                                           ),
                                         ),
                                         ...ranges.map(
@@ -537,9 +543,9 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                 decoration: InputDecoration(
                                   isDense: true,
                                   contentPadding: EdgeInsets.only(
-                                      top: 12, left: 16, bottom: 12, right: 10),
+                                      top: 10, left: 12, bottom: 10, right: 6),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
                                 isExpanded: true,
@@ -547,13 +553,13 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                   Icons.arrow_drop_down,
                                   color: Colors.black45,
                                 ),
-                                iconSize: 30,
+                                iconSize: 22,
                                 items: [
                                   DropdownMenuItem(
                                     value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
                                     child: Text(
-                                      "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                                      style: TextStyle(fontSize: 13),
+                                      "သွေးအုပ်စု",
+                                      style: TextStyle(fontSize: 12.5),
                                     ),
                                   ),
                                   ...bloodTypes
@@ -597,7 +603,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                   controller: searchController,
                                   textAlign: TextAlign.start,
                                   style: const TextStyle(
-                                      fontSize: 15, color: Colors.black),
+                                      fontSize: 14, color: Colors.black),
                                   onChanged: (val) {
                                     if (_debounceTimer?.isActive ?? false) {
                                       _debounceTimer?.cancel();
@@ -614,20 +620,22 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                                     });
                                   },
                                   decoration: InputDecoration(
+                                    isDense: true,
                                     hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-                                    hintStyle: const TextStyle(
-                                        color: Colors.black, fontSize: 15.0),
+                                    hintStyle: TextStyle(
+                                        color: Colors.grey[500], fontSize: 13.5),
                                     fillColor: Colors.white,
                                     filled: true,
                                     suffixIcon: Padding(
                                       padding: const EdgeInsets.all(4.0),
                                       child: Icon(
                                         Icons.search,
+                                        size: 20,
                                         color: primaryColor,
                                       ),
                                     ),
                                     contentPadding: const EdgeInsets.only(
-                                        left: 20, right: 20, top: 4, bottom: 4),
+                                        left: 14, right: 12, top: 10, bottom: 10),
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: const BorderSide(
@@ -1378,7 +1386,92 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
     );
   }
 
+  /// Compact phone rows: blood chip, name over ID/father, donation count.
+  Widget _buildMobileMemberList(List<Member> members) {
+    return ListView.separated(
+      padding: const EdgeInsets.only(bottom: 88), // keep FAB clear of last row
+      itemCount: members.length,
+      separatorBuilder: (_, __) =>
+          Divider(height: 1, thickness: 0.5, color: Colors.grey[200]),
+      itemBuilder: (context, index) {
+        final member = members[index];
+        final secondary = [
+          if ((member.memberId ?? '').trim().isNotEmpty) member.memberId!.trim(),
+          if ((member.fatherName ?? '').trim().isNotEmpty)
+            member.fatherName!.trim(),
+        ].join(' · ');
+        final count = (member.totalCount ?? '').trim();
+        return InkWell(
+          onTap: () {
+            if (member.id != null) {
+              Navigator.of(context)
+                  .push(
+                MaterialPageRoute(
+                  builder: (context) => MemberDetailScreen(
+                    memberId: member.id.toString(),
+                  ),
+                ),
+              )
+                  .then((_) {
+                ref.invalidate(rangedMemberListProvider);
+              });
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
+            child: Row(
+              children: [
+                BloodChip(bloodType: member.bloodType),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        member.name ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      if (secondary.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          secondary,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (count.isNotEmpty && count != '0') ...[
+                  const SizedBox(width: 6),
+                  Text(
+                    '$count ကြိမ်',
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: primaryColor),
+                  ),
+                ],
+                Icon(Icons.chevron_right, size: 18, color: Colors.grey[400]),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget buildSimpleTable(List<Member> members) {
+    // Phones get a compact row list — the 7-column grid only fits 2 columns
+    // at 375px and forces sideways scrolling.
+    if (Responsive.isMobile(context)) {
+      return _buildMobileMemberList(members);
+    }
     memberDataDataSource = MemberListDataSource(memberData: members);
 
     return Container(

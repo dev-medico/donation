@@ -6,6 +6,7 @@ import 'package:donation/data/repository/repository.dart';
 import 'package:donation/data/response/xata_donation_list_response.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/donation/blood_request_give_chart.dart';
 import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
@@ -46,7 +47,9 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
       
       setState(() {
         totalMember = stats['totalMember'] ?? 0;
-        totalDonation = stats['totalDonations'] ?? 0;
+        // 'donations' is the blood donation record COUNT shown as "ကြိမ်";
+        // 'totalDonations' is the money-ledger sum in kyat (desktop finance).
+        totalDonation = stats['donations'] ?? 0;
         totalPatient = stats['totalPatient'] ?? 0;
       });
     } catch (e) {
@@ -110,6 +113,17 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
     return Scaffold(
       //backgroundColor: Colors.white,
       appBar: AppBar(
+        // On phones the dashboard is the home tab of the zoom drawer; give it
+        // a menu button so the drawer is reachable without the swipe gesture.
+        leading: Responsive.isMobile(context) &&
+                ref.watch(drawerControllerProvider) != null
+            ? IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                tooltip: 'မီနူး',
+                onPressed: () =>
+                    ref.read(drawerControllerProvider)?.toggle?.call(),
+              )
+            : null,
         title: const Padding(
           padding: EdgeInsets.only(top: 4.0),
           child: Text("RED Juniors Blood Care Unit",
@@ -129,87 +143,84 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
         ],
       ),
       body: Responsive.isMobile(context)
+          // Phone: 2-column grid of equal-height cards. Cards are Expanded
+          // internally, so each pair must sit directly in a Row (an Expanded
+          // card inside a Column here has unbounded height and crashes the
+          // ListView).
           ? ListView(
+              padding: const EdgeInsets.only(left: 12, top: 8, bottom: 24),
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 12.0, top: 8),
-                  child: Row(
-                    children: [
-                      DashboardCard(
-                        index: 0,
-                        color: primaryDark,
-                        title: "အဖွဲ့၀င် စာရင်း",
-                        subtitle: "စုစုပေါင်း အရေအတွက်",
-                        amount: "${Utils.strToMM(totalMember.toString())} ဦး",
-                        amountColor: Colors.black,
-                      ),
-                      DashboardCard(
-                        index: 1,
-                        color: primaryDark,
-                        title: "သွေးလှူမှု မှတ်တမ်း",
-                        subtitle: "စုစုပေါင်း အကြိမ်ရေ",
-                        amount:
-                            "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
-                        amountColor: Colors.blue,
-                      ),
-                    ],
-                  ),
+                Row(
+                  children: [
+                    DashboardCard(
+                      index: 0,
+                      color: primaryDark,
+                      title: "အဖွဲ့၀င် စာရင်း",
+                      subtitle: "စုစုပေါင်း အရေအတွက်",
+                      amount: "${Utils.strToMM(totalMember.toString())} ဦး",
+                      amountColor: Colors.black,
+                    ),
+                    DashboardCard(
+                      index: 1,
+                      color: primaryDark,
+                      title: "သွေးလှူမှု မှတ်တမ်း",
+                      subtitle: "စုစုပေါင်း အကြိမ်ရေ",
+                      amount:
+                          "${Utils.strToMM(totalDonation.toString())} ကြိမ်",
+                      amountColor: Colors.blue,
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(left: 12.0, top: 8, bottom: 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            DashboardCard(
-                              index: 2,
-                              color: primaryDark,
-                              title: "ထူးခြားဖြစ်စဉ်",
-                              subtitle: "",
-                              amount: "",
-                              amountColor: Colors.black,
-                            ),
-                            DashboardCard(
-                              index: 3,
-                              color: primaryDark,
-                              title: "ရ/သုံး ငွေစာရင်း",
-                              subtitle: "",
-                              amount: "",
-                              amountColor: Colors.black,
-                            ),
-                          ],
-                        ),
-                      ),
-                      DashboardCard(
-                        index: 4,
-                        color: primaryDark,
-                        title: "သွေးတောင်းခံ/လှူဒါန်းမှု",
-                        subtitle: "အသေးစိတ် ကြည့်မည်",
-                        amount: "",
-                        amountColor: Colors.black,
-                      ),
-                      const SizedBox(width: 12),
-                      DashboardCard(
-                        index: 2,
-                        color: primaryDark,
-                        title: "လူနာစာရင်း",
-                        subtitle: "စုစုပေါင်း အရေအတွက်",
-                        amount: "${Utils.strToMM(totalPatient.toString())} ဦး",
-                        amountColor: Colors.black,
-                      ),
-                    ],
-                  ),
+                Row(
+                  children: [
+                    DashboardCard(
+                      index: 2,
+                      color: primaryDark,
+                      title: "လူနာစာရင်း",
+                      subtitle: "စုစုပေါင်း အရေအတွက်",
+                      amount: "${Utils.strToMM(totalPatient.toString())} ဦး",
+                      amountColor: Colors.black,
+                    ),
+                    DashboardCard(
+                      index: 2,
+                      color: primaryDark,
+                      title: "ထူးခြားဖြစ်စဉ်",
+                      subtitle: "အသေးစိတ် ကြည့်မည်",
+                      amount: "",
+                      amountColor: Colors.black,
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    DashboardCard(
+                      index: 3,
+                      color: primaryDark,
+                      title: "ရ/သုံး ငွေစာရင်း",
+                      subtitle: "အသေးစိတ် ကြည့်မည်",
+                      amount: "",
+                      amountColor: Colors.black,
+                    ),
+                    DashboardCard(
+                      index: 4,
+                      color: primaryDark,
+                      title: "သွေးတောင်းခံ/လှူဒါန်းမှု",
+                      subtitle: "အသေးစိတ် ကြည့်မည်",
+                      amount: "",
+                      amountColor: Colors.black,
+                    ),
+                  ],
                 ),
                 // Request Give Chart
                 const Padding(
-                  padding: EdgeInsets.all(12),
+                  padding: EdgeInsets.only(top: 12, right: 12),
                   child: BloodRequestGiveChartScreen(),
                 ),
                 // Disease Chart
-                BloodDonationPieChart(),
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: BloodDonationPieChart(),
+                ),
               ],
             )
           : Row(

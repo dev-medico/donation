@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 
 class SpecialEventListScreen extends ConsumerStatefulWidget {
   const SpecialEventListScreen({Key? key, this.fromHome = false})
@@ -78,24 +79,32 @@ class _SpecialEventListScreenState
     final specialEventsAsync = ref.watch(specialEventsProvider(0));
 
     return Scaffold(
-      appBar: widget.fromHome
-          ? null
-          : AppBar(
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [primaryColor, primaryDark],
-                  ),
-                ),
-              ),
-              centerTitle: true,
-              title: const Text(
-                "ထူးခြားဖြစ်စဉ်",
-                style: TextStyle(fontSize: 17, color: Colors.white),
-              ),
+      // Always show the app bar — as a home tab it previously had none, which
+      // left phones without any way to reach the menu (swipe only).
+      appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [primaryColor, primaryDark],
             ),
+          ),
+        ),
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                tooltip: 'မီနူး',
+                onPressed: () =>
+                    ref.read(drawerControllerProvider)?.toggle?.call(),
+              )
+            : null,
+        centerTitle: true,
+        title: const Text(
+          "ထူးခြားဖြစ်စဉ်",
+          style: TextStyle(fontSize: 17, color: Colors.white),
+        ),
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {
@@ -202,7 +211,95 @@ class _SpecialEventListScreenState
     );
   }
 
+  String _eventDate(dynamic event) {
+    try {
+      final dateString = event['date'].toString();
+      if (dateString.contains(' ')) {
+        try {
+          DateFormat('dd MMM yyyy').parse(dateString);
+          return dateString;
+        } catch (_) {
+          return DateFormat('dd MMM yyyy').format(DateTime.parse(dateString));
+        }
+      }
+      return DateFormat('dd MMM yyyy').format(DateTime.parse(dateString));
+    } catch (_) {
+      return '-';
+    }
+  }
+
+  /// Compact phone cards: date + lab on top, test tallies below, total badge.
+  Widget _buildMobileEventList(List<dynamic> events) {
+    return ListView.separated(
+      padding: const EdgeInsets.only(
+          left: 12, right: 12, top: 4, bottom: 88),
+      itemCount: events.length,
+      separatorBuilder: (_, __) =>
+          Divider(height: 1, thickness: 0.5, color: Colors.grey[200]),
+      itemBuilder: (context, index) {
+        final event = events[index];
+        final lab = (event['lab_name'] ?? '').toString().trim();
+        final total = (event['total'] ?? '0').toString();
+        String n(String key) => (event[key] ?? '0').toString();
+        final tests = 'Hb ${n('haemoglobin')} · HBsAg ${n('hbs_ag')} · '
+            'HCV ${n('hcv_ab')} · MP ${n('mp_ict')} · '
+            'Retro ${n('retro_test')} · VDRL ${n('vdrl_test')}';
+        return InkWell(
+          onTap: () => _showEventDetails(event),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 9),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lab.isEmpty ? _eventDate(event) : '${_eventDate(event)} · $lab',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 13.5, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        tests,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11.5, color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDE7E7),
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  child: Text(
+                    total,
+                    style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: primaryColor),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildEventTable(List<dynamic> events) {
+    if (Responsive.isMobile(context)) {
+      return _buildMobileEventList(events);
+    }
     final dataSource = SpecialEventDataSource(eventData: events);
 
     return Container(

@@ -9,6 +9,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
+import 'package:donation/src/ui/blood_chip.dart';
 
 class SearchMemberListScreen extends ConsumerStatefulWidget {
   static const routeName = "/search_members";
@@ -113,8 +115,11 @@ class _SearchMemberListScreenState
                 padding: const EdgeInsets.only(top: 4, left: 8),
                 child: IconButton(
                   icon: Icon(Icons.menu),
+                  tooltip: 'မီနူး',
                   onPressed: () {
-                    Scaffold.of(context).openDrawer();
+                    // Home tabs live inside the zoom drawer, not a scaffold
+                    // drawer (that one is an empty placeholder).
+                    ref.read(drawerControllerProvider)?.toggle?.call();
                   },
                 ),
               )
@@ -146,7 +151,7 @@ class _SearchMemberListScreenState
           // Filter section - always visible
           Responsive.isMobile(context)
               ? Container(
-                    margin: EdgeInsets.only(left: 20, right: 20),
+                    margin: EdgeInsets.only(left: 12, right: 12),
                     child: Column(
                       children: [
                         Row(
@@ -154,9 +159,9 @@ class _SearchMemberListScreenState
                             Expanded(
                               child: Container(
                                 margin: const EdgeInsets.only(
-                                  top: 20,
-                                  left: 6,
-                                  right: 6,
+                                  top: 10,
+                                  left: 2,
+                                  right: 4,
                                 ),
                                 child: DropdownButtonFormField<String>(
                                   value: selectedBloodType,
@@ -165,9 +170,9 @@ class _SearchMemberListScreenState
                                   decoration: InputDecoration(
                                     isDense: true,
                                     contentPadding: EdgeInsets.only(
-                                        top: 16, left: 20, bottom: 16, right: 12),
+                                        top: 10, left: 12, bottom: 10, right: 6),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
                                   isExpanded: true,
@@ -175,13 +180,13 @@ class _SearchMemberListScreenState
                                     Icons.arrow_drop_down,
                                     color: Colors.black45,
                                   ),
-                                  iconSize: 30,
+                                  iconSize: 22,
                                   items: [
                                     DropdownMenuItem(
                                       value: "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
                                       child: Text(
-                                        "သွေးအုပ်စုဖြင့် ရှာဖွေမည်",
-                                        style: const TextStyle(fontSize: 14),
+                                        "သွေးအုပ်စု",
+                                        style: const TextStyle(fontSize: 12.5),
                                       ),
                                     ),
                                     ...bloodTypes
@@ -207,9 +212,9 @@ class _SearchMemberListScreenState
                             Expanded(
                               child: Container(
                                 margin: const EdgeInsets.only(
-                                  top: 20,
-                                  left: 6,
-                                  right: 6,
+                                  top: 10,
+                                  left: 4,
+                                  right: 2,
                                 ),
                                 child: DropdownButtonFormField<String?>(
                                   value: selectedYear,
@@ -218,9 +223,9 @@ class _SearchMemberListScreenState
                                   decoration: InputDecoration(
                                     isDense: true,
                                     contentPadding: EdgeInsets.only(
-                                        top: 16, left: 20, bottom: 16, right: 12),
+                                        top: 10, left: 12, bottom: 10, right: 6),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
                                   isExpanded: true,
@@ -228,13 +233,13 @@ class _SearchMemberListScreenState
                                     Icons.arrow_drop_down,
                                     color: Colors.black45,
                                   ),
-                                  iconSize: 30,
+                                  iconSize: 22,
                                   items: [
                                     DropdownMenuItem<String?>(
                                       value: null,
                                       child: Text(
                                         "နှစ်အားလုံး",
-                                        style: const TextStyle(fontSize: 14),
+                                        style: const TextStyle(fontSize: 12.5),
                                       ),
                                     ),
                                     ...years
@@ -242,7 +247,7 @@ class _SearchMemberListScreenState
                                               value: year,
                                               child: Text(
                                                 "$year ခုနှစ်",
-                                                style: const TextStyle(fontSize: 14),
+                                                style: const TextStyle(fontSize: 12.5),
                                               ),
                                             )),
                                   ],
@@ -258,16 +263,12 @@ class _SearchMemberListScreenState
                           ],
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          margin: const EdgeInsets.only(
-                            top: 20,
-                            left: 6,
-                          ),
+                          margin: const EdgeInsets.only(top: 8, left: 2, right: 2),
                           child: TextFormField(
                             controller: searchController,
                             textAlign: TextAlign.start,
                             style: const TextStyle(
-                                fontSize: 15, color: Colors.black),
+                                fontSize: 14, color: Colors.black),
                             onChanged: (val) {
                               if (_debounceTimer?.isActive ?? false) {
                                 _debounceTimer?.cancel();
@@ -281,20 +282,22 @@ class _SearchMemberListScreenState
                               });
                             },
                             decoration: InputDecoration(
+                              isDense: true,
                               hintText: 'အမည်ဖြင့် ရှာဖွေမည်',
-                              hintStyle: const TextStyle(
-                                  color: Colors.black, fontSize: 15.0),
+                              hintStyle: TextStyle(
+                                  color: Colors.grey[500], fontSize: 13.5),
                               fillColor: Colors.white.withOpacity(0.2),
                               filled: true,
                               suffixIcon: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(4.0),
                                 child: Icon(
                                   Icons.search,
+                                  size: 20,
                                   color: primaryColor,
                                 ),
                               ),
                               contentPadding: const EdgeInsets.only(
-                                  left: 20, right: 20, top: 4, bottom: 4),
+                                  left: 14, right: 12, top: 10, bottom: 10),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide:
@@ -508,7 +511,10 @@ class _SearchMemberListScreenState
                 ),
               ),
               data: (members) => Container(
-                margin: EdgeInsets.only(left: 20.0, right: 20, top: 20, bottom: 12),
+                margin: Responsive.isMobile(context)
+                    ? const EdgeInsets.only(left: 12, right: 12, top: 8)
+                    : const EdgeInsets.only(
+                        left: 20.0, right: 20, top: 20, bottom: 12),
                 child: buildSimpleTable(filteredMembers),
               ),
             ),
@@ -529,7 +535,99 @@ class _SearchMemberListScreenState
     );
   }
 
+  /// Compact phone rows for the eligible-donor search: blood chip, name,
+  /// phone + last donation date, tap to call or leave a remark.
+  Widget _buildMobileSearchList(List<Member> members) {
+    if (members.isEmpty) {
+      return Center(
+        child: Text(
+          'ရှာဖွေမှုနှင့် ကိုက်ညီသော သွေးလှူရှင် မရှိပါ',
+          style: TextStyle(fontSize: 13.5, color: Colors.grey[600]),
+        ),
+      );
+    }
+    return ListView.separated(
+      padding: const EdgeInsets.only(bottom: 88),
+      itemCount: members.length,
+      separatorBuilder: (_, __) =>
+          Divider(height: 1, thickness: 0.5, color: Colors.grey[200]),
+      itemBuilder: (context, index) {
+        final member = members[index];
+        final phone = (member.phone ?? '').trim();
+        final lastDate = (member.lastDate ?? '').trim();
+        final secondary = [
+          if (phone.isNotEmpty) phone,
+          if (lastDate.isNotEmpty) 'နောက်ဆုံး: $lastDate',
+        ].join(' · ');
+        final status = (member.status ?? '').trim();
+        return InkWell(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (context) => CallOrRemarkDialog(
+                      title: "လုပ်ဆောင်ရန်",
+                      member: member,
+                    ));
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
+            child: Row(
+              children: [
+                BloodChip(bloodType: member.bloodType),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        member.name ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      if (secondary.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          secondary,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (status.isNotEmpty) ...[
+                  const SizedBox(width: 6),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 86),
+                    child: Text(
+                      status,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[700]),
+                    ),
+                  ),
+                ],
+                Icon(Icons.chevron_right, size: 18, color: Colors.grey[400]),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget buildSimpleTable(List<Member> members) {
+    // Phones: compact call-ready rows instead of the 8-column grid.
+    if (Responsive.isMobile(context)) {
+      return _buildMobileSearchList(members);
+    }
     memberDataDataSource = SearchMemberDataSource(memberData: members);
 
     return SfDataGrid(

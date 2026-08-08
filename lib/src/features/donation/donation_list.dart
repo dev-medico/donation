@@ -16,6 +16,8 @@ import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:donation/src/ui/blood_chip.dart';
+import 'package:intl/intl.dart';
 
 class DonationListScreen extends ConsumerStatefulWidget {
   const DonationListScreen({super.key, this.fromHome = false});
@@ -451,7 +453,96 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
     );
   }
 
+  /// Compact phone rows: blood chip, donor over patient/hospital, date.
+  Widget _buildMobileDonationList(List<Donation> data) {
+    if (data.isEmpty) {
+      return Center(
+        child: Text(
+          'ဤလအတွက် မှတ်တမ်း မရှိပါ',
+          style: TextStyle(fontSize: 13.5, color: Colors.grey[600]),
+        ),
+      );
+    }
+    return ListView.separated(
+      padding: const EdgeInsets.only(bottom: 88, right: 8),
+      itemCount: data.length,
+      separatorBuilder: (_, __) =>
+          Divider(height: 1, thickness: 0.5, color: Colors.grey[200]),
+      itemBuilder: (context, index) {
+        final donation = data[index];
+        final donorName = donation.memberObj?.name?.trim() ?? '';
+        final patient = (donation.patientName ?? '').trim();
+        final hospital = (donation.hospital ?? '').trim();
+        final secondary = [
+          if (patient.isNotEmpty) patient,
+          if (hospital.isNotEmpty) hospital,
+        ].join(' · ');
+        final date = donation.donationDate != null
+            ? DateFormat('dd-MM').format(donation.donationDate!)
+            : '';
+        return InkWell(
+          onTap: () async {
+            await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DonationDetailScreen(
+                          data: donation,
+                        )));
+            ref.invalidate(donationsByMonthYearProvider((
+              month: _monthSelected + 1,
+              year: int.parse(years[_yearSelected])
+            )));
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
+            child: Row(
+              children: [
+                BloodChip(bloodType: donation.memberObj?.bloodType),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        donorName.isEmpty ? '—' : donorName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      if (secondary.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          secondary,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (date.isNotEmpty) ...[
+                  const SizedBox(width: 6),
+                  Text(
+                    date,
+                    style: TextStyle(fontSize: 11.5, color: Colors.grey[500]),
+                  ),
+                ],
+                Icon(Icons.chevron_right, size: 18, color: Colors.grey[400]),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   buildSimpleTable(List<Donation> data) {
+    if (Responsive.isMobile(context)) {
+      return _buildMobileDonationList(data);
+    }
     DonationDataSource memberDataDataSource =
         DonationDataSource(donationData: data, ref: ref);
     return Container(
