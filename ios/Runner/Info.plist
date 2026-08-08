@@ -43,8 +43,12 @@
 	<true/>
 	<key>MinimumOSVersion</key>
 	<string>9.0</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Red Juniors uses the camera to take member profile photos and photos attached to blood donation records.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location may be used by the photo picker to tag photos taken with the camera when attaching images to records.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to the photo library.</string>
+	<string>Red Juniors accesses your photo library so you can choose a member profile photo or attach images to donation records.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
