@@ -190,94 +190,96 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                 ],
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 8),
-              width: Responsive.isMobile(context)
-                  ? MediaQuery.of(context).size.width * 1.8
-                  : MediaQuery.of(context).size.width * 0.8,
-              height: Responsive.isMobile(context) ? 40 : 60,
-              child: CommonTabBar(
-                underline: false,
-                listWidget: [
-                  for (int i = 0; i < months.length; i++)
-                    CommonTabBarWidget(
-                      color: primaryColor,
-                      underline: false,
-                      name: Responsive.isMobile(context)
-                          ? monthsMobile[i]
-                          : months[i],
-                      isSelected: _monthSelected,
-                      i: i,
-                      onTap: () {
-                        _monthSelected = i;
-                        setState(() {});
-                      },
-                    ),
-                ],
-              ),
-            ),
+            _buildMonthSelector(context),
             Expanded(
               child: donationData.when(
                 data: (results) {
+                  void openYearlyReport() {
+                    var data = ref.watch(donationsByYearProvider(
+                        int.parse(years[_yearSelected])));
+                    List<Donation> yearData = [];
+                    if (data.value != null) {
+                      yearData = List.from(data.value!);
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BloodDonationReportScreen(
+                          month: _monthSelected,
+                          isYearly: true,
+                          year: years[_yearSelected],
+                          data: yearData,
+                        ),
+                      ),
+                    );
+                  }
+
+                  void openMonthlyReport() {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BloodDonationReportScreen(
+                          isYearly: false,
+                          month: _monthSelected,
+                          year: years[_yearSelected],
+                          data: results,
+                        ),
+                      ),
+                    );
+                  }
+
                   if (results.isEmpty) {
                     return Stack(
                       children: [
                         Align(
                           alignment: Alignment.topLeft,
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                                color: primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(12.0))),
-                            margin: const EdgeInsets.only(
-                              left: 15,
-                              top: 12,
-                            ),
-                            width: 164,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {
-                                var data = ref.watch(donationsByYearProvider(
-                                    int.parse(years[_yearSelected])));
-                                List<Donation> yearData = [];
-                                if (data.value != null) {
-                                  yearData = List.from(data.value!);
-                                }
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            BloodDonationReportScreen(
-                                              month: _monthSelected,
-                                              isYearly: true,
-                                              year: years[_yearSelected],
-                                              data: yearData,
-                                            )));
-                              },
-                              child: Align(
-                                  alignment: Alignment.center,
-                                  child: Row(
-                                    children: const [
-                                      SizedBox(
-                                        width: 12,
-                                      ),
-                                      Icon(Icons.list_alt_outlined,
-                                          color: Colors.white),
-                                      Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 12, bottom: 12, left: 12),
-                                          child: Text(
-                                            "နှစ်ချုပ် မှတ်တမ်း",
-                                            textScaleFactor: 1.0,
-                                            style: TextStyle(
-                                                fontSize: 15.0,
+                          child: Responsive.isMobile(context)
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 12),
+                                  child: _buildMobileReportButton(
+                                    label: 'နှစ်ချုပ် မှတ်တမ်း',
+                                    onTap: openYearlyReport,
+                                  ),
+                                )
+                              : Container(
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(12.0))),
+                                  margin: const EdgeInsets.only(
+                                    left: 15,
+                                    top: 12,
+                                  ),
+                                  width: 164,
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onTap: openYearlyReport,
+                                    child: Align(
+                                        alignment: Alignment.center,
+                                        child: Row(
+                                          children: const [
+                                            SizedBox(
+                                              width: 12,
+                                            ),
+                                            Icon(Icons.list_alt_outlined,
                                                 color: Colors.white),
-                                          )),
-                                    ],
-                                  )),
-                            ),
-                          ),
+                                            Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: 12,
+                                                    bottom: 12,
+                                                    left: 12),
+                                                child: Text(
+                                                  "နှစ်ချုပ် မှတ်တမ်း",
+                                                  textScaleFactor: 1.0,
+                                                  style: TextStyle(
+                                                      fontSize: 15.0,
+                                                      color: Colors.white),
+                                                )),
+                                          ],
+                                        )),
+                                  ),
+                                ),
                         ),
                         Center(
                             child: Text(years[_yearSelected] +
@@ -291,116 +293,128 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                       children: [
                         Align(
                           alignment: Alignment.topLeft,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(12.0))),
-                                margin: const EdgeInsets.only(
-                                  left: 15,
-                                  top: 12,
-                                ),
-                                width: 164,
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  onTap: () {
-                                    var data = ref.watch(
-                                        donationsByYearProvider(
-                                            int.parse(years[_yearSelected])));
-                                    List<Donation> yearData = [];
-                                    if (data.value != null) {
-                                      yearData = List.from(data.value!);
-                                    }
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                BloodDonationReportScreen(
-                                                  month: _monthSelected,
-                                                  isYearly: true,
-                                                  year: years[_yearSelected],
-                                                  data: yearData,
-                                                )));
-                                  },
-                                  child: Align(
-                                      alignment: Alignment.center,
-                                      child: Row(
-                                        children: const [
-                                          SizedBox(
-                                            width: 12,
+                          child: Responsive.isMobile(context)
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 12),
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      if (constraints.maxWidth < 360) {
+                                        return Column(
+                                          children: [
+                                            _buildMobileReportButton(
+                                              label: 'နှစ်ချုပ် မှတ်တမ်း',
+                                              onTap: openYearlyReport,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            _buildMobileReportButton(
+                                              label: 'လချုပ် မှတ်တမ်း',
+                                              onTap: openMonthlyReport,
+                                            ),
+                                          ],
+                                        );
+                                      }
+
+                                      return Row(
+                                        children: [
+                                          Expanded(
+                                            child: _buildMobileReportButton(
+                                              label: 'နှစ်ချုပ် မှတ်တမ်း',
+                                              onTap: openYearlyReport,
+                                            ),
                                           ),
-                                          Icon(Icons.list_alt_outlined,
-                                              color: Colors.white),
-                                          Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: 12,
-                                                  bottom: 12,
-                                                  left: 12),
-                                              child: Text(
-                                                "နှစ်ချုပ် မှတ်တမ်း",
-                                                textScaleFactor: 1.0,
-                                                style: TextStyle(
-                                                    fontSize: 15.0,
-                                                    color: Colors.white),
-                                              )),
-                                        ],
-                                      )),
-                                ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(12.0))),
-                                margin: const EdgeInsets.only(
-                                  left: 15,
-                                  top: 12,
-                                ),
-                                width: 160,
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                BloodDonationReportScreen(
-                                                  isYearly: false,
-                                                  month: _monthSelected,
-                                                  year: years[_yearSelected],
-                                                  data: results,
-                                                )));
-                                  },
-                                  child: Align(
-                                      alignment: Alignment.center,
-                                      child: Row(
-                                        children: const [
-                                          SizedBox(
-                                            width: 12,
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: _buildMobileReportButton(
+                                              label: 'လချုပ် မှတ်တမ်း',
+                                              onTap: openMonthlyReport,
+                                            ),
                                           ),
-                                          Icon(Icons.list_alt_outlined,
-                                              color: Colors.white),
-                                          Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: 12,
-                                                  bottom: 12,
-                                                  left: 12),
-                                              child: Text(
-                                                "လချုပ် မှတ်တမ်း",
-                                                textScaleFactor: 1.0,
-                                                style: TextStyle(
-                                                    fontSize: 15.0,
-                                                    color: Colors.white),
-                                              )),
                                         ],
-                                      )),
+                                      );
+                                    },
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          color: primaryColor,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(12.0))),
+                                      margin: const EdgeInsets.only(
+                                        left: 15,
+                                        top: 12,
+                                      ),
+                                      width: 164,
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        onTap: openYearlyReport,
+                                        child: Align(
+                                            alignment: Alignment.center,
+                                            child: Row(
+                                              children: const [
+                                                SizedBox(
+                                                  width: 12,
+                                                ),
+                                                Icon(Icons.list_alt_outlined,
+                                                    color: Colors.white),
+                                                Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 12,
+                                                        bottom: 12,
+                                                        left: 12),
+                                                    child: Text(
+                                                      "နှစ်ချုပ် မှတ်တမ်း",
+                                                      textScaleFactor: 1.0,
+                                                      style: TextStyle(
+                                                          fontSize: 15.0,
+                                                          color: Colors.white),
+                                                    )),
+                                              ],
+                                            )),
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          color: primaryColor,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(12.0))),
+                                      margin: const EdgeInsets.only(
+                                        left: 15,
+                                        top: 12,
+                                      ),
+                                      width: 160,
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        onTap: openMonthlyReport,
+                                        child: Align(
+                                            alignment: Alignment.center,
+                                            child: Row(
+                                              children: const [
+                                                SizedBox(
+                                                  width: 12,
+                                                ),
+                                                Icon(Icons.list_alt_outlined,
+                                                    color: Colors.white),
+                                                Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 12,
+                                                        bottom: 12,
+                                                        left: 12),
+                                                    child: Text(
+                                                      "လချုပ် မှတ်တမ်း",
+                                                      textScaleFactor: 1.0,
+                                                      style: TextStyle(
+                                                          fontSize: 15.0,
+                                                          color: Colors.white),
+                                                    )),
+                                              ],
+                                            )),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
                         ),
                         Expanded(
                           child: Container(
@@ -536,6 +550,111 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildMobileReportButton({
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: Material(
+        color: primaryColor,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.list_alt_outlined, color: Colors.white),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 15, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMonthSelector(BuildContext context) {
+    if (!Responsive.isMobile(context)) {
+      return Container(
+        margin: const EdgeInsets.only(top: 8),
+        width: MediaQuery.of(context).size.width * 0.8,
+        height: 60,
+        child: CommonTabBar(
+          underline: false,
+          listWidget: [
+            for (int i = 0; i < months.length; i++)
+              CommonTabBarWidget(
+                color: primaryColor,
+                underline: false,
+                name: months[i],
+                isSelected: _monthSelected,
+                i: i,
+                onTap: () {
+                  _monthSelected = i;
+                  setState(() {});
+                },
+              ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      height: 52,
+      margin: const EdgeInsets.only(top: 8),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        itemCount: months.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemBuilder: (context, index) {
+          final isSelected = _monthSelected == index;
+
+          return Material(
+            color: isSelected ? primaryColor : const Color(0xffebe9e9),
+            borderRadius: BorderRadius.circular(8),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                _monthSelected = index;
+                setState(() {});
+              },
+              child: SizedBox(
+                width: 52,
+                height: 48,
+                child: Center(
+                  child: Text(
+                    monthsMobile[index],
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                      color:
+                          isSelected ? Colors.white : const Color(0xff5C5C5C),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 

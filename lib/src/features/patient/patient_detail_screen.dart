@@ -24,7 +24,8 @@ class PatientDetailScreen extends ConsumerStatefulWidget {
   static const routeName = "/patient-detail";
 
   @override
-  ConsumerState<PatientDetailScreen> createState() => _PatientDetailScreenState();
+  ConsumerState<PatientDetailScreen> createState() =>
+      _PatientDetailScreenState();
 }
 
 class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
@@ -45,7 +46,8 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
     });
 
     try {
-      final patient = await ref.read(patientServiceProvider).getPatient(widget.patientId);
+      final patient =
+          await ref.read(patientServiceProvider).getPatient(widget.patientId);
       setState(() {
         _patient = patient;
         _isLoading = false;
@@ -99,7 +101,8 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
 
     if (confirmed == true) {
       try {
-        final success = await ref.read(patientServiceProvider).deletePatient(_patient!.id!);
+        final success =
+            await ref.read(patientServiceProvider).deletePatient(_patient!.id!);
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('အောင်မြင်စွာ ဖျက်ပြီးပါပြီ')),
@@ -196,21 +199,63 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
   }
 
   Widget _buildMobileLayout() {
-    return Column(
-      children: [
-        // Info card at top
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: _buildInfoCard(),
+    final donations = _patient!.donations ?? [];
+
+    return ColoredBox(
+      color: const Color(0xfffafafa),
+      child: RefreshIndicator(
+        onRefresh: _loadPatient,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
+              sliver: SliverToBoxAdapter(
+                child: _buildInfoCard(isMobile: true),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+              sliver: SliverToBoxAdapter(
+                child: _buildMobileDonationHistoryHeader(donations),
+              ),
+            ),
+            if (donations.isEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+                sliver: SliverToBoxAdapter(
+                  child: Container(
+                    height: 180,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: _buildEmptyState(),
+                  ),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => Padding(
+                      padding: EdgeInsets.only(
+                        bottom: index == donations.length - 1 ? 0 : 10,
+                      ),
+                      child: _buildMobileDonationCard(
+                        donations[index],
+                        index,
+                      ),
+                    ),
+                    childCount: donations.length,
+                  ),
+                ),
+              ),
+          ],
         ),
-        // Donation history fills remaining space
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: _buildDonationHistorySection(),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -240,38 +285,46 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
     );
   }
 
-  Widget _buildInfoCard() {
+  Widget _buildInfoCard({bool isMobile = false}) {
     return Card(
-      elevation: 2,
+      margin: isMobile ? EdgeInsets.zero : null,
+      elevation: isMobile ? 0 : 2,
+      shape: isMobile
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.shade200),
+            )
+          : null,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isMobile ? 14 : 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 CircleAvatar(
-                  radius: 30,
+                  radius: isMobile ? 25 : 30,
                   backgroundColor: primaryColor.withOpacity(0.1),
                   child: Icon(
                     _patient!.gender == 'male' ? Icons.man : Icons.woman,
-                    size: 30,
+                    size: isMobile ? 26 : 30,
                     color: primaryColor,
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: isMobile ? 12 : 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         _patient!.name ?? 'အမည်မသိ',
-                        style: const TextStyle(
-                          fontSize: 20,
+                        style: TextStyle(
+                          fontSize: isMobile ? 18 : 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (_patient!.phone != null && _patient!.phone!.isNotEmpty)
+                      if (_patient!.phone != null &&
+                          _patient!.phone!.isNotEmpty)
                         Text(
                           _patient!.phone!,
                           style: TextStyle(
@@ -284,23 +337,51 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
                 ),
               ],
             ),
-            const Divider(height: 32),
-            _buildInfoRow(Icons.cake, 'အသက်',
-                displayAge(_patient!.birthDate, fallbackAge: _patient!.age, empty: '-')),
+            Divider(height: isMobile ? 24 : 32),
+            _buildInfoRow(
+              Icons.cake,
+              'အသက်',
+              displayAge(
+                _patient!.birthDate,
+                fallbackAge: _patient!.age,
+                empty: '-',
+              ),
+              compact: isMobile,
+            ),
             _buildInfoRow(
               Icons.wc,
               'ကျား/မ',
-              _patient!.gender == 'male' ? 'ကျား' : (_patient!.gender == 'female' ? 'မ' : '-'),
+              _patient!.gender == 'male'
+                  ? 'ကျား'
+                  : (_patient!.gender == 'female' ? 'မ' : '-'),
+              compact: isMobile,
             ),
             if (_patient!.bloodType != null && _patient!.bloodType!.isNotEmpty)
-              _buildInfoRow(Icons.bloodtype, 'သွေးအုပ်စု', _patient!.bloodType!),
-            _buildInfoRow(Icons.location_on, 'လိပ်စာ', _patient!.address ?? '-'),
-            if (_patient!.medicalNotes != null && _patient!.medicalNotes!.isNotEmpty)
-              _buildInfoRow(Icons.medical_information, 'ကျန်းမာရေးမှတ်တမ်း', _patient!.medicalNotes!),
+              _buildInfoRow(
+                Icons.bloodtype,
+                'သွေးအုပ်စု',
+                _patient!.bloodType!,
+                compact: isMobile,
+              ),
+            _buildInfoRow(
+              Icons.location_on,
+              'လိပ်စာ',
+              _patient!.address ?? '-',
+              compact: isMobile,
+            ),
+            if (_patient!.medicalNotes != null &&
+                _patient!.medicalNotes!.isNotEmpty)
+              _buildInfoRow(
+                Icons.medical_information,
+                'ကျန်းမာရေးမှတ်တမ်း',
+                _patient!.medicalNotes!,
+                compact: isMobile,
+              ),
             _buildInfoRow(
               Icons.bloodtype,
               'စုစုပေါင်းလှူဒါန်းမှု',
               '${_patient!.donationCount ?? 0} ကြိမ်',
+              compact: isMobile,
             ),
           ],
         ),
@@ -308,7 +389,57 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(
+    IconData icon,
+    String label,
+    String value, {
+    bool compact = false,
+  }) {
+    if (compact) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Icon(icon, size: 17, color: primaryColor),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      height: 1.45,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -338,6 +469,199 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildMobileDonationHistoryHeader(List<Donation> donations) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+      decoration: BoxDecoration(
+        color: primaryColor.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: primaryColor.withValues(alpha: 0.13),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.bloodtype, size: 19, color: primaryColor),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'လှူဒါန်းမှုမှတ်တမ်း',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryColor,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: primaryColor.withValues(alpha: 0.16)),
+            ),
+            child: Text(
+              '${donations.length} ကြိမ်',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: primaryColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileDonationCard(Donation donation, int index) {
+    final memberName = donation.memberObj?.name?.trim();
+    final bloodType = donation.memberObj?.bloodType?.trim();
+    final hospital = donation.hospital?.trim();
+
+    return Material(
+      color: Colors.white,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: InkWell(
+        onTap: () => _viewDonationDetail(donation),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.09),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${index + 1}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _formatDonationDate(donation.donationDate),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        if (bloodType != null && bloodType.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: primaryColor.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              bloodType,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      memberName == null || memberName.isEmpty
+                          ? '-'
+                          : memberName,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[800],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (hospital != null && hospital.isNotEmpty) ...[
+                      const SizedBox(height: 5),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.local_hospital_outlined,
+                            size: 14,
+                            color: Colors.grey[500],
+                          ),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(
+                              hospital,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                                height: 1.35,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 4),
+              Padding(
+                padding: const EdgeInsets.only(top: 7),
+                child: Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: Colors.grey[400],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDonationDate(DateTime? date) {
+    if (date == null) return '-';
+    return DateFormat('dd MMM yyyy').format(date);
   }
 
   Widget _buildDonationHistorySection() {
@@ -400,7 +724,8 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: primaryColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(16),
@@ -576,21 +901,22 @@ class _PatientDonationDataSource extends DataGridSource {
     required List<Donation> donationData,
     required this.onRowTap,
   }) {
-    _dataGridRows = donationData
-        .asMap()
-        .entries
-        .map<DataGridRow>((entry) {
-          final index = entry.key;
-          final donation = entry.value;
-          return DataGridRow(cells: [
-            DataGridCell<int>(columnName: 'no', value: index + 1),
-            DataGridCell<String>(columnName: 'date', value: _formatDate(donation.donationDate)),
-            DataGridCell<String>(columnName: 'member', value: donation.memberObj?.name ?? '-'),
-            DataGridCell<String>(columnName: 'bloodType', value: donation.memberObj?.bloodType ?? '-'),
-            DataGridCell<String>(columnName: 'hospital', value: donation.hospital ?? '-'),
-          ]);
-        })
-        .toList();
+    _dataGridRows = donationData.asMap().entries.map<DataGridRow>((entry) {
+      final index = entry.key;
+      final donation = entry.value;
+      return DataGridRow(cells: [
+        DataGridCell<int>(columnName: 'no', value: index + 1),
+        DataGridCell<String>(
+            columnName: 'date', value: _formatDate(donation.donationDate)),
+        DataGridCell<String>(
+            columnName: 'member', value: donation.memberObj?.name ?? '-'),
+        DataGridCell<String>(
+            columnName: 'bloodType',
+            value: donation.memberObj?.bloodType ?? '-'),
+        DataGridCell<String>(
+            columnName: 'hospital', value: donation.hospital ?? '-'),
+      ]);
+    }).toList();
   }
 
   List<DataGridRow> _dataGridRows = [];
@@ -661,14 +987,16 @@ class _PatientDonationDataSource extends DataGridSource {
         }
 
         return Container(
-          alignment: columnName == 'member' ? Alignment.centerLeft : Alignment.center,
+          alignment:
+              columnName == 'member' ? Alignment.centerLeft : Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Text(
             value,
             style: TextStyle(
               fontSize: 13,
               color: Colors.grey[800],
-              fontWeight: columnName == 'member' ? FontWeight.w500 : FontWeight.normal,
+              fontWeight:
+                  columnName == 'member' ? FontWeight.w500 : FontWeight.normal,
             ),
             overflow: TextOverflow.ellipsis,
           ),

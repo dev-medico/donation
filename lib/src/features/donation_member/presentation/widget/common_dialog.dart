@@ -19,6 +19,10 @@ class CommonDialog extends StatelessWidget {
   final bool isExpand;
   @override
   Widget build(BuildContext context) {
+    if (Responsive.isMobile(context)) {
+      return _buildMobileDialog(context);
+    }
+
     return AlertDialog(
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -48,6 +52,65 @@ class CommonDialog extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileDialog(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final availableWidth = mediaQuery.size.width - 24;
+    final dialogWidth = width < availableWidth ? width : availableWidth;
+    final rawMaxHeight = mediaQuery.size.height -
+        mediaQuery.viewInsets.bottom -
+        mediaQuery.padding.top -
+        mediaQuery.padding.bottom -
+        24;
+    final maxDialogHeight =
+        rawMaxHeight.clamp(120.0, mediaQuery.size.height).toDouble();
+    final effectiveHeight = height == null
+        ? null
+        : height! < maxDialogHeight
+            ? height
+            : maxDialogHeight;
+
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      clipBehavior: Clip.antiAlias,
+      contentPadding: EdgeInsets.zero,
+      content: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: dialogWidth,
+          maxHeight: maxDialogHeight,
+        ),
+        child: SizedBox(
+          width: dialogWidth,
+          height: effectiveHeight,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize:
+                effectiveHeight == null ? MainAxisSize.min : MainAxisSize.max,
+            children: [
+              DialogGradientTitleWidget(
+                title: title,
+                width: dialogWidth,
+                height: 60,
+              ),
+              const SizedBox(height: 2),
+              Flexible(
+                fit: isExpand ? FlexFit.tight : FlexFit.loose,
+                child: SingleChildScrollView(
+                  primary: false,
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+                  child: child,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

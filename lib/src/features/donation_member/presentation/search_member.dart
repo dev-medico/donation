@@ -52,43 +52,12 @@ class _SearchMemberListScreenState
       years.add(year.toString());
     }
     years = years.reversed.toList(); // Most recent year first
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _resetAllFilters();
-    });
-  }
-
-  // Method to reset all filters including those from member list
-  void _resetAllFilters() {
-    // Reset search-specific filters
-    resetSearchFilterProviders(ref);
-
-    // Also reset main list filters to prevent cross-contamination
-    resetFilterProviders(ref);
-
-    // Clear search controller
-    searchController.clear();
-
-    // Set initial values
-    ref.read(searchMemberBloodTypeFilterProvider.notifier).state =
-        "သွေးအုပ်စုဖြင့် ရှာဖွေမည်";
-    ref.read(searchMemberQueryProvider.notifier).state = '';
-    ref.read(searchMemberDonationYearFilterProvider.notifier).state = DateTime.now().year.toString();
-
-    // Force refresh of the filtered list with year-filtered members
-    if (ref.read(searchMemberListWithYearProvider).hasValue) {
-      final allMembers = ref.read(searchMemberListWithYearProvider).value ?? [];
-      ref.read(filteredSearchMemberListProvider.notifier).state =
-          List.from(allMembers);
-    }
   }
 
   @override
   void dispose() {
     searchController.dispose();
     _debounceTimer?.cancel();
-    // Clear filters when screen is disposed
-    resetSearchFilterProviders(ref);
     super.dispose();
   }
 
@@ -96,7 +65,6 @@ class _SearchMemberListScreenState
   Widget build(BuildContext context) {
     // Watch all necessary providers - use the provider with year filter for search
     final membersAsync = ref.watch(searchMemberListWithYearProvider);
-    final filteredMembers = ref.watch(filteredSearchMemberListProvider);
     final selectedBloodType = ref.watch(searchMemberBloodTypeFilterProvider);
     final selectedYear = ref.watch(searchMemberDonationYearFilterProvider);
 
@@ -128,10 +96,6 @@ class _SearchMemberListScreenState
                 child: IconButton(
                   icon: Icon(Icons.arrow_back),
                   onPressed: () {
-                    // Clear all filters before navigating back
-                    resetSearchFilterProviders(ref);
-                    // Don't reset main list filters - we want to preserve those
-                    searchController.clear();
                     Navigator.pop(context);
                   },
                 ),
@@ -276,6 +240,7 @@ class _SearchMemberListScreenState
 
                               _debounceTimer =
                                   Timer(const Duration(milliseconds: 500), () {
+                                if (!mounted) return;
                                 ref
                                     .read(searchMemberQueryProvider.notifier)
                                     .state = val;
@@ -434,6 +399,7 @@ class _SearchMemberListScreenState
 
                             _debounceTimer =
                                 Timer(const Duration(milliseconds: 500), () {
+                              if (!mounted) return;
                               ref
                                   .read(searchMemberQueryProvider.notifier)
                                   .state = val;
@@ -479,43 +445,15 @@ class _SearchMemberListScreenState
           // Table section with loading overlay
           Expanded(
             child: membersAsync.when(
-              loading: () => Stack(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(left: 20.0, right: 20, top: 20, bottom: 12),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(color: primaryColor),
-                          const SizedBox(height: 16),
-                          Text('Loading...', style: TextStyle(color: Colors.grey[600])),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              error: (error, stack) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Error: $error'),
-                    ElevatedButton(
-                      onPressed: () {
-                        ref.invalidate(searchMemberListWithYearProvider);
-                      },
-                      child: Text('Retry'),
-                    ),
-                  ],
-                ),
-              ),
+              skipLoadingOnRefresh: false,
+              loading: _buildSearchLoading,
+              error: (error, stack) => _buildSearchError(error),
               data: (members) => Container(
                 margin: Responsive.isMobile(context)
                     ? const EdgeInsets.only(left: 12, right: 12, top: 8)
                     : const EdgeInsets.only(
                         left: 20.0, right: 20, top: 20, bottom: 12),
-                child: buildSimpleTable(filteredMembers),
+                child: buildSimpleTable(members),
               ),
             ),
           ),
@@ -524,13 +462,73 @@ class _SearchMemberListScreenState
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         onPressed: () {
-          // Reset all filters first
-          _resetAllFilters();
-
-          // Then refresh member list with year filter
+          // Refresh the current search without changing its filters.
           ref.invalidate(searchMemberListWithYearProvider);
         },
         child: const Icon(Icons.refresh),
+      ),
+    );
+  }
+
+  Widget _buildSearchLoading() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(color: primaryColor),
+          const SizedBox(height: 16),
+          Text(
+            'သွေးလှူရှင်များ ရှာဖွေနေပါသည်...',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchError(Object error) {
+    final message = error is TimeoutException
+        ? 'ရှာဖွေမှု အချိန်ကြာနေပါသည်။ အင်တာနက်ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်မံကြိုးစားပါ။'
+        : 'သွေးလှူရှင်စာရင်းကို မရယူနိုင်ပါ။ ထပ်မံကြိုးစားပါ။';
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 44, color: Colors.grey[500]),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey[700], height: 1.5),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                // Keep the current query, blood type, and year on retry.
+                ref.invalidate(searchMemberListWithYearProvider);
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('ပြန်လည်ကြိုးစားမည်'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptySearchState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          'ရှာဖွေမှုနှင့် ကိုက်ညီသော သွေးလှူရှင် မရှိပါ',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 13.5, color: Colors.grey[600]),
+        ),
       ),
     );
   }
@@ -539,12 +537,7 @@ class _SearchMemberListScreenState
   /// phone + last donation date, tap to call or leave a remark.
   Widget _buildMobileSearchList(List<Member> members) {
     if (members.isEmpty) {
-      return Center(
-        child: Text(
-          'ရှာဖွေမှုနှင့် ကိုက်ညီသော သွေးလှူရှင် မရှိပါ',
-          style: TextStyle(fontSize: 13.5, color: Colors.grey[600]),
-        ),
-      );
+      return _buildEmptySearchState();
     }
     return ListView.separated(
       padding: const EdgeInsets.only(bottom: 88),
@@ -624,6 +617,10 @@ class _SearchMemberListScreenState
   }
 
   Widget buildSimpleTable(List<Member> members) {
+    if (members.isEmpty) {
+      return _buildEmptySearchState();
+    }
+
     // Phones: compact call-ready rows instead of the 8-column grid.
     if (Responsive.isMobile(context)) {
       return _buildMobileSearchList(members);

@@ -1,0 +1,76 @@
+import 'dart:async';
+
+import 'package:donation/src/features/donation_member/data/search_member_repository.dart';
+import 'package:donation/src/features/donation_member/domain/member.dart';
+import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
+import 'package:donation/src/features/donation_member/presentation/search_member.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class _PendingSearchMemberRepository extends SearchMemberRepository {
+  int requestCount = 0;
+  final _firstRequest = Completer<List<Member>>();
+  final _retryRequest = Completer<List<Member>>();
+
+  void completeRetry() => _retryRequest.complete(const []);
+
+  @override
+  Future<List<Member>> searchMembers({
+    String? query,
+    String? bloodType,
+    String? donationYear,
+    int page = 0,
+    int limit = 5000,
+  }) {
+    requestCount += 1;
+    return requestCount == 1 ? _firstRequest.future : _retryRequest.future;
+  }
+}
+
+void main() {
+  testWidgets('a stalled member search times out and can be retried',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final repository = _PendingSearchMemberRepository();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          searchMemberRepositoryProvider.overrideWithValue(repository),
+        ],
+        child: const MaterialApp(home: SearchMemberListScreen()),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('သွေးလှူရှင်များ ရှာဖွေနေပါသည်...'), findsOneWidget);
+    expect(repository.requestCount, 1);
+
+    await tester.pump(const Duration(seconds: 21));
+    await tester.pump();
+
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.textContaining('ရှာဖွေမှု အချိန်ကြာနေပါသည်။'), findsOneWidget);
+    expect(find.text('ပြန်လည်ကြိုးစားမည်'), findsOneWidget);
+
+    await tester.tap(find.text('ပြန်လည်ကြိုးစားမည်'));
+    await tester.pump();
+
+    expect(find.text('သွေးလှူရှင်များ ရှာဖွေနေပါသည်...'), findsOneWidget);
+    expect(repository.requestCount, 2);
+
+    repository.completeRetry();
+    await tester.pump();
+
+    expect(find.text('ရှာဖွေမှုနှင့် ကိုက်ညီသော သွေးလှူရှင် မရှိပါ'),
+        findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+
+    expect(repository.requestCount, 2);
+  });
+}

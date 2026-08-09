@@ -194,6 +194,10 @@ class _MonthlySponsorListScreenState
   }
 
   Widget _tile(MonthlySponsor s) {
+    if (MediaQuery.sizeOf(context).width <= 360) {
+      return _buildNarrowTile(s);
+    }
+
     return Container(
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(12)),
@@ -218,7 +222,7 @@ class _MonthlySponsorListScreenState
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20)),
               child: Text('${_money.format(s.totalAmount ?? 0)} ကျပ်',
                   style: TextStyle(
@@ -242,6 +246,121 @@ class _MonthlySponsorListScreenState
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNarrowTile(MonthlySponsor sponsor) {
+    final phone = sponsor.phone?.trim() ?? '';
+
+    return Material(
+      color: Colors.white,
+      clipBehavior: Clip.antiAlias,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _openDetail(sponsor),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 8, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 7),
+                      child: Text(
+                        sponsor.name ?? '-',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  _sponsorMenu(sponsor),
+                ],
+              ),
+              if (phone.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.phone, size: 13, color: Colors.grey[500]),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        phone,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 9),
+              ] else
+                const SizedBox(height: 6),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.payments_outlined,
+                      size: 16,
+                      color: primaryColor,
+                    ),
+                    const SizedBox(width: 7),
+                    Expanded(
+                      child: Text(
+                        '${_money.format(sponsor.totalAmount ?? 0)} ကျပ်',
+                        textAlign: TextAlign.end,
+                        softWrap: true,
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _sponsorMenu(MonthlySponsor sponsor) {
+    return PopupMenuButton<String>(
+      tooltip: 'လုပ်ဆောင်ချက်များ',
+      onSelected: (value) {
+        if (value == 'edit') {
+          _openForm(sponsor: sponsor);
+        } else if (value == 'delete') {
+          _delete(sponsor);
+        }
+      },
+      itemBuilder: (_) => const [
+        PopupMenuItem(value: 'edit', child: Text('ပြင်ဆင်မည်')),
+        PopupMenuItem(value: 'delete', child: Text('ဖျက်မည်')),
+      ],
     );
   }
 }

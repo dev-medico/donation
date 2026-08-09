@@ -110,253 +110,277 @@ class _RequestGiveDetailScreenNewState
           style: TextStyle(fontSize: 16, color: Colors.white),
         ),
       ),
-      body: Column(
-        children: [
-          // Toggle buttons for နှစ်ချုပ် and လချုပ်
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.7,
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        showYearlyView = true;
-                      });
-                    },
-                    child: Container(
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: showYearlyView ? primaryColor : Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: showYearlyView
-                              ? primaryColor
-                              : Colors.grey.shade300,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 16,
-                            color: showYearlyView
-                                ? Colors.white
-                                : Colors.grey.shade600,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'နှစ်ချုပ် မှတ်တမ်း',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: showYearlyView
-                                  ? Colors.white
-                                  : Colors.grey.shade700,
-                              fontWeight: showYearlyView
-                                  ? FontWeight.w500
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        showYearlyView = false;
-                        if (_monthSelected == null) {
-                          _monthSelected = DateTime.now().month - 1;
-                        }
-                      });
-                    },
-                    child: Container(
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: !showYearlyView ? primaryColor : Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: !showYearlyView
-                              ? primaryColor
-                              : Colors.grey.shade300,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.calendar_month,
-                            size: 16,
-                            color: !showYearlyView
-                                ? Colors.white
-                                : Colors.grey.shade600,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'လချုပ် မှတ်တမ်း',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: !showYearlyView
-                                  ? Colors.white
-                                  : Colors.grey.shade700,
-                              fontWeight: !showYearlyView
-                                  ? FontWeight.w500
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            ),
-          ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 600;
+          final contentWidth = isMobile
+              ? double.infinity
+              : MediaQuery.of(context).size.width * 0.7;
 
-          // Year selector tabs
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: 50,
-            margin: const EdgeInsets.all(8),
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: years.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _yearSelected = index;
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color:
-                          _yearSelected == index ? primaryColor : Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: _yearSelected == index
-                            ? primaryColor
-                            : Colors.grey.shade300,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        years[index],
-                        style: TextStyle(
-                          color: _yearSelected == index
-                              ? Colors.white
-                              : Colors.black87,
-                          fontWeight: _yearSelected == index
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Month selector (if not yearly view)
-          if (!showYearlyView)
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 50,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: months.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _monthSelected = index;
-                      });
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: _monthSelected == index
-                            ? primaryColor
-                            : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Center(
-                        child: Text(
-                          months[index],
-                          style: TextStyle(
-                            color: _monthSelected == index
-                                ? Colors.white
-                                : Colors.black87,
-                            fontWeight: _monthSelected == index
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-          // Main content area - left aligned with half screen width
-          Expanded(
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                child: reportData.when(
-              data: (data) {
-                if (showYearlyView) {
-                  return _buildYearlyView(data, selectedYear);
-                } else {
-                  return _buildMonthlyView(data, selectedYear, _monthSelected!);
-                }
-              },
-              loading: () => Center(child: CircularProgressIndicator()),
-              error: (error, stack) {
-                print('Error: $error');
-                print('Stack: $stack');
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          return Column(
+            children: [
+              // Toggle buttons for နှစ်ချုပ် and လချုပ်
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  width: contentWidth,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
                     children: [
-                      Icon(Icons.error_outline, size: 64, color: Colors.red),
-                      SizedBox(height: 16),
-                      Text('Error loading data'),
-                      Text(error.toString(), style: TextStyle(fontSize: 12)),
-                      SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.invalidate(requestGiveReportProvider);
-                        },
-                        child: Text('ပြန်လည်ကြိုးစားမည်'),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              showYearlyView = true;
+                            });
+                          },
+                          child: Container(
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color:
+                                  showYearlyView ? primaryColor : Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: showYearlyView
+                                    ? primaryColor
+                                    : Colors.grey.shade300,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 16,
+                                  color: showYearlyView
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                                ),
+                                SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    'နှစ်ချုပ် မှတ်တမ်း',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: showYearlyView
+                                          ? Colors.white
+                                          : Colors.grey.shade700,
+                                      fontWeight: showYearlyView
+                                          ? FontWeight.w500
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              showYearlyView = false;
+                              if (_monthSelected == null) {
+                                _monthSelected = DateTime.now().month - 1;
+                              }
+                            });
+                          },
+                          child: Container(
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color:
+                                  !showYearlyView ? primaryColor : Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: !showYearlyView
+                                    ? primaryColor
+                                    : Colors.grey.shade300,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.calendar_month,
+                                  size: 16,
+                                  color: !showYearlyView
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                                ),
+                                SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    'လချုပ် မှတ်တမ်း',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: !showYearlyView
+                                          ? Colors.white
+                                          : Colors.grey.shade700,
+                                      fontWeight: !showYearlyView
+                                          ? FontWeight.w500
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                );
-              },
-            ),
+                ),
               ),
-            ),
-          ),
-        ],
+
+              // Year selector tabs
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 50,
+                margin: const EdgeInsets.all(8),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: years.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _yearSelected = index;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: _yearSelected == index
+                              ? primaryColor
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _yearSelected == index
+                                ? primaryColor
+                                : Colors.grey.shade300,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            years[index],
+                            style: TextStyle(
+                              color: _yearSelected == index
+                                  ? Colors.white
+                                  : Colors.black87,
+                              fontWeight: _yearSelected == index
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Month selector (if not yearly view)
+              if (!showYearlyView)
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: months.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _monthSelected = index;
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _monthSelected == index
+                                ? primaryColor
+                                : Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              months[index],
+                              style: TextStyle(
+                                color: _monthSelected == index
+                                    ? Colors.white
+                                    : Colors.black87,
+                                fontWeight: _monthSelected == index
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+              // Main content area - left aligned with half screen width
+              Expanded(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: SizedBox(
+                    width: contentWidth,
+                    child: reportData.when(
+                      data: (data) {
+                        if (showYearlyView) {
+                          return _buildYearlyView(data, selectedYear);
+                        } else {
+                          return _buildMonthlyView(
+                              data, selectedYear, _monthSelected!);
+                        }
+                      },
+                      loading: () => Center(child: CircularProgressIndicator()),
+                      error: (error, stack) {
+                        print('Error: $error');
+                        print('Stack: $stack');
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error_outline,
+                                  size: 64, color: Colors.red),
+                              SizedBox(height: 16),
+                              Text('Error loading data'),
+                              Text(error.toString(),
+                                  style: TextStyle(fontSize: 12)),
+                              SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () {
+                                  ref.invalidate(requestGiveReportProvider);
+                                },
+                                child: Text('ပြန်လည်ကြိုးစားမည်'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddEditDialog(null),
@@ -364,6 +388,137 @@ class _RequestGiveDetailScreenNewState
         child: Icon(Icons.add, color: Colors.white),
         tooltip: 'အသစ်ထည့်မည်',
       ),
+    );
+  }
+
+  Widget _buildTotalsCards({
+    required Object totalRequest,
+    required Object totalGive,
+    required String percentage,
+  }) {
+    Widget requestCard() {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.orange.shade50,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.orange.shade200),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.call_received, color: Colors.orange, size: 16),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    'တောင်းခံမှု',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.orange.shade700,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                totalRequest.toString(),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.orange,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget giveCard() {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.green.shade50,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.green.shade200),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.volunteer_activism,
+                    color: Colors.green, size: 16),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    'လှူဒါန်းမှု',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.green.shade700,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.end,
+              children: [
+                Text(
+                  totalGive.toString(),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+                Text(
+                  '($percentage%)',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.green.shade700,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 480) {
+          return Column(
+            children: [
+              SizedBox(width: double.infinity, child: requestCard()),
+              const SizedBox(height: 12),
+              SizedBox(width: double.infinity, child: giveCard()),
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            Expanded(child: requestCard()),
+            const SizedBox(width: 12),
+            Expanded(child: giveCard()),
+          ],
+        );
+      },
     );
   }
 
@@ -380,280 +535,195 @@ class _RequestGiveDetailScreenNewState
         yearlyTotal['totalGive'] ??
         yearlyTotal['total_give'] ??
         0;
-    
+
     // Calculate percentage for yearly total
-    final yearlyPercentage = totalRequest > 0 
-        ? ((totalGive / totalRequest) * 100).toStringAsFixed(1) 
+    final yearlyPercentage = totalRequest > 0
+        ? ((totalGive / totalRequest) * 100).toStringAsFixed(1)
         : '0.0';
 
     return SingleChildScrollView(
         padding: EdgeInsets.all(16),
-        child: Column(children: [
-          // Year header
-          Container(
-            margin: EdgeInsets.only(bottom: 16),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child:
-                      Icon(Icons.calendar_today, color: primaryColor, size: 20),
-                ),
-                SizedBox(width: 12),
-                Text(
-                  '$year နှစ်ချုပ်',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Totals cards
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.shade200),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.call_received,
-                              color: Colors.orange, size: 16),
-                          SizedBox(width: 4),
-                          Text(
-                            'တောင်းခံမှု',
-                            style: TextStyle(
-                              color: Colors.orange.shade700,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        totalRequest.toString(),
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.green.shade200),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.volunteer_activism,
-                              color: Colors.green, size: 16),
-                          SizedBox(width: 4),
-                          Text(
-                            'လှူဒါန်းမှု',
-                            style: TextStyle(
-                              color: Colors.green.shade700,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            totalGive.toString(),
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            '($yearlyPercentage%)',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.green.shade700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: 16),
-
-          // Monthly list header
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.calendar_month, color: primaryColor, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  'လအလိုက် အချက်အလက်',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Monthly data list
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(12),
-                bottomRight: Radius.circular(12),
-              ),
-            ),
-            child: monthlyData.isEmpty
-                ? Container(
-                    padding: EdgeInsets.symmetric(vertical: 60),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.inbox_outlined,
-                            size: 48,
-                            color: Colors.grey.shade400,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'ဤနှစ်အတွက် အချက်အလက်မရှိပါ',
-                            style: TextStyle(
-                              color: Colors.grey.shade500,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
+        child: Column(
+          children: [
+            // Year header
+            Container(
+              margin: EdgeInsets.only(bottom: 16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: monthlyData.length,
-                    itemBuilder: (context, index) {
-                      final monthData = monthlyData[index];
-                      final month = int.parse(monthData['month'].toString());
-                      final request = monthData['totalrequest'] ??
-                          monthData['totalRequest'] ??
-                          0;
-                      final give =
-                          monthData['totalgive'] ?? monthData['totalGive'] ?? 0;
-                      
-                      // Calculate percentage for this month
-                      final monthlyPercentage = request > 0 
-                          ? ((give / request) * 100).toStringAsFixed(1) 
-                          : '0.0';
+                    child: Icon(Icons.calendar_today,
+                        color: primaryColor, size: 20),
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    '$year နှစ်ချုပ်',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-                      return ListTile(
-                        onTap: () {
-                          setState(() {
-                            showYearlyView = false;
-                            _monthSelected = month - 1;
-                          });
-                        },
-                        leading: CircleAvatar(
-                          backgroundColor: primaryColor.withOpacity(0.1),
-                          child: Text(
-                            month.toString(),
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          monthsMM[month - 1],
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        subtitle: Row(
+            // Totals cards
+            _buildTotalsCards(
+              totalRequest: totalRequest,
+              totalGive: totalGive,
+              percentage: yearlyPercentage,
+            ),
+
+            SizedBox(height: 16),
+
+            // Monthly list header
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.calendar_month, color: primaryColor, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'လအလိုက် အချက်အလက်',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Monthly data list
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
+              child: monthlyData.isEmpty
+                  ? Container(
+                      padding: EdgeInsets.symmetric(vertical: 60),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.call_received,
-                                size: 14, color: Colors.orange),
-                            SizedBox(width: 4),
-                            Text(request.toString(),
-                                style: TextStyle(color: Colors.orange)),
-                            SizedBox(width: 16),
-                            Icon(Icons.volunteer_activism,
-                                size: 14, color: Colors.green),
-                            SizedBox(width: 4),
-                            Text(give.toString(),
-                                style: TextStyle(color: Colors.green)),
-                            SizedBox(width: 16),
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                '$monthlyPercentage%',
-                                style: TextStyle(
-                                  color: Colors.blue.shade700,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            Icon(
+                              Icons.inbox_outlined,
+                              size: 48,
+                              color: Colors.grey.shade400,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'ဤနှစ်အတွက် အချက်အလက်မရှိပါ',
+                              style: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontSize: 14,
                               ),
                             ),
                           ],
                         ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.edit, color: primaryColor, size: 20),
-                          onPressed: () => _showAddEditDialog(monthData,
-                              month: month, year: year),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],));
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: monthlyData.length,
+                      itemBuilder: (context, index) {
+                        final monthData = monthlyData[index];
+                        final month = int.parse(monthData['month'].toString());
+                        final request = monthData['totalrequest'] ??
+                            monthData['totalRequest'] ??
+                            0;
+                        final give = monthData['totalgive'] ??
+                            monthData['totalGive'] ??
+                            0;
+
+                        // Calculate percentage for this month
+                        final monthlyPercentage = request > 0
+                            ? ((give / request) * 100).toStringAsFixed(1)
+                            : '0.0';
+
+                        return ListTile(
+                          onTap: () {
+                            setState(() {
+                              showYearlyView = false;
+                              _monthSelected = month - 1;
+                            });
+                          },
+                          leading: CircleAvatar(
+                            backgroundColor: primaryColor.withOpacity(0.1),
+                            child: Text(
+                              month.toString(),
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          title: Text(
+                            monthsMM[month - 1],
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          subtitle: Row(
+                            children: [
+                              Icon(Icons.call_received,
+                                  size: 14, color: Colors.orange),
+                              SizedBox(width: 4),
+                              Text(request.toString(),
+                                  style: TextStyle(color: Colors.orange)),
+                              SizedBox(width: 16),
+                              Icon(Icons.volunteer_activism,
+                                  size: 14, color: Colors.green),
+                              SizedBox(width: 4),
+                              Text(give.toString(),
+                                  style: TextStyle(color: Colors.green)),
+                              SizedBox(width: 16),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '$monthlyPercentage%',
+                                  style: TextStyle(
+                                    color: Colors.blue.shade700,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon:
+                                Icon(Icons.edit, color: primaryColor, size: 20),
+                            onPressed: () => _showAddEditDialog(monthData,
+                                month: month, year: year),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ));
   }
 
   Widget _buildMonthlyView(
@@ -663,10 +733,10 @@ class _RequestGiveDetailScreenNewState
 
     final totalRequest = summary['totalRequest'] ?? 0;
     final totalGive = summary['totalGive'] ?? 0;
-    
+
     // Calculate percentage for monthly total
-    final monthlyPercentage = totalRequest > 0 
-        ? ((totalGive / totalRequest) * 100).toStringAsFixed(1) 
+    final monthlyPercentage = totalRequest > 0
+        ? ((totalGive / totalRequest) * 100).toStringAsFixed(1)
         : '0.0';
 
     return SingleChildScrollView(
@@ -714,100 +784,10 @@ class _RequestGiveDetailScreenNewState
                   ],
                 ),
                 SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.orange.shade200),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.call_received,
-                                    color: Colors.orange, size: 16),
-                                SizedBox(width: 4),
-                                Text(
-                                  'တောင်းခံမှု',
-                                  style: TextStyle(
-                                    color: Colors.orange.shade700,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              totalRequest.toString(),
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.green.shade200),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.volunteer_activism,
-                                    color: Colors.green, size: 16),
-                                SizedBox(width: 4),
-                                Text(
-                                  'လှူဒါန်းမှု',
-                                  style: TextStyle(
-                                    color: Colors.green.shade700,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.baseline,
-                              textBaseline: TextBaseline.alphabetic,
-                              children: [
-                                Text(
-                                  totalGive.toString(),
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  '($monthlyPercentage%)',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.green.shade700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                _buildTotalsCards(
+                  totalRequest: totalRequest,
+                  totalGive: totalGive,
+                  percentage: monthlyPercentage,
                 ),
               ],
             ),

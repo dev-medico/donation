@@ -231,8 +231,7 @@ class _SpecialEventListScreenState
   /// Compact phone cards: date + lab on top, test tallies below, total badge.
   Widget _buildMobileEventList(List<dynamic> events) {
     return ListView.separated(
-      padding: const EdgeInsets.only(
-          left: 12, right: 12, top: 4, bottom: 88),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 88),
       itemCount: events.length,
       separatorBuilder: (_, __) =>
           Divider(height: 1, thickness: 0.5, color: Colors.grey[200]),
@@ -256,7 +255,9 @@ class _SpecialEventListScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lab.isEmpty ? _eventDate(event) : '${_eventDate(event)} · $lab',
+                        lab.isEmpty
+                            ? _eventDate(event)
+                            : '${_eventDate(event)} · $lab',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -267,7 +268,8 @@ class _SpecialEventListScreenState
                         tests,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11.5, color: Colors.grey[600]),
+                        style:
+                            TextStyle(fontSize: 11.5, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -628,6 +630,50 @@ class _SpecialEventListScreenState
   }
 }
 
+Widget _buildSpecialEventDialogTitle(IconData icon, String title) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Icon(icon, color: primaryColor),
+      const SizedBox(width: 8),
+      Expanded(
+        child: Text(
+          title,
+          softWrap: true,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildSpecialEventTestGrid({
+  required BuildContext context,
+  required List<Widget> children,
+}) {
+  final isMobile = Responsive.isMobile(context);
+
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final columnCount = isMobile
+          ? constraints.maxWidth >= 300
+              ? 2
+              : 1
+          : 3;
+
+      return GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: columnCount,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        mainAxisExtent: isMobile ? 68 : null,
+        childAspectRatio: 2.5,
+        children: children,
+      );
+    },
+  );
+}
+
 // Add Special Event Dialog Widget
 class _AddSpecialEventDialog extends ConsumerStatefulWidget {
   final VoidCallback onAdded;
@@ -730,17 +776,22 @@ class _AddSpecialEventDialogState
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = Responsive.isMobile(context);
+
     return AlertDialog(
-      title: Row(
-        children: [
-          Icon(Icons.add_circle, color: primaryColor),
-          const SizedBox(width: 8),
-          const Text('ထူးခြားဖြစ်စဉ် အသစ်ထည့်သွင်းမည်'),
-        ],
+      insetPadding: isMobile
+          ? const EdgeInsets.symmetric(horizontal: 12, vertical: 24)
+          : null,
+      contentPadding:
+          isMobile ? const EdgeInsets.fromLTRB(16, 20, 16, 0) : null,
+      title: _buildSpecialEventDialogTitle(
+        Icons.add_circle,
+        'ထူးခြားဖြစ်စဉ် အသစ်ထည့်သွင်းမည်',
       ),
-      content: SingleChildScrollView(
-        child: Container(
-          width: 500,
+      content: SizedBox(
+        width: isMobile ? double.maxFinite : 500,
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Form(
             key: _formKey,
             child: Column(
@@ -800,12 +851,8 @@ class _AddSpecialEventDialogState
                 const SizedBox(height: 16),
 
                 // Test fields in a grid
-                GridView.count(
-                  shrinkWrap: true,
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 2.5,
+                _buildSpecialEventTestGrid(
+                  context: context,
                   children: [
                     _buildTestField('Haemoglobin', _haemoglobinController),
                     _buildTestField('HBs Ag', _hbsAgController),
@@ -1043,17 +1090,22 @@ class _EditSpecialEventDialogState
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = Responsive.isMobile(context);
+
     return AlertDialog(
-      title: Row(
-        children: [
-          Icon(Icons.edit, color: primaryColor),
-          const SizedBox(width: 8),
-          const Text('ထူးခြားဖြစ်စဉ် ပြင်ဆင်မည်'),
-        ],
+      insetPadding: isMobile
+          ? const EdgeInsets.symmetric(horizontal: 12, vertical: 24)
+          : null,
+      contentPadding:
+          isMobile ? const EdgeInsets.fromLTRB(16, 20, 16, 0) : null,
+      title: _buildSpecialEventDialogTitle(
+        Icons.edit,
+        'ထူးခြားဖြစ်စဉ် ပြင်ဆင်မည်',
       ),
-      content: SingleChildScrollView(
-        child: Container(
-          width: 500,
+      content: SizedBox(
+        width: isMobile ? double.maxFinite : 500,
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Form(
             key: _formKey,
             child: Column(
@@ -1113,12 +1165,8 @@ class _EditSpecialEventDialogState
                 const SizedBox(height: 16),
 
                 // Test fields in a grid
-                GridView.count(
-                  shrinkWrap: true,
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 2.5,
+                _buildSpecialEventTestGrid(
+                  context: context,
                   children: [
                     _buildTestField('Haemoglobin', _haemoglobinController),
                     _buildTestField('HBs Ag', _hbsAgController),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/member_service.dart' as ms;
@@ -169,16 +170,30 @@ final memberListProvider = FutureProvider.autoDispose<List<Member>>((ref) {
 });
 
 // Separate provider for search member list with year filter
-final searchMemberListWithYearProvider = FutureProvider.autoDispose<List<Member>>((ref) {
+const _searchMemberRequestTimeout = Duration(seconds: 20);
+
+final searchMemberListWithYearProvider =
+    FutureProvider.autoDispose<List<Member>>((ref) async {
   final repository = ref.read(searchMemberRepositoryProvider);
   final donationYear = ref.watch(searchMemberDonationYearFilterProvider);
   final searchQuery = ref.watch(searchMemberQueryProvider);
   final bloodType = ref.watch(searchMemberBloodTypeFilterProvider);
-  
-  return repository.searchMembers(
+
+  final request = repository.searchMembers(
     query: searchQuery.isEmpty ? null : searchQuery,
-    bloodType: (bloodType == 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' || bloodType.isEmpty) ? null : bloodType,
+    bloodType:
+        (bloodType == 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' || bloodType.isEmpty)
+            ? null
+            : bloodType,
     donationYear: donationYear,
+  );
+
+  return request.timeout(
+    _searchMemberRequestTimeout,
+    onTimeout: () => throw TimeoutException(
+      'Member search timed out after '
+      '${_searchMemberRequestTimeout.inSeconds} seconds',
+    ),
   );
 });
 
@@ -324,11 +339,12 @@ final memberBloodBankCardSearchProvider = StateProvider<String>((ref) => '');
 final memberIdSearchProvider = StateProvider<String>((ref) => '');
 
 // Separate filter providers for search member screen
-final searchMemberQueryProvider = StateProvider<String>((ref) => '');
+final searchMemberQueryProvider =
+    StateProvider.autoDispose<String>((ref) => '');
 final searchMemberBloodTypeFilterProvider =
-    StateProvider<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
-final searchMemberDonationYearFilterProvider = 
-    StateProvider<String?>((ref) => DateTime.now().year.toString());
+    StateProvider.autoDispose<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
+final searchMemberDonationYearFilterProvider =
+    StateProvider.autoDispose<String?>((ref) => DateTime.now().year.toString());
 
 // Filtered members provider
 final filteredMemberListProvider = StateProvider.autoDispose<List<Member>>((ref) {

@@ -69,214 +69,173 @@ class DonationYearlyReport extends StatelessWidget {
             ),
 
             //New
-            Table(
-              border: TableBorder.all(),
-              columnWidths: const <int, TableColumnWidth>{
-                0: FlexColumnWidth(),
-                1: FlexColumnWidth(),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.top,
-              children: <TableRow>[
-                TableRow(
-                  children: <Widget>[
-                    Padding(
-                      padding:
-                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
-                      child: const Text(
-                        "ဝင်ငွေ",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          // fontFamily: "Times New Roman",
-                          color: Colors.black,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
+            if (Responsive.isMobile(context)) _buildMobileReport(context),
+            if (!Responsive.isMobile(context))
+              Table(
+                border: TableBorder.all(),
+                columnWidths: const <int, TableColumnWidth>{
+                  0: FlexColumnWidth(),
+                  1: FlexColumnWidth(),
+                },
+                defaultVerticalAlignment: TableCellVerticalAlignment.top,
+                children: <TableRow>[
+                  TableRow(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(
+                            Responsive.isMobile(context) ? 8 : 12),
+                        child: const Text(
+                          "ဝင်ငွေ",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            // fontFamily: "Times New Roman",
+                            color: Colors.black,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
-                      child: const Text(
-                        "အသုံးစရိတ်",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          // fontFamily: "Times New Roman",
-                          color: Colors.black,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: EdgeInsets.all(
+                            Responsive.isMobile(context) ? 8 : 12),
+                        child: const Text(
+                          "အသုံးစရိတ်",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            // fontFamily: "Times New Roman",
+                            color: Colors.black,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Table(
-              border: TableBorder.all(),
-              columnWidths: const <int, TableColumnWidth>{
-                0: FlexColumnWidth(),
-                1: FlexColumnWidth(),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.top,
-              children: <TableRow>[
-                TableRow(
-                  children: <Widget>[
-                    Padding(
-                      padding:
-                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 26,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  Responsive.isMobile(context)
-                                      ? "${Utils.strToMM((selectedYear! - 1).toString())} လက်ကျန်ငွေ"
-                                      : "${Utils.strToMM((selectedYear! - 1).toString())} စာရင်းဖွင့်လက်ကျန်ငွေ",
-                                  style: TextStyle(
-                                      fontSize: Responsive.isMobile(context)
-                                          ? 14
-                                          : 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                                Text(
-                                  "${Utils.strToMM(openingBalance.toString())} ကျပ်",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                              ],
+                    ],
+                  ),
+                ],
+              ),
+            if (!Responsive.isMobile(context))
+              Table(
+                border: TableBorder.all(),
+                columnWidths: const <int, TableColumnWidth>{
+                  0: FlexColumnWidth(),
+                  1: FlexColumnWidth(),
+                },
+                defaultVerticalAlignment: TableCellVerticalAlignment.top,
+                children: <TableRow>[
+                  TableRow(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(
+                            Responsive.isMobile(context) ? 8 : 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 26,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    Responsive.isMobile(context)
+                                        ? "${Utils.strToMM((selectedYear! - 1).toString())} လက်ကျန်ငွေ"
+                                        : "${Utils.strToMM((selectedYear! - 1).toString())} စာရင်းဖွင့်လက်ကျန်ငွေ",
+                                    style: TextStyle(
+                                        fontSize: Responsive.isMobile(context)
+                                            ? 14
+                                            : 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  Text(
+                                    "${Utils.strToMM(openingBalance.toString())} ကျပ်",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 4,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                                bottom: Responsive.isMobile(context) ? 8 : 12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: monthlyDonation!.length * 26 + 40,
-                                  child: ListView.builder(
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemCount: monthlyDonation!.length,
-                                      itemBuilder: ((context, index) {
-                                        return Container(
-                                          margin:
-                                              const EdgeInsets.only(bottom: 2),
-                                          height: 26,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                convertToMMMonthName(index),
-                                                maxLines: 2,
-                                                style: TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              ),
-                                              Text(
-                                                "${Utils.strToMM(monthlyDonation![index].toString())} ကျပ်",
-                                                style: TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      })),
-                                ),
-                                Visibility(
-                                  visible: monthlyDonation!.isNotEmpty,
-                                  child: const Padding(
-                                    padding:
-                                        EdgeInsets.only(top: 12, bottom: 12),
-                                    child: Divider(
-                                      color: Colors.black,
-                                      height: 1.5,
+                            const SizedBox(
+                              height: 4,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  bottom:
+                                      Responsive.isMobile(context) ? 8 : 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: monthlyDonation!.length * 26 + 40,
+                                    child: ListView.builder(
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: monthlyDonation!.length,
+                                        itemBuilder: ((context, index) {
+                                          return Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 2),
+                                            height: 26,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  convertToMMMonthName(index),
+                                                  maxLines: 2,
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black),
+                                                ),
+                                                Text(
+                                                  "${Utils.strToMM(monthlyDonation![index].toString())} ကျပ်",
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        })),
+                                  ),
+                                  Visibility(
+                                    visible: monthlyDonation!.isNotEmpty,
+                                    child: const Padding(
+                                      padding:
+                                          EdgeInsets.only(top: 12, bottom: 12),
+                                      child: Divider(
+                                        color: Colors.black,
+                                        height: 1.5,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 26,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        Responsive.isMobile(context)
-                                            ? "အလှူငွေ စုစုပေါင်း"
-                                            : "ယခုနှစ် အလှူငွေ စုစုပေါင်း",
-                                        style: TextStyle(
-                                            fontSize:
-                                                Responsive.isMobile(context)
-                                                    ? 14
-                                                    : 15,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black),
-                                      ),
-                                      Text(
-                                        "${Utils.strToMM(totalDonationAmount.toString())} ကျပ်",
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 4,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: Responsive.isMobile(context) ? 12 : 20,
-                          top: Responsive.isMobile(context) ? 8 : 12,
-                          bottom: Responsive.isMobile(context) ? 8 : 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: monthlyExpense!.length * 26 + 40,
-                            child: ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: monthlyExpense!.length,
-                                itemBuilder: ((context, index) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(
-                                        bottom: 2, right: 12),
+                                  SizedBox(
                                     height: 26,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          convertToMMMonthName(index),
-                                          maxLines: 2,
+                                          Responsive.isMobile(context)
+                                              ? "အလှူငွေ စုစုပေါင်း"
+                                              : "ယခုနှစ် အလှူငွေ စုစုပေါင်း",
                                           style: TextStyle(
-                                              fontSize: 15,
+                                              fontSize:
+                                                  Responsive.isMobile(context)
+                                                      ? 14
+                                                      : 15,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black),
                                         ),
                                         Text(
-                                          "${Utils.strToMM(monthlyExpense![index].toString())} ကျပ်",
+                                          "${Utils.strToMM(totalDonationAmount.toString())} ကျပ်",
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
@@ -284,146 +243,341 @@ class DonationYearlyReport extends StatelessWidget {
                                         ),
                                       ],
                                     ),
-                                  );
-                                })),
-                          ),
-                          Visibility(
-                            visible: monthlyDonation!.isNotEmpty,
-                            child: const Padding(
-                              padding: EdgeInsets.only(top: 12, bottom: 12),
-                              child: Divider(
-                                color: Colors.black,
-                                height: 1.5,
+                                  ),
+                                  const SizedBox(
+                                    height: 4,
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.only(right: 12),
-                            height: 26,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "စုစုပေါင်း ကုန်ကျငွေ",
-                                  style: TextStyle(
-                                      fontSize: Responsive.isMobile(context)
-                                          ? 14
-                                          : 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                                Text(
-                                  "${Utils.strToMM(totalExpense.toString())} ကျပ်",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                              ],
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: Responsive.isMobile(context) ? 12 : 20,
+                            top: Responsive.isMobile(context) ? 8 : 12,
+                            bottom: Responsive.isMobile(context) ? 8 : 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: monthlyExpense!.length * 26 + 40,
+                              child: ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: monthlyExpense!.length,
+                                  itemBuilder: ((context, index) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(
+                                          bottom: 2, right: 12),
+                                      height: 26,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            convertToMMMonthName(index),
+                                            maxLines: 2,
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black),
+                                          ),
+                                          Text(
+                                            "${Utils.strToMM(monthlyExpense![index].toString())} ကျပ်",
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  })),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 4,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.only(right: 12),
-                            height: 26,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  Responsive.isMobile(context)
-                                      ? "လက်ကျန်ငွေ"
-                                      : "စာရင်းပိတ် လက်ကျန်ငွေ",
-                                  style: TextStyle(
-                                      fontSize: Responsive.isMobile(context)
-                                          ? 14
-                                          : 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
+                            Visibility(
+                              visible: monthlyDonation!.isNotEmpty,
+                              child: const Padding(
+                                padding: EdgeInsets.only(top: 12, bottom: 12),
+                                child: Divider(
+                                  color: Colors.black,
+                                  height: 1.5,
                                 ),
-                                Text(
-                                  "${Utils.strToMM(closingBalance.toString())} ကျပ်",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                            Container(
+                              padding: const EdgeInsets.only(right: 12),
+                              height: 26,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "စုစုပေါင်း ကုန်ကျငွေ",
+                                    style: TextStyle(
+                                        fontSize: Responsive.isMobile(context)
+                                            ? 14
+                                            : 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  Text(
+                                    "${Utils.strToMM(totalExpense.toString())} ကျပ်",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 4,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(right: 12),
+                              height: 26,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    Responsive.isMobile(context)
+                                        ? "လက်ကျန်ငွေ"
+                                        : "စာရင်းပိတ် လက်ကျန်ငွေ",
+                                    style: TextStyle(
+                                        fontSize: Responsive.isMobile(context)
+                                            ? 14
+                                            : 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  Text(
+                                    "${Utils.strToMM(closingBalance.toString())} ကျပ်",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Table(
-              border: TableBorder.all(),
-              columnWidths: const <int, TableColumnWidth>{
-                0: FlexColumnWidth(),
-                1: FlexColumnWidth(),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.top,
-              children: <TableRow>[
-                TableRow(
-                  children: <Widget>[
-                    Padding(
-                      padding:
-                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "စုစုပေါင်း",
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          Text(
-                            "${Utils.strToMM((totalDonationAmount! + openingBalance).toString())} ကျပ်",
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                        ],
+                    ],
+                  ),
+                ],
+              ),
+            if (!Responsive.isMobile(context))
+              Table(
+                border: TableBorder.all(),
+                columnWidths: const <int, TableColumnWidth>{
+                  0: FlexColumnWidth(),
+                  1: FlexColumnWidth(),
+                },
+                defaultVerticalAlignment: TableCellVerticalAlignment.top,
+                children: <TableRow>[
+                  TableRow(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(
+                            Responsive.isMobile(context) ? 8 : 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "စုစုပေါင်း",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                            Text(
+                              "${Utils.strToMM((totalDonationAmount! + openingBalance).toString())} ကျပ်",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.all(Responsive.isMobile(context) ? 8 : 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "စုစုပေါင်း",
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          Text(
-                            "${Utils.strToMM((totalDonationAmount! + openingBalance).toString())} ကျပ်",
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                        ],
+                      Padding(
+                        padding: EdgeInsets.all(
+                            Responsive.isMobile(context) ? 8 : 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "စုစုပေါင်း",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                            Text(
+                              "${Utils.strToMM((totalDonationAmount! + openingBalance).toString())} ကျပ်",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                    ],
+                  ),
+                ],
+              ),
             const SizedBox(
               height: 20,
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildMobileReport(BuildContext context) {
+    final donations = monthlyDonation ?? const <int>[];
+    final expenses = monthlyExpense ?? const <int>[];
+    final year = selectedYear ?? DateTime.now().year;
+    final donationTotal = totalDonationAmount ?? 0;
+    final expenseTotal = totalExpense ?? 0;
+    final balance = closingBalance ?? 0;
+    final accountingTotal = donationTotal + openingBalance;
+
+    return Column(
+      children: [
+        _buildMobileSection(
+          title: 'ဝင်ငွေ',
+          color: Colors.green,
+          children: [
+            _buildMobileAmountRow(
+              '${Utils.strToMM((year - 1).toString())} စာရင်းဖွင့်လက်ကျန်ငွေ',
+              openingBalance,
+              emphasized: true,
+            ),
+            if (donations.isNotEmpty) const Divider(height: 20),
+            for (int index = 0; index < donations.length; index++)
+              _buildMobileAmountRow(
+                convertToMMMonthName(index),
+                donations[index],
+              ),
+            const Divider(height: 20),
+            _buildMobileAmountRow(
+              'ယခုနှစ် အလှူငွေ စုစုပေါင်း',
+              donationTotal,
+              emphasized: true,
+            ),
+            _buildMobileAmountRow(
+              'စုစုပေါင်း',
+              accountingTotal,
+              emphasized: true,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _buildMobileSection(
+          title: 'အသုံးစရိတ်',
+          color: Colors.red,
+          children: [
+            for (int index = 0; index < expenses.length; index++)
+              _buildMobileAmountRow(
+                convertToMMMonthName(index),
+                expenses[index],
+              ),
+            if (expenses.isNotEmpty) const Divider(height: 20),
+            _buildMobileAmountRow(
+              'စုစုပေါင်း ကုန်ကျငွေ',
+              expenseTotal,
+              emphasized: true,
+            ),
+            _buildMobileAmountRow(
+              'စာရင်းပိတ် လက်ကျန်ငွေ',
+              balance,
+              emphasized: true,
+            ),
+            _buildMobileAmountRow(
+              'စုစုပေါင်း',
+              accountingTotal,
+              emphasized: true,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileSection({
+    required String title,
+    required MaterialColor color,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.shade200),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            color: color.withValues(alpha: 0.08),
+            child: Text(
+              title,
+              style: TextStyle(
+                color: color.shade800,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Column(children: children),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileAmountRow(
+    String label,
+    int amount, {
+    bool emphasized = false,
+  }) {
+    final style = TextStyle(
+      color: Colors.black87,
+      fontSize: emphasized ? 15 : 14,
+      fontWeight: emphasized ? FontWeight.bold : FontWeight.w500,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(label, style: style),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 2,
+            child: Text(
+              '${Utils.strToMM(amount.toString())} ကျပ်',
+              textAlign: TextAlign.end,
+              style: style,
+            ),
+          ),
+        ],
       ),
     );
   }

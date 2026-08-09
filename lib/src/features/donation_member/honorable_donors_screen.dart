@@ -84,59 +84,59 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldMessenger(
-      key: _messengerKey,
-      child: Scaffold(
-      backgroundColor: const Color(0xfff2f2f2),
-      appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [primaryColor, primaryDark],
+        key: _messengerKey,
+        child: Scaffold(
+          backgroundColor: const Color(0xfff2f2f2),
+          appBar: AppBar(
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [primaryColor, primaryDark],
+                ),
+              ),
+            ),
+            centerTitle: true,
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: const Text(
+              'ဂုဏ်ထူးဆောင် သွေးအလှူရှင်များ',
+              textScaleFactor: 1.0,
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
-        ),
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
-          'ဂုဏ်ထူးဆောင် သွေးအလှူရှင်များ',
-          textScaleFactor: 1.0,
-          style: TextStyle(fontSize: 16, color: Colors.white),
-        ),
-      ),
-      body: FutureBuilder<List<Member>>(
-        future: _future,
-        builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snap.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text('ရယူ၍ မရပါ — ${snap.error}',
-                    textAlign: TextAlign.center),
-              ),
-            );
-          }
-          final donors = snap.data ?? [];
-          if (donors.isEmpty) {
-            return const Center(
-                child: Text('၃၀ ကြိမ်အထက် လှူဒါန်းထားသူ မရှိသေးပါ'));
-          }
-          return RefreshIndicator(
-            onRefresh: () async => _refresh(),
-            child: ListView.separated(
-              padding: const EdgeInsets.all(12),
-              itemCount: donors.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (context, i) => _donorTile(donors[i], i + 1),
-            ),
-          );
-        },
-      ),
-    ));
+          body: FutureBuilder<List<Member>>(
+            future: _future,
+            builder: (context, snap) {
+              if (snap.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snap.hasError) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text('ရယူ၍ မရပါ — ${snap.error}',
+                        textAlign: TextAlign.center),
+                  ),
+                );
+              }
+              final donors = snap.data ?? [];
+              if (donors.isEmpty) {
+                return const Center(
+                    child: Text('၃၀ ကြိမ်အထက် လှူဒါန်းထားသူ မရှိသေးပါ'));
+              }
+              return RefreshIndicator(
+                onRefresh: () async => _refresh(),
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: donors.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, i) => _donorTile(donors[i], i + 1),
+                ),
+              );
+            },
+          ),
+        ));
   }
 
   Widget _donorTile(Member m, int rank) {
@@ -176,26 +176,11 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
               children: [
                 Text(
                   m.name ?? '-',
-                  style:
-                      const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600, fontSize: 15),
                 ),
                 const SizedBox(height: 2),
-                Row(
-                  children: [
-                    if ((m.bloodType ?? '').isNotEmpty) ...[
-                      Icon(Icons.bloodtype, size: 14, color: primaryColor),
-                      const SizedBox(width: 2),
-                      Text(m.bloodType!,
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.grey[700])),
-                      const SizedBox(width: 10),
-                    ],
-                    if ((m.memberId ?? '').isNotEmpty)
-                      Text(m.memberId!,
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.grey[500])),
-                  ],
-                ),
+                _buildDonorMetadata(m),
               ],
             ),
           ),
@@ -219,6 +204,57 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
     );
   }
 
+  Widget _buildDonorMetadata(Member member) {
+    final hasBloodType = (member.bloodType ?? '').isNotEmpty;
+    final hasMemberId = (member.memberId ?? '').isNotEmpty;
+
+    if (MediaQuery.of(context).size.width < 480) {
+      return Wrap(
+        spacing: 10,
+        runSpacing: 2,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          if (hasBloodType)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.bloodtype, size: 14, color: primaryColor),
+                const SizedBox(width: 2),
+                Text(
+                  member.bloodType!,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                ),
+              ],
+            ),
+          if (hasMemberId)
+            Text(
+              member.memberId!,
+              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+            ),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        if (hasBloodType) ...[
+          Icon(Icons.bloodtype, size: 14, color: primaryColor),
+          const SizedBox(width: 2),
+          Text(
+            member.bloodType!,
+            style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+          ),
+          const SizedBox(width: 10),
+        ],
+        if (hasMemberId)
+          Text(
+            member.memberId!,
+            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+          ),
+      ],
+    );
+  }
+
   Widget _avatar(Member m) {
     final url = m.profileUrl;
     final hasUrl = url != null && url.isNotEmpty;
@@ -239,8 +275,8 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
           if (uploading)
             const Positioned.fill(
               child: DecoratedBox(
-                decoration:
-                    BoxDecoration(color: Colors.black38, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                    color: Colors.black38, shape: BoxShape.circle),
                 child: Center(
                   child: SizedBox(
                     width: 18,

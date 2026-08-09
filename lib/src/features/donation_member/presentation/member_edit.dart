@@ -55,38 +55,42 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
     nameController = TextEditingController(text: widget.member.name ?? '');
     fatherNameController =
         TextEditingController(text: widget.member.fatherName ?? '');
-    
+
     // Parse existing birth date from various formats
-    if (widget.member.birthDate != null && widget.member.birthDate!.isNotEmpty) {
+    if (widget.member.birthDate != null &&
+        widget.member.birthDate!.isNotEmpty) {
       try {
         // Try parsing 'd MMM yyyy' format (e.g., "24 Oct 1987")
-        selectedBirthDate = DateFormat('d MMM yyyy').tryParse(widget.member.birthDate!);
-        
+        selectedBirthDate =
+            DateFormat('d MMM yyyy').tryParse(widget.member.birthDate!);
+
         // If that fails, try 'dd MMM yyyy' format
         if (selectedBirthDate == null) {
-          selectedBirthDate = DateFormat('dd MMM yyyy').tryParse(widget.member.birthDate!);
+          selectedBirthDate =
+              DateFormat('dd MMM yyyy').tryParse(widget.member.birthDate!);
         }
-        
+
         // If that fails, try 'yyyy-MM-dd' format
         if (selectedBirthDate == null) {
           selectedBirthDate = DateTime.tryParse(widget.member.birthDate!);
         }
-        
+
         // Set the display text
         if (selectedBirthDate != null) {
           birthDateController = TextEditingController(
-            text: DateFormat('dd MMM yyyy').format(selectedBirthDate!)
-          );
+              text: DateFormat('dd MMM yyyy').format(selectedBirthDate!));
         } else {
-          birthDateController = TextEditingController(text: widget.member.birthDate ?? '');
+          birthDateController =
+              TextEditingController(text: widget.member.birthDate ?? '');
         }
       } catch (e) {
-        birthDateController = TextEditingController(text: widget.member.birthDate ?? '');
+        birthDateController =
+            TextEditingController(text: widget.member.birthDate ?? '');
       }
     } else {
       birthDateController = TextEditingController();
     }
-    
+
     nrcController = TextEditingController(text: widget.member.nrc ?? '');
     phoneController = TextEditingController(text: widget.member.phone ?? '');
     bloodBankController =
@@ -126,11 +130,13 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
       // Convert birth date to Y-m-d format for backend
       String? birthDateForBackend;
       if (selectedBirthDate != null) {
-        birthDateForBackend = DateFormat('yyyy-MM-dd').format(selectedBirthDate!);
+        birthDateForBackend =
+            DateFormat('yyyy-MM-dd').format(selectedBirthDate!);
       } else if (birthDateController.text.isNotEmpty) {
         // Try to parse the text if date wasn't selected via picker
         try {
-          final parsedDate = DateFormat('dd MMM yyyy').parse(birthDateController.text);
+          final parsedDate =
+              DateFormat('dd MMM yyyy').parse(birthDateController.text);
           birthDateForBackend = DateFormat('yyyy-MM-dd').format(parsedDate);
         } catch (e) {
           // If parsing fails, send the original text
@@ -237,241 +243,250 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Display member ID (non-editable)
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "အဖွဲ့ဝင်အမှတ်",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final isMobile = constraints.maxWidth < 600;
+
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(isMobile ? 16 : 20),
+                  child: SizedBox(
+                    width: isMobile
+                        ? double.infinity
+                        : MediaQuery.of(context).size.width * 0.5,
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Display member ID (non-editable)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "အဖွဲ့ဝင်အမှတ်",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.member.memberId ?? 'N/A',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Name
+                          TextFormField(
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              labelText: "အမည်",
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'အမည်ဖြည့်ရန် လိုအပ်ပါသည်';
+                              }
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Father's Name
+                          TextFormField(
+                            controller: fatherNameController,
+                            decoration: const InputDecoration(
+                              labelText: "အဖအမည်",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Birth Date
+                          GestureDetector(
+                            onTap: () => _selectDate(context),
+                            child: AbsorbPointer(
+                              child: TextFormField(
+                                controller: birthDateController,
+                                decoration: InputDecoration(
+                                  labelText: "မွေးသက္ကရာဇ်",
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: Icon(Icons.calendar_today,
+                                      color: primaryColor),
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              widget.member.memberId ?? 'N/A',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // NRC
+                          TextFormField(
+                            controller: nrcController,
+                            decoration: const InputDecoration(
+                              labelText: "နိုင်ငံသားစီစစ်ရေး အမှတ်",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Phone
+                          TextFormField(
+                            controller: phoneController,
+                            decoration: const InputDecoration(
+                              labelText: "ဖုန်းနံပါတ်",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Blood Bank Card
+                          TextFormField(
+                            controller: bloodBankController,
+                            decoration: const InputDecoration(
+                              labelText: "သွေးဘဏ်ကတ်နံပါတ်",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Blood Type Dropdown
+                          DropdownButtonFormField<String>(
+                            value: selectedBloodType,
+                            decoration: const InputDecoration(
+                              labelText: "သွေးအုပ်စု",
+                              border: OutlineInputBorder(),
+                            ),
+                            items: bloodTypes.map((String bloodType) {
+                              return DropdownMenuItem<String>(
+                                value: bloodType,
+                                child: Text(bloodType),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedBloodType = newValue;
+                              });
+                            },
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Gender Dropdown
+                          DropdownButtonFormField<String>(
+                            value: selectedGender,
+                            decoration: const InputDecoration(
+                              labelText: "လိင်အမျိုးအစား",
+                              border: OutlineInputBorder(),
+                            ),
+                            items: genders.map((String gender) {
+                              return DropdownMenuItem<String>(
+                                value: gender,
+                                child: Text(gender == 'male' ? 'ကျား' : 'မ'),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedGender = newValue;
+                              });
+                            },
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Address
+                          TextFormField(
+                            controller: addressController,
+                            maxLines: 3,
+                            decoration: const InputDecoration(
+                              labelText: "နေရပ်လိပ်စာ",
+                              border: OutlineInputBorder(),
+                              alignLabelWithHint: true,
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Member Count
+                          TextFormField(
+                            controller: memberCountController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: "ယခင်သွေးလှူအကြိမ်",
+                              border: OutlineInputBorder(),
+                              hintText: "ဥပမာ - 1, 2, 3",
+                            ),
+                            validator: (value) {
+                              if (value != null && value.isNotEmpty) {
+                                final number = int.tryParse(value);
+                                if (number == null || number < 0) {
+                                  return 'ကျေးဇူးပြု၍ မှန်ကန်သော နံပါတ်ဖြည့်ပါ';
+                                }
+                              }
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Error message
+                          if (_errorMessage != null)
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                _errorMessage!,
+                                style: TextStyle(color: Colors.red.shade900),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
 
-                      const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
-                      // Name
-                      TextFormField(
-                        controller: nameController,
-                        decoration: const InputDecoration(
-                          labelText: "အမည်",
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'အမည်ဖြည့်ရန် လိုအပ်ပါသည်';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Father's Name
-                      TextFormField(
-                        controller: fatherNameController,
-                        decoration: const InputDecoration(
-                          labelText: "အဖအမည်",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Birth Date
-                      GestureDetector(
-                        onTap: () => _selectDate(context),
-                        child: AbsorbPointer(
-                          child: TextFormField(
-                            controller: birthDateController,
-                            decoration: InputDecoration(
-                              labelText: "မွေးသက္ကရာဇ်",
-                              border: const OutlineInputBorder(),
-                              suffixIcon: Icon(Icons.calendar_today,
-                                  color: primaryColor),
+                          // Submit button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: _updateMember,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                              ),
+                              child: const Text(
+                                "သိမ်းဆည်းမည်",
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-
-                      const SizedBox(height: 16),
-
-                      // NRC
-                      TextFormField(
-                        controller: nrcController,
-                        decoration: const InputDecoration(
-                          labelText: "နိုင်ငံသားစီစစ်ရေး အမှတ်",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Phone
-                      TextFormField(
-                        controller: phoneController,
-                        decoration: const InputDecoration(
-                          labelText: "ဖုန်းနံပါတ်",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Blood Bank Card
-                      TextFormField(
-                        controller: bloodBankController,
-                        decoration: const InputDecoration(
-                          labelText: "သွေးဘဏ်ကတ်နံပါတ်",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Blood Type Dropdown
-                      DropdownButtonFormField<String>(
-                        value: selectedBloodType,
-                        decoration: const InputDecoration(
-                          labelText: "သွေးအုပ်စု",
-                          border: OutlineInputBorder(),
-                        ),
-                        items: bloodTypes.map((String bloodType) {
-                          return DropdownMenuItem<String>(
-                            value: bloodType,
-                            child: Text(bloodType),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedBloodType = newValue;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Gender Dropdown
-                      DropdownButtonFormField<String>(
-                        value: selectedGender,
-                        decoration: const InputDecoration(
-                          labelText: "လိင်အမျိုးအစား",
-                          border: OutlineInputBorder(),
-                        ),
-                        items: genders.map((String gender) {
-                          return DropdownMenuItem<String>(
-                            value: gender,
-                            child: Text(gender == 'male' ? 'ကျား' : 'မ'),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedGender = newValue;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Address
-                      TextFormField(
-                        controller: addressController,
-                        maxLines: 3,
-                        decoration: const InputDecoration(
-                          labelText: "နေရပ်လိပ်စာ",
-                          border: OutlineInputBorder(),
-                          alignLabelWithHint: true,
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Member Count
-                      TextFormField(
-                        controller: memberCountController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: "ယခင်သွေးလှူအကြိမ်",
-                          border: OutlineInputBorder(),
-                          hintText: "ဥပမာ - 1, 2, 3",
-                        ),
-                        validator: (value) {
-                          if (value != null && value.isNotEmpty) {
-                            final number = int.tryParse(value);
-                            if (number == null || number < 0) {
-                              return 'ကျေးဇူးပြု၍ မှန်ကန်သော နံပါတ်ဖြည့်ပါ';
-                            }
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Error message
-                      if (_errorMessage != null)
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.red.shade100,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            _errorMessage!,
-                            style: TextStyle(color: Colors.red.shade900),
-                          ),
-                        ),
-
-                      const SizedBox(height: 16),
-
-                      // Submit button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _updateMember,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                          ),
-                          child: const Text(
-                            "သိမ်းဆည်းမည်",
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
     );
   }

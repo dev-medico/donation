@@ -1711,6 +1711,8 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
+
     return Scaffold(
       backgroundColor: const Color(0xfff2f2f2),
       appBar: AppBar(
@@ -1722,14 +1724,20 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
           colors: [primaryColor, primaryDark],
         ))),
         centerTitle: true,
+        toolbarHeight: isCompact ? 64 : null,
         title: Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Text("အဖွဲ့၀င်အသစ် ထည့်သွင်းမည်",
-              style: TextStyle(fontSize: 15, color: Colors.white)),
+          child: Text(
+            "အဖွဲ့၀င်အသစ် ထည့်သွင်းမည်",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 15, color: Colors.white),
+          ),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(isCompact ? 12 : 20),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1750,21 +1758,28 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                   ],
                 ),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: EdgeInsets.all(isCompact ? 12 : 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const SizedBox(width: 8),
-                          Image.asset("assets/images/card.png", width: 54),
-                          const SizedBox(width: 16),
-                          Text(
-                            "အဖွဲ့၀င်အသစ် အချက်အလက်များ",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: primaryColor),
+                          SizedBox(width: isCompact ? 0 : 8),
+                          Image.asset("assets/images/card.png",
+                              width: isCompact ? 42 : 54),
+                          SizedBox(width: isCompact ? 12 : 16),
+                          Expanded(
+                            child: Text(
+                              "အဖွဲ့၀င်အသစ် အချက်အလက်များ",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryColor),
+                            ),
                           ),
                         ],
                       ),
@@ -1773,485 +1788,507 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                       const SizedBox(height: 12),
 
                       // Replace name input field with a Row that includes check button
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            Expanded(
-                              flex: 4,
-                              child: Text(
-                                "အမည်",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Color.fromARGB(255, 116, 112, 112),
+                      if (isCompact)
+                        _buildCompactNameField()
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 4,
+                                child: Text(
+                                  "အမည်",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color.fromARGB(255, 116, 112, 112),
+                                  ),
                                 ),
                               ),
-                            ),
-                            const Text("-",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.black)),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              flex: 4,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: nameController,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          nameChecked = false;
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        isDense: true,
-                                        contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 12, vertical: 12),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(6),
+                              const Text("-",
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.black)),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                flex: 4,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: nameController,
+                                        onChanged: (val) {
+                                          setState(() {
+                                            nameChecked = false;
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 12),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  nameChecked
-                                      ? Image.asset(
-                                          "assets/images/checked.png",
-                                          height: 24,
-                                          width: 24,
-                                        )
-                                      : Consumer(
-                                          builder: (context, ref, child) {
-                                          return GestureDetector(
-                                            behavior:
-                                                HitTestBehavior.translucent,
-                                            onTap: () => isSearchingMember
-                                                ? null
-                                                : _checkExistingMember(
-                                                    context, ref),
-                                            child: isSearchingMember
-                                                ? SizedBox(
-                                                    height: 24,
-                                                    width: 24,
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                      valueColor:
-                                                          AlwaysStoppedAnimation<
-                                                                  Color>(
-                                                              primaryColor),
-                                                    ))
-                                                : Image.asset(
-                                                    "assets/images/magnifier.png",
-                                                    height: 24,
-                                                    width: 24,
-                                                  ),
-                                          );
-                                        }),
-                                ],
+                                    SizedBox(width: 8),
+                                    nameChecked
+                                        ? Image.asset(
+                                            "assets/images/checked.png",
+                                            height: 24,
+                                            width: 24,
+                                          )
+                                        : Consumer(
+                                            builder: (context, ref, child) {
+                                            return GestureDetector(
+                                              behavior:
+                                                  HitTestBehavior.translucent,
+                                              onTap: () => isSearchingMember
+                                                  ? null
+                                                  : _checkExistingMember(
+                                                      context, ref),
+                                              child: isSearchingMember
+                                                  ? SizedBox(
+                                                      height: 24,
+                                                      width: 24,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        valueColor:
+                                                            AlwaysStoppedAnimation<
+                                                                    Color>(
+                                                                primaryColor),
+                                                      ))
+                                                  : Image.asset(
+                                                      "assets/images/magnifier.png",
+                                                      height: 24,
+                                                      width: 24,
+                                                    ),
+                                            );
+                                          }),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
 
                       _buildInputRow("အဖအမည်", fatherNameController),
 
                       // Birth Date Picker
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            Expanded(
-                              flex: 4,
-                              child: Text("မွေးသက္ကရာဇ်",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color:
-                                          Color.fromARGB(255, 116, 112, 112))),
-                            ),
-                            const Text("-",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.black)),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              flex: 4,
-                              child: InkWell(
-                                onTap: () => _showDatePicker(context),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.grey.shade300),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    birthDate,
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Blood Type Dropdown
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            Expanded(
-                              flex: 4,
-                              child: Text("သွေးအုပ်စု",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color:
-                                          Color.fromARGB(255, 116, 112, 112))),
-                            ),
-                            const Text("-",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.black)),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              flex: 4,
-                              child: DropdownButtonFormField<String>(
-                                value: selectedBloodType,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 8),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(6),
-                                    borderSide:
-                                        BorderSide(color: Colors.grey.shade300),
-                                  ),
-                                  isDense: true,
-                                ),
-                                items: bloodTypes.map((String type) {
-                                  return DropdownMenuItem<String>(
-                                    value: type,
-                                    child: Text(type,
-                                        style: TextStyle(fontSize: 14)),
-                                  );
-                                }).toList(),
-                                onChanged: (String? value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      selectedBloodType = value;
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // NRC Selection - replaces the single NRC field with proper format
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, bottom: 8.0),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    "နိုင်ငံသားစီစစ်ရေးကတ်ပြားအမှတ်",
+                      if (isCompact)
+                        _buildCompactBirthDate()
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 4,
+                                child: Text("မွေးသက္ကရာဇ်",
                                     style: TextStyle(
                                         fontSize: 14,
-                                        color:
-                                            Color.fromARGB(255, 116, 112, 112)),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    "(ဖြည့်စွက်ရန် မလိုအပ်ပါ)",
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        fontStyle: FontStyle.italic,
-                                        color: Colors.grey[600]),
-                                  ),
-                                ],
+                                        color: Color.fromARGB(
+                                            255, 116, 112, 112))),
                               ),
-                            ),
-                            Row(
-                              children: [
-                                // Radio buttons for NRC type
-                                Radio(
-                                  value: 0,
-                                  groupValue: nrcValue,
-                                  activeColor: primaryColor,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      nrcValue = 0;
-                                    });
-                                  },
-                                ),
-                                Text("မှတ်ပုံတင်အမှတ်",
-                                    style: TextStyle(fontSize: 14)),
-                                SizedBox(width: 12),
-                                Radio(
-                                  value: 1,
-                                  groupValue: nrcValue,
-                                  activeColor: primaryColor,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      nrcValue = 1;
-                                    });
-                                  },
-                                ),
-                                Text("MME", style: TextStyle(fontSize: 14)),
-                              ],
-                            ),
-                            nrcValue == 0
-                                ? Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 8, right: 8, top: 8),
-                                    child: Row(
-                                      children: [
-                                        // Township Code Dropdown
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.grey.shade300),
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          child: DropdownButton(
-                                            value: nrc_initial_options_Value,
-                                            items:
-                                                nrc_initial_options_dropDownMenuItems,
-                                            underline: SizedBox(),
-                                            onChanged: (value) =>
-                                                nrcInitialOptionsChanged(value),
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 4, right: 4),
-                                          child: Text("/",
-                                              style: TextStyle(fontSize: 18)),
-                                        ),
-                                        // Township Name Dropdown
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.grey.shade300),
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          child: DropdownButton(
-                                            value:
-                                                nrc_region_state_options_Value,
-                                            items:
-                                                nrc_region_state_options_dropDownMenuItems,
-                                            underline: SizedBox(),
-                                            onChanged: (value) =>
-                                                nrcRegionStateOptionsChanged(
-                                                    value),
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 4, right: 4),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.grey.shade300),
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          child: DropdownButton(
-                                            value: nrc_type_options_Value,
-                                            items:
-                                                nrc_type_options_dropDownMenuItems,
-                                            underline: SizedBox(),
-                                            onChanged: (value) =>
-                                                nrcTypeOptionsChanged(value),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            height: 35,
-                                            margin:
-                                                const EdgeInsets.only(left: 8),
-                                            child: TextFormField(
-                                              controller: nrcController,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              decoration: InputDecoration(
-                                                isDense: true,
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 10),
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                              const Text("-",
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.black)),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                flex: 4,
+                                child: InkWell(
+                                  onTap: () => _showDatePicker(context),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 12),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: Colors.grey.shade300),
+                                      borderRadius: BorderRadius.circular(6),
                                     ),
-                                  )
-                                : Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 8, right: 8, top: 8),
-                                    child: Row(
-                                      children: [
-                                        Text("MME - ",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold)),
-                                        Expanded(
-                                          child: Container(
-                                            height: 35,
-                                            child: TextFormField(
-                                              controller: nrcController,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              decoration: InputDecoration(
-                                                isDense: true,
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 10),
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                    child: Text(
+                                      birthDate,
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.black),
                                     ),
                                   ),
-                          ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
 
-                      // Gender Radio Buttons
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            Expanded(
-                              flex: 4,
-                              child: Text("လိင်အမျိုးအစား",
+                      // Blood Type Dropdown
+                      if (isCompact)
+                        _buildCompactBloodType()
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 4,
+                                child: Text("သွေးအုပ်စု",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromARGB(
+                                            255, 116, 112, 112))),
+                              ),
+                              const Text("-",
                                   style: TextStyle(
-                                      fontSize: 14,
-                                      color:
-                                          Color.fromARGB(255, 116, 112, 112))),
-                            ),
-                            const Text("-",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.black)),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              flex: 4,
-                              child: Row(
+                                      fontSize: 14, color: Colors.black)),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                flex: 4,
+                                child: DropdownButtonFormField<String>(
+                                  value: selectedBloodType,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 8),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade300),
+                                    ),
+                                    isDense: true,
+                                  ),
+                                  items: bloodTypes.map((String type) {
+                                    return DropdownMenuItem<String>(
+                                      value: type,
+                                      child: Text(type,
+                                          style: TextStyle(fontSize: 14)),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        selectedBloodType = value;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      // NRC Selection - replaces the single NRC field with proper format
+                      if (isCompact)
+                        _buildCompactNrcSection()
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 8.0, bottom: 8.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "နိုင်ငံသားစီစစ်ရေးကတ်ပြားအမှတ်",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Color.fromARGB(
+                                              255, 116, 112, 112)),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "(ဖြည့်စွက်ရန် မလိုအပ်ပါ)",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontStyle: FontStyle.italic,
+                                          color: Colors.grey[600]),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
                                 children: [
+                                  // Radio buttons for NRC type
                                   Radio(
                                     value: 0,
-                                    groupValue: genderValue,
+                                    groupValue: nrcValue,
                                     activeColor: primaryColor,
                                     onChanged: (value) {
                                       setState(() {
-                                        genderValue = 0;
+                                        nrcValue = 0;
                                       });
                                     },
                                   ),
-                                  Text("ကျား", style: TextStyle(fontSize: 14)),
-                                  const SizedBox(width: 16),
+                                  Text("မှတ်ပုံတင်အမှတ်",
+                                      style: TextStyle(fontSize: 14)),
+                                  SizedBox(width: 12),
                                   Radio(
                                     value: 1,
-                                    groupValue: genderValue,
+                                    groupValue: nrcValue,
                                     activeColor: primaryColor,
                                     onChanged: (value) {
                                       setState(() {
-                                        genderValue = 1;
+                                        nrcValue = 1;
                                       });
                                     },
                                   ),
-                                  Text("မ", style: TextStyle(fontSize: 14)),
+                                  Text("MME", style: TextStyle(fontSize: 14)),
                                 ],
                               ),
-                            ),
-                          ],
+                              nrcValue == 0
+                                  ? Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 8, right: 8, top: 8),
+                                      child: Row(
+                                        children: [
+                                          // Township Code Dropdown
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey.shade300),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: DropdownButton(
+                                              value: nrc_initial_options_Value,
+                                              items:
+                                                  nrc_initial_options_dropDownMenuItems,
+                                              underline: SizedBox(),
+                                              onChanged: (value) =>
+                                                  nrcInitialOptionsChanged(
+                                                      value),
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                left: 4, right: 4),
+                                            child: Text("/",
+                                                style: TextStyle(fontSize: 18)),
+                                          ),
+                                          // Township Name Dropdown
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey.shade300),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: DropdownButton(
+                                              value:
+                                                  nrc_region_state_options_Value,
+                                              items:
+                                                  nrc_region_state_options_dropDownMenuItems,
+                                              underline: SizedBox(),
+                                              onChanged: (value) =>
+                                                  nrcRegionStateOptionsChanged(
+                                                      value),
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                left: 4, right: 4),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey.shade300),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: DropdownButton(
+                                              value: nrc_type_options_Value,
+                                              items:
+                                                  nrc_type_options_dropDownMenuItems,
+                                              underline: SizedBox(),
+                                              onChanged: (value) =>
+                                                  nrcTypeOptionsChanged(value),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              height: 35,
+                                              margin: const EdgeInsets.only(
+                                                  left: 8),
+                                              child: TextFormField(
+                                                controller: nrcController,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  isDense: true,
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 10),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 8, right: 8, top: 8),
+                                      child: Row(
+                                        children: [
+                                          Text("MME - ",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold)),
+                                          Expanded(
+                                            child: Container(
+                                              height: 35,
+                                              child: TextFormField(
+                                                controller: nrcController,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  isDense: true,
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 10),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                            ],
+                          ),
                         ),
-                      ),
+
+                      // Gender Radio Buttons
+                      if (isCompact)
+                        _buildCompactGender()
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 4,
+                                child: Text("လိင်အမျိုးအစား",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromARGB(
+                                            255, 116, 112, 112))),
+                              ),
+                              const Text("-",
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.black)),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                flex: 4,
+                                child: Row(
+                                  children: [
+                                    Radio(
+                                      value: 0,
+                                      groupValue: genderValue,
+                                      activeColor: primaryColor,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          genderValue = 0;
+                                        });
+                                      },
+                                    ),
+                                    Text("ကျား",
+                                        style: TextStyle(fontSize: 14)),
+                                    const SizedBox(width: 16),
+                                    Radio(
+                                      value: 1,
+                                      groupValue: genderValue,
+                                      activeColor: primaryColor,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          genderValue = 1;
+                                        });
+                                      },
+                                    ),
+                                    Text("မ", style: TextStyle(fontSize: 14)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
                       _buildInputRow("ဖုန်းနံပါတ်", phoneController),
 
                       // Extra Phone Toggle
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            Expanded(
-                              flex: 4,
-                              child: Row(
-                                children: [
-                                  Text("အခြားဖုန်းနံပါတ်",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color.fromARGB(
-                                              255, 116, 112, 112))),
-                                  SizedBox(width: 8),
-                                  Switch(
-                                    value: extraPhone,
-                                    activeColor: primaryColor,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        extraPhone = value;
-                                      });
-                                    },
-                                  ),
-                                ],
+                      if (isCompact)
+                        _buildCompactExtraPhone()
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 4,
+                                child: Row(
+                                  children: [
+                                    Text("အခြားဖုန်းနံပါတ်",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Color.fromARGB(
+                                                255, 116, 112, 112))),
+                                    SizedBox(width: 8),
+                                    Switch(
+                                      value: extraPhone,
+                                      activeColor: primaryColor,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          extraPhone = value;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const Text("-",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.black)),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              flex: 4,
-                              child: extraPhone
-                                  ? TextFormField(
-                                      controller: extraPhoneController,
-                                      decoration: InputDecoration(
-                                        isDense: true,
-                                        contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 12, vertical: 12),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(6),
+                              const Text("-",
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.black)),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                flex: 4,
+                                child: extraPhone
+                                    ? TextFormField(
+                                        controller: extraPhoneController,
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 12),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
                                         ),
-                                      ),
-                                    )
-                                  : SizedBox(),
-                            ),
-                          ],
+                                      )
+                                    : SizedBox(),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
 
                       _buildInputRow(
                           "သွေးဘဏ်ကတ်နံပါတ်", bloodBankCardController),
@@ -2265,80 +2302,89 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                       _buildInputRow("ရပ်ကွက်/ရွာအမည်", quarterController),
 
                       // Township TypeAheadField
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            Expanded(
-                              flex: 4,
-                              child: Text("မြို့နယ်",
+                      if (isCompact)
+                        _buildCompactTownshipField()
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 4,
+                                child: Text("မြို့နယ်",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromARGB(
+                                            255, 116, 112, 112))),
+                              ),
+                              const Text("-",
                                   style: TextStyle(
-                                      fontSize: 14,
-                                      color:
-                                          Color.fromARGB(255, 116, 112, 112))),
-                            ),
-                            const Text("-",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.black)),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              flex: 4,
-                              child: TypeAheadField<String>(
-                                textFieldConfiguration: TextFieldConfiguration(
-                                  controller: townshipController,
-                                  decoration: InputDecoration(
-                                    hintText: 'မြို့နယ်ရွေးချယ်ပါ',
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 12),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(6),
+                                      fontSize: 14, color: Colors.black)),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                flex: 4,
+                                child: TypeAheadField<String>(
+                                  textFieldConfiguration:
+                                      TextFieldConfiguration(
+                                    controller: townshipController,
+                                    decoration: InputDecoration(
+                                      hintText: 'မြို့နယ်ရွေးချယ်ပါ',
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 12),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
                                     ),
                                   ),
+                                  suggestionsCallback: (pattern) {
+                                    List<String> suggestions = [];
+
+                                    // First, get မော်လမြိုင် townships
+                                    var mawlamyineItems = townships.where(
+                                        (item) => item.contains('မော်လမြိုင်'));
+
+                                    // Then get other townships
+                                    var otherItems = townships.where((item) =>
+                                        !item.contains('မော်လမြိုင်'));
+
+                                    if (pattern.isEmpty) {
+                                      // Show မော်လမြိုင် townships first
+                                      suggestions.addAll(mawlamyineItems);
+                                      suggestions.addAll(otherItems
+                                          .take(10 - suggestions.length));
+                                    } else {
+                                      // Filter by pattern but still prioritize မော်လမြိုင်
+                                      var filteredMawlamyine =
+                                          mawlamyineItems.where((item) => item
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                      var filteredOthers = otherItems.where(
+                                          (item) => item
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                      suggestions.addAll(filteredMawlamyine);
+                                      suggestions.addAll(filteredOthers);
+                                    }
+
+                                    return suggestions.take(10).toList();
+                                  },
+                                  itemBuilder: (context, String township) {
+                                    return ListTile(
+                                      dense: true,
+                                      title: Text(township,
+                                          style: TextStyle(fontSize: 14)),
+                                    );
+                                  },
+                                  onSuggestionSelected: (String township) {
+                                    townshipController.text = township;
+                                  },
                                 ),
-                                suggestionsCallback: (pattern) {
-                                  List<String> suggestions = [];
-                                  
-                                  // First, get မော်လမြိုင် townships
-                                  var mawlamyineItems = townships.where((item) => 
-                                    item.contains('မော်လမြိုင်'));
-                                  
-                                  // Then get other townships
-                                  var otherItems = townships.where((item) => 
-                                    !item.contains('မော်လမြိုင်'));
-                                  
-                                  if (pattern.isEmpty) {
-                                    // Show မော်လမြိုင် townships first
-                                    suggestions.addAll(mawlamyineItems);
-                                    suggestions.addAll(otherItems.take(10 - suggestions.length));
-                                  } else {
-                                    // Filter by pattern but still prioritize မော်လမြိုင်
-                                    var filteredMawlamyine = mawlamyineItems.where((item) =>
-                                      item.toLowerCase().contains(pattern.toLowerCase()));
-                                    var filteredOthers = otherItems.where((item) =>
-                                      item.toLowerCase().contains(pattern.toLowerCase()));
-                                    suggestions.addAll(filteredMawlamyine);
-                                    suggestions.addAll(filteredOthers);
-                                  }
-                                  
-                                  return suggestions.take(10).toList();
-                                },
-                                itemBuilder: (context, String township) {
-                                  return ListTile(
-                                    dense: true,
-                                    title: Text(township,
-                                        style: TextStyle(fontSize: 14)),
-                                  );
-                                },
-                                onSuggestionSelected: (String township) {
-                                  townshipController.text = township;
-                                },
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
 
                       const SizedBox(height: 12),
                       Container(height: 1, color: Colors.grey.shade200),
@@ -2347,22 +2393,28 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
                       // Submit Button
                       Consumer(builder: (context, ref, child) {
                         return Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 40, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                            ),
-                            onPressed: () => nameChecked
-                                ? _saveMember(context, ref)
-                                : _showNameCheckRequiredDialog(context),
-                            child: Text(
-                              "ထည့်သွင်းမည်",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
+                          alignment: isCompact
+                              ? Alignment.center
+                              : Alignment.centerRight,
+                          child: SizedBox(
+                            width: isCompact ? double.infinity : null,
+                            height: isCompact ? 48 : null,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 40, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                              onPressed: () => nameChecked
+                                  ? _saveMember(context, ref)
+                                  : _showNameCheckRequiredDialog(context),
+                              child: Text(
+                                "ထည့်သွင်းမည်",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              ),
                             ),
                           ),
                         );
@@ -2438,6 +2490,40 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
 
   Widget _buildInputRow(String label, TextEditingController controller,
       {String? hintText, TextInputType? keyboardType}) {
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
+
+    if (isCompact) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color.fromARGB(255, 116, 112, 112),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: controller,
+              keyboardType: keyboardType,
+              decoration: InputDecoration(
+                hintText: hintText,
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Row(
@@ -2468,6 +2554,375 @@ class _NewMemberTemporaryScreenState extends State<NewMemberTemporaryScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCompactLabeledControl(String label, Widget control) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color.fromARGB(255, 116, 112, 112),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(width: double.infinity, child: control),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactNameField() {
+    return _buildCompactLabeledControl(
+      "အမည်",
+      Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              controller: nameController,
+              onChanged: (_) => setState(() => nameChecked = false),
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          SizedBox.square(
+            dimension: 44,
+            child: Center(
+              child: nameChecked
+                  ? Image.asset("assets/images/checked.png",
+                      height: 24, width: 24)
+                  : Consumer(
+                      builder: (context, ref, child) => InkWell(
+                        borderRadius: BorderRadius.circular(22),
+                        onTap: isSearchingMember
+                            ? null
+                            : () => _checkExistingMember(context, ref),
+                        child: Center(
+                          child: isSearchingMember
+                              ? SizedBox.square(
+                                  dimension: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: primaryColor,
+                                  ),
+                                )
+                              : Image.asset("assets/images/magnifier.png",
+                                  height: 24, width: 24),
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactBirthDate() {
+    return _buildCompactLabeledControl(
+      "မွေးသက္ကရာဇ်",
+      InkWell(
+        onTap: () => _showDatePicker(context),
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 44),
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(birthDate, style: const TextStyle(fontSize: 14)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactBloodType() {
+    return _buildCompactLabeledControl(
+      "သွေးအုပ်စု",
+      DropdownButtonFormField<String>(
+        value: selectedBloodType,
+        isExpanded: true,
+        items: bloodTypes
+            .map((type) => DropdownMenuItem<String>(
+                  value: type,
+                  child: Text(type, style: const TextStyle(fontSize: 14)),
+                ))
+            .toList(),
+        onChanged: (value) {
+          if (value != null) setState(() => selectedBloodType = value);
+        },
+        decoration: InputDecoration(
+          isDense: true,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactGender() {
+    Widget option(int value, String label) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Radio<int>(
+            value: value,
+            groupValue: genderValue,
+            activeColor: primaryColor,
+            onChanged: (_) => setState(() => genderValue = value),
+          ),
+          Text(label, style: const TextStyle(fontSize: 14)),
+        ],
+      );
+    }
+
+    return _buildCompactLabeledControl(
+      "လိင်အမျိုးအစား",
+      Wrap(
+        spacing: 16,
+        runSpacing: 4,
+        children: [option(0, "ကျား"), option(1, "မ")],
+      ),
+    );
+  }
+
+  Widget _buildCompactExtraPhone() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  "အခြားဖုန်းနံပါတ်",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color.fromARGB(255, 116, 112, 112),
+                  ),
+                ),
+              ),
+              Switch(
+                value: extraPhone,
+                activeColor: primaryColor,
+                onChanged: (value) => setState(() => extraPhone = value),
+              ),
+            ],
+          ),
+          if (extraPhone) ...[
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: extraPhoneController,
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactTownshipField() {
+    return _buildCompactLabeledControl(
+      "မြို့နယ်",
+      TypeAheadField<String>(
+        textFieldConfiguration: TextFieldConfiguration(
+          controller: townshipController,
+          decoration: InputDecoration(
+            hintText: 'မြို့နယ်ရွေးချယ်ပါ',
+            isDense: true,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+        ),
+        suggestionsCallback: _compactTownshipSuggestions,
+        itemBuilder: (context, township) => ListTile(
+          dense: true,
+          title: Text(township, style: const TextStyle(fontSize: 14)),
+        ),
+        onSuggestionSelected: (township) {
+          townshipController.text = township;
+        },
+      ),
+    );
+  }
+
+  List<String> _compactTownshipSuggestions(String pattern) {
+    final mawlamyine = townships.where((item) => item.contains('မော်လမြိုင်'));
+    final others = townships.where((item) => !item.contains('မော်လမြိုင်'));
+    final suggestions = <String>[];
+
+    if (pattern.isEmpty) {
+      suggestions.addAll(mawlamyine);
+      suggestions.addAll(others.take(10 - suggestions.length));
+    } else {
+      final query = pattern.toLowerCase();
+      suggestions.addAll(
+          mawlamyine.where((item) => item.toLowerCase().contains(query)));
+      suggestions
+          .addAll(others.where((item) => item.toLowerCase().contains(query)));
+    }
+
+    return suggestions.take(10).toList();
+  }
+
+  Widget _buildCompactNrcSection() {
+    Widget choice(int value, String label) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Radio<int>(
+            value: value,
+            groupValue: nrcValue,
+            activeColor: primaryColor,
+            onChanged: (_) => setState(() => nrcValue = value),
+          ),
+          Text(label, style: const TextStyle(fontSize: 14)),
+        ],
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "နိုင်ငံသားစီစစ်ရေးကတ်ပြားအမှတ်",
+            style: TextStyle(
+              fontSize: 14,
+              color: Color.fromARGB(255, 116, 112, 112),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "(ဖြည့်စွက်ရန် မလိုအပ်ပါ)",
+            style: TextStyle(
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              color: Colors.grey[600],
+            ),
+          ),
+          Wrap(
+            spacing: 12,
+            runSpacing: 4,
+            children: [
+              choice(0, "မှတ်ပုံတင်အမှတ်"),
+              choice(1, "MME"),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (nrcValue == 0) ...[
+            _buildCompactNrcPart(
+              "တိုင်း/ပြည်နယ်",
+              _buildCompactNrcDropdown(
+                nrc_initial_options_Value,
+                nrc_initial_options_dropDownMenuItems,
+                nrcInitialOptionsChanged,
+              ),
+            ),
+            _buildCompactNrcPart(
+              "မြို့နယ်ကုဒ်",
+              _buildCompactNrcDropdown(
+                nrc_region_state_options_Value,
+                nrc_region_state_options_dropDownMenuItems,
+                nrcRegionStateOptionsChanged,
+              ),
+            ),
+            _buildCompactNrcPart(
+              "အမျိုးအစား",
+              _buildCompactNrcDropdown(
+                nrc_type_options_Value,
+                nrc_type_options_dropDownMenuItems,
+                nrcTypeOptionsChanged,
+              ),
+            ),
+          ],
+          _buildCompactNrcPart(
+            nrcValue == 0 ? "နံပါတ်" : "MME နံပါတ်",
+            TextFormField(
+              controller: nrcController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactNrcPart(String label, Widget child) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color.fromARGB(255, 116, 112, 112),
+            ),
+          ),
+          const SizedBox(height: 6),
+          SizedBox(width: double.infinity, child: child),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactNrcDropdown(
+    String? value,
+    List<DropdownMenuItem<String>> items,
+    ValueChanged<String?> onChanged,
+  ) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      isExpanded: true,
+      items: items,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        isDense: true,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+        ),
       ),
     );
   }

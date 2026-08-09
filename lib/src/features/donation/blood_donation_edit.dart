@@ -206,8 +206,9 @@ class _BloodDonationEditScreenState
       final village = (patient.village ?? '').trim();
       final township = (patient.township ?? '').trim();
       quarterController.text = ward.isNotEmpty ? ward : village;
-      townController.text =
-          township.isNotEmpty ? township : (parts.isNotEmpty ? parts.first : '');
+      townController.text = township.isNotEmpty
+          ? township
+          : (parts.isNotEmpty ? parts.first : '');
     }
     setRegion(townController.text);
   }
@@ -377,15 +378,22 @@ class _BloodDonationEditScreenState
       body: SafeArea(
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    alignment: Alignment.centerLeft,
-                    child: _buildEditForm(),
-                  ),
-                ),
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  final isMobile = constraints.maxWidth < 600;
+
+                  return SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: SizedBox(
+                        width: isMobile
+                            ? double.infinity
+                            : MediaQuery.of(context).size.width * 0.5,
+                        child: _buildEditForm(),
+                      ),
+                    ),
+                  );
+                },
               ),
       ),
     );
@@ -636,6 +644,29 @@ class _BloodDonationEditScreenState
     );
   }
 
+  Widget _buildAdaptiveFieldPair({
+    required Widget first,
+    required Widget second,
+  }) {
+    if (MediaQuery.of(context).size.width < 480) {
+      return Column(
+        children: [
+          first,
+          const SizedBox(height: 12),
+          second,
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(child: first),
+        const SizedBox(width: 12),
+        Expanded(child: second),
+      ],
+    );
+  }
+
   Widget _buildEditForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -740,65 +771,59 @@ class _BloodDonationEditScreenState
                   ),
                 ),
                 SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: quarterController,
-                        decoration: InputDecoration(
-                          labelText: 'ရပ်ကွက်',
-                          border: OutlineInputBorder(),
-                        ),
+                _buildAdaptiveFieldPair(
+                  first: TextField(
+                    controller: quarterController,
+                    decoration: InputDecoration(
+                      labelText: 'ရပ်ကွက်',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  second: TypeAheadField(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: townController,
+                      decoration: InputDecoration(
+                        labelText: 'မြို့နယ်',
+                        border: OutlineInputBorder(),
                       ),
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: TypeAheadField(
-                        textFieldConfiguration: TextFieldConfiguration(
-                          controller: townController,
-                          decoration: InputDecoration(
-                            labelText: 'မြို့နယ်',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        suggestionsCallback: (pattern) {
-                          List<String> suggestions = [];
-                          
-                          // First, get မော်လမြိုင် townships
-                          var mawlamyineItems = townships.where((item) => 
-                            item.contains('မော်လမြိုင်'));
-                          
-                          // Then get other townships that match the pattern
-                          var otherItems = townships.where((item) => 
-                            !item.contains('မော်လမြိုင်') && 
+                    suggestionsCallback: (pattern) {
+                      List<String> suggestions = [];
+
+                      // First, get မော်လမြိုင် townships
+                      var mawlamyineItems = townships
+                          .where((item) => item.contains('မော်လမြိုင်'));
+
+                      // Then get other townships that match the pattern
+                      var otherItems = townships.where((item) =>
+                          !item.contains('မော်လမြိုင်') &&
+                          item.toLowerCase().contains(pattern.toLowerCase()));
+
+                      // If pattern is empty, show မော်လမြိုင် townships first
+                      if (pattern.isEmpty) {
+                        suggestions.addAll(mawlamyineItems);
+                        suggestions
+                            .addAll(otherItems.take(10 - suggestions.length));
+                      } else {
+                        // Filter မော်လမြိုင် townships by pattern
+                        var filteredMawlamyine = mawlamyineItems.where((item) =>
                             item.toLowerCase().contains(pattern.toLowerCase()));
-                          
-                          // If pattern is empty, show မော်လမြိုင် townships first
-                          if (pattern.isEmpty) {
-                            suggestions.addAll(mawlamyineItems);
-                            suggestions.addAll(otherItems.take(10 - suggestions.length));
-                          } else {
-                            // Filter မော်လမြိုင် townships by pattern
-                            var filteredMawlamyine = mawlamyineItems.where((item) =>
-                              item.toLowerCase().contains(pattern.toLowerCase()));
-                            suggestions.addAll(filteredMawlamyine);
-                            suggestions.addAll(otherItems);
-                          }
-                          
-                          return suggestions.take(10).toList();
-                        },
-                        itemBuilder: (context, String suggestion) {
-                          return ListTile(
-                            title: Text(suggestion),
-                          );
-                        },
-                        onSuggestionSelected: (String suggestion) {
-                          townController.text = suggestion;
-                          setRegion(suggestion);
-                        },
-                      ),
-                    ),
-                  ],
+                        suggestions.addAll(filteredMawlamyine);
+                        suggestions.addAll(otherItems);
+                      }
+
+                      return suggestions.take(10).toList();
+                    },
+                    itemBuilder: (context, String suggestion) {
+                      return ListTile(
+                        title: Text(suggestion),
+                      );
+                    },
+                    onSuggestionSelected: (String suggestion) {
+                      townController.text = suggestion;
+                      setRegion(suggestion);
+                    },
+                  ),
                 ),
                 SizedBox(height: 8),
                 if (quarterController.text.isNotEmpty ||

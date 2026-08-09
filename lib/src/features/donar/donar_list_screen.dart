@@ -29,6 +29,10 @@ class DonarListScreen extends ConsumerStatefulWidget {
 class _DonarListScreenState extends ConsumerState<DonarListScreen> {
   int _yearSelected = 0;
   int _monthSelected = DateTime.now().month - 1;
+  final ScrollController _yearScrollController = ScrollController();
+  final ScrollController _monthScrollController = ScrollController(
+    initialScrollOffset: (DateTime.now().month - 1) * 60.0,
+  );
 
   List<String> years =
       List.generate(13, (index) => (DateTime.now().year - index).toString());
@@ -88,6 +92,13 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
   void initState() {
     super.initState();
     _loadInitialData();
+  }
+
+  @override
+  void dispose() {
+    _yearScrollController.dispose();
+    _monthScrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadInitialData() async {
@@ -164,10 +175,243 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
     }
   }
 
+  Future<void> _selectMonth(int index) async {
+    _monthSelected = index;
+    final month = index + 1;
+    _scrollMonthToSelection();
+
+    if (!donorsByMonth.containsKey(month) ||
+        !expensesByMonth.containsKey(month)) {
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        await _loadMonthData(month);
+      } catch (e) {
+        print('Error loading month data: $e');
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } else {
+      setState(() {});
+    }
+  }
+
+  Future<void> _selectYear(int index) async {
+    _yearSelected = index;
+    _scrollYearToSelection();
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final selectedYear = int.parse(years[_yearSelected]);
+      final reportData =
+          await ref.read(yearlyReportProvider(selectedYear).future);
+
+      _calculateBalances(reportData);
+      donorsByMonth.clear();
+      expensesByMonth.clear();
+      await _loadMonthData(_monthSelected + 1);
+    } catch (e) {
+      print('Error loading year data: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _scrollYearToSelection({bool animate = true}) {
+    _scrollSelectorToIndex(
+      controller: _yearScrollController,
+      index: _yearSelected,
+      itemExtent: 78,
+      animate: animate,
+    );
+  }
+
+  void _scrollMonthToSelection({bool animate = true}) {
+    _scrollSelectorToIndex(
+      controller: _monthScrollController,
+      index: _monthSelected,
+      itemExtent: 60,
+      animate: animate,
+    );
+  }
+
+  void _scrollSelectorToIndex({
+    required ScrollController controller,
+    required int index,
+    required double itemExtent,
+    required bool animate,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !controller.hasClients) return;
+
+      final position = controller.position;
+      final target = (index * itemExtent -
+              (position.viewportDimension - itemExtent) / 2)
+          .clamp(0.0, position.maxScrollExtent);
+
+      if (animate) {
+        controller.animateTo(
+          target,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+        );
+      } else {
+        controller.jumpTo(target);
+      }
+    });
+  }
+
+  Widget _buildYearSelector(BuildContext context) {
+    if (!Responsive.isMobile(context)) {
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        height: 60,
+        margin: const EdgeInsets.all(8),
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.8,
+              height: 60,
+              child: CommonTabBar(
+                underline: false,
+                listWidget: [
+                  for (int i = 0; i < years.length; i++)
+                    CommonTabBarWidget(
+                      underline: false,
+                      name: years[i],
+                      isSelected: _yearSelected,
+                      i: i,
+                      onTap: () => _selectYear(i),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 68,
+      child: ListView.separated(
+        controller: _yearScrollController,
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+        itemCount: years.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final isSelected = _yearSelected == index;
+
+          return Material(
+            color: isSelected ? primaryColor : const Color(0xfff1efef),
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => _selectYear(index),
+              child: SizedBox(
+                width: 70,
+                height: 52,
+                child: Center(
+                  child: Text(
+                    years[index],
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected
+                          ? Colors.white
+                          : const Color(0xff696464),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildMonthSelector(BuildContext context) {
+    if (!Responsive.isMobile(context)) {
+      return Container(
+        margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+        width: MediaQuery.of(context).size.width * 0.8,
+        height: 60,
+        child: CommonTabBar(
+          underline: false,
+          listWidget: [
+            for (int i = 0; i < months.length; i++)
+              CommonTabBarWidget(
+                color: primaryColor,
+                underline: false,
+                name: months[i],
+                isSelected: _monthSelected,
+                i: i,
+                onTap: () => _selectMonth(i),
+              ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      height: 60,
+      child: ListView.separated(
+        controller: _monthScrollController,
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+        itemCount: months.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final isSelected = _monthSelected == index;
+
+          return Material(
+            color: isSelected ? primaryColor : const Color(0xfff1efef),
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => _selectMonth(index),
+              child: SizedBox(
+                width: 52,
+                height: 48,
+                child: Center(
+                  child: Text(
+                    monthsMobile[index],
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color:
+                          isSelected ? Colors.white : const Color(0xff5C5C5C),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isMobile = Responsive.isMobile(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isMobile ? const Color(0xfff7f7f8) : Colors.white,
       // Always show the app bar — as a home tab it previously had none, which
       // left phones without any way to reach the menu (swipe only).
       appBar: AppBar(
@@ -180,7 +424,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
             ),
           ),
         ),
-        leading: widget.fromHome && Responsive.isMobile(context)
+        leading: widget.fromHome && isMobile
             ? IconButton(
                 icon: const Icon(Icons.menu, color: Colors.white),
                 tooltip: 'မီနူး',
@@ -206,119 +450,16 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
           Column(
             children: [
               // Year selector
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 60,
-                margin: const EdgeInsets.all(8),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    Container(
-                      width: Responsive.isMobile(context)
-                          ? MediaQuery.of(context).size.width * 1.8
-                          : MediaQuery.of(context).size.width * 0.8,
-                      height: Responsive.isMobile(context) ? 40 : 60,
-                      child: CommonTabBar(
-                        underline: false,
-                        listWidget: [
-                          for (int i = 0; i < years.length; i++)
-                            CommonTabBarWidget(
-                              underline: false,
-                              name: years[i],
-                              isSelected: _yearSelected,
-                              i: i,
-                              onTap: () async {
-                                _yearSelected = i;
-                                setState(() {
-                                  isLoading = true;
-                                });
-
-                                try {
-                                  final selectedYear =
-                                      int.parse(years[_yearSelected]);
-
-                                  // Load yearly report data to get monthly stats
-                                  final reportData = await ref.read(
-                                      yearlyReportProvider(selectedYear)
-                                          .future);
-
-                                  // Calculate opening and closing balances
-                                  _calculateBalances(reportData);
-
-                                  // Clear previous month data
-                                  donorsByMonth.clear();
-                                  expensesByMonth.clear();
-
-                                  // Load only the current selected month data
-                                  await _loadMonthData(_monthSelected + 1);
-                                } catch (e) {
-                                  print('Error loading year data: $e');
-                                } finally {
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                }
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _buildYearSelector(context),
 
               // Month selector
-              Container(
-                margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-                width: Responsive.isMobile(context)
-                    ? MediaQuery.of(context).size.width * 1.8
-                    : MediaQuery.of(context).size.width * 0.8,
-                height: Responsive.isMobile(context) ? 40 : 60,
-                child: CommonTabBar(
-                  underline: false,
-                  listWidget: [
-                    for (int i = 0; i < months.length; i++)
-                      CommonTabBarWidget(
-                        color: primaryColor,
-                        underline: false,
-                        name: Responsive.isMobile(context)
-                            ? monthsMobile[i]
-                            : months[i],
-                        isSelected: _monthSelected,
-                        i: i,
-                        onTap: () async {
-                          _monthSelected = i;
-                          final month = i + 1;
-
-                          // Check if data for this month is already loaded
-                          if (!donorsByMonth.containsKey(month) ||
-                              !expensesByMonth.containsKey(month)) {
-                            setState(() {
-                              isLoading = true;
-                            });
-
-                            try {
-                              await _loadMonthData(month);
-                            } catch (e) {
-                              print('Error loading month data: $e');
-                            } finally {
-                              setState(() {
-                                isLoading = false;
-                              });
-                            }
-                          } else {
-                            setState(() {});
-                          }
-                        },
-                      ),
-                  ],
-                ),
-              ),
+              _buildMonthSelector(context),
 
               // Month content
               Expanded(
                 child: _buildMonthContent(_monthSelected + 1),
               ),
+              if (isMobile) const SizedBox(height: 84),
             ],
           ),
 
@@ -334,10 +475,14 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddDialog,
-        backgroundColor: primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: isMobile ? 6 : 0),
+        child: FloatingActionButton(
+          onPressed: _showAddDialog,
+          tooltip: 'စာရင်းအသစ် ထည့်မည်',
+          backgroundColor: primaryColor,
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
       ),
     );
   }
@@ -347,6 +492,16 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
     final expenses = expensesByMonth[month] ?? [];
     final openingBalance = openingBalanceByMonth[month] ?? 0;
     final closingBalance = closingBalanceByMonth[month] ?? 0;
+
+    if (Responsive.isMobile(context)) {
+      return _buildMobileMonthContent(
+        month: month,
+        donors: donors,
+        expenses: expenses,
+        openingBalance: openingBalance,
+        closingBalance: closingBalance,
+      );
+    }
 
     return Container(
       color: Colors.white,
@@ -370,180 +525,210 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  // Opening and Closing balance in one row - Space efficient
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
+                  // Opening and closing balances stack when phone width is tight.
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final shouldStack = Responsive.isMobile(context) &&
+                          constraints.maxWidth < 420;
+                      final cardWidth = shouldStack
+                          ? constraints.maxWidth
+                          : (constraints.maxWidth - 8) / 2;
+
+                      return Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          SizedBox(
+                            width: cardWidth,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    Icons.account_balance_wallet,
-                                    color: Colors.blue[700],
-                                    size: 14,
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.account_balance_wallet,
+                                        color: Colors.blue[700],
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'စာရင်းဖွင့်',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.blue[700],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 4),
                                   Text(
-                                    'စာရင်းဖွင့်',
+                                    '${Utils.strToMM(openingBalance.toString())}',
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
                                       color: Colors.blue[700],
                                     ),
                                   ),
                                 ],
                               ),
-                              Text(
-                                '${Utils.strToMM(openingBalance.toString())}',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue[700],
-                                ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: cardWidth,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    Icons.account_balance,
-                                    color: primaryColor,
-                                    size: 14,
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.account_balance,
+                                        color: primaryColor,
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'စာရင်းပိတ်',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: primaryColor,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 4),
                                   Text(
-                                    'စာရင်းပိတ်',
+                                    '${Utils.strToMM(closingBalance.toString())}',
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
                                       color: primaryColor,
                                     ),
                                   ),
                                 ],
                               ),
-                              Text(
-                                '${Utils.strToMM(closingBalance.toString())}',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: primaryColor,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
+                        ],
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 10),
 
-                  // Donations and Expenses in a row - Compact
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
+                  // Donations and expenses use the same narrow-phone layout.
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final shouldStack = Responsive.isMobile(context) &&
+                          constraints.maxWidth < 420;
+                      final cardWidth = shouldStack
+                          ? constraints.maxWidth
+                          : (constraints.maxWidth - 6) / 2;
+
+                      return Wrap(
+                        spacing: 6,
+                        runSpacing: 8,
+                        children: [
+                          SizedBox(
+                            width: cardWidth,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    Icons.arrow_upward,
-                                    color: Colors.green[700],
-                                    size: 14,
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.arrow_upward,
+                                        color: Colors.green[700],
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        'အလှူ',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.green[700],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 2),
                                   Text(
-                                    'အလှူ',
+                                    '${Utils.strToMM(_calculateTotal(donors, 'amount').toString())}',
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
                                       color: Colors.green[700],
                                     ),
                                   ),
                                 ],
                               ),
-                              Text(
-                                '${Utils.strToMM(_calculateTotal(donors, 'amount').toString())}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green[700],
-                                ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: cardWidth,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    Icons.arrow_downward,
-                                    color: Colors.red[700],
-                                    size: 14,
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.arrow_downward,
+                                        color: Colors.red[700],
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        'အသုံး',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.red[700],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 2),
                                   Text(
-                                    'အသုံး',
+                                    '${Utils.strToMM(_calculateTotal(expenses, 'amount').toString())}',
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
                                       color: Colors.red[700],
                                     ),
                                   ),
                                 ],
                               ),
-                              Text(
-                                '${Utils.strToMM(_calculateTotal(expenses, 'amount').toString())}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red[700],
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
@@ -561,13 +746,15 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                           // Donors table (mobile)
                           SizedBox(
                             height: 280,
-                            child: _buildDonarSection(donors, month, Colors.green),
+                            child:
+                                _buildDonarSection(donors, month, Colors.green),
                           ),
                           const SizedBox(height: 16),
                           // Expenses table (mobile)
                           SizedBox(
                             height: 280,
-                            child: _buildExpenseSection(expenses, month, Colors.red),
+                            child: _buildExpenseSection(
+                                expenses, month, Colors.red),
                           ),
                         ],
                       ),
@@ -577,18 +764,451 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                       children: [
                         // Donors table (desktop)
                         Expanded(
-                          child: _buildDonarSection(donors, month, Colors.green),
+                          child:
+                              _buildDonarSection(donors, month, Colors.green),
                         ),
                         const SizedBox(width: 16),
                         // Expenses table (desktop)
                         Expanded(
-                          child: _buildExpenseSection(expenses, month, Colors.red),
+                          child:
+                              _buildExpenseSection(expenses, month, Colors.red),
                         ),
                       ],
                     ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMobileMonthContent({
+    required int month,
+    required List<dynamic> donors,
+    required List<dynamic> expenses,
+    required int openingBalance,
+    required int closingBalance,
+  }) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 20),
+      children: [
+        _buildMobileSummaryCard(
+          month: month,
+          donors: donors,
+          expenses: expenses,
+          openingBalance: openingBalance,
+          closingBalance: closingBalance,
+        ),
+        const SizedBox(height: 14),
+        _buildMobileLedgerSection(
+          records: donors,
+          accent: Colors.green,
+          title: 'အလှူရှင်',
+          icon: Icons.volunteer_activism,
+          emptyMessage: 'ဤလအတွက် အလှူရှင်မှတ်တမ်း မရှိသေးပါ',
+          nameOf: (record) => displayDonorRecordName(record),
+          onEdit: (record) => _showEditDonorDialog(record),
+          onDelete: (record) => _confirmDeleteDonor(record),
+        ),
+        const SizedBox(height: 14),
+        _buildMobileLedgerSection(
+          records: expenses,
+          accent: Colors.red,
+          title: 'အသုံးစရိတ်',
+          icon: Icons.receipt_long,
+          emptyMessage: 'ဤလအတွက် အသုံးစရိတ်မှတ်တမ်း မရှိသေးပါ',
+          nameOf: (record) => (record['name'] ?? '').toString(),
+          onEdit: (record) => _showEditExpenseDialog(record),
+          onDelete: (record) => _confirmDeleteExpense(record),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileSummaryCard({
+    required int month,
+    required List<dynamic> donors,
+    required List<dynamic> expenses,
+    required int openingBalance,
+    required int closingBalance,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xffeeeaea)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.055),
+            blurRadius: 16,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.account_balance_wallet_outlined,
+                  color: primaryColor,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${monthsMM[month - 1]} ${years[_yearSelected]}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xff292525),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'လစဉ် ငွေစာရင်းအနှစ်ချုပ်',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMobileSummaryTile(
+                  label: 'စာရင်းဖွင့်',
+                  amount: openingBalance,
+                  icon: Icons.account_balance_wallet_outlined,
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMobileSummaryTile(
+                  label: 'စာရင်းပိတ်',
+                  amount: closingBalance,
+                  icon: Icons.account_balance_outlined,
+                  color: primaryColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMobileSummaryTile(
+                  label: 'အလှူ',
+                  amount: _calculateTotal(donors, 'amount'),
+                  icon: Icons.arrow_upward_rounded,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMobileSummaryTile(
+                  label: 'အသုံး',
+                  amount: _calculateTotal(expenses, 'amount'),
+                  icon: Icons.arrow_downward_rounded,
+                  color: Colors.red,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileSummaryTile({
+    required String label,
+    required int amount,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 78),
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.075),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color.withOpacity(0.8), size: 16),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: color.withOpacity(0.82),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 9),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                Utils.strToMM(amount.toString()),
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: color.withOpacity(0.9),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileLedgerSection({
+    required List<dynamic> records,
+    required MaterialColor accent,
+    required String title,
+    required IconData icon,
+    required String emptyMessage,
+    required String Function(dynamic) nameOf,
+    required void Function(dynamic) onEdit,
+    required void Function(dynamic) onDelete,
+  }) {
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: accent.withOpacity(0.2)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+            color: accent.withOpacity(0.09),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: accent.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, size: 19, color: accent[700]),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: accent[700],
+                    ),
+                  ),
+                ),
+                Container(
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 30),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: accent.withOpacity(0.14),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    '${records.length}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: accent[700],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (records.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              child: Text(
+                emptyMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  height: 1.5,
+                  fontSize: 13,
+                  color: Colors.grey[600],
+                ),
+              ),
+            )
+          else
+            for (int index = 0; index < records.length; index++) ...[
+              _buildMobileLedgerRow(
+                record: records[index],
+                accent: accent,
+                name: nameOf(records[index]),
+                onEdit: () => onEdit(records[index]),
+                onDelete: () => onDelete(records[index]),
+              ),
+              if (index < records.length - 1)
+                Divider(
+                  height: 1,
+                  thickness: 0.6,
+                  indent: 14,
+                  endIndent: 14,
+                  color: const Color(0xffeceaea),
+                ),
+            ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileLedgerRow({
+    required dynamic record,
+    required MaterialColor accent,
+    required String name,
+    required VoidCallback onEdit,
+    required VoidCallback onDelete,
+  }) {
+    String date = '';
+    try {
+      date = DateFormat('dd MMM yyyy')
+          .format(DateTime.parse(record['date'].toString()));
+    } catch (_) {}
+    final amount = (record['amount'] ?? 0).toString();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 12, 10, 10),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    height: 1.35,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff2b2828),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 132),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    '${Utils.strToMM(amount)} ကျပ်',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: accent[700],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                size: 14,
+                color: Colors.grey[500],
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  date,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 11.5, color: Colors.grey[600]),
+                ),
+              ),
+              _buildMobileRowAction(
+                icon: Icons.edit_outlined,
+                tooltip: 'ပြင်မည်',
+                color: accent[600] ?? accent,
+                onPressed: onEdit,
+              ),
+              const SizedBox(width: 4),
+              _buildMobileRowAction(
+                icon: Icons.delete_outline,
+                tooltip: 'ဖျက်မည်',
+                color: Colors.red[400]!,
+                onPressed: onDelete,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileRowAction({
+    required IconData icon,
+    required String tooltip,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed,
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Icon(icon, size: 19, color: color),
+          ),
+        ),
       ),
     );
   }
@@ -796,9 +1416,7 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                 Text(
                   '${Utils.strToMM(amount)} ကျပ်',
                   style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: accent),
+                      fontSize: 13, fontWeight: FontWeight.w700, color: accent),
                 ),
                 IconButton(
                   icon: Icon(Icons.edit_outlined,
@@ -1150,20 +1768,31 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
         // Refresh data
         final month = _monthSelected + 1;
         donorsByMonth.remove(month);
-        setState(() { isLoading = true; });
+        setState(() {
+          isLoading = true;
+        });
         await _loadMonthData(month);
         final selectedYear = int.parse(years[_yearSelected]);
         ref.invalidate(yearlyReportProvider(selectedYear));
-        final reportData = await ref.read(yearlyReportProvider(selectedYear).future);
+        final reportData =
+            await ref.read(yearlyReportProvider(selectedYear).future);
         _calculateBalances(reportData);
-        setState(() { isLoading = false; });
+        setState(() {
+          isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('အလှူမှတ်တမ်း အောင်မြင်စွာ ဖျက်ပြီးပါပြီ'), backgroundColor: Colors.green),
+          const SnackBar(
+              content: Text('အလှူမှတ်တမ်း အောင်မြင်စွာ ဖျက်ပြီးပါပြီ'),
+              backgroundColor: Colors.green),
         );
       } catch (e) {
-        setState(() { isLoading = false; });
+        setState(() {
+          isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('ဖျက်ရန် မအောင်မြင်ပါ: $e'), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text('ဖျက်ရန် မအောင်မြင်ပါ: $e'),
+              backgroundColor: Colors.red),
         );
       }
     }
@@ -1196,20 +1825,31 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
         // Refresh data
         final month = _monthSelected + 1;
         expensesByMonth.remove(month);
-        setState(() { isLoading = true; });
+        setState(() {
+          isLoading = true;
+        });
         await _loadMonthData(month);
         final selectedYear = int.parse(years[_yearSelected]);
         ref.invalidate(yearlyReportProvider(selectedYear));
-        final reportData = await ref.read(yearlyReportProvider(selectedYear).future);
+        final reportData =
+            await ref.read(yearlyReportProvider(selectedYear).future);
         _calculateBalances(reportData);
-        setState(() { isLoading = false; });
+        setState(() {
+          isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('အသုံးစရိတ်မှတ်တမ်း အောင်မြင်စွာ ဖျက်ပြီးပါပြီ'), backgroundColor: Colors.green),
+          const SnackBar(
+              content: Text('အသုံးစရိတ်မှတ်တမ်း အောင်မြင်စွာ ဖျက်ပြီးပါပြီ'),
+              backgroundColor: Colors.green),
         );
       } catch (e) {
-        setState(() { isLoading = false; });
+        setState(() {
+          isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('ဖျက်ရန် မအောင်မြင်ပါ: $e'), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text('ဖျက်ရန် မအောင်မြင်ပါ: $e'),
+              backgroundColor: Colors.red),
         );
       }
     }
@@ -1224,7 +1864,9 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
         onUpdated: () async {
           final month = _monthSelected + 1;
           donorsByMonth.remove(month);
-          setState(() { isLoading = true; });
+          setState(() {
+            isLoading = true;
+          });
           try {
             await _loadMonthData(month);
             final selectedYear = int.parse(years[_yearSelected]);
@@ -1233,7 +1875,9 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                 await ref.read(yearlyReportProvider(selectedYear).future);
             _calculateBalances(reportData);
           } finally {
-            setState(() { isLoading = false; });
+            setState(() {
+              isLoading = false;
+            });
           }
         },
       ),
@@ -1249,7 +1893,9 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
         onUpdated: () async {
           final month = _monthSelected + 1;
           expensesByMonth.remove(month);
-          setState(() { isLoading = true; });
+          setState(() {
+            isLoading = true;
+          });
           try {
             await _loadMonthData(month);
             final selectedYear = int.parse(years[_yearSelected]);
@@ -1258,7 +1904,9 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
                 await ref.read(yearlyReportProvider(selectedYear).future);
             _calculateBalances(reportData);
           } finally {
-            setState(() { isLoading = false; });
+            setState(() {
+              isLoading = false;
+            });
           }
         },
       ),
@@ -1304,252 +1952,254 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
     return Stack(
       children: [
         AlertDialog(
-          title:
-              Text(_isDonor ? 'အလှူရှင် မှတ်တမ်းအသစ်' : 'အသုံးစရိတ် မှတ်တမ်းအသစ်'),
+          title: Text(
+              _isDonor ? 'အလှူရှင် မှတ်တမ်းအသစ်' : 'အသုံးစရိတ် မှတ်တမ်းအသစ်'),
           content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Type selector
-              Row(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: RadioListTile<bool>(
-                      title: const Text('အလှူရှင်'),
-                      value: true,
-                      groupValue: _isDonor,
-                      onChanged: (value) {
+                  // Type selector
+                  Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile<bool>(
+                          title: const Text('အလှူရှင်'),
+                          value: true,
+                          groupValue: _isDonor,
+                          onChanged: (value) {
+                            setState(() {
+                              _isDonor = value!;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile<bool>(
+                          title: const Text('အသုံးစရိတ်'),
+                          value: false,
+                          groupValue: _isDonor,
+                          onChanged: (value) {
+                            setState(() {
+                              _isDonor = value!;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Name field - use TypeAhead for donors, regular TextField for expenses
+                  if (_isDonor) ...[
+                    TextFormField(
+                      controller: _prefixController,
+                      decoration: const InputDecoration(
+                        labelText: 'ရှေ့ဆက် (Prefix)',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TypeAheadFormField<MoneyDonor>(
+                      textFieldConfiguration: TextFieldConfiguration(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'အလှူရှင် အမည်',
+                          hintText: 'ရှာဖွေရန် အမည်ရိုက်ထည့်ပါ',
+                          border: OutlineInputBorder(),
+                          suffixIcon: Icon(Icons.search),
+                        ),
+                      ),
+                      suggestionsCallback: (pattern) async {
+                        if (pattern.isEmpty) return [];
+                        try {
+                          final service = ref.read(moneyDonorServiceProvider);
+                          return await service.searchMoneyDonors(pattern);
+                        } catch (e) {
+                          print('Error searching donors: $e');
+                          return [];
+                        }
+                      },
+                      itemBuilder: (context, MoneyDonor donor) {
+                        return ListTile(
+                          title: Row(
+                            children: [
+                              Expanded(child: Text(donor.name ?? '')),
+                              if (donor.isOrganization == true)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Text(
+                                    'အဖွဲ့အစည်း',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          subtitle:
+                              donor.phone != null ? Text(donor.phone!) : null,
+                          dense: true,
+                        );
+                      },
+                      onSuggestionSelected: (MoneyDonor donor) {
                         setState(() {
-                          _isDonor = value!;
+                          _selectedMoneyDonor = donor;
+                          _nameController.text = donor.name ?? '';
                         });
+                      },
+                      noItemsFoundBuilder: (context) {
+                        return Column(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Text('မတွေ့ပါ'),
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.add_circle,
+                                  color: Colors.green),
+                              title: const Text('အလှူရှင်အသစ် ထည့်ရန်'),
+                              onTap: () {
+                                // Close the dialog first
+                                Navigator.of(context).pop();
+                                // Navigate to money donor form
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const MoneyDonorFormScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
+                        }
+                        return null;
                       },
                     ),
-                  ),
-                  Expanded(
-                    child: RadioListTile<bool>(
-                      title: const Text('အသုံးစရိတ်'),
-                      value: false,
-                      groupValue: _isDonor,
-                      onChanged: (value) {
-                        setState(() {
-                          _isDonor = value!;
-                        });
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _suffixController,
+                      decoration: const InputDecoration(
+                        labelText: 'နောက်ဆက် (Suffix)',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ] else
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'အသုံးစရိတ် အကြောင်းအရာ',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
+                        }
+                        return null;
                       },
+                    ),
+
+                  const SizedBox(height: 16),
+
+                  // Amount field
+                  TextFormField(
+                    controller: _amountController,
+                    decoration: const InputDecoration(
+                      labelText: 'ငွေပမာဏ',
+                      border: OutlineInputBorder(),
+                      suffixText: 'ကျပ်',
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
+                      }
+                      if (int.tryParse(value) == null) {
+                        return 'ကိန်းဂဏန်းသာ ထည့်သွင်းပါ';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Date picker
+                  InkWell(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedDate,
+                        firstDate: DateTime(widget.year, 1, 1),
+                        lastDate: DateTime(widget.year, 12, 31),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          _selectedDate = picked;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            DateFormat('dd MMM yyyy').format(_selectedDate),
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const Icon(Icons.calendar_today),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 16),
-
-              // Name field - use TypeAhead for donors, regular TextField for expenses
-              if (_isDonor) ...[
-                TextFormField(
-                  controller: _prefixController,
-                  decoration: const InputDecoration(
-                    labelText: 'ရှေ့ဆက် (Prefix)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TypeAheadFormField<MoneyDonor>(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'အလှူရှင် အမည်',
-                      hintText: 'ရှာဖွေရန် အမည်ရိုက်ထည့်ပါ',
-                      border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.search),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: _isLoading ? null : () => Navigator.pop(context),
+              child: const Text('မလုပ်တော့ပါ'),
+            ),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+              ),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'သိမ်းမည်',
+                      style: TextStyle(color: Colors.white),
                     ),
-                  ),
-                  suggestionsCallback: (pattern) async {
-                    if (pattern.isEmpty) return [];
-                    try {
-                      final service = ref.read(moneyDonorServiceProvider);
-                      return await service.searchMoneyDonors(pattern);
-                    } catch (e) {
-                      print('Error searching donors: $e');
-                      return [];
-                    }
-                  },
-                  itemBuilder: (context, MoneyDonor donor) {
-                    return ListTile(
-                      title: Row(
-                        children: [
-                          Expanded(child: Text(donor.name ?? '')),
-                          if (donor.isOrganization == true)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Text(
-                                'အဖွဲ့အစည်း',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      subtitle: donor.phone != null ? Text(donor.phone!) : null,
-                      dense: true,
-                    );
-                  },
-                  onSuggestionSelected: (MoneyDonor donor) {
-                    setState(() {
-                      _selectedMoneyDonor = donor;
-                      _nameController.text = donor.name ?? '';
-                    });
-                  },
-                  noItemsFoundBuilder: (context) {
-                    return Column(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text('မတွေ့ပါ'),
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.add_circle, color: Colors.green),
-                          title: const Text('အလှူရှင်အသစ် ထည့်ရန်'),
-                          onTap: () {
-                            // Close the dialog first
-                            Navigator.of(context).pop();
-                            // Navigate to money donor form
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MoneyDonorFormScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _suffixController,
-                  decoration: const InputDecoration(
-                    labelText: 'နောက်ဆက် (Suffix)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ]
-              else
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'အသုံးစရိတ် အကြောင်းအရာ',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
-                    }
-                    return null;
-                  },
-                ),
-
-              const SizedBox(height: 16),
-
-              // Amount field
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'ငွေပမာဏ',
-                  border: OutlineInputBorder(),
-                  suffixText: 'ကျပ်',
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'ဖြည့်သွင်းရန် လိုအပ်ပါသည်';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'ကိန်းဂဏန်းသာ ထည့်သွင်းပါ';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 16),
-
-              // Date picker
-              InkWell(
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: _selectedDate,
-                    firstDate: DateTime(widget.year, 1, 1),
-                    lastDate: DateTime(widget.year, 12, 31),
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      _selectedDate = picked;
-                    });
-                  }
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        DateFormat('dd MMM yyyy').format(_selectedDate),
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const Icon(Icons.calendar_today),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: _isLoading ? null : () => Navigator.pop(context),
-          child: const Text('မလုပ်တော့ပါ'),
-        ),
-        ElevatedButton(
-          onPressed: _isLoading ? null : _submit,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
-          ),
-          child: _isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : const Text(
-                  'သိမ်းမည်',
-                  style: TextStyle(color: Colors.white),
-                ),
-        ),
-      ],
+            ),
+          ],
         ),
 
         // Money donor form overlay
@@ -1659,7 +2309,8 @@ class MoneyDonorFormDialog extends ConsumerStatefulWidget {
   }) : super(key: key);
 
   @override
-  ConsumerState<MoneyDonorFormDialog> createState() => _MoneyDonorFormDialogState();
+  ConsumerState<MoneyDonorFormDialog> createState() =>
+      _MoneyDonorFormDialogState();
 }
 
 class _MoneyDonorFormDialogState extends ConsumerState<MoneyDonorFormDialog> {
@@ -1809,7 +2460,9 @@ class _MoneyDonorFormDialogState extends ConsumerState<MoneyDonorFormDialog> {
                         SwitchListTile(
                           title: const Text('အဖွဲ့အစည်း'),
                           subtitle: Text(
-                            _isOrganization ? 'အဖွဲ့အစည်း/ကုမ္ပဏီ' : 'လူပုဂ္ဂိုလ်',
+                            _isOrganization
+                                ? 'အဖွဲ့အစည်း/ကုမ္ပဏီ'
+                                : 'လူပုဂ္ဂိုလ်',
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                           value: _isOrganization,
@@ -1951,7 +2604,8 @@ class _EditDonorRecordDialogState
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.edit, color: Colors.white, size: 18),
+                    child:
+                        const Icon(Icons.edit, color: Colors.white, size: 18),
                   ),
                   const SizedBox(width: 10),
                   const Expanded(
@@ -1972,7 +2626,8 @@ class _EditDonorRecordDialogState
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Icon(Icons.close, color: Colors.white, size: 18),
+                      child: const Icon(Icons.close,
+                          color: Colors.white, size: 18),
                     ),
                   ),
                 ],
@@ -2100,8 +2755,9 @@ class _EditDonorRecordDialogState
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed:
-                              _isLoading || _isDeleting ? null : () => Navigator.pop(context),
+                          onPressed: _isLoading || _isDeleting
+                              ? null
+                              : () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -2149,7 +2805,8 @@ class _EditDonorRecordDialogState
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      onPressed: _isLoading || _isDeleting ? null : _confirmDelete,
+                      onPressed:
+                          _isLoading || _isDeleting ? null : _confirmDelete,
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -2257,8 +2914,7 @@ class _EditDonorRecordDialogState
       };
 
       final service = ref.read(donarRecordServiceProvider);
-      await service.updateDonarRecord(
-          widget.donor['id'].toString(), data);
+      await service.updateDonarRecord(widget.donor['id'].toString(), data);
 
       if (mounted) {
         Navigator.pop(context);
@@ -2360,7 +3016,8 @@ class _EditExpenseRecordDialogState
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.edit, color: Colors.white, size: 18),
+                    child:
+                        const Icon(Icons.edit, color: Colors.white, size: 18),
                   ),
                   const SizedBox(width: 10),
                   const Expanded(
@@ -2381,7 +3038,8 @@ class _EditExpenseRecordDialogState
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Icon(Icons.close, color: Colors.white, size: 18),
+                      child: const Icon(Icons.close,
+                          color: Colors.white, size: 18),
                     ),
                   ),
                 ],
@@ -2508,8 +3166,9 @@ class _EditExpenseRecordDialogState
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed:
-                              _isLoading || _isDeleting ? null : () => Navigator.pop(context),
+                          onPressed: _isLoading || _isDeleting
+                              ? null
+                              : () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -2557,7 +3216,8 @@ class _EditExpenseRecordDialogState
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      onPressed: _isLoading || _isDeleting ? null : _confirmDelete,
+                      onPressed:
+                          _isLoading || _isDeleting ? null : _confirmDelete,
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -2665,8 +3325,7 @@ class _EditExpenseRecordDialogState
       };
 
       final service = ref.read(expenseRecordServiceProvider);
-      await service.updateExpenseRecord(
-          widget.expense['id'].toString(), data);
+      await service.updateExpenseRecord(widget.expense['id'].toString(), data);
 
       if (mounted) {
         Navigator.pop(context);

@@ -16,6 +16,8 @@ class HomeMenuScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
+  String _userName = '';
+
   List<String> titles = [
     'မူလစာမျက်နှာ',
     'သွေးလှူရှင် ရှာမည်',
@@ -26,22 +28,33 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'လစဥ်ထောက်ပံ့သူများ',
     'ထွက်မည်'
   ];
-  List<String> icons = [
-    'assets/images/dashboard.png',
-    'assets/images/search_list.png',
-    'assets/images/members.png',
-    'assets/images/donations.png',
-    'assets/images/special_case.png',
-    'assets/images/finance.png',
-    'assets/images/card.png',
-    'assets/images/log_out.png',
+  List<IconData> icons = const [
+    Icons.dashboard_outlined,
+    Icons.person_search_outlined,
+    Icons.groups_outlined,
+    Icons.bloodtype_outlined,
+    Icons.event_note_outlined,
+    Icons.account_balance_wallet_outlined,
+    Icons.volunteer_activism_outlined,
+    Icons.logout_outlined,
   ];
 
   @override
-  Widget build(BuildContext context) {
-    String? userName = '';
-    String? role = '';
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
 
+  Future<void> _loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _userName = prefs.getString('name')?.trim() ?? '';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -74,22 +87,18 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  userName,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                if (_userName.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    _userName,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  role,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.red.shade700,
-                  ),
-                ),
+                ],
               ],
             ),
           ),
@@ -156,7 +165,8 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
             }
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            constraints: const BoxConstraints(minHeight: 48),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
               color: selectedIndex == index
                   ? Colors.red.withOpacity(0.1)
@@ -165,21 +175,37 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
             ),
             child: Row(
               children: [
-                Image.asset(
-                  icons[index],
-                  width: 24,
-                  height: 24,
-                  color: selectedIndex == index ? Colors.red : Colors.black54,
+                Container(
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: selectedIndex == index
+                        ? Colors.red.withValues(alpha: 0.14)
+                        : const Color(0xFFF3F4F6),
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: Icon(
+                    icons[index],
+                    size: 22,
+                    color: selectedIndex == index ? Colors.red : Colors.black54,
+                  ),
                 ),
-                const SizedBox(width: 16),
-                Text(
-                  titles[index],
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: selectedIndex == index
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    color: selectedIndex == index ? Colors.red : Colors.black87,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    titles[index],
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: selectedIndex == index
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color:
+                          selectedIndex == index ? Colors.red : Colors.black87,
+                    ),
                   ),
                 ),
               ],

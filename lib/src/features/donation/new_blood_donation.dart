@@ -454,7 +454,8 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       // Check if it's from Mon State
       if (element.region == 'မွန်ပြည်နယ်' || element.region == 'Mon State') {
         // Within Mon State, prioritize Mawlamyine township
-        if (element.township == 'မော်လမြိုင်' || element.township == 'Mawlamyine') {
+        if (element.township == 'မော်လမြိုင်' ||
+            element.township == 'Mawlamyine') {
           mawlamyineTownships.add(element);
         } else {
           otherMonStateTownships.add(element);
@@ -479,16 +480,18 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
         addedTownships.add(element.township!);
       }
     }
-    
+
     print('=== Township Initialization Debug ===');
     print('Townships initialized (first 10): ${townships.take(10).join(", ")}');
     print('Total townships: ${townships.length}');
     print('Mawlamyine townships found: ${mawlamyineTownships.length}');
     print('Other Mon State townships: ${otherMonStateTownships.length}');
     print('Other State townships: ${otherStateTownships.length}');
-    print('First township in list: ${townships.isNotEmpty ? townships.first : "EMPTY"}');
+    print(
+        'First township in list: ${townships.isNotEmpty ? townships.first : "EMPTY"}');
     if (townships.isNotEmpty && townships.first != 'မော်လမြိုင်') {
-      print('WARNING: First township is NOT မော်လမြိုင်! It is: ${townships.first}');
+      print(
+          'WARNING: First township is NOT မော်လမြိုင်! It is: ${townships.first}');
     }
     print('===================================');
   }
@@ -523,15 +526,22 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  alignment: Alignment.centerLeft,
-                  child: isFullForm ? _buildFullForm() : _buildShortForm(),
-                ),
-              ),
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final isMobile = constraints.maxWidth < 600;
+
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SizedBox(
+                      width: isMobile
+                          ? double.infinity
+                          : MediaQuery.of(context).size.width * 0.5,
+                      child: isFullForm ? _buildFullForm() : _buildShortForm(),
+                    ),
+                  ),
+                );
+              },
             ),
     );
   }
@@ -687,9 +697,11 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                       title: Row(
                         children: [
                           Expanded(child: Text(patient.name ?? '')),
-                          if (patient.bloodType != null && patient.bloodType!.isNotEmpty)
+                          if (patient.bloodType != null &&
+                              patient.bloodType!.isNotEmpty)
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: Colors.red.shade100,
                                 borderRadius: BorderRadius.circular(12),
@@ -740,10 +752,12 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                   ),
                                 ),
                               ),
-                              if (selectedPatient!.bloodType != null && selectedPatient!.bloodType!.isNotEmpty) ...[
+                              if (selectedPatient!.bloodType != null &&
+                                  selectedPatient!.bloodType!.isNotEmpty) ...[
                                 SizedBox(width: 8),
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: Colors.red.shade100,
                                     borderRadius: BorderRadius.circular(12),
@@ -792,68 +806,65 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                   ),
                 ),
                 SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: quarterController,
-                        decoration: InputDecoration(
-                          labelText: 'ရပ်ကွက်',
-                          border: OutlineInputBorder(),
-                        ),
+                _buildAdaptiveFieldPair(
+                  first: TextField(
+                    controller: quarterController,
+                    decoration: InputDecoration(
+                      labelText: 'ရပ်ကွက်',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  second: TypeAheadField<String>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: townController,
+                      decoration: InputDecoration(
+                        labelText: 'မြို့နယ်',
+                        border: OutlineInputBorder(),
                       ),
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: TypeAheadField<String>(
-                        textFieldConfiguration: TextFieldConfiguration(
-                          controller: townController,
-                          decoration: InputDecoration(
-                            labelText: 'မြို့နယ်',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        suggestionsCallback: (pattern) {
-                          List<String> suggestions = [];
-                          
-                          if (pattern.isEmpty) {
-                            // When no pattern, ensure မော်လမြိုင် is first
-                            if (townships.contains('မော်လမြိုင်')) {
-                              suggestions.add('မော်လမြိုင်');
-                              suggestions.addAll(townships.where((t) => t != 'မော်လမြိုင်').take(9));
-                            } else {
-                              suggestions = townships.take(10).toList();
-                            }
-                          } else {
-                            // When filtering, still prioritize မော်လမြိုင် if it matches
-                            final filteredTownships = townships
-                                .where((township) => township
-                                    .toLowerCase()
-                                    .contains(pattern.toLowerCase()))
-                                .toList();
-                            
-                            // If မော်လမြိုင် matches, put it first
-                            if (filteredTownships.contains('မော်လမြိုင်')) {
-                              suggestions.add('မော်လမြိုင်');
-                              suggestions.addAll(filteredTownships.where((t) => t != 'မော်လမြိုင်').take(9));
-                            } else {
-                              suggestions = filteredTownships.take(10).toList();
-                            }
-                          }
-                          
-                          return suggestions;
-                        },
-                        itemBuilder: (context, String township) {
-                          return ListTile(
-                            title: Text(township),
-                          );
-                        },
-                        onSuggestionSelected: (String township) {
-                          townController.text = township;
-                        },
-                      ),
-                    ),
-                  ],
+                    suggestionsCallback: (pattern) {
+                      List<String> suggestions = [];
+
+                      if (pattern.isEmpty) {
+                        // When no pattern, ensure မော်လမြိုင် is first
+                        if (townships.contains('မော်လမြိုင်')) {
+                          suggestions.add('မော်လမြိုင်');
+                          suggestions.addAll(townships
+                              .where((t) => t != 'မော်လမြိုင်')
+                              .take(9));
+                        } else {
+                          suggestions = townships.take(10).toList();
+                        }
+                      } else {
+                        // When filtering, still prioritize မော်လမြိုင် if it matches
+                        final filteredTownships = townships
+                            .where((township) => township
+                                .toLowerCase()
+                                .contains(pattern.toLowerCase()))
+                            .toList();
+
+                        // If မော်လမြိုင် matches, put it first
+                        if (filteredTownships.contains('မော်လမြိုင်')) {
+                          suggestions.add('မော်လမြိုင်');
+                          suggestions.addAll(filteredTownships
+                              .where((t) => t != 'မော်လမြိုင်')
+                              .take(9));
+                        } else {
+                          suggestions = filteredTownships.take(10).toList();
+                        }
+                      }
+
+                      return suggestions;
+                    },
+                    itemBuilder: (context, String township) {
+                      return ListTile(
+                        title: Text(township),
+                      );
+                    },
+                    onSuggestionSelected: (String township) {
+                      townController.text = township;
+                    },
+                  ),
                 ),
                 SizedBox(height: 8),
                 if (quarterController.text.isNotEmpty ||
@@ -1192,9 +1203,11 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                       title: Row(
                         children: [
                           Expanded(child: Text(patient.name ?? '')),
-                          if (patient.bloodType != null && patient.bloodType!.isNotEmpty)
+                          if (patient.bloodType != null &&
+                              patient.bloodType!.isNotEmpty)
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: Colors.red.shade100,
                                 borderRadius: BorderRadius.circular(12),
@@ -1245,10 +1258,12 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                   ),
                                 ),
                               ),
-                              if (selectedPatient!.bloodType != null && selectedPatient!.bloodType!.isNotEmpty) ...[
+                              if (selectedPatient!.bloodType != null &&
+                                  selectedPatient!.bloodType!.isNotEmpty) ...[
                                 SizedBox(width: 8),
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: Colors.red.shade100,
                                     borderRadius: BorderRadius.circular(12),
@@ -1297,68 +1312,65 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                   ),
                 ),
                 SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: quarterController,
-                        decoration: InputDecoration(
-                          labelText: 'ရပ်ကွက်',
-                          border: OutlineInputBorder(),
-                        ),
+                _buildAdaptiveFieldPair(
+                  first: TextField(
+                    controller: quarterController,
+                    decoration: InputDecoration(
+                      labelText: 'ရပ်ကွက်',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  second: TypeAheadField<String>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: townController,
+                      decoration: InputDecoration(
+                        labelText: 'မြို့နယ်',
+                        border: OutlineInputBorder(),
                       ),
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: TypeAheadField<String>(
-                        textFieldConfiguration: TextFieldConfiguration(
-                          controller: townController,
-                          decoration: InputDecoration(
-                            labelText: 'မြို့နယ်',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        suggestionsCallback: (pattern) {
-                          List<String> suggestions = [];
-                          
-                          if (pattern.isEmpty) {
-                            // When no pattern, ensure မော်လမြိုင် is first
-                            if (townships.contains('မော်လမြိုင်')) {
-                              suggestions.add('မော်လမြိုင်');
-                              suggestions.addAll(townships.where((t) => t != 'မော်လမြိုင်').take(9));
-                            } else {
-                              suggestions = townships.take(10).toList();
-                            }
-                          } else {
-                            // When filtering, still prioritize မော်လမြိုင် if it matches
-                            final filteredTownships = townships
-                                .where((township) => township
-                                    .toLowerCase()
-                                    .contains(pattern.toLowerCase()))
-                                .toList();
-                            
-                            // If မော်လမြိုင် matches, put it first
-                            if (filteredTownships.contains('မော်လမြိုင်')) {
-                              suggestions.add('မော်လမြိုင်');
-                              suggestions.addAll(filteredTownships.where((t) => t != 'မော်လမြိုင်').take(9));
-                            } else {
-                              suggestions = filteredTownships.take(10).toList();
-                            }
-                          }
-                          
-                          return suggestions;
-                        },
-                        itemBuilder: (context, String township) {
-                          return ListTile(
-                            title: Text(township),
-                          );
-                        },
-                        onSuggestionSelected: (String township) {
-                          townController.text = township;
-                        },
-                      ),
-                    ),
-                  ],
+                    suggestionsCallback: (pattern) {
+                      List<String> suggestions = [];
+
+                      if (pattern.isEmpty) {
+                        // When no pattern, ensure မော်လမြိုင် is first
+                        if (townships.contains('မော်လမြိုင်')) {
+                          suggestions.add('မော်လမြိုင်');
+                          suggestions.addAll(townships
+                              .where((t) => t != 'မော်လမြိုင်')
+                              .take(9));
+                        } else {
+                          suggestions = townships.take(10).toList();
+                        }
+                      } else {
+                        // When filtering, still prioritize မော်လမြိုင် if it matches
+                        final filteredTownships = townships
+                            .where((township) => township
+                                .toLowerCase()
+                                .contains(pattern.toLowerCase()))
+                            .toList();
+
+                        // If မော်လမြိုင် matches, put it first
+                        if (filteredTownships.contains('မော်လမြိုင်')) {
+                          suggestions.add('မော်လမြိုင်');
+                          suggestions.addAll(filteredTownships
+                              .where((t) => t != 'မော်လမြိုင်')
+                              .take(9));
+                        } else {
+                          suggestions = filteredTownships.take(10).toList();
+                        }
+                      }
+
+                      return suggestions;
+                    },
+                    itemBuilder: (context, String township) {
+                      return ListTile(
+                        title: Text(township),
+                      );
+                    },
+                    onSuggestionSelected: (String township) {
+                      townController.text = township;
+                    },
+                  ),
                 ),
                 SizedBox(height: 8),
                 if (quarterController.text.isNotEmpty ||
@@ -1545,33 +1557,74 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     );
   }
 
+  Widget _buildAdaptiveFieldPair({
+    required Widget first,
+    required Widget second,
+  }) {
+    if (MediaQuery.of(context).size.width < 480) {
+      return Column(
+        children: [
+          first,
+          const SizedBox(height: 12),
+          second,
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(child: first),
+        const SizedBox(width: 12),
+        Expanded(child: second),
+      ],
+    );
+  }
+
   // Helper method to create info rows
   Widget _infoRow(String label, String value) {
+    final isCompact = MediaQuery.of(context).size.width < 480;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label + ":",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
-              ),
+      child: isCompact
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$label:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(color: Colors.black87),
+                ),
+              ],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 120,
+                  child: Text(
+                    '$label:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    value,
+                    style: const TextStyle(color: Colors.black87),
+                  ),
+                ),
+              ],
             ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                color: Colors.black87,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

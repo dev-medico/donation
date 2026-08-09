@@ -2,6 +2,7 @@ import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/domain/donation.dart';
 import 'package:donation/src/features/donation_member/presentation/member_edit.dart';
 import 'package:donation/src/features/donation_member/data/member_repository.dart';
+import 'package:donation/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -108,227 +109,245 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
 
   Widget _buildMemberDetailView(
       BuildContext context, Member member, List<Donation> donations) {
+    final isMobile = Responsive.isMobile(context);
+    final memberCard = _buildMemberInfoCard(context, member, donations);
+    final historyCard = _buildDonationHistoryCard(
+      donations,
+      embeddedInPageScroll: isMobile,
+    );
+
+    if (isMobile) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 28),
+        children: [
+          memberCard,
+          const SizedBox(height: 12),
+          historyCard,
+        ],
+      );
+    }
+
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Member Info Card - Left Half
-          Expanded(
-            flex: 1,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.15),
-                    spreadRadius: 1,
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+          Expanded(child: memberCard),
+          const SizedBox(width: 20),
+          Expanded(child: historyCard),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMemberInfoCard(
+      BuildContext context, Member member, List<Donation> donations) {
+    final isMobile = Responsive.isMobile(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(isMobile ? 12 : 8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: ListView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(isMobile ? 14 : 16),
+        children: [
+          Row(
+            children: [
+              Image.asset(
+                "assets/images/card.png",
+                width: isMobile ? 46 : 54,
               ),
-              child: ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const SizedBox(width: 8),
-                          Image.asset("assets/images/card.png", width: 54),
-                          const SizedBox(width: 16),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text("အဖွဲ့၀င်အမှတ်",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color:
-                                          Color.fromARGB(255, 116, 112, 112))),
-                              const SizedBox(height: 8),
-                              Text(
-                                member.memberId ?? 'N/A',
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ],
+              SizedBox(width: isMobile ? 12 : 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "အဖွဲ့၀င်အမှတ်",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color.fromARGB(255, 116, 112, 112),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text("ရက်စွဲ",
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Color.fromARGB(255, 116, 112, 112))),
-                            const SizedBox(height: 8),
-                            Text(
-                              member.registerDate ?? 'N/A',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      member.memberId ?? 'N/A',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text(
+                      "ရက်စွဲ",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color.fromARGB(255, 116, 112, 112),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      member.registerDate ?? 'N/A',
+                      maxLines: 2,
+                      textAlign: TextAlign.right,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 14, color: Colors.black),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Divider(height: 1, color: Colors.grey.shade200),
+          const SizedBox(height: 14),
+          _buildInfoRow("အမည်", member.name ?? 'N/A'),
+          _buildInfoRow("အဖအမည်", member.fatherName ?? 'N/A'),
+          _buildInfoRow("မွေးသက္ကရာဇ်", member.birthDate ?? 'N/A'),
+          _buildInfoRow(
+              "နိုင်ငံသားစီစစ်ရေး\nကတ်ပြားအမှတ်", member.nrc ?? 'N/A'),
+          _buildInfoRow("သွေးအုပ်စု", member.bloodType ?? 'N/A'),
+          _buildInfoRow("သွေးဘဏ်ကတ်နံပါတ်", member.bloodBankCard ?? 'N/A'),
+          _buildInfoRow("လိင်အမျိုးအစား", _formatGender(member.gender)),
+          _buildInfoRow("ယခင်သွေးလှူအကြိမ်", member.memberCount ?? '0'),
+          _buildInfoRow(
+              "အဖွဲ့နှင့်သွေးလှူဒါန်းမှု", donations.length.toString()),
+          _buildInfoRow("စုစုပေါင်းသွေးလှူဒါန်းမှု", member.totalCount ?? '0'),
+          _buildInfoRow("ဖုန်းနံပါတ်", member.phone ?? 'N/A'),
+          _buildAddressRow("နေရပ်လိပ်စာ", member.address ?? 'N/A'),
+          if (widget.isEditable) ...[
+            const SizedBox(height: 4),
+            Divider(height: 1, color: Colors.grey.shade200),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => _openMemberEditor(context, member),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "ပြင်ဆင်မည်",
+                        style: TextStyle(fontSize: 15, color: primaryColor),
+                      ),
+                      const SizedBox(width: 8),
+                      Image.asset(
+                        "assets/images/edit.png",
+                        width: 24,
+                        color: primaryColor,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    height: 1,
-                    color: Colors.grey.shade200,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildInfoRow("အမည်", member.name ?? 'N/A'),
-                  _buildInfoRow("အဖအမည်", member.fatherName ?? 'N/A'),
-                  _buildInfoRow("မွေးသက္ကရာဇ်", member.birthDate ?? 'N/A'),
-                  _buildInfoRow(
-                      "နိုင်ငံသားစီစစ်ရေး\nကတ်ပြားအမှတ်", member.nrc ?? 'N/A'),
-                  _buildInfoRow("သွေးအုပ်စု", member.bloodType ?? 'N/A'),
-                  _buildInfoRow(
-                      "သွေးဘဏ်ကတ်နံပါတ်", member.bloodBankCard ?? 'N/A'),
-                  _buildInfoRow("လိင်အမျိုးအစား", _formatGender(member.gender)),
-                  _buildInfoRow(
-                      "ယခင်သွေးလှူအကြိမ်", member.memberCount ?? '0'),
-                  _buildInfoRow(
-                      "အဖွဲ့နှင့်သွေးလှူဒါန်းမှု", donations.length.toString()),
-                  _buildInfoRow(
-                      "စုစုပေါင်းသွေးလှူဒါန်းမှု", member.totalCount ?? '0'),
-                  _buildInfoRow("ဖုန်းနံပါတ်", member.phone ?? 'N/A'),
-                  _buildAddressRow("နေရပ်လိပ်စာ", member.address ?? 'N/A'),
-                  const SizedBox(height: 12),
-                  Container(
-                    height: 1,
-                    color: Colors.grey.shade200,
-                  ),
-                  widget.isEditable
-                      ? Align(
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              top: 12,
-                              right: 12,
-                            ),
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text("ပြင်ဆင်မည်",
-                                      style: TextStyle(
-                                          fontSize: 15, color: primaryColor)),
-                                  const SizedBox(width: 8),
-                                  Image.asset(
-                                    "assets/images/edit.png",
-                                    width: 24,
-                                    color: primaryColor,
-                                  ),
-                                ],
-                              ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MemberEditScreen(
-                                      memberId: member.id.toString(),
-                                      member: member,
-                                    ),
-                                  ),
-                                ).then((result) {
-                                  if (result != null && result is Map && result['success'] == true) {
-                                    // Refresh member detail
-                                    _loadMemberData();
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 
-                                    // Refresh member list
-                                    ref.read(refreshMembersProvider)().then((_) {
-                                      // Reset filters after refreshing
-                                      resetFilterProviders(ref);
-                                      
-                                      // Show success message only if widget is still mounted
-                                      if (mounted && result['message'] != null) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text(result['message'])),
-                                        );
-                                      }
-                                    });
-                                  }
-                                });
-                              },
-                            ),
-                          ),
-                        )
-                      : Container(),
-                ],
+  void _openMemberEditor(BuildContext context, Member member) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MemberEditScreen(
+          memberId: member.id.toString(),
+          member: member,
+        ),
+      ),
+    ).then((result) {
+      if (result != null && result is Map && result['success'] == true) {
+        _loadMemberData();
+        ref.read(refreshMembersProvider)().then((_) {
+          resetFilterProviders(ref);
+          if (mounted && result['message'] != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(result['message'])),
+            );
+          }
+        });
+      }
+    });
+  }
+
+  Widget _buildDonationHistoryCard(
+    List<Donation> donations, {
+    required bool embeddedInPageScroll,
+  }) {
+    final history = donations.isEmpty
+        ? Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+            child: Center(
+              child: Text(
+                "သွေးလှူဒါန်းမှတ်တမ်း မရှိပါ",
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+            ),
+          )
+        : ListView.builder(
+            shrinkWrap: embeddedInPageScroll,
+            physics: embeddedInPageScroll
+                ? const NeverScrollableScrollPhysics()
+                : null,
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            itemCount: donations.length,
+            itemBuilder: (context, index) =>
+                _buildDonationCard(donations[index]),
+          );
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(embeddedInPageScroll ? 12 : 8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              "သွေးလှူဒါန်းမှတ်တမ်း",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: primaryColor,
               ),
             ),
           ),
-
-          // Space between cards
-          const SizedBox(width: 20),
-
-          // Donation History Card - Right Half
-          Expanded(
-            flex: 1,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.15),
-                    spreadRadius: 1,
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      "သွေးလှူဒါန်းမှတ်တမ်း",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: donations.isEmpty
-                        ? Center(
-                            child: Text(
-                              "သွေးလှူဒါန်းမှတ်တမ်း မရှိပါ",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            ),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: donations.length,
-                            itemBuilder: (context, index) =>
-                                _buildDonationCard(donations[index]),
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          if (embeddedInPageScroll) history else Expanded(child: history),
         ],
       ),
     );
@@ -348,34 +367,44 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today, size: 14, color: primaryColor),
-                    const SizedBox(width: 4),
-                    Text(
-                      donation.date ?? 'N/A',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_today, size: 14, color: primaryColor),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          donation.date ?? 'N/A',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
+                    ],
                   ),
-                  child: Text(
-                    donation.hospital ?? 'N/A',
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      donation.hospital ?? 'N/A',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
@@ -439,13 +468,15 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
   }
 
   Widget _buildInfoRow(String label, String value) {
+    final isMobile = Responsive.isMobile(context);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Row(
         children: [
           const SizedBox(width: 8),
           Expanded(
-            flex: 4,
+            flex: isMobile ? 5 : 4,
             child: Text(label,
                 style: const TextStyle(
                     fontSize: 14,
@@ -453,9 +484,9 @@ class _MemberDetailScreenState extends ConsumerState<MemberDetailScreen> {
                     height: 1.8)),
           ),
           const Text("-", style: TextStyle(fontSize: 14, color: Colors.black)),
-          const SizedBox(width: 24),
+          SizedBox(width: isMobile ? 12 : 24),
           Expanded(
-            flex: 4,
+            flex: isMobile ? 5 : 4,
             child: Text(
               value,
               style: const TextStyle(fontSize: 14, color: Colors.black),

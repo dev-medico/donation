@@ -19,10 +19,12 @@ class MoneyDonorDetailScreen extends ConsumerStatefulWidget {
   static const routeName = "/money-donor-detail";
 
   @override
-  ConsumerState<MoneyDonorDetailScreen> createState() => _MoneyDonorDetailScreenState();
+  ConsumerState<MoneyDonorDetailScreen> createState() =>
+      _MoneyDonorDetailScreenState();
 }
 
-class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen> {
+class _MoneyDonorDetailScreenState
+    extends ConsumerState<MoneyDonorDetailScreen> {
   MoneyDonor? _donor;
   List<dynamic> _donations = [];
   bool _isLoading = true;
@@ -41,12 +43,15 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
     });
 
     try {
-      final donor = await ref.read(moneyDonorServiceProvider).getMoneyDonor(widget.donorId);
+      final donor = await ref
+          .read(moneyDonorServiceProvider)
+          .getMoneyDonor(widget.donorId);
 
       // Try to load donation history
       List<dynamic> donations = [];
       try {
-        final report = await ref.read(moneyDonorServiceProvider).getReport(widget.donorId);
+        final report =
+            await ref.read(moneyDonorServiceProvider).getReport(widget.donorId);
         donations = report['donations'] ?? [];
       } catch (e) {
         // If report fails, continue without donation history
@@ -106,7 +111,9 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
 
     if (confirmed == true) {
       try {
-        final success = await ref.read(moneyDonorServiceProvider).deleteMoneyDonor(_donor!.id!);
+        final success = await ref
+            .read(moneyDonorServiceProvider)
+            .deleteMoneyDonor(_donor!.id!);
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('အောင်မြင်စွာ ဖျက်ပြီးပါပြီ')),
@@ -197,21 +204,18 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
   }
 
   Widget _buildMobileLayout() {
-    return Column(
-      children: [
-        // Summary card at top (fixed)
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: _buildSummaryCard(),
-        ),
-        // Donation history fills remaining space
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: _buildDonationHistorySection(),
-          ),
-        ),
-      ],
+    return RefreshIndicator(
+      onRefresh: _loadDonor,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildSummaryCard(),
+          const SizedBox(height: 16),
+          _buildDonationHistorySection(embeddedInPageScroll: true),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 
@@ -287,7 +291,8 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
                           padding: const EdgeInsets.only(top: 4),
                           child: Row(
                             children: [
-                              Icon(Icons.phone, size: 14, color: Colors.grey[600]),
+                              Icon(Icons.phone,
+                                  size: 14, color: Colors.grey[600]),
                               const SizedBox(width: 4),
                               Text(
                                 _donor!.phone!,
@@ -299,13 +304,15 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
                             ],
                           ),
                         ),
-                      if (_donor!.address != null && _donor!.address!.isNotEmpty)
+                      if (_donor!.address != null &&
+                          _donor!.address!.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                              Icon(Icons.location_on,
+                                  size: 14, color: Colors.grey[600]),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
@@ -327,90 +334,7 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
 
             const SizedBox(height: 16),
 
-            // Summary stats row
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.monetization_on,
-                              color: Colors.green[700],
-                              size: 16,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'စုစုပေါင်း',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.green[700],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          '${_formatAmount(_donor!.totalAmount)} ကျပ်',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.receipt_long,
-                              color: primaryColor,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'အကြိမ်',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          '${_donor!.donationCount ?? 0}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            _buildSummaryStats(),
 
             if (_donor!.note != null && _donor!.note!.isNotEmpty) ...[
               const SizedBox(height: 12),
@@ -445,7 +369,82 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
     );
   }
 
-  Widget _buildDonationHistorySection() {
+  Widget _buildSummaryStats() {
+    final totalAmount = _buildSummaryStat(
+      icon: Icons.monetization_on,
+      label: 'စုစုပေါင်း',
+      value: '${_formatAmount(_donor!.totalAmount)} ကျပ်',
+      color: Colors.green.shade700,
+      backgroundColor: Colors.green.withValues(alpha: 0.08),
+    );
+    final donationCount = _buildSummaryStat(
+      icon: Icons.receipt_long,
+      label: 'အကြိမ်',
+      value: '${_donor!.donationCount ?? 0}',
+      color: primaryColor,
+      backgroundColor: primaryColor.withValues(alpha: 0.08),
+    );
+
+    if (Responsive.isMobile(context)) {
+      return Column(
+        children: [
+          totalAmount,
+          const SizedBox(height: 8),
+          donationCount,
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(child: totalAmount),
+        const SizedBox(width: 8),
+        Expanded(child: donationCount),
+      ],
+    );
+  }
+
+  Widget _buildSummaryStat({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+    required Color backgroundColor,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 16),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: color),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              softWrap: true,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDonationHistorySection({bool embeddedInPageScroll = false}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -459,6 +458,8 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
         ],
       ),
       child: Column(
+        mainAxisSize:
+            embeddedInPageScroll ? MainAxisSize.min : MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Section header
@@ -503,7 +504,8 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.green.shade100,
                     borderRadius: BorderRadius.circular(16),
@@ -520,18 +522,21 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
               ],
             ),
           ),
-          // Table content - fills remaining space
-          Expanded(
-            child: _buildDonationsList(),
-          ),
+          if (embeddedInPageScroll)
+            _buildDonationsList(shrinkWrapRows: true)
+          else
+            Expanded(
+              child: _buildDonationsList(),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildDonationsList() {
+  Widget _buildDonationsList({bool shrinkWrapRows = false}) {
     if (_donations.isEmpty) {
       return Container(
+        height: shrinkWrapRows ? 180 : null,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
@@ -571,6 +576,10 @@ class _MoneyDonorDetailScreenState extends ConsumerState<MoneyDonorDetailScreen>
       ),
       child: SfDataGrid(
         source: dataSource,
+        shrinkWrapRows: shrinkWrapRows,
+        verticalScrollPhysics: shrinkWrapRows
+            ? const NeverScrollableScrollPhysics()
+            : const AlwaysScrollableScrollPhysics(),
         columnWidthMode: ColumnWidthMode.fill,
         gridLinesVisibility: GridLinesVisibility.horizontal,
         headerGridLinesVisibility: GridLinesVisibility.none,
@@ -641,19 +650,17 @@ class _DonationHistoryDataSource extends DataGridSource {
         if (dateB == null) return -1;
         return dateA.compareTo(dateB);
       });
-    _donationData = sortedDonations
-        .asMap()
-        .entries
-        .map<DataGridRow>((entry) {
-          final index = entry.key;
-          final donation = entry.value;
-          return DataGridRow(cells: [
-            DataGridCell<int>(columnName: 'no', value: index + 1),
-            DataGridCell<String>(columnName: 'date', value: _formatDate(donation['date'])),
-            DataGridCell<String>(columnName: 'amount', value: _formatAmount(donation['amount'])),
-          ]);
-        })
-        .toList();
+    _donationData = sortedDonations.asMap().entries.map<DataGridRow>((entry) {
+      final index = entry.key;
+      final donation = entry.value;
+      return DataGridRow(cells: [
+        DataGridCell<int>(columnName: 'no', value: index + 1),
+        DataGridCell<String>(
+            columnName: 'date', value: _formatDate(donation['date'])),
+        DataGridCell<String>(
+            columnName: 'amount', value: _formatAmount(donation['amount'])),
+      ]);
+    }).toList();
   }
 
   List<DataGridRow> _donationData = [];
@@ -702,66 +709,67 @@ class _DonationHistoryDataSource extends DataGridSource {
     return DataGridRowAdapter(
         color: isEven ? Colors.white : Colors.grey.shade50,
         cells: row.getCells().map<Widget>((dataGridCell) {
-      final columnName = dataGridCell.columnName;
-      final value = dataGridCell.value.toString();
+          final columnName = dataGridCell.columnName;
+          final value = dataGridCell.value.toString();
 
-      if (columnName == 'no') {
-        return Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(12.0),
-          child: Container(
-            width: 28,
-            height: 28,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.green.shade50,
-              borderRadius: BorderRadius.circular(6),
-            ),
+          if (columnName == 'no') {
+            return Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(12.0),
+              child: Container(
+                width: 28,
+                height: 28,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: Colors.green[700],
+                  ),
+                ),
+              ),
+            );
+          }
+
+          if (columnName == 'amount') {
+            return Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  '$value ကျပ်',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: Colors.green[700],
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Text(
               value,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.green[700],
-              ),
-            ),
-          ),
-        );
-      }
-
-      if (columnName == 'amount') {
-        return Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.green.shade50,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              '$value ကျပ်',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
                 fontSize: 13,
-                color: Colors.green[700],
+                color: Colors.grey[800],
               ),
             ),
-          ),
-        );
-      }
-
-      return Container(
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Text(
-          value,
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey[800],
-          ),
-        ),
-      );
-    }).toList());
+          );
+        }).toList());
   }
 }

@@ -1,5 +1,6 @@
 import 'package:donation/src/features/monthly_sponsor/models/monthly_sponsor.dart';
 import 'package:donation/src/features/monthly_sponsor/monthly_sponsor_service.dart';
+import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -58,8 +59,11 @@ class _MonthlySponsorDetailScreenState
         builder: (ctx, setSt) => AlertDialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          title: Text(donation == null ? 'လစဥ်လှူဒါန်းမှု ထည့်ရန်' : 'ပြင်ဆင်ရန်',
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+          scrollable: Responsive.isMobile(ctx),
+          title: Text(
+              donation == null ? 'လစဥ်လှူဒါန်းမှု ထည့်ရန်' : 'ပြင်ဆင်ရန်',
+              style:
+                  const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           content: Form(
             key: formKey,
             child: Column(
@@ -74,7 +78,8 @@ class _MonthlySponsorDetailScreenState
                   decoration: InputDecoration(
                     labelText: 'ပမာဏ',
                     suffixText: 'ကျပ်',
-                    prefixIcon: Icon(Icons.payments_outlined, color: primaryColor),
+                    prefixIcon:
+                        Icon(Icons.payments_outlined, color: primaryColor),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
@@ -246,8 +251,9 @@ class _MonthlySponsorDetailScreenState
               );
             }
             final s = snap.data!;
-            final donations = List<MonthlySponsorDonation>.from(s.donations ?? const [])
-              ..sort((a, b) => (a.date ?? '').compareTo(b.date ?? ''));
+            final donations =
+                List<MonthlySponsorDonation>.from(s.donations ?? const [])
+                  ..sort((a, b) => (a.date ?? '').compareTo(b.date ?? ''));
             return RefreshIndicator(
               onRefresh: () async => _refresh(),
               child: ListView(
@@ -325,8 +331,7 @@ class _MonthlySponsorDetailScreenState
                 decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.22),
                     shape: BoxShape.circle,
-                    border:
-                        Border.all(color: Colors.white.withOpacity(0.4))),
+                    border: Border.all(color: Colors.white.withOpacity(0.4))),
                 child: Text(initial,
                     style: const TextStyle(
                         color: Colors.white,

@@ -29,13 +29,23 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
   }
 
   @override
+  void dispose() {
+    remarkController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isNarrowPhone =
+        Responsive.isMobile(context) && MediaQuery.sizeOf(context).width <= 360;
+
     return CommonDialog(
       title: "မှတ်ချက်ရေးရန်",
       width: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width
           : MediaQuery.of(context).size.width * 0.3,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
@@ -51,14 +61,18 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  checked ? 'သွေးလှူနိုင်သည်' : 'သွေးမလှူနိုင်ပါ',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: checked ? Colors.green.shade700 : Colors.red.shade700,
+                Expanded(
+                  child: Text(
+                    checked ? 'သွေးလှူနိုင်သည်' : 'သွေးမလှူနိုင်ပါ',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color:
+                          checked ? Colors.green.shade700 : Colors.red.shade700,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Switch(
                   value: checked,
                   onChanged: (value) {
@@ -66,7 +80,7 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
                       checked = value;
                     });
                   },
-                  activeColor: Colors.green,
+                  activeThumbColor: Colors.green,
                   inactiveThumbColor: Colors.red,
                   inactiveTrackColor: Colors.red.shade200,
                 ),
@@ -88,7 +102,7 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
               decoration: InputDecoration(
                 hintText: '',
                 hintStyle: const TextStyle(color: Colors.black, fontSize: 15.0),
-                fillColor: Colors.white.withOpacity(0.2),
+                fillColor: Colors.white.withValues(alpha: 0.2),
                 filled: true,
                 suffixIcon: Padding(
                   padding: const EdgeInsets.only(right: 12, bottom: 50),
@@ -127,112 +141,117 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
                 const EdgeInsets.only(left: 15, bottom: 16, right: 15, top: 34),
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
-              onTap: isLoading 
-                ? null 
-                : () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    
-                    try {
-                      // Create updated member with new status and note
-                      final updatedMember = Member(
-                        id: widget.member!.id,
-                        memberId: widget.member!.memberId,
-                        name: widget.member!.name,
-                        fatherName: widget.member!.fatherName,
-                        birthDate: widget.member!.birthDate,
-                        nrc: widget.member!.nrc,
-                        phone: widget.member!.phone,
-                        bloodBankCard: widget.member!.bloodBankCard,
-                        address: widget.member!.address,
-                        bloodType: widget.member!.bloodType,
-                        gender: widget.member!.gender,
-                        memberCount: widget.member!.memberCount,
-                        totalCount: widget.member!.totalCount,
-                        registerDate: widget.member!.registerDate,
-                        status: checked ? "available" : "not_available",
-                        lastDate: widget.member!.lastDate,
-                        note: remarkController.text.trim(),
-                      );
-                      
-                      // Update member via repository
-                      await _repository.updateMember(
-                        widget.member!.id.toString(), 
-                        updatedMember
-                      );
-                      
-                      // Refresh both member list and search list. Awaited only
-                      // so the re-fetch finishes before we pop; the refreshed
-                      // value itself isn't needed here.
-                      // ignore: unused_result
-                      await ref.refresh(memberListProvider.future);
-                      
-                      // Invalidate the search member list provider to force refresh
-                      ref.invalidate(searchMemberListWithYearProvider);
-                      
-                      // This will trigger a re-fetch of the search member list
-                      // which will then update the filteredSearchMemberListProvider automatically
-                      
-                      if (mounted) {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('အချက်အလက်များ သိမ်းဆည်းပြီးပါပြီ'),
-                            backgroundColor: Colors.green,
-                          ),
+              onTap: isLoading
+                  ? null
+                  : () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      try {
+                        // Create updated member with new status and note
+                        final updatedMember = Member(
+                          id: widget.member!.id,
+                          memberId: widget.member!.memberId,
+                          name: widget.member!.name,
+                          fatherName: widget.member!.fatherName,
+                          birthDate: widget.member!.birthDate,
+                          nrc: widget.member!.nrc,
+                          phone: widget.member!.phone,
+                          bloodBankCard: widget.member!.bloodBankCard,
+                          address: widget.member!.address,
+                          bloodType: widget.member!.bloodType,
+                          gender: widget.member!.gender,
+                          memberCount: widget.member!.memberCount,
+                          totalCount: widget.member!.totalCount,
+                          registerDate: widget.member!.registerDate,
+                          status: checked ? "available" : "not_available",
+                          lastDate: widget.member!.lastDate,
+                          note: remarkController.text.trim(),
                         );
+
+                        // Update member via repository
+                        await _repository.updateMember(
+                            widget.member!.id.toString(), updatedMember);
+
+                        // Refresh both member list and search list. Awaited only
+                        // so the re-fetch finishes before we pop; the refreshed
+                        // value itself isn't needed here.
+                        // ignore: unused_result
+                        await ref.refresh(memberListProvider.future);
+
+                        // Invalidate the search member list provider to force refresh
+                        ref.invalidate(searchMemberListWithYearProvider);
+
+                        // This will trigger a re-fetch of the search member list
+                        // which will then update the filteredSearchMemberListProvider automatically
+
+                        if (mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('အချက်အလက်များ သိမ်းဆည်းပြီးပါပြီ'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
-                    } catch (e) {
-                      if (mounted) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error: $e'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  },
+                    },
               child: Align(
                   alignment: Alignment.center,
                   child: Padding(
-                      padding: EdgeInsets.only(top: 8, bottom: 8, left: 30),
-                      child: isLoading 
-                        ? Center(
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-                              ),
-                            ),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "assets/images/remark.png",
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isNarrowPhone ? 12 : 30,
+                        vertical: 8,
+                      ),
+                      child: isLoading
+                          ? Center(
+                              child: SizedBox(
                                 width: 24,
                                 height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      primaryColor),
+                                ),
                               ),
-                              SizedBox(
-                                width: 30,
-                              ),
-                              Text(
-                                "မှတ်ချက်သိမ်းမည်",
-                                style:
-                                    TextStyle(fontSize: 16.0, color: Colors.black),
-                              ),
-                              SizedBox(
-                                width: 30,
-                              ),
-                            ],
-                      ))),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  "assets/images/remark.png",
+                                  width: 24,
+                                  height: 24,
+                                ),
+                                SizedBox(
+                                  width: isNarrowPhone ? 12 : 30,
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    "မှတ်ချက်သိမ်းမည်",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                if (!isNarrowPhone) const SizedBox(width: 30),
+                              ],
+                            ))),
             ),
           )
         ],

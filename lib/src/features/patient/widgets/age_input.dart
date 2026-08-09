@@ -96,20 +96,60 @@ class _AgeInputState extends State<AgeInput> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(flex: 3, child: _numberField(_yearsController, 'အသက် (နှစ်)')),
-            const SizedBox(width: 8),
-            Expanded(flex: 2, child: _numberField(_monthsController, 'လ')),
-            const SizedBox(width: 8),
-            Expanded(flex: 2, child: _numberField(_daysController, 'ရက်')),
-            IconButton(
-              tooltip: 'မွေးသက္ကရာဇ် ရွေးရန်',
-              icon: Icon(Icons.calendar_month, color: primaryColor),
-              onPressed: _pickDate,
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 360) {
+              return Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _numberField(
+                          _yearsController,
+                          'အသက် (နှစ်)',
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _calendarButton(),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _numberField(_monthsController, 'လ'),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _numberField(_daysController, 'ရက်'),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            }
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: _numberField(_yearsController, 'အသက် (နှစ်)'),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 2,
+                  child: _numberField(_monthsController, 'လ'),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 2,
+                  child: _numberField(_daysController, 'ရက်'),
+                ),
+                _calendarButton(),
+              ],
+            );
+          },
         ),
         if (_birthDate != null)
           Padding(
@@ -120,6 +160,18 @@ class _AgeInputState extends State<AgeInput> {
             ),
           ),
       ],
+    );
+  }
+
+  Widget _calendarButton() {
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: IconButton(
+        tooltip: 'မွေးသက္ကရာဇ် ရွေးရန်',
+        icon: Icon(Icons.calendar_month, color: primaryColor),
+        onPressed: _pickDate,
+      ),
     );
   }
 
@@ -139,7 +191,8 @@ class _AgeInputState extends State<AgeInput> {
         labelStyle: const TextStyle(fontSize: 13, color: Colors.black),
         fillColor: const Color(0xFFefefef),
         filled: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
           borderSide: const BorderSide(),
