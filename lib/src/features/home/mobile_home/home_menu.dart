@@ -122,7 +122,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: Text(
-              'Version 1.4.1',
+              'Version 1.5.1',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12,

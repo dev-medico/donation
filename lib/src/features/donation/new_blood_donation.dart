@@ -12,11 +12,8 @@ import 'package:donation/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
-import 'package:donation/src/features/donation_member/domain/member_repository.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
-import 'package:donation/src/features/services/member_service.dart'
-    as member_services;
 import 'package:donation/src/features/services/donation_service.dart';
 import 'package:donation/src/features/patient/models/patient.dart';
 import 'package:donation/src/features/patient/providers/patient_provider.dart';
@@ -59,7 +56,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
   List<Datum> datas = <Datum>[];
   bool switchNew = true;
   bool isFullForm = false; // Toggle for short/full form
-  bool isLoading = false;
+  bool isSubmitting = false;
 
   List<String> hospitalsSelected = <String>[];
   List<String> hospitals = <String>[
@@ -83,9 +80,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     "မုတ္တမတိုက်နယ်ဆေးရုံ",
     "အမေရိကန်ဆေးရုံ"
   ];
-  // This will use the cache from memberListProvider
-  List<Member> cachedMembers = [];
-
   List<String> diseasesSelected = <String>[];
   List<String> diseases = <String>[
     "......(ကင်ဆာ)",
@@ -130,8 +124,6 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
   void initState() {
     super.initState();
     initial();
-    // Load the cached members
-    _loadCachedMembers();
 
     // Set today's date as default donation date
     setState(() {
@@ -214,117 +206,19 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     });
   }
 
-  // New method to load cached members
-  void _loadCachedMembers() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-
-      // Check if we have members in the provider
-      final memberState = ref.read(memberListProvider);
-
-      if (memberState is AsyncData &&
-          memberState.value != null &&
-          memberState.value!.isNotEmpty) {
-        setState(() {
-          cachedMembers = memberState.value ?? [];
-          isLoading = false;
-        });
-        print('Using ${cachedMembers.length} members from provider cache');
-
-        // Debug: Check if specific member exists
-        final testMember = cachedMembers
-            .where((m) => m.name != null && m.name!.contains('ကိုဝေယံ'))
-            .toList();
-        if (testMember.isNotEmpty) {
-          print(
-              'Found test member: ${testMember.first.name} (ID: ${testMember.first.memberId})');
-        } else {
-          print('Test member "ကိုဝေယံ" not found in cached list');
-        }
-      } else {
-        // If not in provider, fetch and cache them
-        final memberService = ref.read(member_services.memberServiceProvider);
-        final memberRepository = MemberRepository();
-
-        try {
-          // Try to get from repository first
-          final members = await memberRepository.getMembers();
-          if (members.isNotEmpty) {
-            setState(() {
-              cachedMembers = members;
-              isLoading = false;
-            });
-            print(
-                'Loaded ${cachedMembers.length} members from repository cache');
-
-            // Refresh the provider via invalidation instead of direct state setting
-            ref.invalidate(memberListProvider);
-          } else {
-            // If repository is empty, force fetch from API
-            print('No members found in repository, fetching from API...');
-            final fetchedMembers = await memberService.getMembers();
-
-            if (fetchedMembers.isNotEmpty) {
-              final memberList =
-                  fetchedMembers.map((m) => Member.fromJson(m)).toList();
-
-              // Save to repository for future use
-              for (var member in memberList) {
-                await memberRepository.addMember(member);
-              }
-
-              setState(() {
-                cachedMembers = memberList;
-                isLoading = false;
-              });
-
-              // Refresh the provider
-              ref.invalidate(memberListProvider);
-              print(
-                  'Fetched and cached ${cachedMembers.length} members from API');
-            } else {
-              setState(() {
-                cachedMembers = [];
-                isLoading = false;
-              });
-              print('No members found in API');
-            }
-          }
-        } catch (e) {
-          // If any errors occur during repository or API fetch, try direct API fetch as last resort
-          print('Error with repository fetch: $e, trying direct API call');
-          try {
-            final fetchedMembers = await memberService.getMembers();
-            final memberList =
-                fetchedMembers.map((m) => Member.fromJson(m)).toList();
-
-            setState(() {
-              cachedMembers = memberList;
-              isLoading = false;
-            });
-
-            // Refresh the provider
-            ref.invalidate(memberListProvider);
-            print(
-                'Recovered with direct API fetch: ${cachedMembers.length} members');
-          } catch (finalError) {
-            setState(() {
-              cachedMembers = [];
-              isLoading = false;
-            });
-            print('Failed to fetch members after all attempts: $finalError');
-          }
-        }
-      }
-    } catch (e) {
-      setState(() {
-        cachedMembers = [];
-        isLoading = false;
-      });
-      print('Error loading cached members: $e');
+  /// Search donors on demand instead of downloading the complete member list
+  /// before the form can be shown. The member endpoint searches name, member
+  /// ID, phone, father name, and blood-bank card server-side.
+  Future<List<Member>> _searchMembers(String pattern) {
+    final query = pattern.trim();
+    if (query.length < 2) {
+      return Future.value(const <Member>[]);
     }
+
+    return ref
+        .read(memberRepositoryProvider)
+        .getInitialMembers(limit: 25, query: query)
+        .timeout(const Duration(seconds: 12));
   }
 
   // Toggle between short and full form
@@ -368,7 +262,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
     }
 
     setState(() {
-      isLoading = true;
+      isSubmitting = true;
     });
 
     // Create the donation data with formatted address
@@ -412,10 +306,12 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       final donationService = ref.read(donationServiceProvider);
       await donationService.createDonation(donationData);
 
+      if (!mounted) return;
+
       ref.invalidate(donationsByMonthYearProvider);
 
       setState(() {
-        isLoading = false;
+        isSubmitting = false;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -431,8 +327,10 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
       // Pop back to previous screen after successful creation
       Navigator.of(context).pop();
     } catch (e) {
+      if (!mounted) return;
+
       setState(() {
-        isLoading = false;
+        isSubmitting = false;
       });
       print('Error creating donation: $e');
       Utils.messageDialog("သွေးလှူဒါန်းမှု အသစ်ထည့်ခြင်း \nမအောင်မြင်ပါ - $e",
@@ -498,13 +396,23 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.sizeOf(context).width < 700;
+    final isKeyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
+
     return Scaffold(
+      backgroundColor: isMobile ? const Color(0xFFF8F6F6) : null,
       appBar: AppBar(
         title: Text(
           'သွေးလှူဒါန်းမှု အသစ်ထည့်ရန်',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: isMobile ? 17 : 16,
+            fontWeight: isMobile ? FontWeight.w600 : FontWeight.normal,
+          ),
         ),
         backgroundColor: primaryColor,
+        elevation: isMobile ? 0 : null,
+        scrolledUnderElevation: isMobile ? 0 : null,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -524,53 +432,243 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
           ),
         ],
       ),
-      body: isLoading
+      body: !isMobile && isSubmitting
           ? const Center(child: CircularProgressIndicator())
           : LayoutBuilder(
               builder: (context, constraints) {
-                final isMobile = constraints.maxWidth < 600;
-
-                return SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: SizedBox(
-                      width: isMobile
-                          ? double.infinity
-                          : MediaQuery.of(context).size.width * 0.5,
-                      child: isFullForm ? _buildFullForm() : _buildShortForm(),
+                return SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: Theme(
+                    data: isMobile
+                        ? _buildMobileFormTheme(context)
+                        : Theme.of(context),
+                    child: SingleChildScrollView(
+                      keyboardDismissBehavior: isMobile
+                          ? ScrollViewKeyboardDismissBehavior.onDrag
+                          : ScrollViewKeyboardDismissBehavior.manual,
+                      physics:
+                          isMobile ? const ClampingScrollPhysics() : null,
+                      padding: EdgeInsets.fromLTRB(
+                        16,
+                        16,
+                        16,
+                        isMobile ? 32 : 16,
+                      ),
+                      child: SizedBox(
+                        width: isMobile
+                            ? double.infinity
+                            : MediaQuery.of(context).size.width * 0.5,
+                        child:
+                            isFullForm ? _buildFullForm() : _buildShortForm(),
+                      ),
                     ),
                   ),
                 );
               },
             ),
+      bottomNavigationBar: isMobile && !isKeyboardVisible
+          ? _buildMobileSubmitBar()
+          : null,
     );
   }
+
+  bool get _isMobileLayout => MediaQuery.sizeOf(context).width < 700;
+
+  ThemeData _buildMobileFormTheme(BuildContext context) {
+    final theme = Theme.of(context);
+    const fieldBorderColor = Color(0xFFD9D4D4);
+
+    return theme.copyWith(
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFFFCFBFB),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        labelStyle: const TextStyle(
+          color: Color(0xFF686363),
+          fontSize: 14,
+        ),
+        hintStyle: const TextStyle(
+          color: Color(0xFF8A8585),
+          fontSize: 14,
+        ),
+        suffixIconColor: const Color(0xFF5C5656),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: fieldBorderColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: fieldBorderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: primaryColor, width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileSubmitBar() {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: const Border(
+            top: BorderSide(color: Color(0xFFE9E4E4)),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 14,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: _buildSubmitButton(),
+      ),
+    );
+  }
+
+  void _submitDonation() {
+    addDonation(
+      nameController.text,
+      ageController.text,
+      hospitalController.text,
+      diseaseController.text,
+      quarterController.text,
+      townController.text,
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: _isMobileLayout ? 54 : 50,
+      child: ElevatedButton(
+        onPressed: isSubmitting ? null : _submitDonation,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white,
+          elevation: _isMobileLayout ? 0 : 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(_isMobileLayout ? 12 : 8),
+          ),
+        ),
+        child: isSubmitting && _isMobileLayout
+            ? const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.2,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    'ထည့်သွင်းနေသည်…',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              )
+            : Text(
+                'သွေးလှူဒါန်းမှု ထည့်သွင်းမည်',
+                style: TextStyle(
+                  fontSize: _isMobileLayout ? 15 : 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title, IconData icon) {
+    if (!_isMobileLayout) {
+      return Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: primaryColor.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, size: 21, color: primaryColor),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              height: 1.45,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2B2727),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  double get _sectionCardElevation => _isMobileLayout ? 0 : 2;
+
+  EdgeInsetsGeometry? get _sectionCardMargin =>
+      _isMobileLayout ? EdgeInsets.zero : null;
+
+  Color? get _sectionCardColor => _isMobileLayout ? Colors.white : null;
+
+  ShapeBorder get _sectionCardShape => RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_isMobileLayout ? 16 : 8),
+        side: _isMobileLayout
+            ? const BorderSide(color: Color(0xFFE8E2E2))
+            : BorderSide.none,
+      );
 
   // Short form with essential fields only
   Widget _buildShortForm() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: _isMobileLayout
+          ? CrossAxisAlignment.stretch
+          : CrossAxisAlignment.start,
       children: [
         // Blood donor selection (Member)
         Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          elevation: _sectionCardElevation,
+          margin: _sectionCardMargin,
+          color: _sectionCardColor,
+          surfaceTintColor: Colors.transparent,
+          shape: _sectionCardShape,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                _buildSectionTitle(
                   'သွေးလှူဒါန်းသူ ရွေးချယ်ရန်',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  Icons.person_search,
                 ),
                 SizedBox(height: 16),
                 TypeAheadField<Member>(
+                  debounceDuration: const Duration(milliseconds: 350),
                   textFieldConfiguration: TextFieldConfiguration(
                     controller: memberController,
                     decoration: InputDecoration(
@@ -580,41 +678,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                       suffixIcon: Icon(Icons.search),
                     ),
                   ),
-                  suggestionsCallback: (pattern) {
-                    if (pattern.isEmpty) {
-                      return [];
-                    }
-                    // Normalize the search pattern for better Burmese text matching
-                    final searchPattern = pattern.trim();
-
-                    print(
-                        'Searching for: "$searchPattern" in ${cachedMembers.length} members');
-
-                    final results = cachedMembers
-                        .where((member) {
-                          // Search in multiple fields for better results
-                          final nameMatch = member.name != null &&
-                              member.name!.contains(searchPattern);
-                          final memberIdMatch = member.memberId != null &&
-                              member.memberId!.contains(searchPattern);
-                          final phoneMatch = member.phone != null &&
-                              member.phone!.contains(searchPattern);
-
-                          // Debug specific member
-                          if (member.name != null &&
-                              member.name!.contains('ကိုဝေယံ')) {
-                            print(
-                                'Found ကိုဝေယံ - Checking match: name=$nameMatch, id=$memberIdMatch, phone=$phoneMatch');
-                          }
-
-                          return nameMatch || memberIdMatch || phoneMatch;
-                        })
-                        .take(300) // Increased to show more results
-                        .toList();
-
-                    print('Found ${results.length} matching members');
-                    return results;
-                  },
+                  suggestionsCallback: _searchMembers,
                   itemBuilder: (context, Member member) {
                     return ListTile(
                       title: Text(member.name ?? ''),
@@ -633,6 +697,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                 if (selectedMember != null) ...[
                   SizedBox(height: 16),
                   Container(
+                    width: _isMobileLayout ? double.infinity : null,
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
@@ -658,21 +723,19 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
         // Patient Information
         Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          elevation: _sectionCardElevation,
+          margin: _sectionCardMargin,
+          color: _sectionCardColor,
+          surfaceTintColor: Colors.transparent,
+          shape: _sectionCardShape,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                _buildSectionTitle(
                   'လူနာအချက်အလက်',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  Icons.person_outline,
                 ),
                 SizedBox(height: 16),
 
@@ -958,21 +1021,19 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
         // Donation Date
         Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          elevation: _sectionCardElevation,
+          margin: _sectionCardMargin,
+          color: _sectionCardColor,
+          surfaceTintColor: Colors.transparent,
+          shape: _sectionCardShape,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                _buildSectionTitle(
                   'လှူဒါန်းသည့် ရက်စွဲ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  Icons.calendar_today_outlined,
                 ),
                 SizedBox(height: 16),
                 GestureDetector(
@@ -991,10 +1052,17 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     }
                   },
                   child: Container(
+                    width: _isMobileLayout ? double.infinity : null,
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(4),
+                      color: _isMobileLayout ? const Color(0xFFFCFBFB) : null,
+                      border: Border.all(
+                        color: _isMobileLayout
+                            ? const Color(0xFFD9D4D4)
+                            : Colors.grey,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(_isMobileLayout ? 12 : 4),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1007,7 +1075,10 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                 : Colors.grey,
                           ),
                         ),
-                        Icon(Icons.calendar_today),
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          color: _isMobileLayout ? primaryColor : null,
+                        ),
                       ],
                     ),
                   ),
@@ -1019,34 +1090,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
         SizedBox(height: 24),
 
         // Submit Button
-        SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            onPressed: () {
-              final name = nameController.text;
-              final age = ageController.text;
-              final hospital = hospitalController.text;
-              final disease = diseaseController.text;
-              final quarter = quarterController.text;
-              final township = townController.text;
-
-              addDonation(name, age, hospital, disease, quarter, township);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 2,
-            ),
-            child: Text(
-              'သွေးလှူဒါန်းမှု ထည့်သွင်းမည်',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
+        if (!_isMobileLayout) _buildSubmitButton(),
       ],
     );
   }
@@ -1054,28 +1098,29 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
   // Full form with all fields
   Widget _buildFullForm() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: _isMobileLayout
+          ? CrossAxisAlignment.stretch
+          : CrossAxisAlignment.start,
       children: [
         // Blood donor selection (Member)
         Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          elevation: _sectionCardElevation,
+          margin: _sectionCardMargin,
+          color: _sectionCardColor,
+          surfaceTintColor: Colors.transparent,
+          shape: _sectionCardShape,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                _buildSectionTitle(
                   'သွေးလှူဒါန်းသူ ရွေးချယ်ရန်',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  Icons.person_search,
                 ),
                 SizedBox(height: 16),
                 TypeAheadField<Member>(
+                  debounceDuration: const Duration(milliseconds: 350),
                   textFieldConfiguration: TextFieldConfiguration(
                     controller: memberController,
                     decoration: InputDecoration(
@@ -1085,34 +1130,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                       suffixIcon: Icon(Icons.search),
                     ),
                   ),
-                  suggestionsCallback: (pattern) {
-                    if (pattern.isEmpty) {
-                      return [];
-                    }
-                    // Normalize the search pattern for better Burmese text matching
-                    final searchPattern = pattern.trim();
-
-                    print(
-                        'Searching for: "$searchPattern" in ${cachedMembers.length} members');
-
-                    final results = cachedMembers
-                        .where((member) {
-                          // Search in multiple fields for better results
-                          final nameMatch = member.name != null &&
-                              member.name!.contains(searchPattern);
-                          final memberIdMatch = member.memberId != null &&
-                              member.memberId!.contains(searchPattern);
-                          final phoneMatch = member.phone != null &&
-                              member.phone!.contains(searchPattern);
-
-                          return nameMatch || memberIdMatch || phoneMatch;
-                        })
-                        .take(300) // Increased to show more results
-                        .toList();
-
-                    print('Found ${results.length} matching members');
-                    return results;
-                  },
+                  suggestionsCallback: _searchMembers,
                   itemBuilder: (context, Member member) {
                     return ListTile(
                       title: Text(member.name ?? ''),
@@ -1131,6 +1149,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                 if (selectedMember != null) ...[
                   SizedBox(height: 16),
                   Container(
+                    width: _isMobileLayout ? double.infinity : null,
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
@@ -1164,21 +1183,19 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
         // Patient Information
         Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          elevation: _sectionCardElevation,
+          margin: _sectionCardMargin,
+          color: _sectionCardColor,
+          surfaceTintColor: Colors.transparent,
+          shape: _sectionCardShape,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                _buildSectionTitle(
                   'လူနာအချက်အလက်',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  Icons.person_outline,
                 ),
                 SizedBox(height: 16),
 
@@ -1464,21 +1481,19 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
 
         // Donation Date
         Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          elevation: _sectionCardElevation,
+          margin: _sectionCardMargin,
+          color: _sectionCardColor,
+          surfaceTintColor: Colors.transparent,
+          shape: _sectionCardShape,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                _buildSectionTitle(
                   'လှူဒါန်းသည့် ရက်စွဲ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  Icons.calendar_today_outlined,
                 ),
                 SizedBox(height: 16),
                 GestureDetector(
@@ -1497,10 +1512,17 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                     }
                   },
                   child: Container(
+                    width: _isMobileLayout ? double.infinity : null,
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(4),
+                      color: _isMobileLayout ? const Color(0xFFFCFBFB) : null,
+                      border: Border.all(
+                        color: _isMobileLayout
+                            ? const Color(0xFFD9D4D4)
+                            : Colors.grey,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(_isMobileLayout ? 12 : 4),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1513,7 +1535,10 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                                 : Colors.grey,
                           ),
                         ),
-                        Icon(Icons.calendar_today),
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          color: _isMobileLayout ? primaryColor : null,
+                        ),
                       ],
                     ),
                   ),
@@ -1525,34 +1550,7 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
         SizedBox(height: 24),
 
         // Submit Button
-        SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            onPressed: () {
-              final name = nameController.text;
-              final age = ageController.text;
-              final hospital = hospitalController.text;
-              final disease = diseaseController.text;
-              final quarter = quarterController.text;
-              final township = townController.text;
-
-              addDonation(name, age, hospital, disease, quarter, township);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 2,
-            ),
-            child: Text(
-              'သွေးလှူဒါန်းမှု ထည့်သွင်းမည်',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
+        if (!_isMobileLayout) _buildSubmitButton(),
       ],
     );
   }

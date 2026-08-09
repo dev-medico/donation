@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: "none"
 
-version: 1.5.0+174
+version: 1.5.1+175
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -80,6 +80,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  # CocoaPods is required for reliable Xcode archives with file_picker 8.x;
+  # its Swift package currently loses DKImagePickerController during Archive.
+  config:
+    enable-swift-package-manager: false
   assets:
     - assets/images/
     - assets/json/
