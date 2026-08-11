@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:donation/src/features/donation_member/data/search_member_repository.dart';
-import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/donation_member/presentation/search_member.dart';
 import 'package:flutter/material.dart';
@@ -10,18 +9,31 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class _PendingSearchMemberRepository extends SearchMemberRepository {
   int requestCount = 0;
-  final _firstRequest = Completer<List<Member>>();
-  final _retryRequest = Completer<List<Member>>();
+  final _firstRequest = Completer<SearchMemberPage>();
+  final _retryRequest = Completer<SearchMemberPage>();
 
-  void completeRetry() => _retryRequest.complete(const []);
+  void completeRetry() => _retryRequest.complete(
+        const SearchMemberPage(
+          members: [],
+          total: 0,
+          analysis: SearchMemberAnalysis(
+            total: 0,
+            green: 0,
+            yellow: 0,
+            red: 0,
+          ),
+          page: 0,
+          limit: 50,
+        ),
+      );
 
   @override
-  Future<List<Member>> searchMembers({
+  Future<SearchMemberPage> searchMembers({
     String? query,
     String? bloodType,
-    String? donationYear,
+    String? availability,
     int page = 0,
-    int limit = 5000,
+    int limit = 50,
   }) {
     requestCount += 1;
     return requestCount == 1 ? _firstRequest.future : _retryRequest.future;
@@ -65,8 +77,7 @@ void main() {
     repository.completeRetry();
     await tester.pump();
 
-    expect(find.text('ရှာဖွေမှုနှင့် ကိုက်ညီသော သွေးလှူရှင် မရှိပါ'),
-        findsOneWidget);
+    expect(find.text('ဤအခြေအနေတွင် သွေးလှူရှင် မရှိပါ'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();

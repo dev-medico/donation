@@ -1,10 +1,10 @@
 import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation_member/domain/donor_eligibility.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/common_dialog.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:donation/src/features/donation_member/data/member_repository.dart';
 import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 
 class RemarkWriteDialog extends ConsumerStatefulWidget {
@@ -19,13 +19,13 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
   TextEditingController remarkController = TextEditingController();
   bool checked = false;
   bool isLoading = false;
-  final MemberRepository _repository = MemberRepository();
 
   @override
   void initState() {
     super.initState();
-    checked = widget.member!.status == "available";
-    remarkController.text = widget.member!.note ?? "";
+    checked = widget.member?.canDonate ?? true;
+    remarkController.text =
+        DonorEligibility.normalizeRemark(widget.member?.note);
   }
 
   @override
@@ -40,7 +40,7 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
         Responsive.isMobile(context) && MediaQuery.sizeOf(context).width <= 360;
 
     return CommonDialog(
-      title: "မှတ်ချက်ရေးရန်",
+      title: "လှူဒါန်းနိုင်မှု ပြင်ရန်",
       width: Responsive.isMobile(context)
           ? MediaQuery.of(context).size.width
           : MediaQuery.of(context).size.width * 0.3,
@@ -62,27 +62,52 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    checked ? 'သွေးလှူနိုင်သည်' : 'သွေးမလှူနိုင်ပါ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color:
-                          checked ? Colors.green.shade700 : Colors.red.shade700,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        checked
+                            ? 'လှူဒါန်းခွင့် ဖွင့်ထားသည်'
+                            : 'လှူဒါန်းခွင့် ပိတ်ထားသည်',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: checked
+                              ? Colors.green.shade800
+                              : Colors.red.shade800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        checked
+                            ? '၄ လစောင့်ဆိုင်းကာလ သို့မဟုတ် မှတ်ချက်ရှိလျှင် အဝါရောင်ဖြင့် ဆက်လက်ပြပါမည်။'
+                            : 'စာရင်းတွင် အနီရောင်ဖြင့် ပြပါမည်။',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          height: 1.4,
+                          color: checked
+                              ? Colors.green.shade800
+                              : Colors.red.shade800,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 8),
-                Switch(
-                  value: checked,
-                  onChanged: (value) {
-                    setState(() {
-                      checked = value;
-                    });
-                  },
-                  activeThumbColor: Colors.green,
-                  inactiveThumbColor: Colors.red,
-                  inactiveTrackColor: Colors.red.shade200,
+                Semantics(
+                  label: 'လှူဒါန်းခွင့်',
+                  value: checked ? 'ဖွင့်ထားသည်' : 'ပိတ်ထားသည်',
+                  child: Switch(
+                    value: checked,
+                    onChanged: (value) {
+                      setState(() {
+                        checked = value;
+                      });
+                    },
+                    activeThumbColor: Colors.green,
+                    inactiveThumbColor: Colors.red,
+                    inactiveTrackColor: Colors.red.shade200,
+                  ),
                 ),
               ],
             ),
@@ -100,8 +125,10 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
               onChanged: (val) {},
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: '',
-                hintStyle: const TextStyle(color: Colors.black, fontSize: 15.0),
+                labelText: 'မှတ်ချက် (ရှိပါက)',
+                hintText:
+                    'ဆက်သွယ်မေးမြန်းရန် သို့မဟုတ် သတိပြုရန် အချက်ကို ရေးပါ',
+                hintStyle: TextStyle(color: Colors.grey[500], fontSize: 13.0),
                 fillColor: Colors.white.withValues(alpha: 0.2),
                 filled: true,
                 suffixIcon: Padding(
@@ -130,18 +157,11 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
             ),
           ),
           Container(
-            width: Responsive.isMobile(context)
-                ? MediaQuery.of(context).size.width
-                : MediaQuery.of(context).size.width * 0.3,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey),
-                borderRadius: const BorderRadius.all(Radius.circular(12.0))),
+            width: double.infinity,
             margin:
-                const EdgeInsets.only(left: 15, bottom: 16, right: 15, top: 34),
-            child: GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTap: isLoading
+                const EdgeInsets.only(left: 12, bottom: 16, right: 12, top: 28),
+            child: FilledButton.icon(
+              onPressed: isLoading
                   ? null
                   : () async {
                       setState(() {
@@ -149,42 +169,19 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
                       });
 
                       try {
-                        // Create updated member with new status and note
-                        final updatedMember = Member(
-                          id: widget.member!.id,
-                          memberId: widget.member!.memberId,
-                          name: widget.member!.name,
-                          fatherName: widget.member!.fatherName,
-                          birthDate: widget.member!.birthDate,
-                          nrc: widget.member!.nrc,
-                          phone: widget.member!.phone,
-                          bloodBankCard: widget.member!.bloodBankCard,
-                          address: widget.member!.address,
-                          bloodType: widget.member!.bloodType,
-                          gender: widget.member!.gender,
-                          memberCount: widget.member!.memberCount,
-                          totalCount: widget.member!.totalCount,
-                          registerDate: widget.member!.registerDate,
-                          status: checked ? "available" : "not_available",
-                          lastDate: widget.member!.lastDate,
+                        // Only update the two fields controlled by this dialog.
+                        // Search rows contain a derived last donation date, so
+                        // reposting the whole row could overwrite newer data.
+                        final repository = ref.read(memberRepositoryProvider);
+                        await repository.updateMemberAvailability(
+                          widget.member!.id.toString(),
+                          canDonate: checked,
                           note: remarkController.text.trim(),
                         );
 
-                        // Update member via repository
-                        await _repository.updateMember(
-                            widget.member!.id.toString(), updatedMember);
-
-                        // Refresh both member list and search list. Awaited only
-                        // so the re-fetch finishes before we pop; the refreshed
-                        // value itself isn't needed here.
-                        // ignore: unused_result
-                        await ref.refresh(memberListProvider.future);
-
-                        // Invalidate the search member list provider to force refresh
-                        ref.invalidate(searchMemberListWithYearProvider);
-
-                        // This will trigger a re-fetch of the search member list
-                        // which will then update the filteredSearchMemberListProvider automatically
+                        // Both views will re-fetch from the updated source.
+                        ref.invalidate(memberListProvider);
+                        ref.invalidate(searchMemberListProvider);
 
                         if (mounted) {
                           Navigator.pop(context);
@@ -209,49 +206,31 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
                         }
                       }
                     },
-              child: Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isNarrowPhone ? 12 : 30,
-                        vertical: 8,
+              icon: isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
                       ),
-                      child: isLoading
-                          ? Center(
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      primaryColor),
-                                ),
-                              ),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  "assets/images/remark.png",
-                                  width: 24,
-                                  height: 24,
-                                ),
-                                SizedBox(
-                                  width: isNarrowPhone ? 12 : 30,
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    "မှတ်ချက်သိမ်းမည်",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                if (!isNarrowPhone) const SizedBox(width: 30),
-                              ],
-                            ))),
+                    )
+                  : const Icon(Icons.save_outlined),
+              label: Text(
+                isLoading ? 'သိမ်းဆည်းနေပါသည်...' : 'အချက်အလက် သိမ်းမည်',
+                style: const TextStyle(fontFamily: 'MyanUni'),
+              ),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                backgroundColor: primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: TextStyle(
+                  fontSize: isNarrowPhone ? 14 : 15,
+                  fontFamily: 'MyanUni',
+                ),
+              ),
             ),
           )
         ],

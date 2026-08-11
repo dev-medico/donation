@@ -14,9 +14,11 @@ import 'package:donation/src/features/services/donation_service.dart';
 
 class DonationDetailScreen extends ConsumerStatefulWidget {
   final Donation data;
+  final bool isPreview;
   DonationDetailScreen({
     Key? key,
     required this.data,
+    this.isPreview = false,
   }) : super(key: key);
 
   @override
@@ -45,7 +47,6 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
           padding: const EdgeInsets.only(top: 4, right: 20),
           child: Center(
             child: Text("သွေးလှူဒါန်းမှု အချက်အလက်များ",
-                textScaleFactor: 1.0,
                 style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 15 : 16,
                     color: Colors.white)),
@@ -337,13 +338,13 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                           : MediaQuery.of(context).size.width * 0.5,
                       decoration: shadowDecoration(Colors.white),
                       margin: const EdgeInsets.only(
-                          left: 20, right: 20, bottom: 20),
-                      padding: const EdgeInsets.all(20),
+                          left: 12, right: 12, bottom: 16),
+                      padding: const EdgeInsets.all(14),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Row(
                             children: [
-                              const SizedBox(width: 8),
                               Image.asset(
                                 "assets/images/blood_bag.png",
                                 width: 32,
@@ -361,19 +362,13 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTap: goToDetail,
-                                child: SizedBox(
-                                  width: 44,
-                                  height: 44,
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/images/detail.png",
-                                      width: 28,
-                                      color: Colors.black,
-                                    ),
-                                  ),
+                              IconButton(
+                                tooltip: 'အဖွဲ့ဝင်အချက်အလက် ကြည့်ရန်',
+                                onPressed: goToDetail,
+                                icon: Image.asset(
+                                  "assets/images/detail.png",
+                                  width: 28,
+                                  color: Colors.black,
                                 ),
                               ),
                             ],
@@ -381,237 +376,34 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                           const SizedBox(
                             height: 8,
                           ),
-                          Container(
-                            height: 1,
-                            width: MediaQuery.of(context).size.width - 80,
-                            color: Colors.grey,
-                          ),
+                          const Divider(height: 1, color: Colors.grey),
                           const SizedBox(
                             height: 8,
                           ),
-                          if (MediaQuery.of(context).size.width < 480) ...[
-                            _buildCompactMobileInfoRow(
-                              'အဖွဲ့ဝင်အမှတ်',
-                              data.memberObj?.memberId?.toString() ?? '-',
-                            ),
-                            _buildCompactMobileInfoRow(
-                              'အမည်',
-                              data.memberObj?.name?.toString() ?? '-',
-                            ),
-                            _buildCompactMobileInfoRow(
-                              'အဖအမည်',
-                              data.memberObj?.fatherName?.toString() ?? '-',
-                            ),
-                            _buildCompactMobileInfoRow(
-                              'သွေးအုပ်စု',
-                              data.memberObj?.bloodType?.toString() ?? '-',
-                            ),
-                            _buildCompactMobileInfoRow(
-                              'မွေးသက္ကရာဇ်',
-                              data.memberObj?.birthDate?.toString() ?? '-',
-                            ),
-                            _buildCompactMobileInfoRow(
-                              'သွေးဘဏ်ကတ်',
-                              data.memberObj?.bloodBankCard?.toString() ?? '-',
-                            ),
-                          ] else ...[
-                            Row(
-                              children: [
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                const Expanded(
-                                  flex: 3,
-                                  child: Text("အဖွဲ့ဝင်အမှတ်",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color.fromARGB(
-                                              255, 116, 112, 112))),
-                                ),
-                                const Text("-",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black)),
-                                const SizedBox(
-                                  width: 24,
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    data.memberObj?.memberId?.toString() ?? "-",
-                                    style: const TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Row(
-                              children: [
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                const Expanded(
-                                  flex: 2,
-                                  child: Text("အမည်",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color.fromARGB(
-                                              255, 116, 112, 112))),
-                                ),
-                                const Text("-",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black)),
-                                const SizedBox(
-                                  width: 24,
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    data.memberObj?.name?.toString() ?? "-",
-                                    style: const TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 12,
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text("အဖအမည်",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color.fromARGB(
-                                              255, 116, 112, 112))),
-                                ),
-                                Text("-",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black)),
-                                SizedBox(
-                                  width: 24,
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    data.memberObj?.fatherName?.toString() ??
-                                        "-",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 12,
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text("သွေးအုပ်စု",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color.fromARGB(
-                                              255, 116, 112, 112))),
-                                ),
-                                Text("-",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black)),
-                                SizedBox(
-                                  width: 24,
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    data.memberObj?.bloodType?.toString() ??
-                                        "-",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Row(
-                              children: [
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                const Expanded(
-                                  flex: 2,
-                                  child: Text("မွေးသက္ကရာဇ်",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color.fromARGB(
-                                              255, 116, 112, 112))),
-                                ),
-                                const Text("-",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black)),
-                                const SizedBox(
-                                  width: 24,
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    data.memberObj?.birthDate?.toString() ??
-                                        "-",
-                                    style: const TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Row(
-                              children: [
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                const Expanded(
-                                  flex: 2,
-                                  child: Text("သွေးဘဏ်ကတ်",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color.fromARGB(
-                                              255, 116, 112, 112))),
-                                ),
-                                const Text("-",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black)),
-                                const SizedBox(
-                                  width: 24,
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    data.memberObj?.bloodBankCard?.toString() ??
-                                        "-",
-                                    style: const TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                          ],
+                          _buildCompactMobileInfoRow(
+                            'အဖွဲ့ဝင်အမှတ်',
+                            data.memberObj?.memberId?.toString() ?? '-',
+                          ),
+                          _buildCompactMobileInfoRow(
+                            'အမည်',
+                            data.memberObj?.name?.toString() ?? '-',
+                          ),
+                          _buildCompactMobileInfoRow(
+                            'အဖအမည်',
+                            data.memberObj?.fatherName?.toString() ?? '-',
+                          ),
+                          _buildCompactMobileInfoRow(
+                            'သွေးအုပ်စု',
+                            data.memberObj?.bloodType?.toString() ?? '-',
+                          ),
+                          _buildCompactMobileInfoRow(
+                            'မွေးသက္ကရာဇ်',
+                            data.memberObj?.birthDate?.toString() ?? '-',
+                          ),
+                          _buildCompactMobileInfoRow(
+                            'သွေးဘဏ်ကတ်',
+                            data.memberObj?.bloodBankCard?.toString() ?? '-',
+                          ),
                         ],
                       ),
                     ),
@@ -1062,93 +854,101 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
                 ),
           Container(
             margin: EdgeInsets.only(
-                left: 16,
+                left: Responsive.isMobile(context) ? 12 : 16,
                 right: Responsive.isMobile(context)
-                    ? 16
+                    ? 12
                     : MediaQuery.of(context).size.width * 0.54,
                 top: Responsive.isMobile(context) ? 0 : 26),
             child: Row(
               children: [
                 Expanded(
-                  child: Container(
-                    height: 50,
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(12.0))),
-                    margin: const EdgeInsets.only(bottom: 16, right: 6),
-                    width: double.infinity,
-                    child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.delete,
-                              size: 28,
-                              color: primaryColor,
-                            ),
-                            const SizedBox(
-                              width: 12,
-                            ),
-                            Text("ဖျက်မည်",
-                                style: TextStyle(
-                                    fontSize: 15, color: primaryColor)),
-                          ],
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16, right: 5),
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        if (widget.isPreview) {
+                          _showPreviewMessage();
+                          return;
+                        }
+                        messageDialog(
+                            "အချက်အလက် ပယ်ဖျက်မည်မှာ \nသေချာပါသလား ? ",
+                            context,
+                            "သေချာပါသည်",
+                            Colors.black);
+                      },
+                      icon: const Icon(Icons.delete_outline, size: 22),
+                      label: const Text(
+                        "ဖျက်မည်",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: primaryColor,
+                        backgroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(50),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        side: BorderSide(
+                            color: primaryColor.withValues(alpha: .3)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        onTap: () {
-                          messageDialog(
-                              "အချက်အလက် ပယ်ဖျက်မည်မှာ \nသေချာပါသလား ? ",
-                              context,
-                              "သေချာပါသည်",
-                              Colors.black);
-                        }),
+                        textStyle: const TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'MyanUni',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: Container(
-                    height: 50,
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(12.0))),
-                    margin: const EdgeInsets.only(
-                      left: 6,
-                      bottom: 16,
-                    ),
-                    width: double.infinity,
-                    child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              "assets/images/edit.png",
-                              width: 24,
-                              color: Colors.green,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 5, bottom: 16),
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        if (widget.isPreview) {
+                          _showPreviewMessage();
+                          return;
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BloodDonationEditScreen(
+                              data: data,
                             ),
-                            const SizedBox(
-                              width: 12,
-                            ),
-                            const Text("ပြင်ဆင်မည်",
-                                style: TextStyle(
-                                    fontSize: 15, color: Colors.green)),
-                          ],
+                          ),
+                        ).then((_) {
+                          // Refresh data when returning from edit screen.
+                          ref.invalidate(donationsByMonthYearProvider((
+                            month: DateTime.now().month,
+                            year: DateTime.now().year,
+                          )));
+                        });
+                      },
+                      icon: const Icon(Icons.edit_outlined, size: 22),
+                      label: const Text(
+                        "ပြင်ဆင်မည်",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.green.shade700,
+                        backgroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(50),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        side: BorderSide(
+                          color: Colors.green.shade700.withValues(alpha: .3),
                         ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BloodDonationEditScreen(
-                                data: data,
-                              ),
-                            ),
-                          ).then((_) {
-                            // Refresh data when returning from edit screen
-                            ref.invalidate(donationsByMonthYearProvider((
-                              month: int.parse(DateTime.now().month.toString()),
-                              year: int.parse(DateTime.now().year.toString())
-                            )));
-                          });
-                        }),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'MyanUni',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -1160,24 +960,48 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
   }
 
   Widget _buildCompactMobileInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Color.fromARGB(255, 116, 112, 112),
-            ),
+    return Semantics(
+      container: true,
+      label: '$label၊ $value',
+      excludeSemantics: true,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 104,
+                child: Text(
+                  label,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: Color.fromARGB(255, 116, 112, 112),
+                  ),
+                ),
+              ),
+              const Text(
+                ':',
+                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  value,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    height: 1.4,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 3),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14, color: Colors.black),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -1339,6 +1163,10 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
   }
 
   void goToDetail() {
+    if (widget.isPreview) {
+      _showPreviewMessage();
+      return;
+    }
     if (data.memberObj != null && data.memberObj!.id != null) {
       Navigator.push(
         context,
@@ -1366,5 +1194,13 @@ class _DonationDetailScreenState extends ConsumerState<DonationDetailScreen> {
         ),
       );
     }
+  }
+
+  void _showPreviewMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('ဒီလုပ်ဆောင်ချက်ကို နမူနာမြင်ကွင်းတွင် ပိတ်ထားပါသည်'),
+      ),
+    );
   }
 }

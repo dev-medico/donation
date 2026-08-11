@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/member_service.dart' as ms;
+import 'package:donation/src/features/services/donation_service.dart';
+import 'package:donation/src/features/donation_member/domain/donor_eligibility.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/domain/member_range.dart';
 import 'package:donation/src/features/donation_member/data/member_repository.dart';
@@ -169,31 +171,191 @@ final memberListProvider = FutureProvider.autoDispose<List<Member>>((ref) {
   return repository.getAllMembers(forceRefresh: false);
 });
 
-// Separate provider for search member list with year filter
+// Find Blood analyses the complete filtered directory on the backend, while the
+// client keeps only a small paginated window in memory.
 const _searchMemberRequestTimeout = Duration(seconds: 20);
+const _searchMemberPageSize = 50;
 
-final searchMemberListWithYearProvider =
-    FutureProvider.autoDispose<List<Member>>((ref) async {
+class SearchMemberDirectoryState {
+  const SearchMemberDirectoryState({
+    required this.members,
+    required this.analysis,
+    required this.filteredTotal,
+    required this.page,
+    required this.hasMore,
+    this.isLoadingMore = false,
+    this.loadMoreError,
+  });
+
+  final List<Member> members;
+  final SearchMemberAnalysis? analysis;
+
+  /// Total after all active filters, including the availability chip.
+  final int filteredTotal;
+  final int page;
+  final bool hasMore;
+  final bool isLoadingMore;
+  final String? loadMoreError;
+
+  SearchMemberDirectoryState copyWith({
+    List<Member>? members,
+    SearchMemberAnalysis? analysis,
+    int? filteredTotal,
+    int? page,
+    bool? hasMore,
+    bool? isLoadingMore,
+    String? loadMoreError,
+    bool clearLoadMoreError = false,
+  }) {
+    return SearchMemberDirectoryState(
+      members: members ?? this.members,
+      analysis: analysis ?? this.analysis,
+      filteredTotal: filteredTotal ?? this.filteredTotal,
+      page: page ?? this.page,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      loadMoreError:
+          clearLoadMoreError ? null : (loadMoreError ?? this.loadMoreError),
+    );
+  }
+}
+
+class SearchMemberDirectoryController
+    extends StateNotifier<AsyncValue<SearchMemberDirectoryState>> {
+  SearchMemberDirectoryController({
+    required SearchMemberRepository repository,
+    required String? query,
+    required String? bloodType,
+    required DonorEligibilityLevel? availability,
+  })  : _repository = repository,
+        _query = query,
+        _bloodType = bloodType,
+        _availability = availability,
+        super(const AsyncLoading()) {
+    Future<void>.microtask(_loadFirstPage);
+  }
+
+  final SearchMemberRepository _repository;
+  final String? _query;
+  final String? _bloodType;
+  final DonorEligibilityLevel? _availability;
+  int _requestGeneration = 0;
+
+  Future<SearchMemberPage> _loadPage(int page) {
+    return _repository
+        .searchMembers(
+          query: _query,
+          bloodType: _bloodType,
+          availability: _availability?.apiValue,
+          page: page,
+          limit: _searchMemberPageSize,
+        )
+        .timeout(_searchMemberRequestTimeout);
+  }
+
+  Future<void> _loadFirstPage() async {
+    final generation = ++_requestGeneration;
+    try {
+      final result = await _loadPage(0);
+      if (!mounted || generation != _requestGeneration) return;
+      state = AsyncData(
+        SearchMemberDirectoryState(
+          members: result.members,
+          analysis: result.analysis,
+          filteredTotal: result.total ?? result.members.length,
+          page: result.page,
+          hasMore: result.hasMore,
+        ),
+      );
+    } catch (error, stackTrace) {
+      if (!mounted || generation != _requestGeneration) return;
+      state = AsyncError(error, stackTrace);
+    }
+  }
+
+  Future<void> refresh() async {
+    if (!mounted) return;
+    state = const AsyncLoading();
+    await _loadFirstPage();
+  }
+
+  Future<void> loadNextPage() async {
+    final current = state.asData?.value;
+    if (current == null || current.isLoadingMore || !current.hasMore) return;
+    final generation = _requestGeneration;
+
+    state = AsyncData(
+      current.copyWith(
+        isLoadingMore: true,
+        clearLoadMoreError: true,
+      ),
+    );
+
+    try {
+      final next = await _loadPage(current.page + 1);
+      if (!mounted || generation != _requestGeneration) return;
+
+      final seen = current.members
+          .map((member) => member.id?.toString() ?? member.memberId ?? '')
+          .toSet();
+      final appended = <Member>[...current.members];
+      for (final member in next.members) {
+        final identity = member.id?.toString() ?? member.memberId ?? '';
+        if (identity.isEmpty || seen.add(identity)) appended.add(member);
+      }
+
+      state = AsyncData(
+        SearchMemberDirectoryState(
+          members: appended,
+          analysis: next.analysis ?? current.analysis,
+          filteredTotal: next.total ?? current.filteredTotal,
+          page: next.page,
+          hasMore: next.hasMore,
+        ),
+      );
+    } catch (error) {
+      if (!mounted || generation != _requestGeneration) return;
+      state = AsyncData(
+        current.copyWith(
+          isLoadingMore: false,
+          loadMoreError: error.toString(),
+        ),
+      );
+    }
+  }
+}
+
+final searchMemberListProvider = StateNotifierProvider.autoDispose<
+    SearchMemberDirectoryController,
+    AsyncValue<SearchMemberDirectoryState>>((ref) {
   final repository = ref.read(searchMemberRepositoryProvider);
-  final donationYear = ref.watch(searchMemberDonationYearFilterProvider);
   final searchQuery = ref.watch(searchMemberQueryProvider);
   final bloodType = ref.watch(searchMemberBloodTypeFilterProvider);
+  final availability = ref.watch(searchMemberAvailabilityFilterProvider);
+  ref.watch(donationMutationRevisionProvider);
 
-  final request = repository.searchMembers(
-    query: searchQuery.isEmpty ? null : searchQuery,
-    bloodType:
-        (bloodType == 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' || bloodType.isEmpty)
-            ? null
-            : bloodType,
-    donationYear: donationYear,
+  // The backend classifies against Bangkok calendar dates. Compute the same
+  // midnight in UTC so devices in another timezone refresh at the right time.
+  final nowUtc = DateTime.now().toUtc();
+  final bangkokNow = nowUtc.add(const Duration(hours: 7));
+  final nextDay = DateTime.utc(
+    bangkokNow.year,
+    bangkokNow.month,
+    bangkokNow.day + 1,
+  ).subtract(const Duration(hours: 7)).add(const Duration(seconds: 1));
+  final dailyRefresh = Timer(
+    nextDay.difference(nowUtc),
+    () => ref.invalidateSelf(),
   );
+  ref.onDispose(dailyRefresh.cancel);
 
-  return request.timeout(
-    _searchMemberRequestTimeout,
-    onTimeout: () => throw TimeoutException(
-      'Member search timed out after '
-      '${_searchMemberRequestTimeout.inSeconds} seconds',
-    ),
+  return SearchMemberDirectoryController(
+    repository: repository,
+    query: searchQuery.trim().isEmpty ? null : searchQuery.trim(),
+    bloodType: (bloodType == 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' || bloodType.isEmpty)
+        ? null
+        : bloodType,
+    availability: availability,
   );
 });
 
@@ -264,7 +426,8 @@ final memberIsLoadingMoreProvider = StateProvider<bool>((ref) => false);
 final accumulatedMembersProvider = StateProvider<List<Member>>((ref) => []);
 
 /// Fetch ranges from API - this returns quickly with just range metadata
-final memberRangesProvider = FutureProvider.autoDispose<List<MemberRange>>((ref) async {
+final memberRangesProvider =
+    FutureProvider.autoDispose<List<MemberRange>>((ref) async {
   final repository = ref.read(memberRepositoryProvider);
   final bloodType = ref.watch(memberBloodTypeFilterProvider);
 
@@ -275,7 +438,8 @@ final memberRangesProvider = FutureProvider.autoDispose<List<MemberRange>>((ref)
 
 /// Fetch members only for the selected range (lazy loading)
 /// Returns initial 50 members if no range is selected (with search support)
-final rangedMemberListProvider = FutureProvider.autoDispose<List<Member>>((ref) async {
+final rangedMemberListProvider =
+    FutureProvider.autoDispose<List<Member>>((ref) async {
   final selectedRange = ref.watch(selectedMemberRangeProvider);
   final repository = ref.read(memberRepositoryProvider);
   final searchQuery = ref.watch(memberSearchQueryProvider);
@@ -296,7 +460,8 @@ final rangedMemberListProvider = FutureProvider.autoDispose<List<Member>>((ref) 
       bloodType: bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ? bloodType : null,
       phone: phoneSearch.isNotEmpty ? phoneSearch : null,
       fatherName: fatherNameSearch.isNotEmpty ? fatherNameSearch : null,
-      bloodBankCard: bloodBankCardSearch.isNotEmpty ? bloodBankCardSearch : null,
+      bloodBankCard:
+          bloodBankCardSearch.isNotEmpty ? bloodBankCardSearch : null,
       memberIdSearch: memberIdSearch.isNotEmpty ? memberIdSearch : null,
       birthDate: birthDateSearch.isNotEmpty ? birthDateSearch : null,
     );
@@ -343,11 +508,11 @@ final searchMemberQueryProvider =
     StateProvider.autoDispose<String>((ref) => '');
 final searchMemberBloodTypeFilterProvider =
     StateProvider.autoDispose<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
-final searchMemberDonationYearFilterProvider =
-    StateProvider.autoDispose<String?>((ref) => DateTime.now().year.toString());
-
+final searchMemberAvailabilityFilterProvider =
+    StateProvider.autoDispose<DonorEligibilityLevel?>((ref) => null);
 // Filtered members provider
-final filteredMemberListProvider = StateProvider.autoDispose<List<Member>>((ref) {
+final filteredMemberListProvider =
+    StateProvider.autoDispose<List<Member>>((ref) {
   final allMembersAsync = ref.watch(memberListProvider);
 
   return allMembersAsync.when(
@@ -393,39 +558,54 @@ final filteredMemberListProvider = StateProvider.autoDispose<List<Member>>((ref)
       final fatherNameSearch = ref.watch(memberFatherNameSearchProvider);
       final bloodBankCardSearch = ref.watch(memberBloodBankCardSearchProvider);
       final memberIdSearch = ref.watch(memberIdSearchProvider);
-      
+
       if (birthDateSearch.isNotEmpty) {
         filtered = filtered
             .where((member) =>
-                member.birthDate?.toLowerCase().contains(birthDateSearch.toLowerCase()) ?? false)
+                member.birthDate
+                    ?.toLowerCase()
+                    .contains(birthDateSearch.toLowerCase()) ??
+                false)
             .toList();
       }
-      
+
       if (phoneSearch.isNotEmpty) {
         filtered = filtered
             .where((member) =>
-                member.phone?.toLowerCase().contains(phoneSearch.toLowerCase()) ?? false)
+                member.phone
+                    ?.toLowerCase()
+                    .contains(phoneSearch.toLowerCase()) ??
+                false)
             .toList();
       }
-      
+
       if (fatherNameSearch.isNotEmpty) {
         filtered = filtered
             .where((member) =>
-                member.fatherName?.toLowerCase().contains(fatherNameSearch.toLowerCase()) ?? false)
+                member.fatherName
+                    ?.toLowerCase()
+                    .contains(fatherNameSearch.toLowerCase()) ??
+                false)
             .toList();
       }
-      
+
       if (bloodBankCardSearch.isNotEmpty) {
         filtered = filtered
             .where((member) =>
-                member.bloodBankCard?.toLowerCase().contains(bloodBankCardSearch.toLowerCase()) ?? false)
+                member.bloodBankCard
+                    ?.toLowerCase()
+                    .contains(bloodBankCardSearch.toLowerCase()) ??
+                false)
             .toList();
       }
-      
+
       if (memberIdSearch.isNotEmpty) {
         filtered = filtered
             .where((member) =>
-                member.memberId?.toLowerCase().contains(memberIdSearch.toLowerCase()) ?? false)
+                member.memberId
+                    ?.toLowerCase()
+                    .contains(memberIdSearch.toLowerCase()) ??
+                false)
             .toList();
       }
 
@@ -455,13 +635,14 @@ final filteredMemberListProvider = StateProvider.autoDispose<List<Member>>((ref)
 });
 
 // Separate provider for search member screen - simply returns the search results
-final filteredSearchMemberListProvider = StateProvider.autoDispose<List<Member>>((ref) {
-  // The searchMemberListWithYearProvider already handles filtering
+final filteredSearchMemberListProvider =
+    StateProvider.autoDispose<List<Member>>((ref) {
+  // The searchMemberListProvider already handles filtering
   // This provider just returns the results for display
-  final allMembersAsync = ref.watch(searchMemberListWithYearProvider);
+  final allMembersAsync = ref.watch(searchMemberListProvider);
 
   return allMembersAsync.when(
-    data: (members) => members,
+    data: (directory) => directory.members,
     loading: () => [],
     error: (_, __) => [],
   );
@@ -479,7 +660,8 @@ void updateFilteredMembers(WidgetRef ref) {
   if (bloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' && bloodType.isNotEmpty) {
     filtered = filtered
         .where((member) =>
-            member.bloodType?.toLowerCase().trim() == bloodType.toLowerCase().trim())
+            member.bloodType?.toLowerCase().trim() ==
+            bloodType.toLowerCase().trim())
         .toList();
   }
 
@@ -520,7 +702,7 @@ void updateFilteredMembers(WidgetRef ref) {
 // Function to update filtered members for search screen
 void updateSearchFilteredMembers(WidgetRef ref) {
   // The search is now handled by the API, so we just refresh the provider
-  ref.invalidate(searchMemberListWithYearProvider);
+  ref.invalidate(searchMemberListProvider);
 }
 
 // Provider for the member loading status
@@ -608,7 +790,8 @@ void resetFilterProviders(WidgetRef ref) {
   ref.read(memberBloodTypeFilterProvider.notifier).state =
       'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
   ref.read(memberRangeFilterProvider.notifier).state = null;
-  ref.read(selectedMemberRangeProvider.notifier).state = null; // Reset new range provider
+  ref.read(selectedMemberRangeProvider.notifier).state =
+      null; // Reset new range provider
   ref.read(memberBirthDateSearchProvider.notifier).state = '';
   ref.read(memberPhoneSearchProvider.notifier).state = '';
   ref.read(memberFatherNameSearchProvider.notifier).state = '';
@@ -631,5 +814,5 @@ void resetSearchFilterProviders(WidgetRef ref) {
   ref.read(searchMemberQueryProvider.notifier).state = '';
   ref.read(searchMemberBloodTypeFilterProvider.notifier).state =
       'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
-  ref.read(searchMemberDonationYearFilterProvider.notifier).state = DateTime.now().year.toString();
+  ref.read(searchMemberAvailabilityFilterProvider.notifier).state = null;
 }

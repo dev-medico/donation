@@ -192,11 +192,55 @@ class MemberRepository {
     }
   }
 
+  /// Updates only the staff-controlled availability switch and remark.
+  ///
+  /// Find Blood rows intentionally contain a derived `last_date`; keeping this
+  /// request partial prevents that display value (or any stale profile field)
+  /// from being written back to the member record.
+  Future<Member> updateMemberAvailability(
+    String id, {
+    required bool canDonate,
+    required String note,
+  }) async {
+    try {
+      final response = await _apiClient.post<Map<String, dynamic>>(
+        '$_baseUrl/update',
+        queryParameters: {'id': id},
+        data: {
+          'status': canDonate ? 'available' : 'not_available',
+          'note': note,
+        },
+      );
+
+      final responseData = response.data;
+      if (responseData == null) {
+        throw Exception('Invalid response data');
+      }
+      if (responseData['status'] == 'error') {
+        throw Exception(responseData['message'] ?? 'Failed to update member');
+      }
+      if (responseData['status'] != 'ok' || responseData['data'] == null) {
+        throw Exception('Invalid response format');
+      }
+
+      final updatedMember = Member.fromJson(
+        responseData['data'] as Map<String, dynamic>,
+      );
+      clearMemberCache(id);
+      _memberListCache = null;
+      return updatedMember;
+    } catch (e) {
+      debugPrint('Error updating member availability: $e');
+      throw Exception('Failed to update member availability: $e');
+    }
+  }
+
   /// Fetches range options from the API
   /// Returns a list of MemberRange objects for the dropdown
   Future<List<MemberRange>> getMemberRanges({String? bloodType}) async {
     try {
-      debugPrint('Fetching member ranges${bloodType != null ? " for blood type: $bloodType" : ""}');
+      debugPrint(
+          'Fetching member ranges${bloodType != null ? " for blood type: $bloodType" : ""}');
 
       final queryParams = <String, dynamic>{};
       if (bloodType != null && bloodType.isNotEmpty) {
@@ -221,7 +265,8 @@ class MemberRepository {
             .map((item) => MemberRange.fromJson(item as Map<String, dynamic>))
             .toList();
 
-        debugPrint('Fetched ${ranges.length} ranges, total members: ${data['totalMembers']}');
+        debugPrint(
+            'Fetched ${ranges.length} ranges, total members: ${data['totalMembers']}');
         return ranges;
       } else {
         throw Exception(jsonData['message'] ?? 'Failed to retrieve ranges');
@@ -425,7 +470,8 @@ class MemberRepository {
             ? (page + 1) * limit < total
             : members.length >= limit;
 
-        debugPrint('Fetched ${members.length} members (page $page), hasMore: $hasMore, total: $total');
+        debugPrint(
+            'Fetched ${members.length} members (page $page), hasMore: $hasMore, total: $total');
         return {
           'members': members,
           'hasMore': hasMore,

@@ -2,11 +2,12 @@ import 'package:donation/src/features/services/base_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final donationLoadingStatusProvider = StateProvider<String>((ref) => '');
+final donationMutationRevisionProvider = StateProvider<int>((ref) => 0);
 final donationServiceProvider =
     Provider<DonationService>((ref) => DonationService(ref));
 
 class DonationService extends BaseService {
-  final ProviderRef? ref;
+  final Ref? ref;
 
   DonationService([this.ref]);
 
@@ -17,6 +18,12 @@ class DonationService extends BaseService {
     if (ref != null) {
       ref!.read(donationLoadingStatusProvider.notifier).state = status;
     }
+  }
+
+  void _notifyDonationMutation() {
+    if (ref == null) return;
+    final notifier = ref!.read(donationMutationRevisionProvider.notifier);
+    notifier.state = notifier.state + 1;
   }
 
   // Future<List<dynamic>> getDonations({int limit = 500}) async {
@@ -174,6 +181,7 @@ class DonationService extends BaseService {
 
       _updateLoadingStatus('Donation created successfully!');
       if (response.statusCode == 201 || response.statusCode == 200) {
+        _notifyDonationMutation();
         return response.data!['data'] as Map<String, dynamic>;
       }
       throw Exception('Failed to create donation');
@@ -199,6 +207,7 @@ class DonationService extends BaseService {
 
       _updateLoadingStatus('Donation updated successfully!');
       if (response.statusCode == 200) {
+        _notifyDonationMutation();
         return response.data!['data'] as Map<String, dynamic>;
       }
       throw Exception('Failed to update donation');
@@ -224,6 +233,7 @@ class DonationService extends BaseService {
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Failed to delete donation');
       }
+      _notifyDonationMutation();
     } catch (e) {
       print('Error deleting donation: $e');
       _updateLoadingStatus('Error: $e');

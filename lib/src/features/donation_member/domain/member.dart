@@ -17,6 +17,24 @@ class Member {
   final String? memberCount;
   final String? totalCount;
   final String? profileUrl;
+  final bool? canDonateValue;
+
+  /// Whether staff have manually left donation permission switched on.
+  ///
+  /// The database stores this as a legacy status string. Recent-donation
+  /// eligibility is intentionally calculated separately so it cannot overwrite
+  /// the staff-controlled switch.
+  bool get canDonate {
+    if (canDonateValue != null) return canDonateValue!;
+    final normalized = (status ?? 'available').trim().toLowerCase();
+    return !const {
+      'not_available',
+      'unavailable',
+      'disabled',
+      'false',
+      '0',
+    }.contains(normalized);
+  }
 
   Member({
     this.id,
@@ -37,6 +55,7 @@ class Member {
     this.memberCount,
     this.totalCount,
     this.profileUrl,
+    this.canDonateValue,
   });
 
   factory Member.fromJson(Map<String, dynamic> json) {
@@ -59,7 +78,26 @@ class Member {
       memberCount: json['member_count'],
       totalCount: json['total_count'],
       profileUrl: json['profile_url'],
+      canDonateValue: _parseBoolean(json['can_donate']),
     );
+  }
+
+  static bool? _parseBoolean(dynamic value) {
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      switch (value.trim().toLowerCase()) {
+        case 'true':
+        case '1':
+        case 'yes':
+          return true;
+        case 'false':
+        case '0':
+        case 'no':
+          return false;
+      }
+    }
+    return null;
   }
 
   Map<String, dynamic> toJson() {
