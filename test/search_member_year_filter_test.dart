@@ -53,8 +53,14 @@ Future<void> _pumpScreen(
   required Size size,
   required SearchMemberRepository repository,
 }) async {
-  await tester.binding.setSurfaceSize(size);
-  addTearDown(() => tester.binding.setSurfaceSize(null));
+  // Find Blood picks its phone/desktop layout from MediaQuery.size, which
+  // setSurfaceSize does not move — only the view's own metrics do.
+  tester.view.devicePixelRatio = 1.0;
+  tester.view.physicalSize = size;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
   await tester.pumpWidget(
     ProviderScope(
       overrides: [

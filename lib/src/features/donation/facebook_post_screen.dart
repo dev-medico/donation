@@ -27,8 +27,12 @@ class FacebookPostScreen extends ConsumerStatefulWidget {
   ConsumerState<FacebookPostScreen> createState() => _FacebookPostScreenState();
 }
 
-class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen> {
+class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
+    with SingleTickerProviderStateMixin {
   late DateTime _selectedDate;
+  // Built eagerly: `late final` would defer creation to the first read, and on
+  // a desktop layout — which has no tabs — that first read would be dispose().
+  late final TabController _tabController;
   final TextEditingController _helpersController = TextEditingController();
   final TextEditingController _textController = TextEditingController();
 
@@ -41,6 +45,7 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     final now = DateTime.now();
     _selectedDate = DateTime(now.year, now.month, now.day);
     _helpersController.text = kDefaultVolunteerHelpers;
@@ -50,6 +55,7 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     _helpersController.dispose();
     _textController.dispose();
     super.dispose();
@@ -131,8 +137,8 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen> {
       helpText: 'ရက်စွဲ ရွေးပါ',
     );
     if (picked == null) return;
-    setState(() =>
-        _selectedDate = DateTime(picked.year, picked.month, picked.day));
+    setState(
+        () => _selectedDate = DateTime(picked.year, picked.month, picked.day));
     _load();
   }
 
@@ -176,18 +182,41 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen> {
             onPressed: _isLoading ? null : () => _load(force: true),
           ),
         ],
-      ),
-      body: isMobile
-          ? SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildControls(),
-                  const SizedBox(height: 12),
-                  _buildPreview(minHeight: 320),
+        // A phone cannot show the settings and the finished text at once, and
+        // stacking them buried the copy button under every patient card. Two
+        // tabs keep both one tap away; the copy bar below stays put in either.
+        bottom: isMobile
+            ? TabBar(
+                controller: _tabController,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white70,
+                indicatorColor: Colors.white,
+                labelStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+                unselectedLabelStyle: const TextStyle(fontSize: 13),
+                tabs: const [
+                  Tab(height: 40, text: 'ပြင်ဆင်ရန်'),
+                  Tab(height: 40, text: 'ပို့စ်စာသား'),
                 ],
-              ),
+              )
+            : null,
+      ),
+      bottomNavigationBar: isMobile ? _buildCopyBar() : null,
+      body: isMobile
+          ? TabBarView(
+              controller: _tabController,
+              children: [
+                SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
+                  child: _buildControls(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                  child: _buildPreview(expand: true, showHeader: false),
+                ),
+              ],
             )
           : Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,6 +237,48 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen> {
                 ),
               ],
             ),
+    );
+  }
+
+  /// Always-visible copy action for phones, with the day's tally beside it so
+  /// the post-text tab still says what is being copied.
+  Widget _buildCopyBar() {
+    final summary = _groups.isEmpty
+        ? 'မှတ်တမ်း မရှိပါ'
+        : 'လူနာ ${toMyanmarDigits(_groups.length)} ဦး · '
+            'သွေး ${toMyanmarDigits(_donationCount)} လုံး';
+
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: Colors.grey.withValues(alpha: 0.25)),
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                summary,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+              ),
+            ),
+            const SizedBox(width: 8),
+            FilledButton.icon(
+              key: const ValueKey('copy-facebook-post'),
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: _copy,
+              icon: const Icon(Icons.copy, size: 18),
+              label: const Text('ကူးယူမည်'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -422,6 +493,10 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen> {
                         ? group.timeOfDay
                         : kDefaultPostTime,
                     isDense: true,
+                    // Without this the field takes the width of its longest
+                    // option ('ဒီနေ့ညနေစောင်းပိုင်း') and overflows the card
+                    // on a phone.
+                    isExpanded: true,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       contentPadding:
@@ -449,7 +524,13 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen> {
     );
   }
 
-  Widget _buildPreview({bool expand = false, double minHeight = 240}) {
+  Widget _buildPreview({
+    bool expand = false,
+    double minHeight = 240,
+    // Phones label this through the tab and copy from the bottom bar, so the
+    // card's own header would only repeat what is already on screen.
+    bool showHeader = true,
+  }) {
     final field = TextField(
       controller: _textController,
       maxLines: null,
@@ -472,24 +553,26 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'ပို့စ်စာသား',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+          if (showHeader) ...[
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'ပို့စ်စာသား',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              FilledButton.icon(
-                key: const ValueKey('copy-facebook-post'),
-                style: FilledButton.styleFrom(backgroundColor: Colors.red),
-                onPressed: _copy,
-                icon: const Icon(Icons.copy, size: 18),
-                label: const Text('ကူးယူမည်'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
+                FilledButton.icon(
+                  key: const ValueKey('copy-facebook-post'),
+                  style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: _copy,
+                  icon: const Icon(Icons.copy, size: 18),
+                  label: const Text('ကူးယူမည်'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
           if (expand)
             Expanded(child: field)
           else
