@@ -1387,6 +1387,10 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
   }
 
   /// Compact phone rows: blood chip, name over ID/father, donation count.
+  ///
+  /// The birth date earns its own line because whole families share a name in
+  /// this ledger: a search for one name returns several members whose ID and
+  /// father's name are not enough to tell them apart when picking a donor.
   Widget _buildMobileMemberList(List<Member> members) {
     return ListView.separated(
       padding: const EdgeInsets.only(bottom: 88), // keep FAB clear of last row
@@ -1401,6 +1405,7 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
             member.fatherName!.trim(),
         ].join(' · ');
         final count = (member.totalCount ?? '').trim();
+        final birthDate = (member.birthDate ?? '').trim();
         return InkWell(
           onTap: () {
             if (member.id != null) {
@@ -1442,6 +1447,26 @@ class _MemberListScreenState extends ConsumerState<MemberListScreen> {
                           overflow: TextOverflow.ellipsis,
                           style:
                               TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ],
+                      if (birthDate.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            Icon(Icons.cake_outlined,
+                                size: 12, color: Colors.grey[500]),
+                            const SizedBox(width: 3),
+                            Flexible(
+                              child: Text(
+                                birthDate,
+                                key: ValueKey('member-birth-date-${member.id}'),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontSize: 11.5, color: Colors.grey[600]),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ],
