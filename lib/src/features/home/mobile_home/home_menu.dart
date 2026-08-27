@@ -26,6 +26,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     'ထူးခြားဖြစ်စဉ်',
     'ရ/သုံး ငွေစာရင်း',
     'လစဥ်ထောက်ပံ့သူများ',
+    'Facebook ပို့စ်',
     'ထွက်မည်'
   ];
   List<IconData> icons = const [
@@ -36,6 +37,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
     Icons.event_note_outlined,
     Icons.account_balance_wallet_outlined,
     Icons.volunteer_activism_outlined,
+    Icons.facebook,
     Icons.logout_outlined,
   ];
 
@@ -151,7 +153,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
             ref.watch(drawerControllerProvider)!.toggle!.call();
 
             // Handle log out separately
-            if (index == 7) {
+            if (index == titles.length - 1) {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.remove('token');
               prefs.remove('name');

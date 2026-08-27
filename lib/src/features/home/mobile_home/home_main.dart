@@ -1,5 +1,6 @@
 import 'package:donation/src/features/dashboard/dashboard.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
+import 'package:donation/src/features/donation/facebook_post_screen.dart';
 import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/donation_member/presentation/search_member.dart';
@@ -60,6 +61,9 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
 
     // Monthly Sponsors
     const MonthlySponsorListScreen(fromHome: true),
+
+    // Facebook post generator
+    const FacebookPostScreen(fromHome: true),
   ];
 
   @override

@@ -2,6 +2,7 @@ import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
+import 'package:donation/src/features/donation/facebook_post_screen.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/donation_member/presentation/search_member.dart';
 import 'package:donation/src/features/finder/report_new.dart';
@@ -34,6 +35,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'ရ/သုံး ငွေစာရင်း',
     'အလှူရှင်များ',
     'လစဥ်ထောက်ပံ့သူများ',
+    'Facebook ပို့စ်',
     'Log Out(V 1.5.1)'
   ];
   List<String> icons = [
@@ -46,6 +48,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'assets/images/finance.png',
     'assets/images/card.png',
     'assets/images/finance.png',
+    'assets/images/post.png',
     'assets/images/settings.png',
   ];
 
@@ -64,6 +67,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
       const DonarListScreen(), // Finance - Donar List with tabs
       const MoneyDonorListScreen(), // Money Donors
       const MonthlySponsorListScreen(), // Monthly Sponsors
+      const FacebookPostScreen(), // Facebook post generator
       Container(), // Logout placeholder
     ];
   }
