@@ -24,6 +24,7 @@ class SearchMemberRepository {
     String? query,
     String? bloodType,
     String? availability,
+    String? lastDonation,
     int page = 0,
     int limit = 50,
   }) async {
@@ -32,6 +33,7 @@ class SearchMemberRepository {
       debugPrint('  - Query: $query');
       debugPrint('  - Blood Type: $bloodType');
       debugPrint('  - Availability: $availability');
+      debugPrint('  - Last donation: $lastDonation');
       debugPrint('  - Page: $page, Limit: $limit');
 
       final queryParams = <String, dynamic>{
@@ -47,6 +49,12 @@ class SearchMemberRepository {
       }
       if (availability != null && availability.isNotEmpty) {
         queryParams['availability'] = availability;
+      }
+      // The server resolves this against the effective last donation date,
+      // which is the later of the member's stored date and their newest
+      // donation row, so paging and the analysis counters stay in agreement.
+      if (lastDonation != null && lastDonation.isNotEmpty) {
+        queryParams['last_donation'] = lastDonation;
       }
 
       final pageLoader = _pageLoader;

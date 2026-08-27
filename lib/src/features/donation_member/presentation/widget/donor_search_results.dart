@@ -74,7 +74,7 @@ class DonorSearchResults extends StatelessWidget {
                 selectedLevel: selectedLevel,
               ),
             ],
-            SizedBox(height: showDesktopRows ? 10 : 4),
+            SizedBox(height: showDesktopRows ? 10 : 3),
             if (showDesktopRows) ...[
               const _DesktopHeader(),
               const SizedBox(height: 6),
@@ -97,13 +97,13 @@ class DonorSearchResults extends StatelessWidget {
                       },
                       child: ListView.separated(
                         key: const ValueKey('all-donor-results'),
-                        padding: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.only(bottom: 12),
                         itemCount: entries.length +
                             ((hasMore || isLoadingMore || loadMoreError != null)
                                 ? 1
                                 : 0),
                         separatorBuilder: (_, __) => SizedBox(
-                          height: showDesktopRows ? 8 : 4,
+                          height: showDesktopRows ? 8 : 3,
                         ),
                         itemBuilder: (context, index) {
                           if (index == entries.length) {
@@ -516,17 +516,18 @@ class _MobileDonorCard extends StatelessWidget {
 
     return Semantics(
       container: true,
-      label: '${member.name ?? ''}, ${_statusLabel(eligibility)}',
+      label: '${member.name ?? ''}, ${_memberLocation(member)}, '
+          '${_statusLabel(eligibility)}',
       child: Material(
         key: ValueKey('donor-card-${member.id}'),
         color: palette.background,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(11),
           side: BorderSide(color: palette.border),
         ),
         clipBehavior: Clip.antiAlias,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -534,10 +535,10 @@ class _MobileDonorCard extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 2),
                 child: BloodChip(
                   bloodType: member.bloodType,
-                  size: isNarrowPhone ? 36 : 40,
+                  size: isNarrowPhone ? 36 : 38,
                 ),
               ),
-              SizedBox(width: isNarrowPhone ? 6 : 8),
+              const SizedBox(width: 6),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,23 +567,25 @@ class _MobileDonorCard extends StatelessWidget {
                         height: 1.3,
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 1),
+                    _MemberLocationLine(member: member, compact: true),
+                    const SizedBox(height: 3),
                     _CompactMobileDetails(entry: entry),
                   ],
                 ),
               ),
-              SizedBox(width: isNarrowPhone ? 4 : 6),
+              const SizedBox(width: 4),
               SizedBox(
-                width: isNarrowPhone ? 93 : 104,
+                width: isNarrowPhone ? 92 : 98,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     _StatusBadge(
                       eligibility: eligibility,
-                      maxWidth: isNarrowPhone ? 91 : 100,
+                      maxWidth: isNarrowPhone ? 92 : 98,
                       compact: true,
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -593,7 +596,7 @@ class _MobileDonorCard extends StatelessWidget {
                           icon: Icons.phone_outlined,
                           onPressed: phone.isEmpty ? null : onOpenActions,
                         ),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 4),
                         _CompactActionButton(
                           key: ValueKey('edit-donor-${member.id}'),
                           tooltip: eligibility.level ==
@@ -659,7 +662,7 @@ class _CompactMobileDetails extends StatelessWidget {
             const SizedBox(height: 3),
             _CompactMetaLine(
               icon: Icons.event_available_outlined,
-              text: '၄ လပြည့်ရန် ${_remainingLabel(eligibility)} ကျန် · '
+              text: '${_remainingLabel(eligibility)} ကျန် · '
                   '${_formatDate(eligibility.nextEligibleDate!)} တွင် လှူနိုင်',
               color: palette.foreground,
             ),
@@ -701,9 +704,9 @@ class _CompactMetaLine extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: color,
-              fontSize: 11.5,
+              fontSize: 11.25,
               fontWeight: FontWeight.w600,
-              height: 1.35,
+              height: 1.3,
             ),
           ),
         ),
@@ -814,7 +817,8 @@ class _DesktopDonorRow extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: '${member.name ?? ''}, ${_statusLabel(eligibility)}',
+      label: '${member.name ?? ''}, ${_memberLocation(member)}, '
+          '${_statusLabel(eligibility)}',
       child: Material(
         key: ValueKey('donor-row-${member.id}'),
         color: palette.background,
@@ -861,6 +865,8 @@ class _DesktopDonorRow extends StatelessWidget {
                                 height: 1.4,
                               ),
                             ),
+                            const SizedBox(height: 3),
+                            _MemberLocationLine(member: member),
                           ],
                         ),
                       ),
@@ -934,6 +940,40 @@ class _DesktopDonorRow extends StatelessWidget {
   }
 }
 
+class _MemberLocationLine extends StatelessWidget {
+  const _MemberLocationLine({required this.member, this.compact = false});
+
+  final Member member;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          Icons.location_on_outlined,
+          size: compact ? 12 : 13,
+          color: const Color(0xFF64748B),
+        ),
+        const SizedBox(width: 3),
+        Expanded(
+          child: Text(
+            _memberLocation(member),
+            key: ValueKey('donor-location-${member.id}'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: compact ? 10.5 : 11,
+              color: const Color(0xFF64748B),
+              height: 1.25,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _StatusBadge extends StatelessWidget {
   const _StatusBadge({
     required this.eligibility,
@@ -955,7 +995,7 @@ class _StatusBadge extends StatelessWidget {
         width: maxWidth,
         padding: EdgeInsets.symmetric(
           horizontal: compact ? 6 : 8,
-          vertical: compact ? 4 : 5,
+          vertical: compact ? 3 : 5,
         ),
         decoration: BoxDecoration(
           color: palette.surface,
@@ -974,11 +1014,11 @@ class _StatusBadge extends StatelessWidget {
             Expanded(
               child: Text(
                 _statusLabel(eligibility),
-                maxLines: 2,
+                maxLines: compact ? 1 : 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: palette.foreground,
-                  fontSize: compact ? 11 : 10.5,
+                  fontSize: compact ? 10.75 : 10.5,
                   fontWeight: FontWeight.w700,
                   height: 1.25,
                 ),
@@ -1093,8 +1133,8 @@ class _DonationDates extends StatelessWidget {
           const SizedBox(height: 5),
           _DateLine(
             icon: Icons.hourglass_bottom_outlined,
-            label: '၄ လပြည့်ရန်',
-            value: '${_remainingLabel(eligibility)} ကျန်',
+            label: 'ကျန်ချိန်',
+            value: _remainingLabel(eligibility),
           ),
           const SizedBox(height: 5),
           _DateLine(
@@ -1155,7 +1195,7 @@ String _compactDetailMessage(DonorEligibility eligibility) {
     return 'လှူဒါန်းခွင့် ပိတ်ထားသည်';
   }
   if (eligibility.isWaiting && eligibility.nextEligibleDate != null) {
-    return '၄ လပြည့်ရန် ${_remainingLabel(eligibility)} ကျန် · '
+    return '${_remainingLabel(eligibility)} ကျန် · '
         '${_formatDate(eligibility.nextEligibleDate!)} တွင် လှူနိုင်';
   }
   if (eligibility.hasInvalidLastDonationDate) {
@@ -1175,7 +1215,7 @@ String _statusLabel(DonorEligibility eligibility) {
       return 'ပိတ်ထားသည်';
     case DonorEligibilityLevel.caution:
       if (eligibility.hasRemark) return 'မှတ်ချက်ရှိ';
-      if (eligibility.isWaiting) return '၄ လ မပြည့်သေး';
+      if (eligibility.isWaiting) return 'လ မပြည့်သေး';
       return 'ရက်စွဲစစ်ဆေးရန်';
   }
 }
@@ -1186,12 +1226,12 @@ String _reasonMessage(DonorEligibility eligibility) {
       return 'လှူဒါန်းခွင့် ပိတ်ထားသည်။ ပြန်ဖွင့်ရန် အခြေအနေကို ပြင်ပါ။';
     case DonorEligibilityLevel.caution:
       if (eligibility.hasRemark && eligibility.isWaiting) {
-        return 'မှတ်ချက်ကို စစ်ဆေးပါ။ ၄ လပြည့်ရန် '
-            '${_remainingLabel(eligibility)} ကျန်ပါသည်။';
+        return 'မှတ်ချက်ကို စစ်ဆေးပါ · '
+            '${_remainingLabel(eligibility)} ကျန်';
       }
       if (eligibility.hasRemark) return 'အောက်ပါမှတ်ချက်ကို စစ်ဆေးပါ။';
       if (eligibility.isWaiting) {
-        return '၄ လပြည့်ရန် ${_remainingLabel(eligibility)} ကျန်ပါသည်။';
+        return '${_remainingLabel(eligibility)} ကျန်';
       }
       return 'နောက်ဆုံးလှူဒါန်းသည့်ရက်ကို အတည်ပြုရန် လိုအပ်ပါသည်။';
     case DonorEligibilityLevel.eligible:
@@ -1208,6 +1248,24 @@ String _contactLine(Member member) {
     if ((member.phone ?? '').trim().isNotEmpty) member.phone!.trim(),
   ];
   return parts.isEmpty ? 'ဖုန်းနံပါတ် မရှိပါ' : parts.join(' · ');
+}
+
+String _memberLocation(Member member) {
+  final raw = (member.address ?? '').trim();
+  if (raw.isEmpty) return 'နေရပ် မသတ်မှတ်ထား';
+
+  // New records use the Myanmar comma. Accept common legacy separators so
+  // older addresses still expose the ward/quarter and township at a glance.
+  final normalized = raw
+      .replaceAll(RegExp(r'[\r\n]+'), '၊')
+      .replaceAll(RegExp(r'[,;|]+'), '၊');
+  final parts = normalized.split('၊').map((part) => part.trim()).where((part) {
+    final lower = part.toLowerCase();
+    return part.isNotEmpty && part != '-' && lower != 'n/a' && lower != 'null';
+  }).toList(growable: false);
+
+  if (parts.isEmpty) return 'နေရပ် မသတ်မှတ်ထား';
+  return parts.skip(parts.length > 2 ? parts.length - 2 : 0).join(' · ');
 }
 
 String _remainingLabel(DonorEligibility eligibility) {

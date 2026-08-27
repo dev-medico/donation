@@ -21,6 +21,7 @@ class _ClassificationRepository extends SearchMemberRepository {
         name: 'လှူနိုင်သူ',
         bloodType: 'O (Rh +)',
         phone: '091111111',
+        address: 'အမှတ် ၁, သီရိလမ်း, ဇေယျာရပ်ကွက်, ချောင်းဆုံမြို့နယ်',
         status: 'available',
       ),
       Member(
@@ -38,6 +39,7 @@ class _ClassificationRepository extends SearchMemberRepository {
         name: 'လေးလမပြည့်သူ',
         bloodType: 'B (Rh +)',
         phone: '093333333',
+        address: 'အမှတ် ၃၊ ၅ လမ်း၊ မုပွန်ရပ်ကွက်၊ မော်လမြိုင်မြို့နယ်',
         status: 'available',
         lastDate: recent.toIso8601String(),
       ),
@@ -57,6 +59,7 @@ class _ClassificationRepository extends SearchMemberRepository {
     String? query,
     String? bloodType,
     String? availability,
+    String? lastDonation,
     int page = 0,
     int limit = 50,
   }) async {
@@ -97,6 +100,7 @@ class _ManyMemberRepository extends SearchMemberRepository {
     String? query,
     String? bloodType,
     String? availability,
+    String? lastDonation,
     int page = 0,
     int limit = 50,
   }) async {
@@ -129,6 +133,7 @@ class _ThousandsRepository extends SearchMemberRepository {
     String? query,
     String? bloodType,
     String? availability,
+    String? lastDonation,
     int page = 0,
     int limit = 50,
   }) async {
@@ -242,6 +247,7 @@ void main() {
     expect(find.text('အားလုံး 4'), findsOneWidget);
     expect(find.byKey(const ValueKey('donor-card-1')), findsOneWidget);
     expect(find.text('လှူနိုင်သူ'), findsOneWidget);
+    expect(find.text('ဇေယျာရပ်ကွက် · ချောင်းဆုံမြို့နယ်'), findsOneWidget);
     expect(find.byKey(const ValueKey('donor-card-3')), findsOneWidget);
 
     await tester.scrollUntilVisible(
@@ -259,8 +265,11 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).last,
     );
-    expect(find.text('၄ လ မပြည့်သေး'), findsWidgets);
-    expect(find.textContaining('၄ လပြည့်ရန်'), findsWidgets);
+    expect(find.text('လ မပြည့်သေး'), findsWidgets);
+    expect(find.text('မုပွန်ရပ်ကွက် · မော်လမြိုင်မြို့နယ်'), findsOneWidget);
+    expect(find.text('၄ လ မပြည့်သေး'), findsNothing);
+    expect(find.textContaining('၄ လပြည့်ရန်'), findsNothing);
+    expect(find.textContaining('ကျန် ·'), findsOneWidget);
     expect(find.textContaining('တွင် လှူနိုင်'), findsOneWidget);
 
     await tester.scrollUntilVisible(
@@ -269,6 +278,7 @@ void main() {
       scrollable: find.byType(Scrollable).last,
     );
     expect(find.text('ပိတ်ထားသူ'), findsOneWidget);
+    expect(find.text('နေရပ် မသတ်မှတ်ထား'), findsWidgets);
     expect(find.text('ပိတ်ထားသည်'), findsOneWidget);
     expect(find.byKey(const ValueKey('edit-donor-4')), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -388,7 +398,9 @@ void main() {
     expect(find.text('အခြေအနေ / မှတ်ချက်'), findsOneWidget);
     for (var id = 1; id <= 4; id += 1) {
       expect(find.byKey(ValueKey('donor-row-$id')), findsOneWidget);
+      expect(find.byKey(ValueKey('donor-location-$id')), findsOneWidget);
     }
+    expect(find.text('ဇေယျာရပ်ကွက် · ချောင်းဆုံမြို့နယ်'), findsOneWidget);
     expect(find.byKey(const ValueKey('eligibility-count-eligible')),
         findsOneWidget);
     expect(find.byKey(const ValueKey('eligibility-count-caution')),

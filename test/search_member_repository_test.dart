@@ -24,6 +24,7 @@ class _PagedRepository extends SearchMemberRepository {
     String? query,
     String? bloodType,
     String? availability,
+    String? lastDonation,
     int page = 0,
     int limit = 50,
   }) async {
@@ -63,6 +64,7 @@ class _RefreshRaceRepository extends SearchMemberRepository {
     String? query,
     String? bloodType,
     String? availability,
+    String? lastDonation,
     int page = 0,
     int limit = 50,
   }) async {
@@ -117,6 +119,7 @@ void main() {
       query: 'a-0001',
       bloodType: 'O (Rh +)',
       availability: 'yellow',
+      lastDonation: '2024',
       page: 1,
       limit: 50,
     );
@@ -133,17 +136,19 @@ void main() {
     expect(requests.single['q'], 'a-0001');
     expect(requests.single['blood_type'], 'O (Rh +)');
     expect(requests.single['availability'], 'yellow');
+    expect(requests.single['last_donation'], '2024');
     expect(requests.single['page'], 1);
     expect(requests.single['limit'], 50);
-    expect(requests.single.containsKey('donation_year'), isFalse);
   });
 
   test('without total, hasMore follows whether the page is full', () async {
     final requestedPages = <int>[];
+    final sentParams = <Map<String, dynamic>>[];
     final repository = SearchMemberRepository(
       pageLoader: (params) async {
         final page = params['page'] as int;
         requestedPages.add(page);
+        sentParams.add(Map<String, dynamic>.from(params));
         return {
           'status': 'ok',
           'data': [_memberJson(1), _memberJson(2)],
@@ -156,6 +161,8 @@ void main() {
     expect(result.members.map((member) => member.id), [1, 2]);
     expect(result.hasMore, isTrue);
     expect(requestedPages, [0]);
+    // An unset year filter must not narrow the directory server-side.
+    expect(sentParams.single.containsKey('last_donation'), isFalse);
   });
 
   test('directory controller appends pages and stops at the server total',
@@ -166,6 +173,7 @@ void main() {
       query: null,
       bloodType: null,
       availability: null,
+      lastDonation: null,
     );
     addTearDown(controller.dispose);
 
@@ -193,6 +201,7 @@ void main() {
       query: null,
       bloodType: null,
       availability: null,
+      lastDonation: null,
     );
     addTearDown(controller.dispose);
 

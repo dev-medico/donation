@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:donation/responsive.dart';
+import 'package:donation/src/features/donation_member/domain/last_donation_filter.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/call_or_remark_dialog.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/donor_search_results.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/remark_write_dialog.dart';
@@ -52,6 +53,65 @@ class _SearchMemberListScreenState
     ref.read(searchMemberBloodTypeFilterProvider.notifier).state =
         'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
     ref.read(searchMemberAvailabilityFilterProvider.notifier).state = null;
+    ref.read(searchMemberLastDonationFilterProvider.notifier).state = null;
+  }
+
+  /// "Not donated since ...". Every year is an upper bound rather than a single
+  /// year, so ten entries still reach the oldest donor in the ledger, and the
+  /// donors who have rested longest are one tap away.
+  Widget _buildLastDonationFilter({
+    required LastDonationFilter? selected,
+    required bool compact,
+  }) {
+    final textStyle = TextStyle(fontSize: compact ? 12.5 : 14);
+    final years = LastDonationFilter.menuYears(DateTime.now());
+
+    return DropdownButtonFormField<LastDonationFilter?>(
+      key: ValueKey('last-donation-filter-${selected?.apiValue ?? 'all'}'),
+      initialValue: selected,
+      dropdownColor: Colors.white,
+      focusColor: Colors.white,
+      isExpanded: true,
+      icon: Icon(
+        Icons.arrow_drop_down,
+        color: Colors.black45,
+        size: compact ? 20 : 30,
+      ),
+      decoration: InputDecoration(
+        isDense: true,
+        contentPadding: compact
+            ? const EdgeInsets.only(top: 8, left: 9, bottom: 8, right: 4)
+            : const EdgeInsets.only(top: 16, left: 20, bottom: 16, right: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(compact ? 10 : 12),
+        ),
+      ),
+      items: [
+        DropdownMenuItem<LastDonationFilter?>(
+          value: null,
+          child: Text(
+            compact
+                ? 'နောက်ဆုံးလှူသည့်နှစ်'
+                : 'နောက်ဆုံးလှူသည့်နှစ်ဖြင့် ရှာဖွေမည်',
+            style: textStyle,
+          ),
+        ),
+        ...years.map((year) {
+          final filter = LastDonationFilter.upToYear(year);
+          return DropdownMenuItem<LastDonationFilter?>(
+            value: filter,
+            child: Text(filter.label, style: textStyle),
+          );
+        }),
+        DropdownMenuItem<LastDonationFilter?>(
+          value: const LastDonationFilter.never(),
+          child: Text(const LastDonationFilter.never().label, style: textStyle),
+        ),
+      ],
+      onChanged: (value) {
+        ref.read(searchMemberLastDonationFilterProvider.notifier).state = value;
+      },
+    );
   }
 
   @override
@@ -62,9 +122,12 @@ class _SearchMemberListScreenState
     final selectedQuery = ref.watch(searchMemberQueryProvider);
     final selectedAvailability =
         ref.watch(searchMemberAvailabilityFilterProvider);
+    final selectedLastDonation =
+        ref.watch(searchMemberLastDonationFilterProvider);
     final hasActiveFilters = selectedBloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ||
         selectedQuery.trim().isNotEmpty ||
-        selectedAvailability != null;
+        selectedAvailability != null ||
+        selectedLastDonation != null;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -126,130 +189,134 @@ class _SearchMemberListScreenState
               ? Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8),
                   padding: const EdgeInsets.only(top: 6),
-                  child: Row(
+                  child: Column(
                     children: [
-                      SizedBox(
-                        width: isNarrowPhone ? 110 : 132,
-                        child: DropdownButtonFormField<String>(
-                          key: ValueKey('blood-filter-$selectedBloodType'),
-                          initialValue: selectedBloodType,
-                          dropdownColor: Colors.white,
-                          focusColor: Colors.white,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding: const EdgeInsets.only(
-                              top: 8,
-                              left: 9,
-                              bottom: 8,
-                              right: 4,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          isExpanded: true,
-                          icon: const Icon(
-                            Icons.arrow_drop_down,
-                            color: Colors.black45,
-                            size: 20,
-                          ),
-                          items: [
-                            const DropdownMenuItem(
-                              value: 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်',
-                              child: Text(
-                                'သွေးအုပ်စု',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ),
-                            ...bloodTypes.map(
-                              (item) => DropdownMenuItem<String>(
-                                value: item,
-                                child: Text(
-                                  item,
-                                  style: const TextStyle(fontSize: 12.5),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: isNarrowPhone ? 110 : 132,
+                            child: DropdownButtonFormField<String>(
+                              key: ValueKey('blood-filter-$selectedBloodType'),
+                              initialValue: selectedBloodType,
+                              dropdownColor: Colors.white,
+                              focusColor: Colors.white,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding: const EdgeInsets.only(
+                                  top: 8,
+                                  left: 9,
+                                  bottom: 8,
+                                  right: 4,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              ref
-                                  .read(searchMemberBloodTypeFilterProvider
-                                      .notifier)
-                                  .state = value;
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: TextFormField(
-                          key: const ValueKey('member-search-field'),
-                          controller: searchController,
-                          textAlign: TextAlign.start,
-                          style: const TextStyle(
-                              fontSize: 13, color: Colors.black),
-                          onChanged: (val) {
-                            if (_debounceTimer?.isActive ?? false) {
-                              _debounceTimer?.cancel();
-                            }
-
-                            _debounceTimer =
-                                Timer(const Duration(milliseconds: 500), () {
-                              if (!mounted) return;
-                              ref
-                                  .read(searchMemberQueryProvider.notifier)
-                                  .state = val;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            isDense: true,
-                            hintText: 'အမည် / ဖုန်း / အမှတ်',
-                            hintStyle: TextStyle(
-                                color: Colors.grey[500], fontSize: 12),
-                            fillColor: Colors.white.withValues(alpha: 0.2),
-                            filled: true,
-                            suffixIcon: hasActiveFilters
-                                ? IconButton(
-                                    key: const ValueKey('clear-member-filters'),
-                                    tooltip: 'စစ်ထုတ်မှုအားလုံး ဖျက်ရန်',
-                                    onPressed: _clearFilters,
-                                    icon: Icon(
-                                      Icons.filter_alt_off_outlined,
-                                      size: 20,
-                                      color: primaryColor,
-                                    ),
-                                  )
-                                : Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Icon(
-                                      Icons.search,
-                                      size: 20,
-                                      color: primaryColor,
+                              isExpanded: true,
+                              icon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.black45,
+                                size: 20,
+                              ),
+                              items: [
+                                const DropdownMenuItem(
+                                  value: 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်',
+                                  child: Text(
+                                    'သွေးအုပ်စု',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                                ...bloodTypes.map(
+                                  (item) => DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(fontSize: 12.5),
                                     ),
                                   ),
-                            contentPadding: const EdgeInsets.only(
-                                left: 10, right: 8, top: 8, bottom: 8),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            disabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  ref
+                                      .read(searchMemberBloodTypeFilterProvider
+                                          .notifier)
+                                      .state = value;
+                                }
+                              },
+                            ),
                           ),
-                          keyboardType: TextInputType.text,
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: _buildLastDonationFilter(
+                              selected: selectedLastDonation,
+                              compact: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        key: const ValueKey('member-search-field'),
+                        controller: searchController,
+                        textAlign: TextAlign.start,
+                        style:
+                            const TextStyle(fontSize: 13, color: Colors.black),
+                        onChanged: (val) {
+                          if (_debounceTimer?.isActive ?? false) {
+                            _debounceTimer?.cancel();
+                          }
+
+                          _debounceTimer =
+                              Timer(const Duration(milliseconds: 500), () {
+                            if (!mounted) return;
+                            ref.read(searchMemberQueryProvider.notifier).state =
+                                val;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: 'အမည် / ဖုန်း / အမှတ် / နေရပ်',
+                          hintStyle:
+                              TextStyle(color: Colors.grey[500], fontSize: 12),
+                          fillColor: Colors.white.withValues(alpha: 0.2),
+                          filled: true,
+                          suffixIcon: hasActiveFilters
+                              ? IconButton(
+                                  key: const ValueKey('clear-member-filters'),
+                                  tooltip: 'စစ်ထုတ်မှုအားလုံး ဖျက်ရန်',
+                                  onPressed: _clearFilters,
+                                  icon: Icon(
+                                    Icons.filter_alt_off_outlined,
+                                    size: 20,
+                                    color: primaryColor,
+                                  ),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Icon(
+                                    Icons.search,
+                                    size: 20,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                          contentPadding: const EdgeInsets.only(
+                              left: 10, right: 8, top: 8, bottom: 8),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.grey)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.grey)),
+                          disabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.grey)),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.grey)),
                         ),
-                      )
+                        keyboardType: TextInputType.text,
+                      ),
                     ],
                   ),
                 )
@@ -327,7 +394,8 @@ class _SearchMemberListScreenState
                           });
                         },
                         decoration: InputDecoration(
-                          hintText: 'အမည်၊ အဖွဲ့ဝင်အမှတ်၊ ဖုန်း',
+                          hintText:
+                              'အမည်၊ အမှတ်၊ ဖုန်း၊ လိပ်စာ၊ ရပ်ကွက်၊ မြို့နယ်',
                           hintStyle: const TextStyle(
                               color: Colors.black, fontSize: 15.0),
                           fillColor: Colors.white.withValues(alpha: 0.2),
@@ -365,6 +433,14 @@ class _SearchMemberListScreenState
                               borderSide: const BorderSide(color: Colors.grey)),
                         ),
                         keyboardType: TextInputType.text,
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width / 5,
+                      margin: const EdgeInsets.only(top: 28),
+                      child: _buildLastDonationFilter(
+                        selected: selectedLastDonation,
+                        compact: false,
                       ),
                     ),
                   ],

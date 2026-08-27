@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/member_service.dart' as ms;
 import 'package:donation/src/features/services/donation_service.dart';
 import 'package:donation/src/features/donation_member/domain/donor_eligibility.dart';
+import 'package:donation/src/features/donation_member/domain/last_donation_filter.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/domain/member_range.dart';
 import 'package:donation/src/features/donation_member/data/member_repository.dart';
@@ -227,10 +228,12 @@ class SearchMemberDirectoryController
     required String? query,
     required String? bloodType,
     required DonorEligibilityLevel? availability,
+    required LastDonationFilter? lastDonation,
   })  : _repository = repository,
         _query = query,
         _bloodType = bloodType,
         _availability = availability,
+        _lastDonation = lastDonation,
         super(const AsyncLoading()) {
     Future<void>.microtask(_loadFirstPage);
   }
@@ -239,6 +242,7 @@ class SearchMemberDirectoryController
   final String? _query;
   final String? _bloodType;
   final DonorEligibilityLevel? _availability;
+  final LastDonationFilter? _lastDonation;
   int _requestGeneration = 0;
 
   Future<SearchMemberPage> _loadPage(int page) {
@@ -247,6 +251,7 @@ class SearchMemberDirectoryController
           query: _query,
           bloodType: _bloodType,
           availability: _availability?.apiValue,
+          lastDonation: _lastDonation?.apiValue,
           page: page,
           limit: _searchMemberPageSize,
         )
@@ -332,6 +337,7 @@ final searchMemberListProvider = StateNotifierProvider.autoDispose<
   final searchQuery = ref.watch(searchMemberQueryProvider);
   final bloodType = ref.watch(searchMemberBloodTypeFilterProvider);
   final availability = ref.watch(searchMemberAvailabilityFilterProvider);
+  final lastDonation = ref.watch(searchMemberLastDonationFilterProvider);
   ref.watch(donationMutationRevisionProvider);
 
   // The backend classifies against Bangkok calendar dates. Compute the same
@@ -356,6 +362,7 @@ final searchMemberListProvider = StateNotifierProvider.autoDispose<
         ? null
         : bloodType,
     availability: availability,
+    lastDonation: lastDonation,
   );
 });
 
@@ -510,6 +517,10 @@ final searchMemberBloodTypeFilterProvider =
     StateProvider.autoDispose<String>((ref) => 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်');
 final searchMemberAvailabilityFilterProvider =
     StateProvider.autoDispose<DonorEligibilityLevel?>((ref) => null);
+// "Not donated since ...": narrows the whole directory, counters included, so
+// the summary describes exactly the donors the rows are drawn from.
+final searchMemberLastDonationFilterProvider =
+    StateProvider.autoDispose<LastDonationFilter?>((ref) => null);
 // Filtered members provider
 final filteredMemberListProvider =
     StateProvider.autoDispose<List<Member>>((ref) {
@@ -815,4 +826,5 @@ void resetSearchFilterProviders(WidgetRef ref) {
   ref.read(searchMemberBloodTypeFilterProvider.notifier).state =
       'သွေးအုပ်စုဖြင့် ရှာဖွေမည်';
   ref.read(searchMemberAvailabilityFilterProvider.notifier).state = null;
+  ref.read(searchMemberLastDonationFilterProvider.notifier).state = null;
 }

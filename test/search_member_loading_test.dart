@@ -32,6 +32,7 @@ class _PendingSearchMemberRepository extends SearchMemberRepository {
     String? query,
     String? bloodType,
     String? availability,
+    String? lastDonation,
     int page = 0,
     int limit = 50,
   }) {
