@@ -5,7 +5,9 @@ import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donation_member/presentation/member_list.dart';
 import 'package:donation/src/features/donation_member/presentation/search_member.dart';
 import 'package:donation/src/features/home/mobile_home/home_menu.dart';
+import 'package:donation/src/features/money_donor/money_donor_list_screen.dart';
 import 'package:donation/src/features/monthly_sponsor/monthly_sponsor_list_screen.dart';
+import 'package:donation/src/features/patient/patient_list_screen.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -20,17 +22,8 @@ class HomeMainScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
-  List<String> titles = [
-    'မူလစာမျက်နှာ',
-    'သွေးလှူရှင် ရှာမည်',
-    'အဖွဲ့ဝင် စာရင်း',
-    'သွေးလှူမှု မှတ်တမ်း',
-    'ထူးခြားဖြစ်စဉ်',
-    'ရ/သုံး ငွေစာရင်း',
-  ];
-
   // List of screens to display when menu items are selected
-  List<Widget> widgets = [
+  final List<Widget> widgets = [
     // Dashboard/Home
     DashBoardScreen(),
 
@@ -49,6 +42,9 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
       fromHome: true,
     ),
 
+    // Patient List
+    const PatientListScreen(fromHome: true),
+
     // Special Events
     SpecialEventListScreen(
       fromHome: true,
@@ -58,6 +54,9 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
     DonarListScreen(
       fromHome: true,
     ),
+
+    // Money Donors
+    const MoneyDonorListScreen(fromHome: true),
 
     // Monthly Sponsors
     const MonthlySponsorListScreen(fromHome: true),
@@ -69,6 +68,7 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
   @override
   Widget build(BuildContext context) {
     var selectedIndex = ref.watch(drawerIndexProvider);
+    assert(widgets.length == mobileHomeMenuTitles.length - 1);
     return Scaffold(
       body: widgets[selectedIndex ?? 0],
       drawer: const SizedBox(width: 0), // Empty drawer to prevent errors

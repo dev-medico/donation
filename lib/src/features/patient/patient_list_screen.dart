@@ -5,6 +5,7 @@ import 'package:donation/src/features/patient/providers/patient_provider.dart';
 import 'package:donation/src/features/patient/patient_data_source.dart';
 import 'package:donation/src/features/patient/patient_form.dart';
 import 'package:donation/src/features/patient/patient_detail_screen.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/responsive.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,8 @@ import 'package:donation/utils/age_utils.dart';
 import 'package:donation/src/ui/blood_chip.dart';
 
 class PatientListScreen extends ConsumerStatefulWidget {
-  const PatientListScreen({super.key});
+  const PatientListScreen({super.key, this.fromHome = false});
+  final bool fromHome;
   static const routeName = "/patient-list";
 
   @override
@@ -144,6 +146,14 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
             ),
           ),
         ),
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                tooltip: 'မီနူး',
+                onPressed: () =>
+                    ref.read(drawerControllerProvider)?.toggle?.call(),
+              )
+            : null,
         centerTitle: true,
         title: const Text(
           "လူနာစာရင်း",

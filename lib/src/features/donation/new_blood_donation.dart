@@ -397,9 +397,11 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.sizeOf(context).width < 700;
-    final isKeyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final isKeyboardVisible = keyboardInset > 0;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: isMobile ? const Color(0xFFF8F6F6) : null,
       appBar: AppBar(
         title: Text(
@@ -453,7 +455,9 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                         16,
                         16,
                         16,
-                        isMobile ? 32 : 16,
+                        isMobile
+                            ? (isKeyboardVisible ? keyboardInset + 24 : 32)
+                            : 16,
                       ),
                       child: SizedBox(
                         width: isMobile
@@ -964,54 +968,18 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                   ),
                   SizedBox(height: 12),
                 ],
-                TypeAheadField<String>(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    controller: hospitalController,
-                    decoration: InputDecoration(
-                      labelText: 'ဆေးရုံ/ဆေးခန်း',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  suggestionsCallback: (pattern) {
-                    return hospitals
-                        .where((hospital) => hospital
-                            .toLowerCase()
-                            .contains(pattern.toLowerCase()))
-                        .toList();
-                  },
-                  itemBuilder: (context, String hospital) {
-                    return ListTile(
-                      title: Text(hospital),
-                    );
-                  },
-                  onSuggestionSelected: (String hospital) {
-                    hospitalController.text = hospital;
-                  },
+                _buildKeyboardSafeTypeAhead(
+                  fieldKey: const ValueKey('donation-hospital-typeahead'),
+                  controller: hospitalController,
+                  label: 'ဆေးရုံ/ဆေးခန်း',
+                  values: hospitals,
                 ),
                 SizedBox(height: 12),
-                TypeAheadField<String>(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    controller: diseaseController,
-                    decoration: InputDecoration(
-                      labelText: 'ရောဂါအမျိုးအစား',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  suggestionsCallback: (pattern) {
-                    return diseases
-                        .where((disease) => disease
-                            .toLowerCase()
-                            .contains(pattern.toLowerCase()))
-                        .toList();
-                  },
-                  itemBuilder: (context, String disease) {
-                    return ListTile(
-                      title: Text(disease),
-                    );
-                  },
-                  onSuggestionSelected: (String disease) {
-                    diseaseController.text = disease;
-                  },
+                _buildKeyboardSafeTypeAhead(
+                  fieldKey: const ValueKey('donation-disease-typeahead'),
+                  controller: diseaseController,
+                  label: 'ရောဂါအမျိုးအစား',
+                  values: diseases,
                 ),
               ],
             ),
@@ -1424,54 +1392,18 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
                   ),
                   SizedBox(height: 12),
                 ],
-                TypeAheadField<String>(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    controller: hospitalController,
-                    decoration: InputDecoration(
-                      labelText: 'ဆေးရုံ/ဆေးခန်း',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  suggestionsCallback: (pattern) {
-                    return hospitals
-                        .where((hospital) => hospital
-                            .toLowerCase()
-                            .contains(pattern.toLowerCase()))
-                        .toList();
-                  },
-                  itemBuilder: (context, String hospital) {
-                    return ListTile(
-                      title: Text(hospital),
-                    );
-                  },
-                  onSuggestionSelected: (String hospital) {
-                    hospitalController.text = hospital;
-                  },
+                _buildKeyboardSafeTypeAhead(
+                  fieldKey: const ValueKey('donation-hospital-typeahead'),
+                  controller: hospitalController,
+                  label: 'ဆေးရုံ/ဆေးခန်း',
+                  values: hospitals,
                 ),
                 SizedBox(height: 12),
-                TypeAheadField<String>(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    controller: diseaseController,
-                    decoration: InputDecoration(
-                      labelText: 'ရောဂါအမျိုးအစား',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  suggestionsCallback: (pattern) {
-                    return diseases
-                        .where((disease) => disease
-                            .toLowerCase()
-                            .contains(pattern.toLowerCase()))
-                        .toList();
-                  },
-                  itemBuilder: (context, String disease) {
-                    return ListTile(
-                      title: Text(disease),
-                    );
-                  },
-                  onSuggestionSelected: (String disease) {
-                    diseaseController.text = disease;
-                  },
+                _buildKeyboardSafeTypeAhead(
+                  fieldKey: const ValueKey('donation-disease-typeahead'),
+                  controller: diseaseController,
+                  label: 'ရောဂါအမျိုးအစား',
+                  values: diseases,
                 ),
               ],
             ),
@@ -1552,6 +1484,48 @@ class NewBloodDonationState extends ConsumerState<NewBloodDonationScreen> {
         // Submit Button
         if (!_isMobileLayout) _buildSubmitButton(),
       ],
+    );
+  }
+
+  Widget _buildKeyboardSafeTypeAhead({
+    required Key fieldKey,
+    required TextEditingController controller,
+    required String label,
+    required List<String> values,
+  }) {
+    final isMobile = _isMobileLayout;
+
+    return TypeAheadField<String>(
+      key: fieldKey,
+      direction: isMobile ? AxisDirection.up : AxisDirection.down,
+      autoFlipDirection: isMobile,
+      autoFlipMinHeight: 160,
+      suggestionsBoxDecoration: isMobile
+          ? const SuggestionsBoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              constraints: BoxConstraints(maxHeight: 240),
+            )
+          : const SuggestionsBoxDecoration(),
+      textFieldConfiguration: TextFieldConfiguration(
+        controller: controller,
+        scrollPadding: EdgeInsets.fromLTRB(20, 20, 20, isMobile ? 260 : 20),
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+      suggestionsCallback: (pattern) {
+        final normalizedPattern = pattern.toLowerCase();
+        return values
+            .where((value) => value.toLowerCase().contains(normalizedPattern))
+            .toList();
+      },
+      itemBuilder: (context, String value) {
+        return ListTile(title: Text(value));
+      },
+      onSuggestionSelected: (String value) {
+        controller.text = value;
+      },
     );
   }
 

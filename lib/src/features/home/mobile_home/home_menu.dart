@@ -6,6 +6,34 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final drawerIndexProvider = StateProvider<int?>((ref) => 0);
 
+const mobileHomeMenuTitles = <String>[
+  'မူလစာမျက်နှာ',
+  'သွေးလှူရှင် ရှာမည်',
+  'အဖွဲ့ဝင် စာရင်း',
+  'သွေးလှူမှု မှတ်တမ်း',
+  'လူနာစာရင်း',
+  'ထူးခြားဖြစ်စဉ်',
+  'ရ/သုံး ငွေစာရင်း',
+  'အလှူရှင်များ',
+  'လစဥ်ထောက်ပံ့သူများ',
+  'Facebook ပို့စ်',
+  'ထွက်မည်',
+];
+
+const mobileHomeMenuIcons = <IconData>[
+  Icons.dashboard_outlined,
+  Icons.person_search_outlined,
+  Icons.groups_outlined,
+  Icons.bloodtype_outlined,
+  Icons.local_hospital_outlined,
+  Icons.event_note_outlined,
+  Icons.account_balance_wallet_outlined,
+  Icons.payments_outlined,
+  Icons.volunteer_activism_outlined,
+  Icons.facebook,
+  Icons.logout_outlined,
+];
+
 class HomeMenuScreen extends ConsumerStatefulWidget {
   const HomeMenuScreen({
     super.key,
@@ -17,29 +45,6 @@ class HomeMenuScreen extends ConsumerStatefulWidget {
 
 class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
   String _userName = '';
-
-  List<String> titles = [
-    'မူလစာမျက်နှာ',
-    'သွေးလှူရှင် ရှာမည်',
-    'အဖွဲ့ဝင် စာရင်း',
-    'သွေးလှူမှု မှတ်တမ်း',
-    'ထူးခြားဖြစ်စဉ်',
-    'ရ/သုံး ငွေစာရင်း',
-    'လစဥ်ထောက်ပံ့သူများ',
-    'Facebook ပို့စ်',
-    'ထွက်မည်'
-  ];
-  List<IconData> icons = const [
-    Icons.dashboard_outlined,
-    Icons.person_search_outlined,
-    Icons.groups_outlined,
-    Icons.bloodtype_outlined,
-    Icons.event_note_outlined,
-    Icons.account_balance_wallet_outlined,
-    Icons.volunteer_activism_outlined,
-    Icons.facebook,
-    Icons.logout_outlined,
-  ];
 
   @override
   void initState() {
@@ -111,9 +116,10 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
           // Menu items
           Expanded(
             child: ListView.builder(
+              key: const ValueKey('mobile-home-menu-list'),
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(vertical: 12),
-              itemCount: titles.length,
+              itemCount: mobileHomeMenuTitles.length,
               itemBuilder: (BuildContext context, int index) {
                 return menuItem(index);
               },
@@ -153,7 +159,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
             ref.watch(drawerControllerProvider)!.toggle!.call();
 
             // Handle log out separately
-            if (index == titles.length - 1) {
+            if (index == mobileHomeMenuTitles.length - 1) {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.remove('token');
               prefs.remove('name');
@@ -167,6 +173,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
             }
           },
           child: Container(
+            key: ValueKey('mobile-home-menu-item-$index'),
             constraints: const BoxConstraints(minHeight: 48),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
@@ -188,7 +195,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                     borderRadius: BorderRadius.circular(11),
                   ),
                   child: Icon(
-                    icons[index],
+                    mobileHomeMenuIcons[index],
                     size: 22,
                     color: selectedIndex == index ? Colors.red : Colors.black54,
                   ),
@@ -196,7 +203,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    titles[index],
+                    mobileHomeMenuTitles[index],
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     softWrap: true,

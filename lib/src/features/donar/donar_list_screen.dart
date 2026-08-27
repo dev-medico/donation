@@ -1914,6 +1914,21 @@ class _DonarListScreenState extends ConsumerState<DonarListScreen> {
   }
 }
 
+class _AddRecordDialogContent extends StatelessWidget {
+  const _AddRecordDialogContent({
+    required this.isMobile,
+    required this.child,
+  });
+
+  final bool isMobile;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return isMobile ? child : SingleChildScrollView(child: child);
+  }
+}
+
 // Add record dialog widget
 class _AddRecordDialog extends ConsumerStatefulWidget {
   final int year;
@@ -1949,12 +1964,19 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.sizeOf(context).width < 700;
+
     return Stack(
       children: [
         AlertDialog(
+          scrollable: isMobile,
+          insetPadding: isMobile
+              ? const EdgeInsets.symmetric(horizontal: 16, vertical: 24)
+              : null,
           title: Text(
               _isDonor ? 'အလှူရှင် မှတ်တမ်းအသစ်' : 'အသုံးစရိတ် မှတ်တမ်းအသစ်'),
-          content: SingleChildScrollView(
+          content: _AddRecordDialogContent(
+            isMobile: isMobile,
             child: Form(
               key: _formKey,
               child: Column(
@@ -2003,6 +2025,17 @@ class _AddRecordDialogState extends ConsumerState<_AddRecordDialog> {
                     ),
                     const SizedBox(height: 12),
                     TypeAheadFormField<MoneyDonor>(
+                      direction:
+                          isMobile ? AxisDirection.up : AxisDirection.down,
+                      autoFlipDirection: isMobile,
+                      autoFlipMinHeight: 180,
+                      suggestionsBoxDecoration: isMobile
+                          ? SuggestionsBoxDecoration(
+                              constraints:
+                                  const BoxConstraints(maxHeight: 240),
+                              borderRadius: BorderRadius.circular(12),
+                            )
+                          : const SuggestionsBoxDecoration(),
                       textFieldConfiguration: TextFieldConfiguration(
                         controller: _nameController,
                         decoration: const InputDecoration(

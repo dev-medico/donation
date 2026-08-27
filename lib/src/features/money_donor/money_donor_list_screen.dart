@@ -5,6 +5,7 @@ import 'package:donation/src/features/money_donor/providers/money_donor_provider
 import 'package:donation/src/features/money_donor/money_donor_data_source.dart';
 import 'package:donation/src/features/money_donor/money_donor_form.dart';
 import 'package:donation/src/features/money_donor/money_donor_detail_screen.dart';
+import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/responsive.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,8 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MoneyDonorListScreen extends ConsumerStatefulWidget {
-  const MoneyDonorListScreen({super.key});
+  const MoneyDonorListScreen({super.key, this.fromHome = false});
+  final bool fromHome;
   static const routeName = "/money-donor-list";
 
   @override
@@ -148,6 +150,14 @@ class _MoneyDonorListScreenState extends ConsumerState<MoneyDonorListScreen> {
             ),
           ),
         ),
+        leading: widget.fromHome && Responsive.isMobile(context)
+            ? IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                tooltip: 'မီနူး',
+                onPressed: () =>
+                    ref.read(drawerControllerProvider)?.toggle?.call(),
+              )
+            : null,
         centerTitle: true,
         title: const Text(
           "အလှူရှင်များ",
