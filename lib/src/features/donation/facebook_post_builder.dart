@@ -9,21 +9,29 @@
 /// Everything here is pure Dart so it can be unit tested without a widget tree.
 library;
 
-/// Time-of-day phrases. The ledger stores only a data-entry timestamp, not the
-/// hour the donation actually happened, so this is chosen per patient rather
-/// than derived from `donation_date`.
+/// Complete time-of-day phrases. The ledger stores only a data-entry timestamp,
+/// not the hour the donation actually happened, so this is chosen per patient
+/// rather than derived from `donation_date`.
+///
+/// Some phrases intentionally include `ဒီနေ့` and others do not. Keep them as
+/// complete display/output values instead of adding a common prefix in the UI
+/// or post builder.
 const List<String> kPostTimeOptions = <String>[
-  'မနက်',
+  'မနက်စောစော',
   'မနက်ပိုင်း',
-  'နေ့လယ်',
+  'ဒီနေ့မနက်',
   'နေ့လယ်ပိုင်း',
-  'ညနေ',
+  'ဒီနေ့နေ့လယ်',
   'ညနေပိုင်း',
-  'ညနေစောင်းပိုင်း',
-  'ည',
+  'ဒီနေ့ညနေ',
+  'ညနေစောင်း',
+  'ဒီနေ့ည',
+  kCustomNightTimeOption,
 ];
 
-const String kDefaultPostTime = 'နေ့လယ်';
+const String kCustomNightTimeOption = 'ည(--:--)';
+
+const String kDefaultPostTime = 'ဒီနေ့နေ့လယ်';
 
 const String kDefaultVolunteerHelpers =
     'Kyaw Myo Oo, Nyi Nyi , Myo Myo & Hay Mar Win';
@@ -234,7 +242,7 @@ String _paragraph(DonationPostGroup group, _ParagraphMode mode) {
       '${group.patientName}အတွက် လိုအပ်နေတဲ့'
       '(${group.bloodType})သွေး(${toMyanmarDigits(group.unitCount)})လုံး'
       '$objectParticle ${donorPhrase(group.donorNames)} '
-      'ဒီနေ့${group.timeOfDay}$timeParticle '
+      '${group.timeOfDay}$timeParticle '
       '${hospitalShortName(group.hospital)}ကို သွားရောက်လှူဒါန်းပေး$ending';
 }
 

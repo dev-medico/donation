@@ -108,6 +108,39 @@ void main() {
     expect(find.textContaining('လူနာ'), findsWidgets);
   });
 
+  testWidgets('time dropdown shows the requested complete phrases',
+      (tester) async {
+    await _pumpScreen(tester, const Size(390, 844));
+
+    await tester.tap(find.text('ဒီနေ့နေ့လယ်').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('မနက်စောစော'), findsOneWidget);
+    expect(find.text('ဒီနေ့မနက်'), findsOneWidget);
+    expect(find.text('ညနေစောင်း'), findsOneWidget);
+    expect(find.text('ည(--:--)'), findsOneWidget);
+    expect(find.text('ဒီနေ့မနက်စောစော'), findsNothing);
+  });
+
+  testWidgets('night-time placeholder opens a clock and updates the post',
+      (tester) async {
+    await _pumpScreen(tester, const Size(390, 844));
+
+    await tester.tap(find.text('ဒီနေ့နေ့လယ်').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('ည(--:--)'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('ညအချိန် ရွေးပါ'), findsOneWidget);
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('ပို့စ်စာသား'));
+    await tester.pumpAndSettle();
+    final field = tester.widget<TextField>(find.byType(TextField).last);
+    expect(field.controller?.text, matches(RegExp(r'ည\([၀-၉]+:[၀-၉]{2}\)မှာ')));
+  });
+
   testWidgets('copying puts the generated post on the clipboard',
       (tester) async {
     String? copied;

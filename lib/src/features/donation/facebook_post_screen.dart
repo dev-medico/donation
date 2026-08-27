@@ -150,6 +150,32 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
     );
   }
 
+  Future<void> _selectPostTime(
+    DonationPostGroup group,
+    String selected,
+  ) async {
+    if (selected != kCustomNightTimeOption) {
+      setState(() => group.timeOfDay = selected);
+      _regenerate();
+      return;
+    }
+
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      helpText: 'ညအချိန် ရွေးပါ',
+    );
+    if (picked == null || !mounted) return;
+
+    final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
+    final minute = picked.minute.toString().padLeft(2, '0');
+    setState(() {
+      group.timeOfDay =
+          'ည(${toMyanmarDigits(hour)}:${toMyanmarDigits(minute)})';
+    });
+    _regenerate();
+  }
+
   int get _donationCount =>
       _groups.fold<int>(0, (sum, group) => sum + group.unitCount);
 
@@ -446,6 +472,14 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
   }
 
   Widget _buildGroupCard(DonationPostGroup group, int index) {
+    final hasCustomNightTime =
+        group.timeOfDay.startsWith('ည(') && group.timeOfDay.endsWith(')');
+    final dropdownValue = hasCustomNightTime
+        ? kCustomNightTimeOption
+        : (kPostTimeOptions.contains(group.timeOfDay)
+            ? group.timeOfDay
+            : kDefaultPostTime);
+
     return Container(
       key: ValueKey('post-group-${group.key}'),
       margin: const EdgeInsets.only(bottom: 8),
@@ -489,13 +523,13 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
                 SizedBox(
                   height: 38,
                   child: DropdownButtonFormField<String>(
-                    initialValue: kPostTimeOptions.contains(group.timeOfDay)
-                        ? group.timeOfDay
-                        : kDefaultPostTime,
+                    key: ValueKey(
+                      'post-time-${group.key}-${group.timeOfDay}',
+                    ),
+                    initialValue: dropdownValue,
                     isDense: true,
                     // Without this the field takes the width of its longest
-                    // option ('ဒီနေ့ညနေစောင်းပိုင်း') and overflows the card
-                    // on a phone.
+                    // option and overflows the card on a phone.
                     isExpanded: true,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -505,14 +539,17 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
                     items: kPostTimeOptions
                         .map((option) => DropdownMenuItem<String>(
                               value: option,
-                              child: Text('ဒီနေ့$option',
+                              child: Text(
+                                  option == kCustomNightTimeOption &&
+                                          hasCustomNightTime
+                                      ? group.timeOfDay
+                                      : option,
                                   style: const TextStyle(fontSize: 13)),
                             ))
                         .toList(),
-                    onChanged: (value) {
+                    onChanged: (value) async {
                       if (value == null) return;
-                      setState(() => group.timeOfDay = value);
-                      _regenerate();
+                      await _selectPostTime(group, value);
                     },
                   ),
                 ),

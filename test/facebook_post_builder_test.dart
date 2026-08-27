@@ -106,8 +106,13 @@ void main() {
       final text = buildFacebookPostText(
         date: date,
         groups: groupsWithTimes(const [
-          'နေ့လယ်', 'နေ့လယ်ပိုင်း', 'နေ့လယ်',
-          'နေ့လယ်ပိုင်း', 'ညနေ', 'ညနေ', 'ညနေစောင်းပိုင်း',
+          'ဒီနေ့နေ့လယ်',
+          'နေ့လယ်ပိုင်း',
+          'ဒီနေ့နေ့လယ်',
+          'နေ့လယ်ပိုင်း',
+          'ဒီနေ့ညနေ',
+          'ဒီနေ့ညနေ',
+          'ညနေစောင်း',
         ]),
       );
       expect(
@@ -124,7 +129,7 @@ void main() {
     test('pairs paragraphs: odd ones close with ကိုတော့/မှာပဲ', () {
       final text = buildFacebookPostText(
         date: date,
-        groups: groupsWithTimes(List.filled(7, 'နေ့လယ်')),
+        groups: groupsWithTimes(List.filled(7, 'ဒီနေ့နေ့လယ်')),
       );
       final paragraphs = text
           .split('\n\n')
@@ -149,7 +154,7 @@ void main() {
     test('keeps the fixed header, sign-off and hashtags', () {
       final text = buildFacebookPostText(
         date: date,
-        groups: groupsWithTimes(List.filled(7, 'နေ့လယ်')),
+        groups: groupsWithTimes(List.filled(7, 'ဒီနေ့နေ့လယ်')),
         volunteerHelpers: 'Kyaw Myo Oo, Nyi Nyi',
       );
       expect(text, startsWith('၂၅၊ ၈၊ ၂၀၂၆ (အင်္ဂါနေ့)'));
@@ -164,5 +169,20 @@ void main() {
       expect(text, contains('#RED_Juniors'));
       expect(text, isNot(contains('သွားရောက်လှူဒါန်းပေး')));
     });
+  });
+
+  test('time choices are complete phrases in the requested order', () {
+    expect(kPostTimeOptions, const [
+      'မနက်စောစော',
+      'မနက်ပိုင်း',
+      'ဒီနေ့မနက်',
+      'နေ့လယ်ပိုင်း',
+      'ဒီနေ့နေ့လယ်',
+      'ညနေပိုင်း',
+      'ဒီနေ့ညနေ',
+      'ညနေစောင်း',
+      'ဒီနေ့ည',
+      'ည(--:--)',
+    ]);
   });
 }
