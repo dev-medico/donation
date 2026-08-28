@@ -2,20 +2,19 @@ import 'package:donation/src/features/donation_member/domain/last_donation_filte
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('the menu offers ten years, newest first, without the current year', () {
+  test('the menu offers every ledger year, newest first', () {
     final years = LastDonationFilter.menuYears(DateTime(2026, 8, 27));
 
-    expect(years, hasLength(10));
-    expect(years.first, 2025);
-    expect(years.last, 2016);
-    expect(years.contains(2026), isFalse);
+    expect(years, hasLength(17));
+    expect(years.first, 2026);
+    expect(years.last, 2010);
   });
 
-  test('a year is sent as the year itself and reads as an upper bound', () {
-    const filter = LastDonationFilter.upToYear(2024);
+  test('a year is sent and displayed as one exact year', () {
+    const filter = LastDonationFilter.inYear(2024);
 
     expect(filter.apiValue, '2024');
-    expect(filter.label, '2024 နှင့် အရင်');
+    expect(filter.label, '2024');
     expect(filter.year, 2024);
     expect(filter.neverDonated, isFalse);
   });
@@ -33,20 +32,20 @@ void main() {
     // The menu rebuilds its items on every frame, so the selected value is a
     // different instance from the one in the item list.
     expect(
-      const LastDonationFilter.upToYear(2024),
-      LastDonationFilter.upToYear(2024),
+      const LastDonationFilter.inYear(2024),
+      LastDonationFilter.inYear(2024),
     );
     expect(
-      const LastDonationFilter.upToYear(2024).hashCode,
-      LastDonationFilter.upToYear(2024).hashCode,
+      const LastDonationFilter.inYear(2024).hashCode,
+      LastDonationFilter.inYear(2024).hashCode,
     );
     expect(
-      const LastDonationFilter.upToYear(2024),
-      isNot(const LastDonationFilter.upToYear(2023)),
+      const LastDonationFilter.inYear(2024),
+      isNot(const LastDonationFilter.inYear(2023)),
     );
     expect(
       const LastDonationFilter.never(),
-      isNot(const LastDonationFilter.upToYear(2024)),
+      isNot(const LastDonationFilter.inYear(2024)),
     );
   });
 }

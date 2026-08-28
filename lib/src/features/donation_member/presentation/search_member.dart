@@ -15,7 +15,7 @@ class SearchMemberListScreen extends ConsumerStatefulWidget {
   static const routeName = "/search_members";
   final bool fromHome;
   const SearchMemberListScreen({Key? key, this.fromHome = false})
-      : super(key: key);
+    : super(key: key);
 
   @override
   _SearchMemberListScreenState createState() => _SearchMemberListScreenState();
@@ -56,9 +56,7 @@ class _SearchMemberListScreenState
     ref.read(searchMemberLastDonationFilterProvider.notifier).state = null;
   }
 
-  /// "Not donated since ...". Every year is an upper bound rather than a single
-  /// year, so ten entries still reach the oldest donor in the ledger, and the
-  /// donors who have rested longest are one tap away.
+  /// Filters by the exact calendar year in which the donor last donated.
   Widget _buildLastDonationFilter({
     required LastDonationFilter? selected,
     required bool compact,
@@ -97,7 +95,7 @@ class _SearchMemberListScreenState
           ),
         ),
         ...years.map((year) {
-          final filter = LastDonationFilter.upToYear(year);
+          final filter = LastDonationFilter.inYear(year);
           return DropdownMenuItem<LastDonationFilter?>(
             value: filter,
             child: Text(filter.label, style: textStyle),
@@ -120,11 +118,14 @@ class _SearchMemberListScreenState
     final membersAsync = ref.watch(searchMemberListProvider);
     final selectedBloodType = ref.watch(searchMemberBloodTypeFilterProvider);
     final selectedQuery = ref.watch(searchMemberQueryProvider);
-    final selectedAvailability =
-        ref.watch(searchMemberAvailabilityFilterProvider);
-    final selectedLastDonation =
-        ref.watch(searchMemberLastDonationFilterProvider);
-    final hasActiveFilters = selectedBloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ||
+    final selectedAvailability = ref.watch(
+      searchMemberAvailabilityFilterProvider,
+    );
+    final selectedLastDonation = ref.watch(
+      searchMemberLastDonationFilterProvider,
+    );
+    final hasActiveFilters =
+        selectedBloodType != 'သွေးအုပ်စုဖြင့် ရှာဖွေမည်' ||
         selectedQuery.trim().isNotEmpty ||
         selectedAvailability != null ||
         selectedLastDonation != null;
@@ -133,12 +134,14 @@ class _SearchMemberListScreenState
       backgroundColor: Colors.white,
       appBar: AppBar(
         flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [primaryColor, primaryDark],
-        ))),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [primaryColor, primaryDark],
+            ),
+          ),
+        ),
         leading: widget.fromHome && Responsive.isMobile(context)
             ? Padding(
                 padding: const EdgeInsets.only(top: 4, left: 8),
@@ -176,10 +179,13 @@ class _SearchMemberListScreenState
         ],
         title: Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Text("သွေးလှူရှင်များ ရှာဖွေရန်",
-              style: TextStyle(
-                  fontSize: Responsive.isMobile(context) ? 15 : 16,
-                  color: Colors.white)),
+          child: Text(
+            "သွေးလှူရှင်များ ရှာဖွေရန်",
+            style: TextStyle(
+              fontSize: Responsive.isMobile(context) ? 15 : 16,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
       body: Column(
@@ -239,9 +245,12 @@ class _SearchMemberListScreenState
                               onChanged: (value) {
                                 if (value != null) {
                                   ref
-                                      .read(searchMemberBloodTypeFilterProvider
-                                          .notifier)
-                                      .state = value;
+                                          .read(
+                                            searchMemberBloodTypeFilterProvider
+                                                .notifier,
+                                          )
+                                          .state =
+                                      value;
                                 }
                               },
                             ),
@@ -260,25 +269,33 @@ class _SearchMemberListScreenState
                         key: const ValueKey('member-search-field'),
                         controller: searchController,
                         textAlign: TextAlign.start,
-                        style:
-                            const TextStyle(fontSize: 13, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.black,
+                        ),
                         onChanged: (val) {
                           if (_debounceTimer?.isActive ?? false) {
                             _debounceTimer?.cancel();
                           }
 
-                          _debounceTimer =
-                              Timer(const Duration(milliseconds: 500), () {
-                            if (!mounted) return;
-                            ref.read(searchMemberQueryProvider.notifier).state =
-                                val;
-                          });
+                          _debounceTimer = Timer(
+                            const Duration(milliseconds: 500),
+                            () {
+                              if (!mounted) return;
+                              ref
+                                      .read(searchMemberQueryProvider.notifier)
+                                      .state =
+                                  val;
+                            },
+                          );
                         },
                         decoration: InputDecoration(
                           isDense: true,
                           hintText: 'အမည် / ဖုန်း / အမှတ် / နေရပ်',
-                          hintStyle:
-                              TextStyle(color: Colors.grey[500], fontSize: 12),
+                          hintStyle: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 12,
+                          ),
                           fillColor: Colors.white.withValues(alpha: 0.2),
                           filled: true,
                           suffixIcon: hasActiveFilters
@@ -301,19 +318,27 @@ class _SearchMemberListScreenState
                                   ),
                                 ),
                           contentPadding: const EdgeInsets.only(
-                              left: 10, right: 8, top: 8, bottom: 8),
+                            left: 10,
+                            right: 8,
+                            top: 8,
+                            bottom: 8,
+                          ),
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                           focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                           disabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                           enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                         ),
                         keyboardType: TextInputType.text,
                       ),
@@ -333,7 +358,11 @@ class _SearchMemberListScreenState
                         decoration: InputDecoration(
                           isDense: true,
                           contentPadding: EdgeInsets.only(
-                              top: 16, left: 20, bottom: 16, right: 12),
+                            top: 16,
+                            left: 20,
+                            bottom: 16,
+                            right: 12,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -352,52 +381,68 @@ class _SearchMemberListScreenState
                               style: const TextStyle(fontSize: 14),
                             ),
                           ),
-                          ...bloodTypes.map((item) => DropdownMenuItem<String>(
-                                value: item,
-                                child: Text(
-                                  item,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              )),
+                          ...bloodTypes.map(
+                            (item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ),
                         ],
                         onChanged: (value) {
                           if (value != null) {
                             ref
-                                .read(searchMemberBloodTypeFilterProvider
-                                    .notifier)
-                                .state = value;
+                                    .read(
+                                      searchMemberBloodTypeFilterProvider
+                                          .notifier,
+                                    )
+                                    .state =
+                                value;
                           }
                         },
                       ),
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width / 3,
-                      margin:
-                          const EdgeInsets.only(right: 40, top: 28, left: 20),
+                      margin: const EdgeInsets.only(
+                        right: 40,
+                        top: 28,
+                        left: 20,
+                      ),
                       padding: const EdgeInsets.only(top: 8, bottom: 8),
                       child: TextFormField(
                         key: const ValueKey('member-search-field'),
                         controller: searchController,
                         textAlign: TextAlign.start,
-                        style:
-                            const TextStyle(fontSize: 15, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.black,
+                        ),
                         onChanged: (val) {
                           if (_debounceTimer?.isActive ?? false) {
                             _debounceTimer?.cancel();
                           }
 
-                          _debounceTimer =
-                              Timer(const Duration(milliseconds: 500), () {
-                            if (!mounted) return;
-                            ref.read(searchMemberQueryProvider.notifier).state =
-                                val;
-                          });
+                          _debounceTimer = Timer(
+                            const Duration(milliseconds: 500),
+                            () {
+                              if (!mounted) return;
+                              ref
+                                      .read(searchMemberQueryProvider.notifier)
+                                      .state =
+                                  val;
+                            },
+                          );
                         },
                         decoration: InputDecoration(
                           hintText:
                               'အမည်၊ အမှတ်၊ ဖုန်း၊ လိပ်စာ၊ ရပ်ကွက်၊ မြို့နယ်',
                           hintStyle: const TextStyle(
-                              color: Colors.black, fontSize: 15.0),
+                            color: Colors.black,
+                            fontSize: 15.0,
+                          ),
                           fillColor: Colors.white.withValues(alpha: 0.2),
                           filled: true,
                           suffixIcon: hasActiveFilters
@@ -418,19 +463,27 @@ class _SearchMemberListScreenState
                                   ),
                                 ),
                           contentPadding: const EdgeInsets.only(
-                              left: 20, right: 20, top: 4, bottom: 4),
+                            left: 20,
+                            right: 20,
+                            top: 4,
+                            bottom: 4,
+                          ),
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                           focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                           disabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                           enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.grey)),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
                         ),
                         keyboardType: TextInputType.text,
                       ),
@@ -455,7 +508,11 @@ class _SearchMemberListScreenState
                 margin: Responsive.isMobile(context)
                     ? const EdgeInsets.only(left: 8, right: 8, top: 6)
                     : const EdgeInsets.only(
-                        left: 20.0, right: 20, top: 20, bottom: 12),
+                        left: 20.0,
+                        right: 20,
+                        top: 20,
+                        bottom: 12,
+                      ),
                 child: buildSimpleTable(directory),
               ),
             ),
@@ -534,10 +591,8 @@ class _SearchMemberListScreenState
       onOpenActions: (member) {
         showDialog(
           context: context,
-          builder: (context) => CallOrRemarkDialog(
-            title: 'လုပ်ဆောင်ရန်',
-            member: member,
-          ),
+          builder: (context) =>
+              CallOrRemarkDialog(title: 'လုပ်ဆောင်ရန်', member: member),
         );
       },
       onEdit: (member) {

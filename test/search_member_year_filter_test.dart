@@ -63,9 +63,7 @@ Future<void> _pumpScreen(
   });
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        searchMemberRepositoryProvider.overrideWithValue(repository),
-      ],
+      overrides: [searchMemberRepositoryProvider.overrideWithValue(repository)],
       child: const MaterialApp(home: SearchMemberListScreen()),
     ),
   );
@@ -75,13 +73,24 @@ Future<void> _pumpScreen(
 Future<void> _selectFromYearMenu(WidgetTester tester, String label) async {
   await tester.tap(find.byKey(const ValueKey('last-donation-filter-all')));
   await tester.pumpAndSettle();
-  await tester.tap(find.text(label).last);
+
+  final option = find.text(label);
+  for (var attempt = 0; attempt < 10 && option.evaluate().isEmpty; attempt++) {
+    await tester.drag(
+      find.byType(Scrollable).last,
+      const Offset(0, -300),
+    );
+    await tester.pumpAndSettle();
+  }
+  expect(option, findsWidgets);
+  await tester.tap(option.last);
   await tester.pumpAndSettle();
 }
 
 void main() {
-  testWidgets('picking a year asks the server for that year and earlier',
-      (tester) async {
+  testWidgets('picking a year asks the server for that exact year', (
+    tester,
+  ) async {
     final repository = _RecordingRepository();
     await _pumpScreen(
       tester,
@@ -92,14 +101,34 @@ void main() {
     expect(repository.lastDonationRequests, [null]);
 
     final year = LastDonationFilter.menuYears(DateTime.now()).first;
-    await _selectFromYearMenu(tester, '$year နှင့် အရင်');
+    await _selectFromYearMenu(tester, '$year');
 
     expect(repository.lastDonationRequests, [null, '$year']);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('never-donated members can be requested on their own',
-      (tester) async {
+  testWidgets('the oldest ledger year remains selectable', (tester) async {
+    final repository = _RecordingRepository();
+    await _pumpScreen(
+      tester,
+      size: const Size(390, 844),
+      repository: repository,
+    );
+
+    await _selectFromYearMenu(
+      tester,
+      '${LastDonationFilter.firstRecordedYear}',
+    );
+
+    expect(
+      repository.lastDonationRequests,
+      [null, '${LastDonationFilter.firstRecordedYear}'],
+    );
+  });
+
+  testWidgets('never-donated members can be requested on their own', (
+    tester,
+  ) async {
     final repository = _RecordingRepository();
     await _pumpScreen(
       tester,
@@ -121,7 +150,7 @@ void main() {
     );
 
     final year = LastDonationFilter.menuYears(DateTime.now()).first;
-    await _selectFromYearMenu(tester, '$year နှင့် အရင်');
+    await _selectFromYearMenu(tester, '$year');
     expect(repository.lastDonationRequests.last, '$year');
 
     // The year alone is enough to offer "clear all filters".

@@ -20,6 +20,14 @@ final donationsByYearProvider =
   return donationsData.map((data) => Donation.fromJson(data)).toList();
 });
 
+final donationsByDateProvider =
+    FutureProvider.family<List<Donation>, DateTime>((ref, date) async {
+  final donationService = ref.read(donationServiceProvider);
+  final donationsData = await donationService.getDonationsByDate(date);
+
+  return donationsData.map((data) => Donation.fromJson(data)).toList();
+});
+
 final donationStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
   final donationService = ref.read(donationServiceProvider);
   return donationService.getDonationStats();

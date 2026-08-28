@@ -5,6 +5,7 @@ import 'package:donation/src/common_widgets/common_tab_bar.dart';
 import 'package:donation/src/features/donation/blood_donation_report.dart';
 import 'package:donation/src/features/donation/donation_data_source.dart';
 import 'package:donation/src/features/donation/donation_detail.dart';
+import 'package:donation/src/features/donation/donations_by_date_screen.dart';
 import 'package:donation/src/features/donation/models/donation.dart';
 import 'package:donation/src/features/donation/new_blood_donation.dart';
 import 'package:donation/src/features/donation/providers/donation_providers.dart';
@@ -78,6 +79,37 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
     "12",
   ];
 
+  Future<void> _findDonationsByDate() async {
+    final today = DateTime.now();
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: today,
+      firstDate: DateTime(2010),
+      lastDate: today,
+      helpText: 'လှူဒါန်းသည့်ရက် ရွေးပါ',
+      cancelText: 'မရွေးတော့ပါ',
+      confirmText: 'ရှာမည်',
+    );
+
+    if (!mounted || selectedDate == null) return;
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DonationsByDateScreen(
+          initialDate: selectedDate,
+        ),
+      ),
+    );
+
+    if (mounted) {
+      ref.invalidate(donationsByMonthYearProvider((
+        month: _monthSelected + 1,
+        year: int.parse(years[_yearSelected]),
+      )));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var donationData = ref.watch(donationsByMonthYearProvider(
@@ -137,6 +169,15 @@ class _DonationListScreenState extends ConsumerState<DonationListScreen> {
                   color: Colors.white)),
         ),
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: IconButton(
+              key: const Key('find-donations-by-date'),
+              tooltip: 'လှူဒါန်းသည့်ရက်ဖြင့် ရှာရန်',
+              icon: const Icon(Icons.manage_search, color: Colors.white),
+              onPressed: _findDonationsByDate,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 4, right: 8),
             child: IconButton(

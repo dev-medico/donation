@@ -146,6 +146,49 @@ class DonationService extends BaseService {
     }
   }
 
+  /// Fetches every donation on one exact local calendar date.
+  Future<List<dynamic>> getDonationsByDate(DateTime date,
+      {int limit = 100}) async {
+    final headers = await getAuthHeaders();
+    final selectedDate = '${date.year.toString().padLeft(4, '0')}-'
+        '${date.month.toString().padLeft(2, '0')}-'
+        '${date.day.toString().padLeft(2, '0')}';
+    final allDonations = <dynamic>[];
+    var currentPage = 0;
+    var hasMoreData = true;
+
+    _updateLoadingStatus('Fetching donations for $selectedDate...');
+
+    try {
+      while (hasMoreData) {
+        final response = await apiClient.get(
+          '$_basePath/by-date',
+          queryParameters: {
+            'date': selectedDate,
+            'limit': limit.toString(),
+            'page': currentPage.toString(),
+          },
+          options: {'headers': headers},
+        );
+
+        if (response.statusCode != 200) {
+          throw Exception('Failed to fetch donations for $selectedDate');
+        }
+
+        final pageData = response.data!['data'] as List<dynamic>;
+        allDonations.addAll(pageData);
+        hasMoreData = response.data!['hasMore'] == true;
+        currentPage++;
+      }
+
+      _updateLoadingStatus('');
+      return allDonations;
+    } catch (error) {
+      _updateLoadingStatus('Error: $error');
+      rethrow;
+    }
+  }
+
   Future<Map<String, dynamic>> getDonationById(String id) async {
     final headers = await getAuthHeaders();
     _updateLoadingStatus('Fetching donation details...');
