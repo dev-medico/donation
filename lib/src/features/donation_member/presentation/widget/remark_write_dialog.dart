@@ -2,6 +2,7 @@ import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/domain/donor_eligibility.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/common_dialog.dart';
+import 'package:donation/src/ui/blood_chip.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,7 +10,12 @@ import 'package:donation/src/features/donation_member/presentation/controller/me
 
 class RemarkWriteDialog extends ConsumerStatefulWidget {
   final Member? member;
-  const RemarkWriteDialog({super.key, required this.member});
+
+  /// Called with the saved member so an open directory can update that one row
+  /// in place. Without it the directory falls back to a full refresh.
+  final void Function(Member saved)? onSaved;
+
+  const RemarkWriteDialog({super.key, required this.member, this.onSaved});
 
   @override
   ConsumerState<RemarkWriteDialog> createState() => _RemarkWriteDialogState();
@@ -19,6 +25,18 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
   TextEditingController remarkController = TextEditingController();
   bool checked = false;
   bool isLoading = false;
+
+  /// The remarks staff actually save, most frequent first in the ledger:
+  /// switched-off or unreachable phones, donors now working abroad, health
+  /// rests, pregnancy. One tap fills the field mid-call.
+  static const List<String> _quickRemarks = [
+    'ဖုန်းစက်ပိတ်ထား',
+    'ဖုန်းဆက်လို့မရ',
+    'ယိုးဒယားရောက်နေ',
+    'နိုင်ငံခြားရောက်နေ',
+    'ကျန်းမာရေးအရ နားထား',
+    'ကိုယ်ဝန်ရှိ',
+  ];
 
   @override
   void initState() {
@@ -32,6 +50,85 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
   void dispose() {
     remarkController.dispose();
     super.dispose();
+  }
+
+  void _fillQuickRemark(String phrase) {
+    final existing = remarkController.text.trim();
+    final next = existing.isEmpty ? phrase : '$existing၊ $phrase';
+    remarkController.value = TextEditingValue(
+      text: next,
+      selection: TextSelection.collapsed(offset: next.length),
+    );
+  }
+
+  Future<void> _save() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Only update the two fields controlled by this dialog. Search rows
+      // contain a derived last donation date, so reposting the whole row
+      // could overwrite newer data.
+      final repository = ref.read(memberRepositoryProvider);
+      final saved = await repository.updateMemberAvailability(
+        widget.member!.id.toString(),
+        canDonate: checked,
+        note: remarkController.text.trim(),
+      );
+
+      // The update endpoint returns the raw member record; merge only the
+      // availability fields onto the directory row so the derived effective
+      // last-donation date survives.
+      final merged = (widget.member ?? saved).withAvailability(
+        status: saved.status ?? (checked ? 'available' : 'not_available'),
+        note: saved.note ?? remarkController.text.trim(),
+        canDonateValue: saved.canDonateValue,
+      );
+
+      // The member-list screen re-fetches on its next visit.
+      ref.invalidate(memberListProvider);
+
+      final onSaved = widget.onSaved;
+      if (onSaved != null) {
+        // The directory updates this one row in place: no reload, no lost
+        // scroll position while the admin works down the list.
+        onSaved(merged);
+      } else {
+        ref.invalidate(searchMemberListProvider);
+      }
+
+      if (mounted) {
+        final messenger = ScaffoldMessenger.of(context);
+        Navigator.pop(context);
+        final name = (merged.name ?? '').trim();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              name.isEmpty ? 'သိမ်းဆည်းပြီးပါပြီ' : '$name — သိမ်းဆည်းပြီးပါပြီ',
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'သိမ်းဆည်း၍ မရသေးပါ။ အင်တာနက်ကို စစ်ဆေးပြီး ထပ်မံကြိုးစားပါ။',
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -48,8 +145,10 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _MemberIdentityHeader(member: widget.member),
+          const SizedBox(height: 14),
           Container(
-            margin: EdgeInsets.only(left: 12, right: 12, top: 20),
+            margin: EdgeInsets.only(left: 12, right: 12),
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: checked ? Colors.green.shade50 : Colors.red.shade50,
@@ -157,55 +256,38 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
             ),
           ),
           Container(
+            margin: const EdgeInsets.only(left: 12, right: 12, top: 10),
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final phrase in _quickRemarks)
+                  ActionChip(
+                    key: ValueKey('quick-remark-$phrase'),
+                    label: Text(phrase),
+                    labelStyle: const TextStyle(
+                      fontSize: 11.5,
+                      color: Color(0xFF334155),
+                    ),
+                    labelPadding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+                    backgroundColor: const Color(0xFFF8FAFC),
+                    shape: StadiumBorder(
+                      side: const BorderSide(color: Color(0xFFCBD5E1)),
+                    ),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onPressed: isLoading ? null : () => _fillQuickRemark(phrase),
+                  ),
+              ],
+            ),
+          ),
+          Container(
             width: double.infinity,
             margin:
-                const EdgeInsets.only(left: 12, bottom: 16, right: 12, top: 28),
+                const EdgeInsets.only(left: 12, bottom: 16, right: 12, top: 24),
             child: FilledButton.icon(
-              onPressed: isLoading
-                  ? null
-                  : () async {
-                      setState(() {
-                        isLoading = true;
-                      });
-
-                      try {
-                        // Only update the two fields controlled by this dialog.
-                        // Search rows contain a derived last donation date, so
-                        // reposting the whole row could overwrite newer data.
-                        final repository = ref.read(memberRepositoryProvider);
-                        await repository.updateMemberAvailability(
-                          widget.member!.id.toString(),
-                          canDonate: checked,
-                          note: remarkController.text.trim(),
-                        );
-
-                        // Both views will re-fetch from the updated source.
-                        ref.invalidate(memberListProvider);
-                        ref.invalidate(searchMemberListProvider);
-
-                        if (mounted) {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('အချက်အလက်များ သိမ်းဆည်းပြီးပါပြီ'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        if (mounted) {
-                          setState(() {
-                            isLoading = false;
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      }
-                    },
+              onPressed: isLoading ? null : _save,
               icon: isLoading
                   ? const SizedBox(
                       width: 18,
@@ -233,6 +315,71 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
               ),
             ),
           )
+        ],
+      ),
+    );
+  }
+}
+
+/// Names the donor being edited. Admins work through hundreds of similar rows
+/// in one sitting; showing who this save belongs to prevents editing the
+/// wrong donor after a mis-tap.
+class _MemberIdentityHeader extends StatelessWidget {
+  const _MemberIdentityHeader({required this.member});
+
+  final Member? member;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = (member?.name ?? '').trim();
+    final details = <String>[
+      if ((member?.memberId ?? '').trim().isNotEmpty)
+        member!.memberId!.trim(),
+      if ((member?.phone ?? '').trim().isNotEmpty) member!.phone!.trim(),
+    ];
+
+    return Container(
+      key: const ValueKey('remark-member-identity'),
+      margin: const EdgeInsets.only(left: 12, right: 12, top: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        children: [
+          BloodChip(bloodType: member?.bloodType, size: 36),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name.isEmpty ? 'အမည်မရှိ' : name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                if (details.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    details.join(' · '),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );

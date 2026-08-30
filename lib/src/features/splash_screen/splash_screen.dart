@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animated_widgets/animated_widgets.dart';
 import 'package:donation/core/api/api_client.dart';
-import 'package:donation/src/features/donation_member/presentation/controller/member_provider.dart';
 import 'package:donation/src/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
@@ -11,7 +8,6 @@ import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:donation/src/features/services/auth_service.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   SplashScreen({Key? key}) : super(key: key);
@@ -22,9 +18,6 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
-  String name = "";
-  String memberPhone = "";
-
   @override
   void initState() {
     super.initState();
@@ -32,65 +25,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   initial() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      name = prefs.getString("name") ?? "";
-      memberPhone = prefs.getString("phone") ?? "";
-    });
-    log("Phone - " + memberPhone);
-    log("name - " + name);
+    final prefs = await SharedPreferences.getInstance();
+    // A stored token is the whole session: route on it alone, with no network
+    // call and nothing that can clear it. (This used to fall into a dead
+    // member re-login branch whenever the account had no phone number, which
+    // wiped the session on every app start.) If the token was really revoked,
+    // the first authenticated request 401s and returns to login as usual.
+    final hasSession = (prefs.getString('token') ?? '').isNotEmpty;
 
-    Future.delayed(const Duration(seconds: 5), () async {
-      if (memberPhone != "") {
-        if (name == "") {
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-        } else {
-          // Restoring an existing session: open the same grace window used
-          // after a fresh login so the home screen's first authenticated
-          // request can't bounce us straight back to the login page.
-          ApiClient.markLoggedIn();
-          Navigator.pushReplacementNamed(context, HomeScreen.routeName);
-        }
+    Future.delayed(const Duration(seconds: 5), () {
+      if (!mounted) return;
+      if (hasSession) {
+        // Restoring an existing session: open the same grace window used
+        // after a fresh login so the home screen's first authenticated
+        // request can't bounce us straight back to the login page.
+        ApiClient.markLoggedIn();
+        Navigator.pushReplacementNamed(context, HomeScreen.routeName);
       } else {
-        final authService = ref.read(authServiceProvider);
-        try {
-          // Re-authenticate member
-          await authService.memberLogin(memberPhone);
-
-          // Get member data
-          final memberFuture =
-              ref.read(membersDataByPhoneProvider(memberPhone).future);
-          final member = await memberFuture;
-
-          if (member != null) {
-            ref.read(loginMemberProvider.notifier).state = member;
-            if (mounted) {
-              // Todo
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => FeedMainScreen(
-              //       data: member,
-              //       isEditable: false,
-              //     ),
-              //   ),
-              // );
-            }
-          } else {
-            // Member not found, logout and go to login screen
-            await authService.logout();
-            if (mounted) {
-              Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-            }
-          }
-        } catch (err) {
-          log("Login error: $err");
-          // Error in login, clear data and go to login screen
-          await authService.logout();
-          if (mounted) {
-            Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-          }
-        }
+        Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       }
     });
   }

@@ -19,6 +19,8 @@ class DonorSearchResults extends StatelessWidget {
     required this.onOpenActions,
     required this.onEdit,
     this.loadMoreError,
+    this.highlightedMemberKey,
+    this.highlightTick = 0,
   });
 
   final List<Member> members;
@@ -33,6 +35,11 @@ class DonorSearchResults extends StatelessWidget {
   final ValueChanged<Member> onOpenActions;
   final ValueChanged<Member> onEdit;
   final String? loadMoreError;
+
+  /// Row to pulse after its remark was saved, keyed by member id. [highlightTick]
+  /// changes on every save so editing the same row pulses again.
+  final String? highlightedMemberKey;
+  final int highlightTick;
 
   @override
   Widget build(BuildContext context) {
@@ -115,17 +122,29 @@ class DonorSearchResults extends StatelessWidget {
                           }
 
                           final entry = entries[index];
-                          if (showDesktopRows) {
-                            return _DesktopDonorRow(
-                              entry: entry,
-                              onOpenActions: () => onOpenActions(entry.member),
-                              onEdit: () => onEdit(entry.member),
-                            );
+                          final Widget row = showDesktopRows
+                              ? _DesktopDonorRow(
+                                  entry: entry,
+                                  onOpenActions: () =>
+                                      onOpenActions(entry.member),
+                                  onEdit: () => onEdit(entry.member),
+                                )
+                              : _MobileDonorCard(
+                                  entry: entry,
+                                  onOpenActions: () =>
+                                      onOpenActions(entry.member),
+                                  onEdit: () => onEdit(entry.member),
+                                );
+                          final memberKey = entry.member.id?.toString() ??
+                              entry.member.memberId;
+                          if (highlightedMemberKey == null ||
+                              memberKey != highlightedMemberKey) {
+                            return row;
                           }
-                          return _MobileDonorCard(
-                            entry: entry,
-                            onOpenActions: () => onOpenActions(entry.member),
-                            onEdit: () => onEdit(entry.member),
+                          return _SavedPulse(
+                            tick: highlightTick,
+                            borderRadius: showDesktopRows ? 12 : 11,
+                            child: row,
                           );
                         },
                       ),
@@ -230,6 +249,50 @@ class _DonorEntry {
 
   final Member member;
   final DonorEligibility eligibility;
+}
+
+/// One-shot glow around the card whose edit was just saved: after the dialog
+/// closes it re-anchors the admin's eye on the row they were working on.
+/// Slate, so it cannot be read as one of the three availability colours.
+class _SavedPulse extends StatelessWidget {
+  const _SavedPulse({
+    required this.tick,
+    required this.borderRadius,
+    required this.child,
+  });
+
+  final int tick;
+  final double borderRadius;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return TweenAnimationBuilder<double>(
+      key: ValueKey('saved-pulse-$tick'),
+      tween: Tween(begin: 1, end: 0),
+      duration: const Duration(milliseconds: 1600),
+      curve: Curves.easeOutCubic,
+      child: child,
+      builder: (context, strength, child) {
+        if (strength == 0) return child!;
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(borderRadius),
+            boxShadow: [
+              BoxShadow(
+                color:
+                    const Color(0xFF334155).withValues(alpha: 0.45 * strength),
+                blurRadius: 9 * strength,
+                spreadRadius: 2.5 * strength,
+              ),
+            ],
+          ),
+          child: child,
+        );
+      },
+    );
+  }
 }
 
 class _EligibilityPalette {

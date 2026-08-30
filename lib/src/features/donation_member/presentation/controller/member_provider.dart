@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:math' as math;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/member_service.dart' as ms;
 import 'package:donation/src/features/services/donation_service.dart';
@@ -282,6 +283,73 @@ class SearchMemberDirectoryController
     if (!mounted) return;
     state = const AsyncLoading();
     await _loadFirstPage();
+  }
+
+  /// Applies one saved availability/remark edit to the loaded rows in place.
+  ///
+  /// The admin works through the directory row by row, so a save must not
+  /// reload or reorder anything: the edited member keeps its position and only
+  /// its own card re-renders. The availability counters are re-derived locally
+  /// so the summary chips agree with the recoloured row without a round trip.
+  /// Rows that stop matching an active availability chip stay visible until
+  /// the next natural reload; hiding them would shift the rows the admin is
+  /// still working through.
+  void applyAvailabilityEdit(Member saved) {
+    final current = state.asData?.value;
+    if (current == null) return;
+    final identity = saved.id?.toString() ?? saved.memberId ?? '';
+    if (identity.isEmpty) return;
+
+    Member? previous;
+    Member? updated;
+    final members = current.members.map((member) {
+      final memberIdentity = member.id?.toString() ?? member.memberId ?? '';
+      if (previous != null || memberIdentity != identity) return member;
+      previous = member;
+      updated = member.withAvailability(
+        status: saved.status,
+        note: saved.note,
+        canDonateValue: saved.canDonateValue,
+      );
+      return updated!;
+    }).toList(growable: false);
+    if (previous == null) return;
+
+    state = AsyncData(
+      current.copyWith(
+        members: members,
+        analysis: _analysisAfterEdit(current.analysis, previous!, updated!),
+      ),
+    );
+  }
+
+  SearchMemberAnalysis? _analysisAfterEdit(
+    SearchMemberAnalysis? analysis,
+    Member before,
+    Member after,
+  ) {
+    if (analysis == null) return null;
+    // Classify with the same date the server used for the counters, so the
+    // local shift can never disagree with the palette on the card.
+    final asOf = analysis.calculatedOn;
+    final beforeLevel = DonorEligibility.fromMember(before, now: asOf).level;
+    final afterLevel = DonorEligibility.fromMember(after, now: asOf).level;
+    if (beforeLevel == afterLevel) return analysis;
+
+    final counts = {
+      DonorEligibilityLevel.eligible: analysis.green,
+      DonorEligibilityLevel.caution: analysis.yellow,
+      DonorEligibilityLevel.disabled: analysis.red,
+    };
+    counts[beforeLevel] = math.max(0, counts[beforeLevel]! - 1);
+    counts[afterLevel] = counts[afterLevel]! + 1;
+    return SearchMemberAnalysis(
+      total: analysis.total,
+      green: counts[DonorEligibilityLevel.eligible]!,
+      yellow: counts[DonorEligibilityLevel.caution]!,
+      red: counts[DonorEligibilityLevel.disabled]!,
+      calculatedOn: analysis.calculatedOn,
+    );
   }
 
   Future<void> loadNextPage() async {

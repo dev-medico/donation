@@ -150,9 +150,11 @@ class DialogGradientTitleWidget extends StatelessWidget {
       child: Row(
         children: [
           const SizedBox(width: 20),
-          Center(
+          Expanded(
             child: Text(
               title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: Responsive.isMobile(context) ? 15 : 16,
@@ -160,7 +162,7 @@ class DialogGradientTitleWidget extends StatelessWidget {
               ),
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 12),
           InkWell(
             onTap: () {
               Navigator.pop(context);

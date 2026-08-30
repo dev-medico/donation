@@ -58,6 +58,39 @@ class Member {
     this.canDonateValue,
   });
 
+  /// Returns a copy with only the staff-editable availability fields replaced.
+  ///
+  /// Search rows carry the server-derived effective last donation date in
+  /// [lastDate], so an edit must never copy that (or any other field) from the
+  /// raw member record the update endpoint returns.
+  Member withAvailability({
+    required String? status,
+    required String? note,
+    required bool? canDonateValue,
+  }) {
+    return Member(
+      id: id,
+      memberId: memberId,
+      name: name,
+      fatherName: fatherName,
+      bloodType: bloodType,
+      phone: phone,
+      nrc: nrc,
+      address: address,
+      gender: gender,
+      birthDate: birthDate,
+      bloodBankCard: bloodBankCard,
+      note: note,
+      status: status,
+      lastDate: lastDate,
+      registerDate: registerDate,
+      memberCount: memberCount,
+      totalCount: totalCount,
+      profileUrl: profileUrl,
+      canDonateValue: canDonateValue,
+    );
+  }
+
   factory Member.fromJson(Map<String, dynamic> json) {
     return Member(
       id: json['id'],

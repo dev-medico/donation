@@ -1,3 +1,4 @@
+import 'package:donation/core/api/api_client.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:flutter/material.dart';
@@ -160,9 +161,19 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
 
             // Handle log out separately
             if (index == mobileHomeMenuTitles.length - 1) {
+              // Revoke only this device's session on the server; other
+              // devices on the same account stay signed in. Never let a
+              // dead network block the local sign-out.
+              try {
+                await ApiClient()
+                    .post('auth/logout')
+                    .timeout(const Duration(seconds: 3));
+              } catch (_) {}
+
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.remove('token');
               prefs.remove('name');
+              prefs.remove('phone');
 
               Navigator.pushAndRemoveUntil(
                   context,

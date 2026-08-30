@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation_member/domain/last_donation_filter.dart';
+import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/call_or_remark_dialog.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/donor_search_results.dart';
 import 'package:donation/src/features/donation_member/presentation/widget/remark_write_dialog.dart';
@@ -38,6 +39,19 @@ class _SearchMemberListScreenState
 
   final searchController = TextEditingController();
   Timer? _debounceTimer;
+
+  // A saved remark updates its own row in place; the pulse re-anchors the
+  // admin's eye on that row so they can continue from where they were.
+  String? _lastSavedMemberKey;
+  int _savePulseTick = 0;
+
+  void _handleAvailabilitySaved(Member saved) {
+    ref.read(searchMemberListProvider.notifier).applyAvailabilityEdit(saved);
+    setState(() {
+      _lastSavedMemberKey = saved.id?.toString() ?? saved.memberId;
+      _savePulseTick += 1;
+    });
+  }
 
   @override
   void dispose() {
@@ -581,6 +595,8 @@ class _SearchMemberListScreenState
       hasMore: directory.hasMore,
       isLoadingMore: directory.isLoadingMore,
       loadMoreError: directory.loadMoreError,
+      highlightedMemberKey: _lastSavedMemberKey,
+      highlightTick: _savePulseTick,
       onSelectedLevel: (level) {
         ref.read(searchMemberAvailabilityFilterProvider.notifier).state = level;
       },
@@ -591,14 +607,20 @@ class _SearchMemberListScreenState
       onOpenActions: (member) {
         showDialog(
           context: context,
-          builder: (context) =>
-              CallOrRemarkDialog(title: 'လုပ်ဆောင်ရန်', member: member),
+          builder: (context) => CallOrRemarkDialog(
+            title: 'လုပ်ဆောင်ရန်',
+            member: member,
+            onSaved: _handleAvailabilitySaved,
+          ),
         );
       },
       onEdit: (member) {
         showDialog(
           context: context,
-          builder: (context) => RemarkWriteDialog(member: member),
+          builder: (context) => RemarkWriteDialog(
+            member: member,
+            onSaved: _handleAvailabilitySaved,
+          ),
         );
       },
     );

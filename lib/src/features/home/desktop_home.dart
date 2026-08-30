@@ -1,5 +1,7 @@
+import 'package:donation/core/api/api_client.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:donation/src/features/donar/donar_list_screen.dart';
 import 'package:donation/src/features/donation/donation_list.dart';
 import 'package:donation/src/features/donation/facebook_post_screen.dart';
@@ -88,8 +90,21 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
             unselectedLabelTextStyle: TextStyle(color: Colors.black87),
             unselectedIconTheme: IconThemeData(color: Colors.black54),
             elevation: 6,
-            onDestinationSelected: (index) {
+            onDestinationSelected: (index) async {
               if (index == titles.length - 1) {
+                // Real sign-out, same as the mobile drawer: revoke only this
+                // device's server session (other devices stay signed in) and
+                // clear the stored session before leaving.
+                try {
+                  await ApiClient()
+                      .post('auth/logout')
+                      .timeout(const Duration(seconds: 3));
+                } catch (_) {}
+                final prefs = await SharedPreferences.getInstance();
+                prefs.remove('token');
+                prefs.remove('name');
+                prefs.remove('phone');
+                if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),

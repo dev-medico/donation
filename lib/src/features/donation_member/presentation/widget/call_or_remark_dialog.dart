@@ -10,8 +10,12 @@ import 'package:url_launcher/url_launcher.dart';
 class CallOrRemarkDialog extends StatelessWidget {
   final String? title;
   final Member? member;
+
+  /// Forwarded to [RemarkWriteDialog] so a directory row can update in place.
+  final void Function(Member saved)? onSaved;
+
   const CallOrRemarkDialog(
-      {super.key, required this.title, required this.member});
+      {super.key, required this.title, required this.member, this.onSaved});
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +152,7 @@ class CallOrRemarkDialog extends StatelessWidget {
                     context: context,
                     builder: (context) => RemarkWriteDialog(
                           member: member,
+                          onSaved: onSaved,
                         ));
               },
               child: Align(
