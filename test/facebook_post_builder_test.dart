@@ -127,11 +127,18 @@ void main() {
       );
     });
 
-    test('names the town, not the township, for a ward address', () {
+    test('keeps the township and town for a ward address', () {
       expect(
         patientLocation(
             'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်'),
-        'မော်လမြိုင်မြို့၊ ရွှေတောင်ရပ်ကွက်',
+        'မော်လမြိုင်မြို့နယ်၊ မော်လမြိုင်မြို့၊ ရွှေတောင်ရပ်ကွက်',
+      );
+    });
+
+    test('keeps the township in a three-part village address', () {
+      expect(
+        patientLocation('ဓမ္မာရုံရိပ်သာ၊မုဒွန်းကျေးရွာ၊ချောင်းဆုံမြို့နယ်'),
+        'ချောင်းဆုံမြို့နယ်၊ မုဒွန်းကျေးရွာ၊ ဓမ္မာရုံရိပ်သာ',
       );
     });
 
@@ -224,6 +231,33 @@ void main() {
           'ဖာသိမ်ကျေးရွာက ဦးခင်မောင်လွင်အတွက် လိုအပ်နေတဲ့(A)သွေး(၂)လုံးကို '
           'ကိုနိုင်းနိုင်းထက် နဲ့ ကိုခိုင်လှထွန်းအောင် တို့က ဒီနေ့နေ့လယ်မှာ '
           'ရတနာမွန်ဆေးရုံကို သွားရောက်လှူဒါန်းပေးခဲ့ပြီး',
+        ),
+      );
+    });
+
+    test('renders the township from a three-part address in the post', () {
+      final groups = groupDonationsForPost(const <Map<String, dynamic>>[
+        {
+          'id': 16000,
+          'donation_date': '2026-08-25 12:00:00',
+          'hospital': 'မော်လမြိုင်ပြည်သူ့ဆေးရုံကြီး',
+          'patient_id': 7000,
+          'patient_name': 'ဒေါ်စမ်းသပ်',
+          'patient_address': 'ဓမ္မာရုံရိပ်သာ၊မုဒွန်းကျေးရွာ၊ချောင်းဆုံမြို့နယ်',
+          'memberObj': {
+            'name': 'ကိုစမ်းသပ်',
+            'blood_type': 'O (Rh +)',
+          },
+        },
+      ], date);
+
+      final text = buildFacebookPostText(date: date, groups: groups);
+
+      expect(
+        text,
+        contains(
+          'ချောင်းဆုံမြို့နယ်၊ မုဒွန်းကျေးရွာ၊ ဓမ္မာရုံရိပ်သာက '
+          'ဒေါ်စမ်းသပ်အတွက်',
         ),
       );
     });

@@ -269,7 +269,7 @@ void main() {
     final service = _FakeDonationService(saveGate: saveGate);
     await _pumpScreen(
       tester,
-      const Size(390, 844),
+      const Size(320, 568),
       service: service,
     );
 
@@ -301,7 +301,20 @@ void main() {
       matching: find.byType(InkWell),
     );
     expect(tester.widget<InkWell>(datePicker.first).onTap, isNull);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('saving-time-indicator')),
+      findsOneWidget,
+    );
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    final savingDropdown = tester.widget<DropdownButtonFormField<String>>(
+      find.byType(DropdownButtonFormField<String>).first,
+    );
+    expect(savingDropdown.onChanged, isNull);
+    expect(
+      tester.getSize(find.byKey(const ValueKey('saving-time-indicator'))),
+      const Size(40, 24),
+    );
+    expect(tester.takeException(), isNull);
 
     saveGate.complete();
     await tester.pumpAndSettle();

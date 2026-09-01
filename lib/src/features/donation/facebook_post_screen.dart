@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/donation/facebook_post_builder.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
@@ -617,49 +619,61 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
                 const SizedBox(height: 6),
                 SizedBox(
                   height: 38,
-                  child: DropdownButtonFormField<String>(
-                    key: ValueKey(
-                      'post-time-${group.key}-${group.timeOfDay}-$fieldRevision',
-                    ),
-                    initialValue: dropdownValue,
-                    isDense: true,
-                    // Without this the field takes the width of its longest
-                    // option and overflows the card on a phone.
-                    isExpanded: true,
-                    decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                  child: IgnorePointer(
+                    ignoring: isSaving,
+                    child: DropdownButtonFormField<String>(
+                      key: ValueKey(
+                        'post-time-${group.key}-${group.timeOfDay}-$fieldRevision',
                       ),
-                      suffixIcon: isSaving
-                          ? const Padding(
-                              padding: EdgeInsets.all(8),
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : null,
-                      suffixIconConstraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
+                      initialValue: dropdownValue,
+                      isDense: true,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF3D3D3D),
                       ),
+                      // Without this the field takes the width of its longest
+                      // option and overflows the card on a phone.
+                      isExpanded: true,
+                      icon: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 180),
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeIn,
+                        child: isSaving
+                            ? const _SavingTimeIndicator(
+                                key: ValueKey('saving-time-indicator'),
+                              )
+                            : const Icon(
+                                Icons.arrow_drop_down,
+                                key: ValueKey('post-time-dropdown-arrow'),
+                              ),
+                      ),
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        filled: isSaving,
+                        fillColor: isSaving ? const Color(0xFFFFF8F8) : null,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                      ),
+                      items: kPostTimeOptions
+                          .map((option) => DropdownMenuItem<String>(
+                                value: option,
+                                child: Text(
+                                    option == kCustomNightTimeOption &&
+                                            hasCustomNightTime
+                                        ? group.timeOfDay
+                                        : option,
+                                    style: const TextStyle(fontSize: 13)),
+                              ))
+                          .toList(),
+                      onChanged: isSaving
+                          ? null
+                          : (value) async {
+                              if (value == null) return;
+                              await _selectPostTime(group, value);
+                            },
                     ),
-                    items: kPostTimeOptions
-                        .map((option) => DropdownMenuItem<String>(
-                              value: option,
-                              child: Text(
-                                  option == kCustomNightTimeOption &&
-                                          hasCustomNightTime
-                                      ? group.timeOfDay
-                                      : option,
-                                  style: const TextStyle(fontSize: 13)),
-                            ))
-                        .toList(),
-                    onChanged: isSaving
-                        ? null
-                        : (value) async {
-                            if (value == null) return;
-                            await _selectPostTime(group, value);
-                          },
                   ),
                 ),
               ],
@@ -727,6 +741,86 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
               child: field,
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// A quiet, compact save treatment for a time field. The old circular
+/// progress indicator competed with the dropdown arrow and made the control
+/// look crowded, especially on a phone. These staggered dots take the arrow's
+/// place while the request is in flight and keep the chosen time readable.
+class _SavingTimeIndicator extends StatefulWidget {
+  const _SavingTimeIndicator({super.key});
+
+  @override
+  State<_SavingTimeIndicator> createState() => _SavingTimeIndicatorState();
+}
+
+class _SavingTimeIndicatorState extends State<_SavingTimeIndicator>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      label: 'အချိန် သိမ်းဆည်းနေသည်',
+      child: Container(
+        width: 40,
+        height: 24,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFEBEE),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFFFCDD2)),
+        ),
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, _) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List<Widget>.generate(3, (index) {
+                final phase = (_controller.value * math.pi * 2) -
+                    (index * math.pi * 0.55);
+                final emphasis = (math.sin(phase) + 1) / 2;
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1.5),
+                  child: Transform.scale(
+                    scale: 0.72 + (emphasis * 0.28),
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFFE53935).withValues(
+                          alpha: 0.42 + (emphasis * 0.58),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            );
+          },
+        ),
       ),
     );
   }

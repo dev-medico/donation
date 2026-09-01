@@ -119,10 +119,10 @@ String bloodLetter(String? raw) {
 ///
 /// The ledger stores the address narrowest-first:
 ///   `ဖာသိမ်ကျေးရွာ၊ကျိုက်မရောမြို့နယ်`             -> `ကျိုက်မရောမြို့နယ်၊ ဖာသိမ်ကျေးရွာ`
-///   `ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်` -> `မော်လမြိုင်မြို့၊ ရွှေတောင်ရပ်ကွက်`
+///   `ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်` -> `မော်လမြိုင်မြို့နယ်၊ မော်လမြိုင်မြို့၊ ရွှေတောင်ရပ်ကွက်`
 ///
-/// When a town sits between the ward and the township, the post names the town
-/// rather than the township, so the broadest segment is dropped.
+/// Keep every segment so a street/ward/village does not accidentally hide the
+/// patient's township in the generated post.
 String patientLocation(String? raw) {
   if (raw == null) return '';
   final parts = raw
@@ -131,9 +131,7 @@ String patientLocation(String? raw) {
       .where((part) => part.isNotEmpty)
       .toList();
   if (parts.isEmpty) return '';
-  final reversed = parts.reversed.toList();
-  final kept = reversed.length >= 3 ? reversed.sublist(1) : reversed;
-  return kept.join('၊ ');
+  return parts.reversed.join('၊ ');
 }
 
 /// Burmese member records often carry an alias after `(ခ)`. The post uses the
