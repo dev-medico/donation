@@ -100,6 +100,37 @@ class DonationService extends BaseService {
     }
   }
 
+  /// Saves the Facebook-post time for every donation row represented by one
+  /// patient card. The backend updates the rows together so another device
+  /// sees one consistent choice on its next load or refresh.
+  Future<void> saveFacebookPostTime(
+    List<int> donationIds,
+    String timeOfDay,
+  ) async {
+    if (donationIds.isEmpty) {
+      throw ArgumentError.value(
+        donationIds,
+        'donationIds',
+        'At least one donation is required',
+      );
+    }
+
+    final headers = await getAuthHeaders();
+    final response = await apiClient.post(
+      '$_basePath/save-post-time',
+      data: {
+        'donation_ids': donationIds,
+        'time_of_day': timeOfDay,
+      },
+      options: {'headers': headers},
+    );
+
+    final body = response.data;
+    if (response.statusCode != 200 || body is! Map || body['status'] != 'ok') {
+      throw Exception('Failed to save Facebook post time');
+    }
+  }
+
   Future<List<dynamic>> getDonationsByYear(int year, {int limit = 500}) async {
     final headers = await getAuthHeaders();
     _updateLoadingStatus('Fetching donations for $year...');

@@ -3,16 +3,101 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Real ledger rows for 2026-08-25, captured from /donation/by-month-year.
 const List<Map<String, dynamic>> kAug25Rows = <Map<String, dynamic>>[
-  {'id': 15415, 'donation_date': '2026-08-25 22:15:58', 'hospital': 'ရတနာမွန်ဆေးရုံ', 'patient_id': 6470, 'patient_name': 'ဦးခင်မောင်လွင်', 'patient_address': 'ဖာသိမ်ကျေးရွာ၊ကျိုက်မရောမြို့နယ်', 'memberObj': {'name': 'ကိုနိုင်းနိုင်းထက်', 'blood_type': 'A (Rh +)'}},
-  {'id': 15416, 'donation_date': '2026-08-25 22:16:41', 'hospital': 'မေတ္တာရိပ်ဆေးခန်း', 'patient_id': 6474, 'patient_name': 'ဒေါ်လှဝင်း', 'patient_address': 'ကော့ဘိန်းကျေးရွာ၊ကော့ကရိတ်မြို့နယ်', 'memberObj': {'name': 'ကိုခိုင်မျိုးထွန်း(ခ)သဲကုန်း', 'blood_type': 'O (Rh +)'}},
-  {'id': 15417, 'donation_date': '2026-08-25 22:17:11', 'hospital': 'ရတနာမွန်ဆေးရုံ', 'patient_id': 6470, 'patient_name': 'ဦးခင်မောင်လွင်', 'patient_address': 'ဖာသိမ်ကျေးရွာ၊ကျိုက်မရောမြို့နယ်', 'memberObj': {'name': 'ကိုခိုင်လှထွန်းအောင်', 'blood_type': 'A (Rh +)'}},
-  {'id': 15418, 'donation_date': '2026-08-25 22:17:50', 'hospital': 'မော်လမြိုင်ပြည်သူ့ဆေးရုံကြီး', 'patient_id': 6473, 'patient_name': 'ဦးသန်းဇော်', 'patient_address': 'မုရစ်ကြီးကျေးရွာ၊ချောင်းဆုံမြို့နယ်', 'memberObj': {'name': 'ကိုစိုးရာဇာ', 'blood_type': 'B (Rh +)'}},
-  {'id': 15419, 'donation_date': '2026-08-25 22:18:49', 'hospital': 'မော်လမြိုင်ပြည်သူ့ဆေးရုံကြီး', 'patient_id': 6475, 'patient_name': 'ဦးအောင်ဝင်း', 'patient_address': 'မုရစ်ကလေးကျေးရွာ၊ချောင်းဆုံမြို့နယ်', 'memberObj': {'name': 'ကိုဝင်းကိုကို', 'blood_type': 'B (Rh +)'}},
-  {'id': 15420, 'donation_date': '2026-08-25 22:19:21', 'hospital': 'ငွေမိုးဆေးရုံ', 'patient_id': 6472, 'patient_name': 'ဒေါ်ဝေဝေ', 'patient_address': 'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်', 'memberObj': {'name': 'ကိုအောင်ကို', 'blood_type': 'A (Rh +)'}},
-  {'id': 15421, 'donation_date': '2026-08-25 22:20:00', 'hospital': 'အောင်ရတနာဆေးရုံ(ရန်ကုန်)', 'patient_id': 5082, 'patient_name': 'ဦးနေလင်းထိုက်', 'patient_address': 'ရွှေမြိုင်သီရိရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်', 'memberObj': {'name': 'မအိကေဖြိုး', 'blood_type': 'O (Rh +)'}},
-  {'id': 15422, 'donation_date': '2026-08-25 22:20:48', 'hospital': 'အောင်ရတနာဆေးရုံ(ရန်ကုန်)', 'patient_id': 5082, 'patient_name': 'ဦးနေလင်းထိုက်', 'patient_address': 'ရွှေမြိုင်သီရိရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်', 'memberObj': {'name': 'မင်းဖိုးသဇင်', 'blood_type': 'O (Rh +)'}},
-  {'id': 15423, 'donation_date': '2026-08-25 22:21:31', 'hospital': 'ငွေမိုးဆေးရုံ', 'patient_id': 6476, 'patient_name': 'ဒေါ်ခင်မြတ်မွန်', 'patient_address': 'ဖက်တန်းရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်', 'memberObj': {'name': 'ကိုဝင်းဇော်ဦး', 'blood_type': 'A (Rh +)'}},
-  {'id': 15424, 'donation_date': '2026-08-25 22:21:58', 'hospital': 'ငွေမိုးဆေးရုံ', 'patient_id': 6476, 'patient_name': 'ဒေါ်ခင်မြတ်မွန်', 'patient_address': 'ဖက်တန်းရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်', 'memberObj': {'name': 'ကိုမျိုးညွန့်ဦး', 'blood_type': 'A (Rh +)'}},
+  {
+    'id': 15415,
+    'donation_date': '2026-08-25 22:15:58',
+    'hospital': 'ရတနာမွန်ဆေးရုံ',
+    'patient_id': 6470,
+    'patient_name': 'ဦးခင်မောင်လွင်',
+    'patient_address': 'ဖာသိမ်ကျေးရွာ၊ကျိုက်မရောမြို့နယ်',
+    'memberObj': {'name': 'ကိုနိုင်းနိုင်းထက်', 'blood_type': 'A (Rh +)'}
+  },
+  {
+    'id': 15416,
+    'donation_date': '2026-08-25 22:16:41',
+    'hospital': 'မေတ္တာရိပ်ဆေးခန်း',
+    'patient_id': 6474,
+    'patient_name': 'ဒေါ်လှဝင်း',
+    'patient_address': 'ကော့ဘိန်းကျေးရွာ၊ကော့ကရိတ်မြို့နယ်',
+    'memberObj': {
+      'name': 'ကိုခိုင်မျိုးထွန်း(ခ)သဲကုန်း',
+      'blood_type': 'O (Rh +)'
+    }
+  },
+  {
+    'id': 15417,
+    'donation_date': '2026-08-25 22:17:11',
+    'hospital': 'ရတနာမွန်ဆေးရုံ',
+    'patient_id': 6470,
+    'patient_name': 'ဦးခင်မောင်လွင်',
+    'patient_address': 'ဖာသိမ်ကျေးရွာ၊ကျိုက်မရောမြို့နယ်',
+    'memberObj': {'name': 'ကိုခိုင်လှထွန်းအောင်', 'blood_type': 'A (Rh +)'}
+  },
+  {
+    'id': 15418,
+    'donation_date': '2026-08-25 22:17:50',
+    'hospital': 'မော်လမြိုင်ပြည်သူ့ဆေးရုံကြီး',
+    'patient_id': 6473,
+    'patient_name': 'ဦးသန်းဇော်',
+    'patient_address': 'မုရစ်ကြီးကျေးရွာ၊ချောင်းဆုံမြို့နယ်',
+    'memberObj': {'name': 'ကိုစိုးရာဇာ', 'blood_type': 'B (Rh +)'}
+  },
+  {
+    'id': 15419,
+    'donation_date': '2026-08-25 22:18:49',
+    'hospital': 'မော်လမြိုင်ပြည်သူ့ဆေးရုံကြီး',
+    'patient_id': 6475,
+    'patient_name': 'ဦးအောင်ဝင်း',
+    'patient_address': 'မုရစ်ကလေးကျေးရွာ၊ချောင်းဆုံမြို့နယ်',
+    'memberObj': {'name': 'ကိုဝင်းကိုကို', 'blood_type': 'B (Rh +)'}
+  },
+  {
+    'id': 15420,
+    'donation_date': '2026-08-25 22:19:21',
+    'hospital': 'ငွေမိုးဆေးရုံ',
+    'patient_id': 6472,
+    'patient_name': 'ဒေါ်ဝေဝေ',
+    'patient_address': 'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
+    'memberObj': {'name': 'ကိုအောင်ကို', 'blood_type': 'A (Rh +)'}
+  },
+  {
+    'id': 15421,
+    'donation_date': '2026-08-25 22:20:00',
+    'hospital': 'အောင်ရတနာဆေးရုံ(ရန်ကုန်)',
+    'patient_id': 5082,
+    'patient_name': 'ဦးနေလင်းထိုက်',
+    'patient_address':
+        'ရွှေမြိုင်သီရိရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
+    'memberObj': {'name': 'မအိကေဖြိုး', 'blood_type': 'O (Rh +)'}
+  },
+  {
+    'id': 15422,
+    'donation_date': '2026-08-25 22:20:48',
+    'hospital': 'အောင်ရတနာဆေးရုံ(ရန်ကုန်)',
+    'patient_id': 5082,
+    'patient_name': 'ဦးနေလင်းထိုက်',
+    'patient_address':
+        'ရွှေမြိုင်သီရိရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
+    'memberObj': {'name': 'မင်းဖိုးသဇင်', 'blood_type': 'O (Rh +)'}
+  },
+  {
+    'id': 15423,
+    'donation_date': '2026-08-25 22:21:31',
+    'hospital': 'ငွေမိုးဆေးရုံ',
+    'patient_id': 6476,
+    'patient_name': 'ဒေါ်ခင်မြတ်မွန်',
+    'patient_address': 'ဖက်တန်းရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
+    'memberObj': {'name': 'ကိုဝင်းဇော်ဦး', 'blood_type': 'A (Rh +)'}
+  },
+  {
+    'id': 15424,
+    'donation_date': '2026-08-25 22:21:58',
+    'hospital': 'ငွေမိုးဆေးရုံ',
+    'patient_id': 6476,
+    'patient_name': 'ဒေါ်ခင်မြတ်မွန်',
+    'patient_address': 'ဖက်တန်းရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
+    'memberObj': {'name': 'ကိုမျိုးညွန့်ဦး', 'blood_type': 'A (Rh +)'}
+  },
 ];
 
 void main() {
@@ -44,13 +129,15 @@ void main() {
 
     test('names the town, not the township, for a ward address', () {
       expect(
-        patientLocation('ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်'),
+        patientLocation(
+            'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်'),
         'မော်လမြိုင်မြို့၊ ရွှေတောင်ရပ်ကွက်',
       );
     });
 
     test('drops the (ခ) alias from a donor name', () {
-      expect(donorDisplayName('ကိုခိုင်မျိုးထွန်း(ခ)သဲကုန်း'), 'ကိုခိုင်မျိုးထွန်း');
+      expect(donorDisplayName('ကိုခိုင်မျိုးထွန်း(ခ)သဲကုန်း'),
+          'ကိုခိုင်မျိုးထွန်း');
       expect(donorDisplayName('ကိုစိုးရာဇာ'), 'ကိုစိုးရာဇာ');
     });
 
@@ -83,8 +170,23 @@ void main() {
       expect(groups.first.patientName, 'ဦးခင်မောင်လွင်');
       expect(groups.first.donorNames,
           ['ကိုနိုင်းနိုင်းထက်', 'ကိုခိုင်လှထွန်းအောင်']);
+      expect(groups.first.donationIds, [15415, 15417]);
       expect(groups.first.unitCount, 2);
       expect(groups.first.bloodType, 'A');
+    });
+
+    test('hydrates a persisted time for every donation in one paragraph', () {
+      final rows = kAug25Rows
+          .map<Map<String, dynamic>>(Map<String, dynamic>.from)
+          .toList();
+      rows[0]['facebook_post_time'] = 'ည(၇:၃၀)';
+      rows[2]['facebook_post_time'] = 'ည(၇:၃၀)';
+
+      final groups = groupDonationsForPost(rows, date);
+
+      expect(groups.first.donationIds, [15415, 15417]);
+      expect(groups.first.timeOfDay, 'ည(၇:၃၀)');
+      expect(groups[1].timeOfDay, kDefaultPostTime);
     });
 
     test('ignores donations from other days', () {
@@ -160,7 +262,8 @@ void main() {
       expect(text, startsWith('၂၅၊ ၈၊ ၂၀၂၆ (အင်္ဂါနေ့)'));
       expect(text, contains('Volunteer Helper  Kyaw Myo Oo, Nyi Nyi'));
       expect(text, contains('❤️❤️  Heart To Blood 🩸🩸'));
-      expect(text, endsWith('#RED_Juniors\n#Blood_Care_Unit\n#Tel: 09 756119611'));
+      expect(
+          text, endsWith('#RED_Juniors\n#Blood_Care_Unit\n#Tel: 09 756119611'));
     });
 
     test('a day with no donations still renders header and sign-off', () {
@@ -184,5 +287,13 @@ void main() {
       'ဒီနေ့ည',
       'ည(--:--)',
     ]);
+  });
+
+  test('only real supported time values can be restored', () {
+    expect(isSavedPostTime('ဒီနေ့ညနေ'), isTrue);
+    expect(isSavedPostTime('ည(၇:၃၀)'), isTrue);
+    expect(isSavedPostTime(kCustomNightTimeOption), isFalse);
+    expect(isSavedPostTime('ည(၁၃:၀၀)'), isFalse);
+    expect(isSavedPostTime('ည(၁၀:၆၀)'), isFalse);
   });
 }

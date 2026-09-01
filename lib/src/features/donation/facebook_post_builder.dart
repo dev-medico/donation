@@ -33,11 +33,46 @@ const String kCustomNightTimeOption = 'ည(--:--)';
 
 const String kDefaultPostTime = 'ဒီနေ့နေ့လယ်';
 
+final RegExp _savedCustomPostTime = RegExp(r'^ည\(([၀-၉]{1,2}):([၀-၉]{2})\)$');
+
+/// Whether [value] is safe to restore from the shared backend setting.
+///
+/// The custom-time placeholder is a UI action, not a real saved value. A
+/// resolved custom time such as `ည(၈:၃၀)` is persisted instead.
+bool isSavedPostTime(String value) {
+  if (value != kCustomNightTimeOption && kPostTimeOptions.contains(value)) {
+    return true;
+  }
+
+  final match = _savedCustomPostTime.firstMatch(value);
+  if (match == null) return false;
+  final hour = _parseMyanmarNumber(match.group(1)!);
+  final minute = _parseMyanmarNumber(match.group(2)!);
+  return hour >= 1 && hour <= 12 && minute >= 0 && minute <= 59;
+}
+
+int _parseMyanmarNumber(String value) {
+  var result = 0;
+  for (final rune in value.runes) {
+    result = result * 10 + rune - 0x1040;
+  }
+  return result;
+}
+
 const String kDefaultVolunteerHelpers =
     'Kyaw Myo Oo, Nyi Nyi , Myo Myo & Hay Mar Win';
 
 const List<String> _myanmarDigits = <String>[
-  '၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉',
+  '၀',
+  '၁',
+  '၂',
+  '၃',
+  '၄',
+  '၅',
+  '၆',
+  '၇',
+  '၈',
+  '၉',
 ];
 
 const Map<int, String> _burmeseWeekdays = <int, String>{
@@ -62,8 +97,7 @@ String toMyanmarDigits(Object value) {
   return buffer.toString();
 }
 
-String burmeseWeekday(DateTime date) =>
-    _burmeseWeekdays[date.weekday] ?? '';
+String burmeseWeekday(DateTime date) => _burmeseWeekdays[date.weekday] ?? '';
 
 /// e.g. `၂၅၊ ၈၊ ၂၀၂၆ (အင်္ဂါနေ့)`
 String formatPostDate(DateTime date) {
@@ -146,8 +180,9 @@ class DonationPostGroup {
     required this.hospital,
     required this.bloodType,
     required this.donorNames,
+    List<int>? donationIds,
     this.timeOfDay = kDefaultPostTime,
-  });
+  }) : donationIds = donationIds ?? <int>[];
 
   final String key;
   final String patientName;
@@ -155,6 +190,7 @@ class DonationPostGroup {
   final String hospital;
   final String bloodType;
   final List<String> donorNames;
+  final List<int> donationIds;
   String timeOfDay;
 
   /// One donor gives one unit, so the unit count is the donor count.
@@ -173,6 +209,7 @@ List<DonationPostGroup> groupDonationsForPost(
 
   final ordered = <String>[];
   final grouped = <String, DonationPostGroup>{};
+  final groupsWithSavedTime = <String>{};
 
   for (final row in rows) {
     if (row is! Map) continue;
@@ -193,6 +230,11 @@ List<DonationPostGroup> groupDonationsForPost(
         ? donorDisplayName((member['name'] ?? '').toString())
         : '';
     final donorBlood = member is Map ? member['blood_type']?.toString() : null;
+    final donationId = row['id'] is int
+        ? row['id'] as int
+        : int.tryParse(row['id']?.toString() ?? '');
+    final savedTime = (row['facebook_post_time'] ?? '').toString().trim();
+    final hasSavedTime = isSavedPostTime(savedTime);
 
     final existing = grouped[key];
     if (existing == null) {
@@ -204,9 +246,20 @@ List<DonationPostGroup> groupDonationsForPost(
         hospital: hospital,
         bloodType: bloodLetter(donorBlood),
         donorNames: donorName.isEmpty ? <String>[] : <String>[donorName],
+        donationIds: donationId == null ? <int>[] : <int>[donationId],
+        timeOfDay: hasSavedTime ? savedTime : kDefaultPostTime,
       );
+      if (hasSavedTime) groupsWithSavedTime.add(key);
     } else {
       if (donorName.isNotEmpty) existing.donorNames.add(donorName);
+      if (donationId != null) existing.donationIds.add(donationId);
+      // During a rolling app deployment, older rows in a group may still be
+      // null while another row already carries the shared choice. Use the
+      // first saved value found anywhere in that patient/hospital group.
+      if (hasSavedTime && !groupsWithSavedTime.contains(key)) {
+        existing.timeOfDay = savedTime;
+        groupsWithSavedTime.add(key);
+      }
       // Fill in the blood group if the first row of the group had no member.
       if (existing.bloodType.isEmpty && donorBlood != null) {
         grouped[key] = DonationPostGroup(
@@ -216,6 +269,7 @@ List<DonationPostGroup> groupDonationsForPost(
           hospital: existing.hospital,
           bloodType: bloodLetter(donorBlood),
           donorNames: existing.donorNames,
+          donationIds: existing.donationIds,
           timeOfDay: existing.timeOfDay,
         );
       }
@@ -235,8 +289,7 @@ String _paragraph(DonationPostGroup group, _ParagraphMode mode) {
   final closing = mode == _ParagraphMode.closing;
   final objectParticle = closing ? 'ကိုတော့' : 'ကို';
   final timeParticle = closing ? 'မှာပဲ' : 'မှာ';
-  final ending =
-      mode == _ParagraphMode.continuing ? 'ခဲ့ပြီး' : 'ခဲ့ပါတယ်။';
+  final ending = mode == _ParagraphMode.continuing ? 'ခဲ့ပြီး' : 'ခဲ့ပါတယ်။';
 
   return '${hospitalFullName(group.hospital)}မှာ ဆေးကုသမှုခံယူနေတဲ့ $where'
       '${group.patientName}အတွက် လိုအပ်နေတဲ့'

@@ -41,6 +41,8 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
   String? _loadedMonthKey;
   bool _isLoading = false;
   String? _error;
+  final Set<String> _savingTimeGroups = <String>{};
+  final Map<String, int> _timeFieldRevisions = <String, int>{};
 
   @override
   void initState() {
@@ -154,26 +156,112 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
     DonationPostGroup group,
     String selected,
   ) async {
-    if (selected != kCustomNightTimeOption) {
-      setState(() => group.timeOfDay = selected);
-      _regenerate();
-      return;
+    var resolvedTime = selected;
+    if (selected == kCustomNightTimeOption) {
+      final picked = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+        helpText: 'ညအချိန် ရွေးပါ',
+      );
+      if (picked == null || !mounted) return;
+
+      final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
+      final minute = picked.minute.toString().padLeft(2, '0');
+      resolvedTime = 'ည(${toMyanmarDigits(hour)}:${toMyanmarDigits(minute)})';
     }
 
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-      helpText: 'ညအချိန် ရွေးပါ',
-    );
-    if (picked == null || !mounted) return;
+    await _savePostTime(group, resolvedTime);
+  }
 
-    final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
-    final minute = picked.minute.toString().padLeft(2, '0');
+  String _timeSaveKey(DateTime date, DonationPostGroup group) {
+    return '${date.year}-${date.month}-${date.day}|${group.key}';
+  }
+
+  Future<void> _savePostTime(
+    DonationPostGroup group,
+    String timeOfDay,
+  ) async {
+    final dateAtSelection = _selectedDate;
+    final saveKey = _timeSaveKey(dateAtSelection, group);
+    final previousTime = group.timeOfDay;
+
     setState(() {
-      group.timeOfDay =
-          'ည(${toMyanmarDigits(hour)}:${toMyanmarDigits(minute)})';
+      group.timeOfDay = timeOfDay;
+      _savingTimeGroups.add(saveKey);
+      _bumpTimeFieldRevision(saveKey);
     });
     _regenerate();
+
+    try {
+      await ref
+          .read(donationServiceProvider)
+          .saveFacebookPostTime(group.donationIds, timeOfDay);
+      if (!mounted) return;
+
+      _rememberPostTime(group.donationIds, timeOfDay);
+      setState(() {
+        _savingTimeGroups.remove(saveKey);
+        // The user may have moved to another day while the request was in
+        // flight. Only touch the visible group when it is still the one that
+        // initiated this save.
+        if (_isSameDay(_selectedDate, dateAtSelection)) {
+          final visibleIndex =
+              _groups.indexWhere((item) => item.key == group.key);
+          if (visibleIndex != -1) {
+            _groups[visibleIndex].timeOfDay = timeOfDay;
+          }
+        }
+      });
+      _regenerate();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _savingTimeGroups.remove(saveKey);
+        _bumpTimeFieldRevision(saveKey);
+        if (_isSameDay(_selectedDate, dateAtSelection)) {
+          final visibleIndex =
+              _groups.indexWhere((item) => item.key == group.key);
+          if (visibleIndex != -1 &&
+              _groups[visibleIndex].timeOfDay == timeOfDay) {
+            _groups[visibleIndex].timeOfDay = previousTime;
+          }
+        }
+      });
+      _regenerate();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'အချိန်ကို သိမ်းဆည်း၍ မရပါ။ ထပ်မံရွေးချယ်ပါ။',
+          ),
+        ),
+      );
+    }
+  }
+
+  bool _isSameDay(DateTime left, DateTime right) {
+    return left.year == right.year &&
+        left.month == right.month &&
+        left.day == right.day;
+  }
+
+  void _bumpTimeFieldRevision(String saveKey) {
+    _timeFieldRevisions[saveKey] = (_timeFieldRevisions[saveKey] ?? 0) + 1;
+  }
+
+  void _rememberPostTime(List<int> donationIds, String timeOfDay) {
+    final savedIds = donationIds.toSet();
+    _monthRows = _monthRows.map((row) {
+      if (row is! Map) return row;
+      final id = row['id'] is int
+          ? row['id'] as int
+          : int.tryParse(row['id']?.toString() ?? '');
+      if (id == null || !savedIds.contains(id)) return row;
+
+      return <String, dynamic>{
+        ...Map<String, dynamic>.from(row),
+        'facebook_post_time': timeOfDay,
+      };
+    }).toList();
   }
 
   int get _donationCount =>
@@ -205,7 +293,9 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
           IconButton(
             tooltip: 'ပြန်လည်ရယူမည်',
             icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: _isLoading ? null : () => _load(force: true),
+            onPressed: _isLoading || _savingTimeGroups.isNotEmpty
+                ? null
+                : () => _load(force: true),
           ),
         ],
         // A phone cannot show the settings and the finished text at once, and
@@ -357,16 +447,18 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
   }
 
   Widget _buildDateRow() {
+    final navigationDisabled = _isLoading || _savingTimeGroups.isNotEmpty;
+
     return Row(
       children: [
         IconButton(
           tooltip: 'ယခင်နေ့',
           icon: const Icon(Icons.chevron_left),
-          onPressed: _isLoading ? null : () => _shiftDay(-1),
+          onPressed: navigationDisabled ? null : () => _shiftDay(-1),
         ),
         Expanded(
           child: InkWell(
-            onTap: _isLoading ? null : _pickDate,
+            onTap: navigationDisabled ? null : _pickDate,
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -396,7 +488,7 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
         IconButton(
           tooltip: 'နောက်နေ့',
           icon: const Icon(Icons.chevron_right),
-          onPressed: _isLoading ? null : () => _shiftDay(1),
+          onPressed: navigationDisabled ? null : () => _shiftDay(1),
         ),
       ],
     );
@@ -479,6 +571,9 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
         : (kPostTimeOptions.contains(group.timeOfDay)
             ? group.timeOfDay
             : kDefaultPostTime);
+    final saveKey = _timeSaveKey(_selectedDate, group);
+    final isSaving = _savingTimeGroups.contains(saveKey);
+    final fieldRevision = _timeFieldRevisions[saveKey] ?? 0;
 
     return Container(
       key: ValueKey('post-group-${group.key}'),
@@ -524,17 +619,29 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
                   height: 38,
                   child: DropdownButtonFormField<String>(
                     key: ValueKey(
-                      'post-time-${group.key}-${group.timeOfDay}',
+                      'post-time-${group.key}-${group.timeOfDay}-$fieldRevision',
                     ),
                     initialValue: dropdownValue,
                     isDense: true,
                     // Without this the field takes the width of its longest
                     // option and overflows the card on a phone.
                     isExpanded: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      suffixIcon: isSaving
+                          ? const Padding(
+                              padding: EdgeInsets.all(8),
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : null,
+                      suffixIconConstraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
                     ),
                     items: kPostTimeOptions
                         .map((option) => DropdownMenuItem<String>(
@@ -547,10 +654,12 @@ class _FacebookPostScreenState extends ConsumerState<FacebookPostScreen>
                                   style: const TextStyle(fontSize: 13)),
                             ))
                         .toList(),
-                    onChanged: (value) async {
-                      if (value == null) return;
-                      await _selectPostTime(group, value);
-                    },
+                    onChanged: isSaving
+                        ? null
+                        : (value) async {
+                            if (value == null) return;
+                            await _selectPostTime(group, value);
+                          },
                   ),
                 ),
               ],

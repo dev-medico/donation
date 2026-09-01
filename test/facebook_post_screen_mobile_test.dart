@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:donation/src/features/donation/facebook_post_screen.dart';
+import 'package:donation/src/features/donation/facebook_post_builder.dart';
 import 'package:donation/src/features/services/donation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,20 +15,25 @@ List<Map<String, dynamic>> _rowsFor(DateTime day) {
       '${day.day.toString().padLeft(2, '0')} 09:14:00';
   return [
     {
+      'id': 101,
       'donation_date': date,
       'patient_name': 'ဒေါ်ခင်မြင့်',
-      'patient_address': 'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
+      'patient_address':
+          'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
       'hospital': 'မော်လမြိုင်ဆေးရုံကြီး',
       'memberObj': {'name': 'ကိုအောင်အောင်', 'blood_type': 'O (Rh +)'},
     },
     {
+      'id': 102,
       'donation_date': date,
       'patient_name': 'ဒေါ်ခင်မြင့်',
-      'patient_address': 'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
+      'patient_address':
+          'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
       'hospital': 'မော်လမြိုင်ဆေးရုံကြီး',
       'memberObj': {'name': 'ကိုမျိုးမင်း', 'blood_type': 'O (Rh +)'},
     },
     {
+      'id': 201,
       'donation_date': date,
       'patient_name': 'ဦးစိန်လှ',
       'patient_address': 'ဖာသိမ်ကျေးရွာ၊ကျိုက်မရောမြို့နယ်',
@@ -35,17 +43,57 @@ List<Map<String, dynamic>> _rowsFor(DateTime day) {
   ];
 }
 
+class _SaveCall {
+  const _SaveCall(this.donationIds, this.timeOfDay);
+
+  final List<int> donationIds;
+  final String timeOfDay;
+}
+
 class _FakeDonationService extends DonationService {
+  _FakeDonationService({
+    this.failSaves = false,
+    this.saveGate,
+  });
+
+  final bool failSaves;
+  final Completer<void>? saveGate;
+  final Map<int, String> _persistedTimes = <int, String>{};
+  final List<_SaveCall> saveCalls = <_SaveCall>[];
+
   @override
   Future<List<dynamic>> getDonationsByMonthYear(
     int month,
     int year, {
     int limit = 500,
-  }) async =>
-      _rowsFor(DateTime.now());
+  }) async {
+    return _rowsFor(DateTime.now()).map<Map<String, dynamic>>((row) {
+      final hydrated = Map<String, dynamic>.from(row);
+      final persisted = _persistedTimes[row['id'] as int];
+      if (persisted != null) hydrated['facebook_post_time'] = persisted;
+      return hydrated;
+    }).toList();
+  }
+
+  @override
+  Future<void> saveFacebookPostTime(
+    List<int> donationIds,
+    String timeOfDay,
+  ) async {
+    saveCalls.add(_SaveCall(List<int>.from(donationIds), timeOfDay));
+    if (failSaves) throw Exception('save failed');
+    if (saveGate != null) await saveGate!.future;
+    for (final id in donationIds) {
+      _persistedTimes[id] = timeOfDay;
+    }
+  }
 }
 
-Future<void> _pumpScreen(WidgetTester tester, Size size) async {
+Future<void> _pumpScreen(
+  WidgetTester tester,
+  Size size, {
+  DonationService? service,
+}) async {
   // The layout switches on MediaQuery.size, which setSurfaceSize does not
   // move — only the view's own metrics do.
   tester.view.devicePixelRatio = 1.0;
@@ -57,11 +105,23 @@ Future<void> _pumpScreen(WidgetTester tester, Size size) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        donationServiceProvider.overrideWithValue(_FakeDonationService()),
+        donationServiceProvider.overrideWithValue(
+          service ?? _FakeDonationService(),
+        ),
       ],
       child: const MaterialApp(home: FacebookPostScreen()),
     ),
   );
+  await tester.pumpAndSettle();
+}
+
+Future<void> _selectFirstGroupTime(
+  WidgetTester tester,
+  String timeOfDay,
+) async {
+  await tester.tap(find.text(kDefaultPostTime).first);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(timeOfDay).last);
   await tester.pumpAndSettle();
 }
 
@@ -124,7 +184,12 @@ void main() {
 
   testWidgets('night-time placeholder opens a clock and updates the post',
       (tester) async {
-    await _pumpScreen(tester, const Size(390, 844));
+    final service = _FakeDonationService();
+    await _pumpScreen(
+      tester,
+      const Size(390, 844),
+      service: service,
+    );
 
     await tester.tap(find.text('ဒီနေ့နေ့လယ်').first);
     await tester.pumpAndSettle();
@@ -135,10 +200,114 @@ void main() {
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
 
+    expect(service.saveCalls, hasLength(1));
+    expect(service.saveCalls.single.donationIds, [101, 102]);
+    expect(service.saveCalls.single.timeOfDay,
+        matches(RegExp(r'^ည\([၀-၉]+:[၀-၉]{2}\)$')));
+    expect(service.saveCalls.single.timeOfDay, isNot(kCustomNightTimeOption));
+
     await tester.tap(find.text('ပို့စ်စာသား'));
     await tester.pumpAndSettle();
     final field = tester.widget<TextField>(find.byType(TextField).last);
     expect(field.controller?.text, matches(RegExp(r'ည\([၀-၉]+:[၀-၉]{2}\)မှာ')));
+  });
+
+  testWidgets('a selected time is saved for the group and restored on reopen',
+      (tester) async {
+    final service = _FakeDonationService();
+    await _pumpScreen(
+      tester,
+      const Size(390, 844),
+      service: service,
+    );
+
+    await _selectFirstGroupTime(tester, 'ဒီနေ့ညနေ');
+
+    expect(service.saveCalls, hasLength(1));
+    expect(service.saveCalls.single.donationIds, [101, 102]);
+    expect(service.saveCalls.single.timeOfDay, 'ဒီနေ့ညနေ');
+
+    // Recreate the whole screen. The selected phrase must now come from the
+    // service rows, rather than surviving only in this widget's local state.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    await _pumpScreen(
+      tester,
+      const Size(390, 844),
+      service: service,
+    );
+
+    expect(find.text('ဒီနေ့ညနေ'), findsOneWidget);
+    await tester.tap(find.text('ပို့စ်စာသား'));
+    await tester.pumpAndSettle();
+    final field = tester.widget<TextField>(find.byType(TextField).last);
+    expect(field.controller?.text, contains('ဒီနေ့ညနေမှာ'));
+  });
+
+  testWidgets('a failed save rolls the time back and shows an error',
+      (tester) async {
+    final service = _FakeDonationService(failSaves: true);
+    await _pumpScreen(
+      tester,
+      const Size(390, 844),
+      service: service,
+    );
+
+    await _selectFirstGroupTime(tester, 'ဒီနေ့ညနေ');
+
+    expect(service.saveCalls, hasLength(1));
+    expect(service.saveCalls.single.donationIds, [101, 102]);
+    expect(service.saveCalls.single.timeOfDay, 'ဒီနေ့ညနေ');
+    expect(find.text('ဒီနေ့ညနေ'), findsNothing);
+    expect(find.text(kDefaultPostTime), findsWidgets);
+    expect(find.byType(SnackBar), findsOneWidget);
+  });
+
+  testWidgets('refresh cannot overwrite a save that is still in flight',
+      (tester) async {
+    final saveGate = Completer<void>();
+    final service = _FakeDonationService(saveGate: saveGate);
+    await _pumpScreen(
+      tester,
+      const Size(390, 844),
+      service: service,
+    );
+
+    await tester.tap(find.text(kDefaultPostTime).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('ဒီနေ့ညနေ').last);
+    await tester.pump();
+
+    final refresh = find.widgetWithIcon(IconButton, Icons.refresh);
+    expect(tester.widget<IconButton>(refresh).onPressed, isNull);
+    expect(
+      tester
+          .widget<IconButton>(
+            find.widgetWithIcon(IconButton, Icons.chevron_left),
+          )
+          .onPressed,
+      isNull,
+    );
+    expect(
+      tester
+          .widget<IconButton>(
+            find.widgetWithIcon(IconButton, Icons.chevron_right),
+          )
+          .onPressed,
+      isNull,
+    );
+    final datePicker = find.ancestor(
+      of: find.text(formatPostDate(DateTime.now())),
+      matching: find.byType(InkWell),
+    );
+    expect(tester.widget<InkWell>(datePicker.first).onTap, isNull);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    saveGate.complete();
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<IconButton>(refresh).onPressed, isNotNull);
+    expect(find.text('ဒီနေ့ညနေ'), findsOneWidget);
   });
 
   testWidgets('copying puts the generated post on the clipboard',
