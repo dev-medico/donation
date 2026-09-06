@@ -26,7 +26,7 @@ The similarly named files without the `live-` prefix are controlled Flutter widg
 ## Native release
 
 - Marketing version: `1.5.12`.
-- Final intended build number: `187`.
+- Release build number: `187`.
 - Build 186 was signed, validated and uploaded, but was not submitted for review.
 - Play pre-review flagged a critical advisory in the unused native Firebase Auth dependency's transitive reCAPTCHA 18.1.2 SDK. The warning was not ignored.
 - Build 187 removes the unused Firebase BoM/Auth declarations. Active login uses the existing backend API; all Firebase initialization/OTP code is inactive.
@@ -34,7 +34,11 @@ The similarly named files without the `live-` prefix are controlled Flutter widg
 - Android package: `com.red.juniors`; target SDK 36; bundle size 67,201,468 bytes.
 - AAB SHA256: `ae304b01f9fc7a54cb6614a618fc9b24c71bed54c6014557479560296e4c3d64`.
 - Firebase Auth and reCAPTCHA are absent from the AAB, its resolved dependency metadata, and `releaseRuntimeClasspath`.
-- Play submission and iOS archive/upload verification are pending.
+- The unsubmitted Play release 186 was discarded; its bundle remains in the artifact library.
+- Play production release `187 (1.5.12)` was submitted for a full rollout in the existing targeted countries. Publishing overview confirms **Changes in review**; automated quick checks were still running at submission. This is not a claim that the release is publicly available yet.
+- The signed iOS archive completed successfully. Its application reports bundle ID `com.red.juniors`, marketing version `1.5.12`, and build `187`; deep, strict code-signature verification passed.
+- Archive: `build/ios/archive/Runner-1.5.12-187.xcarchive` (local, excluded from Git).
+- App Store Connect upload succeeded on September 6, 2026. Xcode reported `Uploaded package is processing`, `Upload succeeded`, `Uploaded Runner`, and `EXPORT SUCCEEDED`; the upload command exited 0. This upload does not submit an App Store version for review.
 
 ## Tests
 
