@@ -1,153 +1,185 @@
+import 'dart:async';
+
 import 'package:donation/src/features/services/special_event_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-// Provider for fetching special events list
-final specialEventsProvider = FutureProvider.family<List<dynamic>, int>((ref, page) async {
-  final service = ref.read(specialEventServiceProvider);
+const _unsetLoadMoreError = Object();
 
-  try {
-    final events = await service.getSpecialEvents(
-      page: page,
-      limit: 1000,
-    );
-    return events;
-  } catch (e) {
-    print('Error fetching special events: $e');
-    throw e;
-  }
-});
-
-// Provider for a single special event
-final specialEventProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, id) async {
-  final service = ref.read(specialEventServiceProvider);
-
-  try {
-    final event = await service.getSpecialEventById(id);
-    return event;
-  } catch (e) {
-    print('Error fetching special event: $e');
-    throw e;
-  }
-});
-
-// Provider for searching special events
-final specialEventSearchProvider = FutureProvider.family<List<dynamic>, String>((ref, query) async {
-  final service = ref.read(specialEventServiceProvider);
-
-  try {
-    final events = await service.getSpecialEvents(
-      page: 0,
-      limit: 100,
-      q: query,
-    );
-    return events;
-  } catch (e) {
-    print('Error searching special events: $e');
-    throw e;
-  }
-});
-
-// State provider for managing special event form
-class SpecialEventFormState {
-  final String? id;
-  final DateTime date;
-  final String haemoglobin;
-  final String hbsAg;
-  final String hcvAb;
-  final String mpIct;
-  final String retroTest;
-  final String vdrlTest;
-  final String labName;
-  final String total;
-
-  SpecialEventFormState({
-    this.id,
-    required this.date,
-    required this.haemoglobin,
-    required this.hbsAg,
-    required this.hcvAb,
-    required this.mpIct,
-    required this.retroTest,
-    required this.vdrlTest,
-    required this.labName,
+class SpecialEventListState {
+  const SpecialEventListState({
+    required this.events,
+    required this.query,
+    required this.page,
     required this.total,
+    required this.hasMore,
+    this.isRefreshing = false,
+    this.isLoadingMore = false,
+    this.loadMoreError,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'date': date.toIso8601String().split('T')[0],
-      'haemoglobin': haemoglobin,
-      'hbs_ag': hbsAg,
-      'hcv_ab': hcvAb,
-      'mp_ict': mpIct,
-      'retro_test': retroTest,
-      'vdrl_test': vdrlTest,
-      'lab_name': labName,
-      'total': total,
-    };
-  }
+  final List<Map<String, dynamic>> events;
+  final String query;
+  final int page;
+  final int total;
+  final bool hasMore;
+  final bool isRefreshing;
+  final bool isLoadingMore;
+  final String? loadMoreError;
 
-  factory SpecialEventFormState.fromJson(Map<String, dynamic> json) {
-    return SpecialEventFormState(
-      id: json['id']?.toString(),
-      date: DateTime.parse(json['date']),
-      haemoglobin: json['haemoglobin'] ?? '',
-      hbsAg: json['hbs_ag'] ?? '',
-      hcvAb: json['hcv_ab'] ?? '',
-      mpIct: json['mp_ict'] ?? '',
-      retroTest: json['retro_test'] ?? '',
-      vdrlTest: json['vdrl_test'] ?? '',
-      labName: json['lab_name'] ?? '',
-      total: json['total'] ?? '',
+  SpecialEventListState copyWith({
+    List<Map<String, dynamic>>? events,
+    String? query,
+    int? page,
+    int? total,
+    bool? hasMore,
+    bool? isRefreshing,
+    bool? isLoadingMore,
+    Object? loadMoreError = _unsetLoadMoreError,
+  }) {
+    return SpecialEventListState(
+      events: events ?? this.events,
+      query: query ?? this.query,
+      page: page ?? this.page,
+      total: total ?? this.total,
+      hasMore: hasMore ?? this.hasMore,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      loadMoreError: identical(loadMoreError, _unsetLoadMoreError)
+          ? this.loadMoreError
+          : loadMoreError as String?,
     );
   }
 }
 
-// Provider for creating special event
-final createSpecialEventProvider = FutureProvider.family<Map<String, dynamic>, SpecialEventFormState>((ref, formState) async {
-  final service = ref.read(specialEventServiceProvider);
-
-  try {
-    final result = await service.createSpecialEvent(formState.toJson());
-    // Invalidate the list to refresh
-    ref.invalidate(specialEventsProvider);
-    return result;
-  } catch (e) {
-    print('Error creating special event: $e');
-    throw e;
-  }
+final specialEventListProvider = StateNotifierProvider.autoDispose<
+    SpecialEventListController, AsyncValue<SpecialEventListState>>((ref) {
+  return SpecialEventListController(ref.read(specialEventServiceProvider));
 });
 
-// Provider for updating special event
-final updateSpecialEventProvider = FutureProvider.family<Map<String, dynamic>, SpecialEventFormState>((ref, formState) async {
-  final service = ref.read(specialEventServiceProvider);
-
-  if (formState.id == null) {
-    throw Exception('Event ID is required for update');
+class SpecialEventListController
+    extends StateNotifier<AsyncValue<SpecialEventListState>> {
+  SpecialEventListController(
+    this._service, {
+    bool loadImmediately = true,
+  }) : super(const AsyncValue<SpecialEventListState>.loading()) {
+    if (loadImmediately) {
+      unawaited(refresh());
+    }
   }
 
-  try {
-    final result = await service.updateSpecialEvent(formState.id!, formState.toJson());
-    // Invalidate the list and single event to refresh
-    ref.invalidate(specialEventsProvider);
-    ref.invalidate(specialEventProvider(formState.id!));
-    return result;
-  } catch (e) {
-    print('Error updating special event: $e');
-    throw e;
-  }
-});
+  static const int pageSize = 50;
 
-// Provider for deleting special event
-final deleteSpecialEventProvider = FutureProvider.family<void, String>((ref, id) async {
-  final service = ref.read(specialEventServiceProvider);
+  final SpecialEventService _service;
+  int _requestGeneration = 0;
 
-  try {
-    await service.deleteSpecialEvent(id);
-    // Invalidate the list to refresh
-    ref.invalidate(specialEventsProvider);
-  } catch (e) {
-    print('Error deleting special event: $e');
-    throw e;
+  Future<void> refresh({String? query}) async {
+    final previous = state.asData?.value;
+    final normalizedQuery = (query ?? previous?.query ?? '').trim();
+    final generation = ++_requestGeneration;
+
+    if (previous == null) {
+      state = const AsyncValue<SpecialEventListState>.loading();
+    } else {
+      state = AsyncValue.data(previous.copyWith(
+        query: normalizedQuery,
+        isRefreshing: true,
+        isLoadingMore: false,
+        loadMoreError: null,
+      ));
+    }
+
+    try {
+      final result = await _service.getSpecialEvents(
+        page: 0,
+        limit: pageSize,
+        q: normalizedQuery,
+      );
+      if (generation != _requestGeneration) return;
+
+      state = AsyncValue.data(SpecialEventListState(
+        events: List.unmodifiable(result.events),
+        query: normalizedQuery,
+        page: result.page,
+        total: result.total,
+        hasMore: result.hasMore,
+      ));
+    } catch (error, stackTrace) {
+      if (generation != _requestGeneration) return;
+      state = AsyncValue.error(error, stackTrace);
+    }
   }
-});
+
+  Future<void> search(String query) => refresh(query: query);
+
+  Future<void> loadMore() async {
+    final current = state.asData?.value;
+    if (current == null ||
+        current.isRefreshing ||
+        current.isLoadingMore ||
+        !current.hasMore) {
+      return;
+    }
+
+    final generation = _requestGeneration;
+    state = AsyncValue.data(current.copyWith(
+      isLoadingMore: true,
+      loadMoreError: null,
+    ));
+
+    try {
+      final result = await _service.getSpecialEvents(
+        page: current.page + 1,
+        limit: pageSize,
+        q: current.query,
+      );
+      if (generation != _requestGeneration) return;
+
+      final ids = current.events
+          .map((event) => event['id']?.toString())
+          .whereType<String>()
+          .toSet();
+      final combined = <Map<String, dynamic>>[
+        ...current.events,
+        ...result.events.where((event) {
+          final id = event['id']?.toString();
+          return id == null || ids.add(id);
+        }),
+      ];
+
+      state = AsyncValue.data(current.copyWith(
+        events: List.unmodifiable(combined),
+        page: result.page,
+        total: result.total,
+        hasMore: result.hasMore,
+        isLoadingMore: false,
+        loadMoreError: null,
+      ));
+    } catch (error) {
+      if (generation != _requestGeneration) return;
+      state = AsyncValue.data(current.copyWith(
+        isLoadingMore: false,
+        loadMoreError: error.toString(),
+      ));
+    }
+  }
+
+  Future<Map<String, dynamic>> create(Map<String, dynamic> data) async {
+    final event = await _service.createSpecialEvent(data);
+    await refresh();
+    return event;
+  }
+
+  Future<Map<String, dynamic>> update(
+    String id,
+    Map<String, dynamic> data,
+  ) async {
+    final event = await _service.updateSpecialEvent(id, data);
+    await refresh();
+    return event;
+  }
+
+  Future<void> delete(String id) async {
+    await _service.deleteSpecialEvent(id);
+    await refresh();
+  }
+}

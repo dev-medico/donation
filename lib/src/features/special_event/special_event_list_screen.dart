@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/special_event/providers/special_event_provider.dart';
 import 'package:donation/src/features/special_event/special_event_data_source.dart';
-import 'package:donation/src/features/services/special_event_service.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/myanmar_number_input_formatter.dart';
+import 'package:donation/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -23,9 +26,8 @@ class SpecialEventListScreen extends ConsumerStatefulWidget {
 class _SpecialEventListScreenState
     extends ConsumerState<SpecialEventListScreen> {
   final ScrollController _scrollController = ScrollController();
-  int currentPage = 0;
-  List<dynamic> allEvents = [];
-  bool isLoadingMore = false;
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
 
   @override
   void initState() {
@@ -35,48 +37,32 @@ class _SpecialEventListScreenState
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      _loadMoreData();
+    if (_scrollController.hasClients &&
+        _scrollController.position.extentAfter < 240) {
+      unawaited(ref.read(specialEventListProvider.notifier).loadMore());
     }
   }
 
-  Future<void> _loadMoreData() async {
-    if (!isLoadingMore) {
-      setState(() {
-        isLoadingMore = true;
-      });
-
-      try {
-        final nextPage = currentPage + 1;
-        final moreEvents =
-            await ref.read(specialEventsProvider(nextPage).future);
-
-        if (moreEvents.isNotEmpty) {
-          setState(() {
-            currentPage = nextPage;
-            allEvents.addAll(moreEvents);
-          });
-        }
-      } catch (e) {
-        print('Error loading more data: $e');
-      } finally {
-        setState(() {
-          isLoadingMore = false;
-        });
-      }
-    }
+  void _search(String value) {
+    _searchDebounce?.cancel();
+    setState(() {});
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      unawaited(ref.read(specialEventListProvider.notifier).search(value));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final specialEventsAsync = ref.watch(specialEventsProvider(0));
+    final specialEventsAsync = ref.watch(specialEventListProvider);
 
     return Scaffold(
       // Always show the app bar — as a home tab it previously had none, which
@@ -105,110 +91,264 @@ class _SpecialEventListScreenState
           style: TextStyle(fontSize: 17, color: Colors.white),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            currentPage = 0;
-            allEvents.clear();
-          });
-          ref.invalidate(specialEventsProvider);
-        },
-        child: specialEventsAsync.when(
-          data: (initialEvents) {
-            // Initialize allEvents if empty
-            if (allEvents.isEmpty && initialEvents.isNotEmpty) {
-              allEvents = List.from(initialEvents);
-            }
+      body: specialEventsAsync.when(
+        data: _buildLoadedBody,
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => _buildErrorBody(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddEventDialog,
+        backgroundColor: primaryColor,
+        tooltip: 'ထူးခြားဖြစ်စဉ် အသစ်ထည့်မည်',
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
 
-            if (allEvents.isEmpty) {
-              return Center(
-                child: Column(
+  Widget _buildLoadedBody(SpecialEventListState state) {
+    return Column(
+      children: [
+        _buildSummaryAndSearch(state),
+        if (state.isRefreshing)
+          LinearProgressIndicator(
+            minHeight: 2,
+            color: primaryColor,
+            backgroundColor: primaryColor.withValues(alpha: 0.08),
+          ),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: ref.read(specialEventListProvider.notifier).refresh,
+            child: state.events.isEmpty
+                ? _buildEmptyList(state)
+                : _buildEventTable(state.events),
+          ),
+        ),
+        if (state.isLoadingMore)
+          LinearProgressIndicator(
+            minHeight: 2,
+            color: primaryColor,
+            backgroundColor: primaryColor.withValues(alpha: 0.08),
+          ),
+        if (state.loadMoreError != null)
+          Material(
+            color: const Color(0xFFFFF4F4),
+            child: InkWell(
+              onTap: ref.read(specialEventListProvider.notifier).loadMore,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.event_note,
-                      size: 64,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'ထူးခြားဖြစ်စဉ် မရှိသေးပါ',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
-                    ),
+                    Icon(Icons.refresh, size: 18, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('နောက်ထပ်မှတ်တမ်းများ ပြန်ယူမည်'),
                   ],
                 ),
-              );
-            }
-
-            return Column(
-              children: [
-                Expanded(
-                  child: _buildEventTable(allEvents),
-                ),
-                if (isLoadingMore)
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(),
-                  ),
-              ],
-            );
-          },
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
+              ),
+            ),
           ),
-          error: (error, stack) => Center(
+      ],
+    );
+  }
+
+  Widget _buildSummaryAndSearch(SpecialEventListState state) {
+    final isMobile = Responsive.isMobile(context);
+    final summaryText = Text(
+      'စုစုပေါင်း ${Utils.strToMM(state.total.toString())} မှတ်တမ်း',
+      key: const ValueKey('special-event-summary'),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(fontWeight: FontWeight.w600),
+    );
+    final summary = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: primaryColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: isMobile ? MainAxisSize.max : MainAxisSize.min,
+        children: [
+          Icon(Icons.event_note_outlined, size: 20, color: primaryColor),
+          const SizedBox(width: 8),
+          if (isMobile) Expanded(child: summaryText) else summaryText,
+        ],
+      ),
+    );
+
+    final search = TextField(
+      key: const ValueKey('special-event-search'),
+      controller: _searchController,
+      textInputAction: TextInputAction.search,
+      onChanged: _search,
+      onSubmitted: (value) {
+        _searchDebounce?.cancel();
+        unawaited(ref.read(specialEventListProvider.notifier).search(value));
+      },
+      decoration: InputDecoration(
+        hintText: 'ဓာတ်ခွဲခန်းအမည်ဖြင့် ရှာရန်',
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: _searchController.text.isEmpty
+            ? null
+            : IconButton(
+                tooltip: 'ရှာဖွေမှု ရှင်းမည်',
+                onPressed: _clearSearch,
+                icon: const Icon(Icons.close),
+              ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        isDense: true,
+        filled: true,
+        fillColor: Colors.white,
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                summary,
+                const SizedBox(height: 10),
+                search,
+              ],
+            )
+          : Row(
+              children: [
+                summary,
+                const SizedBox(width: 12),
+                Expanded(child: search),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildEmptyList(SpecialEventListState state) {
+    final isSearching = state.query.isNotEmpty;
+    return LayoutBuilder(
+      builder: (context, constraints) => ListView(
+        key: const ValueKey('special-event-empty'),
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(24),
+        children: [
+          SizedBox(
+            height: (constraints.maxHeight - 48).clamp(280.0, 520.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.error_outline,
-                  color: Colors.red,
-                  size: 48,
-                ),
+                Icon(Icons.event_note_outlined,
+                    size: 64, color: Colors.grey[400]),
                 const SizedBox(height: 16),
                 Text(
-                  'Error loading special events',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.red[700],
-                    fontWeight: FontWeight.bold,
+                  isSearching
+                      ? 'ကိုက်ညီသော မှတ်တမ်း မတွေ့ပါ'
+                      : 'ထူးခြားဖြစ်စဉ် မှတ်တမ်း မရှိသေးပါ',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  error.toString(),
-                  style: const TextStyle(color: Colors.grey),
+                  isSearching
+                      ? 'အခြားဓာတ်ခွဲခန်းအမည်ဖြင့် ထပ်ရှာနိုင်ပါသည်။'
+                      : 'မှတ်တမ်းအသစ် ထည့်နိုင်သလို အောက်သို့ဆွဲ၍ ပြန်ယူနိုင်ပါသည်။',
                   textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey[600]),
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    ref.invalidate(specialEventsProvider);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                  ),
-                  child: const Text(
-                    'Retry',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                const SizedBox(height: 20),
+                FilledButton.icon(
+                  key: ValueKey(isSearching
+                      ? 'special-event-clear-search'
+                      : 'special-event-empty-add'),
+                  onPressed: isSearching ? _clearSearch : _showAddEventDialog,
+                  style: FilledButton.styleFrom(backgroundColor: primaryColor),
+                  icon: Icon(isSearching ? Icons.close : Icons.add),
+                  label: Text(isSearching
+                      ? 'ရှာဖွေမှု ရှင်းမည်'
+                      : 'မှတ်တမ်းအသစ် ထည့်မည်'),
                 ),
+                if (!isSearching) ...[
+                  const SizedBox(height: 8),
+                  TextButton.icon(
+                    key: const ValueKey('special-event-empty-retry'),
+                    onPressed:
+                        ref.read(specialEventListProvider.notifier).refresh,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('မှတ်တမ်းများ ပြန်ယူမည်'),
+                  ),
+                ],
               ],
             ),
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddEventDialog();
-        },
-        backgroundColor: primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
+        ],
       ),
     );
+  }
+
+  Widget _buildErrorBody() {
+    return RefreshIndicator(
+      onRefresh: ref.read(specialEventListProvider.notifier).refresh,
+      child: LayoutBuilder(
+        builder: (context, constraints) => ListView(
+          key: const ValueKey('special-event-error'),
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(24),
+          children: [
+            SizedBox(
+              height: (constraints.maxHeight - 48).clamp(280.0, 560.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.cloud_off_outlined,
+                      size: 56, color: Colors.red[300]),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'မှတ်တမ်းများ ရယူ၍ မရသေးပါ',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'အင်တာနက်ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်မံကြိုးစားပါ။',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    key: const ValueKey('special-event-retry'),
+                    onPressed:
+                        ref.read(specialEventListProvider.notifier).refresh,
+                    style:
+                        FilledButton.styleFrom(backgroundColor: primaryColor),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('ပြန်လည်ကြိုးစားမည်'),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton.icon(
+                    onPressed: _showAddEventDialog,
+                    icon: const Icon(Icons.add),
+                    label: const Text('မှတ်တမ်းအသစ် ထည့်မည်'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    setState(() {});
+    unawaited(ref.read(specialEventListProvider.notifier).search(''));
   }
 
   String _eventDate(dynamic event) {
@@ -228,9 +368,19 @@ class _SpecialEventListScreenState
     }
   }
 
-  /// Compact phone cards: date + lab on top, test tallies below, total badge.
-  Widget _buildMobileEventList(List<dynamic> events) {
+  int _eventNumber(Map<String, dynamic> event, String key) {
+    final value = event[key];
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  /// Compact phone rows surface only non-zero findings so staff can scan the
+  /// exceptional result rather than six repeated zeroes.
+  Widget _buildMobileEventList(List<Map<String, dynamic>> events) {
     return ListView.separated(
+      key: const ValueKey('special-event-list'),
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 88),
       itemCount: events.length,
       separatorBuilder: (_, __) =>
@@ -238,58 +388,113 @@ class _SpecialEventListScreenState
       itemBuilder: (context, index) {
         final event = events[index];
         final lab = (event['lab_name'] ?? '').toString().trim();
-        final total = (event['total'] ?? '0').toString();
-        String n(String key) => (event[key] ?? '0').toString();
-        final tests = 'Hb ${n('haemoglobin')} · HBsAg ${n('hbs_ag')} · '
-            'HCV ${n('hcv_ab')} · MP ${n('mp_ict')} · '
-            'Retro ${n('retro_test')} · VDRL ${n('vdrl_test')}';
+        final total = _eventNumber(event, 'total');
+        final findings = <(String, int)>[
+          ('Hb', _eventNumber(event, 'haemoglobin')),
+          ('HBs Ag', _eventNumber(event, 'hbs_ag')),
+          ('HCV Ab', _eventNumber(event, 'hcv_ab')),
+          ('MP ICT', _eventNumber(event, 'mp_ict')),
+          ('Retro', _eventNumber(event, 'retro_test')),
+          ('VDRL', _eventNumber(event, 'vdrl_test')),
+        ].where((finding) => finding.$2 > 0).toList();
+
         return InkWell(
           onTap: () => _showEventDetails(event),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 9),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            padding: const EdgeInsets.symmetric(vertical: 11),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lab.isEmpty ? 'ဓာတ်ခွဲခန်းအမည် မရှိပါ' : lab,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Row(
+                            children: [
+                              Icon(Icons.calendar_today_outlined,
+                                  size: 13, color: Colors.grey[600]),
+                              const SizedBox(width: 5),
+                              Text(
+                                _eventDate(event),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Semantics(
+                      label: 'စုစုပေါင်း $total',
+                      excludeSemantics: true,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDE7E7),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '${Utils.strToMM(total.toString())} ခု',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 9),
+                if (findings.isEmpty)
+                  Text(
+                    'ထူးခြားစစ်ဆေးချက် ၀',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  )
+                else
+                  Wrap(
+                    spacing: 7,
+                    runSpacing: 6,
                     children: [
-                      Text(
-                        lab.isEmpty
-                            ? _eventDate(event)
-                            : '${_eventDate(event)} · $lab',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 13.5, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        tests,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style:
-                            TextStyle(fontSize: 11.5, color: Colors.grey[600]),
-                      ),
+                      for (final finding in findings)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: primaryColor.withValues(alpha: 0.16),
+                            ),
+                          ),
+                          child: Text(
+                            '${finding.$1} ${Utils.strToMM(finding.$2.toString())}',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: primaryDark,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFDE7E7),
-                    borderRadius: BorderRadius.circular(9),
-                  ),
-                  child: Text(
-                    total,
-                    style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: primaryColor),
-                  ),
-                ),
               ],
             ),
           ),
@@ -298,7 +503,7 @@ class _SpecialEventListScreenState
     );
   }
 
-  Widget _buildEventTable(List<dynamic> events) {
+  Widget _buildEventTable(List<Map<String, dynamic>> events) {
     if (Responsive.isMobile(context)) {
       return _buildMobileEventList(events);
     }
@@ -311,7 +516,7 @@ class _SpecialEventListScreenState
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -321,6 +526,7 @@ class _SpecialEventListScreenState
         borderRadius: BorderRadius.circular(12),
         child: SfDataGrid(
           source: dataSource,
+          verticalScrollController: _scrollController,
           onCellTap: (details) {
             if (details.rowColumnIndex.rowIndex > 0) {
               final index = details.rowColumnIndex.rowIndex - 1;
@@ -493,41 +699,43 @@ class _SpecialEventListScreenState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(event['lab_name'] ?? 'Special Event'),
+        title: Text((event['lab_name'] ?? '').toString().trim().isEmpty
+            ? 'ထူးခြားဖြစ်စဉ်'
+            : event['lab_name'].toString()),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailRow('Date', dateDisplay),
+              _buildDetailRow('ရက်စွဲ', dateDisplay),
               _buildDetailRow('Haemoglobin', event['haemoglobin']),
               _buildDetailRow('HBs Ag', event['hbs_ag']),
               _buildDetailRow('HCV Ab', event['hcv_ab']),
               _buildDetailRow('MP ICT', event['mp_ict']),
               _buildDetailRow('Retro Test', event['retro_test']),
               _buildDetailRow('VDRL Test', event['vdrl_test']),
-              _buildDetailRow('Total', event['total']),
+              _buildDetailRow('စုစုပေါင်း', event['total']),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Close', style: TextStyle(color: primaryColor)),
+            child: Text('ပိတ်မည်', style: TextStyle(color: primaryColor)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _showEditEventDialog(event);
             },
-            child: Text('Edit', style: TextStyle(color: primaryColor)),
+            child: Text('ပြင်မည်', style: TextStyle(color: primaryColor)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _deleteEvent(event['id'].toString());
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text('ဖျက်မည်', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -560,69 +768,80 @@ class _SpecialEventListScreenState
   }
 
   void _showAddEventDialog() {
-    showDialog(
+    if (Responsive.isMobile(context)) {
+      unawaited(
+        Navigator.of(context).push<void>(
+          MaterialPageRoute<void>(
+            fullscreenDialog: true,
+            builder: (context) => const _AddSpecialEventDialog(),
+          ),
+        ),
+      );
+      return;
+    }
+
+    unawaited(showDialog<void>(
       context: context,
-      builder: (context) => _AddSpecialEventDialog(
-        onAdded: () {
-          setState(() {
-            currentPage = 0;
-            allEvents.clear();
-          });
-          ref.invalidate(specialEventsProvider);
-        },
-      ),
-    );
+      builder: (context) => const _AddSpecialEventDialog(),
+    ));
   }
 
   void _showEditEventDialog(Map<String, dynamic> event) {
-    showDialog(
+    if (Responsive.isMobile(context)) {
+      unawaited(
+        Navigator.of(context).push<void>(
+          MaterialPageRoute<void>(
+            fullscreenDialog: true,
+            builder: (context) => _EditSpecialEventDialog(event: event),
+          ),
+        ),
+      );
+      return;
+    }
+
+    unawaited(showDialog<void>(
       context: context,
-      builder: (context) => _EditSpecialEventDialog(
-        event: event,
-        onUpdated: () {
-          setState(() {
-            currentPage = 0;
-            allEvents.clear();
-          });
-          ref.invalidate(specialEventsProvider);
-        },
-      ),
-    );
+      builder: (context) => _EditSpecialEventDialog(event: event),
+    ));
   }
 
   void _deleteEvent(String id) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Event'),
-        content: const Text('Are you sure you want to delete this event?'),
+        title: const Text('မှတ်တမ်း ဖျက်မည်'),
+        content: const Text('ဤထူးခြားဖြစ်စဉ်မှတ်တမ်းကို ဖျက်ရန် သေချာပါသလား။'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
+            child:
+                Text('မဖျက်တော့ပါ', style: TextStyle(color: Colors.grey[600])),
           ),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
+              final messenger = ScaffoldMessenger.of(this.context);
 
               try {
-                await ref.read(deleteSpecialEventProvider(id).future);
-
-                setState(() {
-                  allEvents
-                      .removeWhere((event) => event['id'].toString() == id);
-                });
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Event deleted successfully')),
+                await ref.read(specialEventListProvider.notifier).delete(id);
+                if (!mounted) return;
+                messenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('မှတ်တမ်း ဖျက်ပြီးပါပြီ'),
+                    backgroundColor: Colors.green,
+                  ),
                 );
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error deleting event: $e')),
+                if (!mounted) return;
+                messenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('မှတ်တမ်း ဖျက်၍ မရပါ။ ထပ်မံကြိုးစားပါ။'),
+                    backgroundColor: Colors.red,
+                  ),
                 );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text('ဖျက်မည်', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -643,6 +862,152 @@ Widget _buildSpecialEventDialogTitle(IconData icon, String title) {
         ),
       ),
     ],
+  );
+}
+
+Widget _buildMobileSpecialEventFormPage({
+  required String keyPrefix,
+  required String title,
+  required bool isLoading,
+  required Widget form,
+  required VoidCallback onSubmit,
+  required BuildContext context,
+}) {
+  return PopScope(
+    canPop: !isLoading,
+    child: Scaffold(
+      key: ValueKey('$keyPrefix-page'),
+      backgroundColor: const Color(0xFFFFFBFC),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          key: ValueKey('$keyPrefix-close'),
+          onPressed: isLoading ? null : () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.close, color: Colors.white),
+          tooltip: 'မလုပ်တော့ပါ',
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [primaryColor, primaryDark],
+            ),
+          ),
+        ),
+        centerTitle: true,
+        title: Text(
+          title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 17, color: Colors.white),
+        ),
+      ),
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Theme(
+              data: _specialEventMobileFormTheme(context),
+              child: form,
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: const Border(
+              top: BorderSide(color: Color(0xFFE9E4E4)),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 14,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  key: ValueKey('$keyPrefix-cancel'),
+                  onPressed:
+                      isLoading ? null : () => Navigator.of(context).pop(),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                  child: const Text('မလုပ်တော့ပါ'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton(
+                  key: ValueKey('$keyPrefix-save'),
+                  onPressed: isLoading ? null : onSubmit,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    backgroundColor: primaryColor,
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                            semanticsLabel: 'သိမ်းဆည်းနေသည်',
+                          ),
+                        )
+                      : const Text('သိမ်းမည်'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+ThemeData _specialEventMobileFormTheme(BuildContext context) {
+  final theme = Theme.of(context);
+  const borderColor = Color(0xFFD9D4D4);
+
+  return theme.copyWith(
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      labelStyle: const TextStyle(color: Color(0xFF625D5D), fontSize: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: borderColor),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: borderColor),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: primaryColor, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.red, width: 1.5),
+      ),
+    ),
   );
 }
 
@@ -676,9 +1041,7 @@ Widget _buildSpecialEventTestGrid({
 
 // Add Special Event Dialog Widget
 class _AddSpecialEventDialog extends ConsumerStatefulWidget {
-  final VoidCallback onAdded;
-
-  const _AddSpecialEventDialog({required this.onAdded});
+  const _AddSpecialEventDialog();
 
   @override
   ConsumerState<_AddSpecialEventDialog> createState() =>
@@ -728,10 +1091,10 @@ class _AddSpecialEventDialogState
       _isLoading = true;
     });
 
+    final messenger = ScaffoldMessenger.of(context);
     try {
-      final service = ref.read(specialEventServiceProvider);
       final data = {
-        'lab_name': _labNameController.text,
+        'lab_name': _labNameController.text.trim(),
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
         'haemoglobin': int.parse(_haemoglobinController.text.isEmpty
             ? '0'
@@ -749,28 +1112,31 @@ class _AddSpecialEventDialogState
         'total': _calculateTotal(),
       };
 
-      await service.createSpecialEvent(data);
+      await ref.read(specialEventListProvider.notifier).create(data);
+      if (!mounted) return;
 
-      Navigator.pop(context);
-      widget.onAdded();
+      Navigator.of(context).pop();
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(
           content: Text('ထူးခြားဖြစ်စဉ် အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ'),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('မှတ်တမ်း ထည့်၍ မရပါ။ ဖြည့်ထားသည်များကို စစ်ဆေးပါ။'),
           backgroundColor: Colors.red,
         ),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -778,124 +1144,25 @@ class _AddSpecialEventDialogState
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
 
+    if (isMobile) {
+      return _buildMobileSpecialEventFormPage(
+        keyPrefix: 'special-event-add',
+        title: 'ထူးခြားဖြစ်စဉ် ထည့်မည်',
+        isLoading: _isLoading,
+        form: _buildForm(isMobile: true),
+        onSubmit: _submit,
+        context: context,
+      );
+    }
+
     return AlertDialog(
-      insetPadding: isMobile
-          ? const EdgeInsets.symmetric(horizontal: 12, vertical: 24)
-          : null,
-      contentPadding:
-          isMobile ? const EdgeInsets.fromLTRB(16, 20, 16, 0) : null,
       title: _buildSpecialEventDialogTitle(
         Icons.add_circle,
         'ထူးခြားဖြစ်စဉ် အသစ်ထည့်သွင်းမည်',
       ),
       content: SizedBox(
-        width: isMobile ? double.maxFinite : 500,
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Lab Name
-                TextFormField(
-                  controller: _labNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Lab Name *',
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Lab Name ဖြည့်သွင်းပါ';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Date Picker
-                InkWell(
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDate,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime.now(),
-                    );
-                    if (picked != null) {
-                      setState(() {
-                        _selectedDate = picked;
-                      });
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 15),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          DateFormat('dd MMM yyyy').format(_selectedDate),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const Icon(Icons.calendar_today),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Test fields in a grid
-                _buildSpecialEventTestGrid(
-                  context: context,
-                  children: [
-                    _buildTestField('Haemoglobin', _haemoglobinController),
-                    _buildTestField('HBs Ag', _hbsAgController),
-                    _buildTestField('HCV Ab', _hcvAbController),
-                    _buildTestField('MP ICT', _mpIctController),
-                    _buildTestField('Retro', _retroController),
-                    _buildTestField('VDRL', _vdrlController),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Total display
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'စုစုပေါင်း',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        _calculateTotal().toString(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        width: 500,
+        child: _buildForm(isMobile: false),
       ),
       actions: [
         TextButton(
@@ -925,8 +1192,158 @@ class _AddSpecialEventDialogState
     );
   }
 
-  Widget _buildTestField(String label, TextEditingController controller) {
+  Widget _buildForm({required bool isMobile}) {
+    final formattedDate = DateFormat('dd MMM yyyy').format(_selectedDate);
+
+    return SingleChildScrollView(
+      key: const ValueKey('special-event-add-form-scroll'),
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      padding: isMobile
+          ? const EdgeInsets.fromLTRB(16, 20, 16, 32)
+          : EdgeInsets.zero,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextFormField(
+              key: const ValueKey('special-event-add-lab-name'),
+              controller: _labNameController,
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                labelText: 'Lab Name *',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Lab Name ဖြည့်သွင်းပါ';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            Semantics(
+              key: const ValueKey('special-event-add-date'),
+              button: true,
+              label: 'ရက်စွဲ $formattedDate',
+              excludeSemantics: true,
+              child: InkWell(
+                onTap: _pickDate,
+                borderRadius: BorderRadius.circular(isMobile ? 12 : 4),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                  decoration: BoxDecoration(
+                    color: isMobile ? Colors.white : null,
+                    border: Border.all(
+                      color: isMobile ? const Color(0xFFD9D4D4) : Colors.grey,
+                    ),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 4),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ရက်စွဲ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(formattedDate,
+                              style: const TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                      const Icon(Icons.calendar_today_outlined),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'စစ်ဆေးချက် အရေအတွက်များ',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 10),
+            _buildSpecialEventTestGrid(
+              context: context,
+              children: [
+                _buildTestField(
+                  'Haemoglobin',
+                  _haemoglobinController,
+                  fieldKey: 'haemoglobin',
+                ),
+                _buildTestField('HBs Ag', _hbsAgController, fieldKey: 'hbs-ag'),
+                _buildTestField('HCV Ab', _hcvAbController, fieldKey: 'hcv-ab'),
+                _buildTestField('MP ICT', _mpIctController, fieldKey: 'mp-ict'),
+                _buildTestField('Retro', _retroController, fieldKey: 'retro'),
+                _buildTestField('VDRL', _vdrlController, fieldKey: 'vdrl'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Semantics(
+              label: 'စုစုပေါင်း ${_calculateTotal()}',
+              excludeSemantics: true,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(isMobile ? 12 : 8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'စုစုပေါင်း',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      Utils.strToMM(_calculateTotal().toString()),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && mounted) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Widget _buildTestField(
+    String label,
+    TextEditingController controller, {
+    required String fieldKey,
+  }) {
     return TextFormField(
+      key: ValueKey('special-event-add-$fieldKey'),
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
@@ -934,6 +1351,8 @@ class _AddSpecialEventDialogState
         isDense: true,
       ),
       keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.next,
+      inputFormatters: const [MyanmarNumberInputFormatter()],
       onChanged: (value) {
         setState(() {}); // Update total
       },
@@ -952,11 +1371,9 @@ class _AddSpecialEventDialogState
 // Edit Special Event Dialog Widget
 class _EditSpecialEventDialog extends ConsumerStatefulWidget {
   final Map<String, dynamic> event;
-  final VoidCallback onUpdated;
 
   const _EditSpecialEventDialog({
     required this.event,
-    required this.onUpdated,
   });
 
   @override
@@ -1042,10 +1459,10 @@ class _EditSpecialEventDialogState
       _isLoading = true;
     });
 
+    final messenger = ScaffoldMessenger.of(context);
     try {
-      final service = ref.read(specialEventServiceProvider);
       final data = {
-        'lab_name': _labNameController.text,
+        'lab_name': _labNameController.text.trim(),
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
         'haemoglobin': int.parse(_haemoglobinController.text.isEmpty
             ? '0'
@@ -1063,28 +1480,33 @@ class _EditSpecialEventDialogState
         'total': _calculateTotal(),
       };
 
-      await service.updateSpecialEvent(widget.event['id'].toString(), data);
+      await ref
+          .read(specialEventListProvider.notifier)
+          .update(widget.event['id'].toString(), data);
+      if (!mounted) return;
 
-      Navigator.pop(context);
-      widget.onUpdated();
+      Navigator.of(context).pop();
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(
           content: Text('ထူးခြားဖြစ်စဉ် အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ'),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('မှတ်တမ်း ပြင်၍ မရပါ။ ဖြည့်ထားသည်များကို စစ်ဆေးပါ။'),
           backgroundColor: Colors.red,
         ),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -1092,124 +1514,25 @@ class _EditSpecialEventDialogState
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
 
+    if (isMobile) {
+      return _buildMobileSpecialEventFormPage(
+        keyPrefix: 'special-event-edit',
+        title: 'ထူးခြားဖြစ်စဉ် ပြင်မည်',
+        isLoading: _isLoading,
+        form: _buildForm(isMobile: true),
+        onSubmit: _submit,
+        context: context,
+      );
+    }
+
     return AlertDialog(
-      insetPadding: isMobile
-          ? const EdgeInsets.symmetric(horizontal: 12, vertical: 24)
-          : null,
-      contentPadding:
-          isMobile ? const EdgeInsets.fromLTRB(16, 20, 16, 0) : null,
       title: _buildSpecialEventDialogTitle(
         Icons.edit,
         'ထူးခြားဖြစ်စဉ် ပြင်ဆင်မည်',
       ),
       content: SizedBox(
-        width: isMobile ? double.maxFinite : 500,
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Lab Name
-                TextFormField(
-                  controller: _labNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Lab Name *',
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Lab Name ဖြည့်သွင်းပါ';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Date Picker
-                InkWell(
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDate,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime.now(),
-                    );
-                    if (picked != null) {
-                      setState(() {
-                        _selectedDate = picked;
-                      });
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 15),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          DateFormat('dd MMM yyyy').format(_selectedDate),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const Icon(Icons.calendar_today),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Test fields in a grid
-                _buildSpecialEventTestGrid(
-                  context: context,
-                  children: [
-                    _buildTestField('Haemoglobin', _haemoglobinController),
-                    _buildTestField('HBs Ag', _hbsAgController),
-                    _buildTestField('HCV Ab', _hcvAbController),
-                    _buildTestField('MP ICT', _mpIctController),
-                    _buildTestField('Retro', _retroController),
-                    _buildTestField('VDRL', _vdrlController),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Total display
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'စုစုပေါင်း',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        _calculateTotal().toString(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        width: 500,
+        child: _buildForm(isMobile: false),
       ),
       actions: [
         TextButton(
@@ -1239,8 +1562,158 @@ class _EditSpecialEventDialogState
     );
   }
 
-  Widget _buildTestField(String label, TextEditingController controller) {
+  Widget _buildForm({required bool isMobile}) {
+    final formattedDate = DateFormat('dd MMM yyyy').format(_selectedDate);
+
+    return SingleChildScrollView(
+      key: const ValueKey('special-event-edit-form-scroll'),
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      padding: isMobile
+          ? const EdgeInsets.fromLTRB(16, 20, 16, 32)
+          : EdgeInsets.zero,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextFormField(
+              key: const ValueKey('special-event-edit-lab-name'),
+              controller: _labNameController,
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                labelText: 'Lab Name *',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Lab Name ဖြည့်သွင်းပါ';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            Semantics(
+              key: const ValueKey('special-event-edit-date'),
+              button: true,
+              label: 'ရက်စွဲ $formattedDate',
+              excludeSemantics: true,
+              child: InkWell(
+                onTap: _pickDate,
+                borderRadius: BorderRadius.circular(isMobile ? 12 : 4),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                  decoration: BoxDecoration(
+                    color: isMobile ? Colors.white : null,
+                    border: Border.all(
+                      color: isMobile ? const Color(0xFFD9D4D4) : Colors.grey,
+                    ),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 4),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ရက်စွဲ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(formattedDate,
+                              style: const TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                      const Icon(Icons.calendar_today_outlined),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'စစ်ဆေးချက် အရေအတွက်များ',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 10),
+            _buildSpecialEventTestGrid(
+              context: context,
+              children: [
+                _buildTestField(
+                  'Haemoglobin',
+                  _haemoglobinController,
+                  fieldKey: 'haemoglobin',
+                ),
+                _buildTestField('HBs Ag', _hbsAgController, fieldKey: 'hbs-ag'),
+                _buildTestField('HCV Ab', _hcvAbController, fieldKey: 'hcv-ab'),
+                _buildTestField('MP ICT', _mpIctController, fieldKey: 'mp-ict'),
+                _buildTestField('Retro', _retroController, fieldKey: 'retro'),
+                _buildTestField('VDRL', _vdrlController, fieldKey: 'vdrl'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Semantics(
+              label: 'စုစုပေါင်း ${_calculateTotal()}',
+              excludeSemantics: true,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(isMobile ? 12 : 8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'စုစုပေါင်း',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      Utils.strToMM(_calculateTotal().toString()),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && mounted) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Widget _buildTestField(
+    String label,
+    TextEditingController controller, {
+    required String fieldKey,
+  }) {
     return TextFormField(
+      key: ValueKey('special-event-edit-$fieldKey'),
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
@@ -1248,6 +1721,8 @@ class _EditSpecialEventDialogState
         isDense: true,
       ),
       keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.next,
+      inputFormatters: const [MyanmarNumberInputFormatter()],
       onChanged: (value) {
         setState(() {}); // Update total
       },

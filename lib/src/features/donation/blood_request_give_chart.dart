@@ -3,12 +3,14 @@ import 'package:donation/responsive.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/report_service.dart';
+import 'package:donation/src/features/services/request_give_service.dart';
 import 'package:donation/src/features/finder/request_give_detail_screen_new.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 final requestGiveStatsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   try {
+    ref.watch(requestGiveRevisionProvider);
     final reportService = ref.read(reportServiceProvider);
     return await reportService.getRequestGiveStats();
   } catch (e) {
@@ -32,7 +34,7 @@ class BloodRequestGiveChartScreen extends ConsumerStatefulWidget {
 }
 
 class _BloodRequestGiveChartScreenState
-    extends ConsumerState<BloodRequestGiveChartScreen> 
+    extends ConsumerState<BloodRequestGiveChartScreen>
     with AutomaticKeepAliveClientMixin {
   late TooltipBehavior _tooltip;
 
@@ -64,101 +66,100 @@ class _BloodRequestGiveChartScreenState
           ? MediaQuery.of(context).size.width * 0.9
           : MediaQuery.of(context).size.width * 0.43,
       child: requestGiveStats.when(
-            data: (data) {
-              final chartData = data
-                  .map((item) => ChartData(
-                        "${item['month']}/${item['year']}",
-                        (item['request'] as num).toDouble(),
-                        (item['give'] as num).toDouble(),
-                      ))
-                  .toList();
+        data: (data) {
+          final chartData = data
+              .map((item) => ChartData(
+                    "${item['month']}/${item['year']}",
+                    (item['request'] as num).toDouble(),
+                    (item['give'] as num).toDouble(),
+                  ))
+              .toList();
 
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "သွေးတောင်းခံ/လှူဒါန်းမှု အခြေအနေ",
-                            style: TextStyle(
-                              fontSize:
-                                  Responsive.isMobile(context) ? 15.5 : 16.5,
-                              color: primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const RequestGiveDetailScreenNew(),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.visibility,
-                              size: 20, color: primaryColor),
-                          tooltip: 'အသေးစိတ်ကြည့်ရှုမည်',
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: Responsive.isMobile(context) ? 10 : 8),
                     Expanded(
-                      child: RepaintBoundary(
-                        child: SfCartesianChart(
-                          primaryXAxis: CategoryAxis(),
-                          tooltipBehavior: _tooltip,
-                          legend: Legend(
-                            isVisible: true,
-                            position: LegendPosition.bottom,
-                          ),
-                          series: <CartesianSeries>[
-                            ColumnSeries<ChartData, String>(
-                              name: 'တောင်းခံ',
-                              color: Colors.red,
-                              dataSource: chartData,
-                              xValueMapper: (ChartData data, _) => data.x,
-                              yValueMapper: (ChartData data, _) => data.y,
-                              animationDuration: 0,
-                            ),
-                            ColumnSeries<ChartData, String>(
-                              name: 'လှူဒါန်း',
-                              color: Colors.green,
-                              dataSource: chartData,
-                              xValueMapper: (ChartData data, _) => data.x,
-                              yValueMapper: (ChartData data, _) => data.y1,
-                              animationDuration: 0,
-                            ),
-                          ],
+                      child: Text(
+                        "သွေးတောင်းခံ/လှူဒါန်းမှု အခြေအနေ",
+                        style: TextStyle(
+                          fontSize: Responsive.isMobile(context) ? 15.5 : 16.5,
+                          color: primaryColor,
+                          fontWeight: FontWeight.bold,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const RequestGiveDetailScreenNew(),
+                          ),
+                        );
+                      },
+                      icon:
+                          Icon(Icons.visibility, size: 20, color: primaryColor),
+                      tooltip: 'အသေးစိတ်ကြည့်ရှုမည်',
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
                       ),
                     ),
                   ],
                 ),
-              );
-            },
-            loading: () => Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  error.toString().replaceAll('Exception: ', ''),
-                  textAlign: TextAlign.center,
+                SizedBox(height: Responsive.isMobile(context) ? 10 : 8),
+                Expanded(
+                  child: RepaintBoundary(
+                    child: SfCartesianChart(
+                      primaryXAxis: CategoryAxis(),
+                      tooltipBehavior: _tooltip,
+                      legend: Legend(
+                        isVisible: true,
+                        position: LegendPosition.bottom,
+                      ),
+                      series: <CartesianSeries>[
+                        ColumnSeries<ChartData, String>(
+                          name: 'တောင်းခံ',
+                          color: Colors.red,
+                          dataSource: chartData,
+                          xValueMapper: (ChartData data, _) => data.x,
+                          yValueMapper: (ChartData data, _) => data.y,
+                          animationDuration: 0,
+                        ),
+                        ColumnSeries<ChartData, String>(
+                          name: 'လှူဒါန်း',
+                          color: Colors.green,
+                          dataSource: chartData,
+                          xValueMapper: (ChartData data, _) => data.x,
+                          yValueMapper: (ChartData data, _) => data.y1,
+                          animationDuration: 0,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
+          );
+        },
+        loading: () => Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              error.toString().replaceAll('Exception: ', ''),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
       ),
     );
   }

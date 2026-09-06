@@ -5,8 +5,24 @@ final specialEventLoadingStatusProvider = StateProvider<String>((ref) => '');
 final specialEventServiceProvider =
     Provider<SpecialEventService>((ref) => SpecialEventService(ref));
 
+class SpecialEventPage {
+  const SpecialEventPage({
+    required this.events,
+    required this.page,
+    required this.limit,
+    required this.total,
+    required this.hasMore,
+  });
+
+  final List<Map<String, dynamic>> events;
+  final int page;
+  final int limit;
+  final int total;
+  final bool hasMore;
+}
+
 class SpecialEventService extends BaseService {
-  final ProviderRef? ref;
+  final Ref? ref;
 
   SpecialEventService([this.ref]);
 
@@ -19,7 +35,7 @@ class SpecialEventService extends BaseService {
     }
   }
 
-  Future<List<dynamic>> getSpecialEvents({
+  Future<SpecialEventPage> getSpecialEvents({
     int page = 0,
     int limit = 50,
     String? q,
@@ -39,17 +55,36 @@ class SpecialEventService extends BaseService {
       );
 
       _updateLoadingStatus('');
-      if (response.statusCode == 200) {
-        if (response.data != null && response.data!['data'] != null) {
-          return response.data!['data'] as List<dynamic>;
-        }
-        return [];
+      if (response.statusCode != 200) {
+        throw Exception('Failed to fetch special events');
       }
-      throw Exception('Failed to fetch special events');
+
+      final body = _responseBody(response.data, 'Invalid special event list');
+      final rawEvents = body['data'];
+      if (rawEvents is! List) {
+        throw Exception('Invalid special event list');
+      }
+
+      final events = rawEvents
+          .whereType<Map>()
+          .map((event) => Map<String, dynamic>.from(event))
+          .toList(growable: false);
+      final total = _asInt(body['total'], fallback: events.length);
+      final responsePage = _asInt(body['page'], fallback: page);
+      final responseLimit = _asInt(body['limit'], fallback: limit);
+
+      return SpecialEventPage(
+        events: events,
+        page: responsePage,
+        limit: responseLimit,
+        total: total,
+        hasMore: body['hasMore'] == true ||
+            ((responsePage + 1) * responseLimit) < total,
+      );
     } catch (e) {
       print('Error fetching special events: $e');
       _updateLoadingStatus('Error: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -65,8 +100,10 @@ class SpecialEventService extends BaseService {
 
       _updateLoadingStatus('');
       if (response.statusCode == 200) {
-        if (response.data != null && response.data!['data'] != null) {
-          return response.data!['data'] as Map<String, dynamic>;
+        final body = _responseBody(response.data, 'Invalid response format');
+        final event = body['data'];
+        if (event is Map) {
+          return Map<String, dynamic>.from(event);
         }
         throw Exception('Invalid response format');
       }
@@ -74,11 +111,12 @@ class SpecialEventService extends BaseService {
     } catch (e) {
       print('Error fetching special event by ID: $e');
       _updateLoadingStatus('Error: $e');
-      throw e;
+      rethrow;
     }
   }
 
-  Future<Map<String, dynamic>> createSpecialEvent(Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> createSpecialEvent(
+      Map<String, dynamic> data) async {
     final headers = await getAuthHeaders();
     _updateLoadingStatus('Creating special event...');
 
@@ -91,13 +129,18 @@ class SpecialEventService extends BaseService {
 
       _updateLoadingStatus('Special event created successfully!');
       if (response.statusCode == 201 || response.statusCode == 200) {
-        return response.data!['data'] as Map<String, dynamic>;
+        final body = _responseBody(response.data, 'Invalid create response');
+        final event = body['data'];
+        if (event is Map) {
+          return Map<String, dynamic>.from(event);
+        }
+        throw Exception('Invalid create response');
       }
       throw Exception('Failed to create special event');
     } catch (e) {
       print('Error creating special event: $e');
       _updateLoadingStatus('Error: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -115,13 +158,18 @@ class SpecialEventService extends BaseService {
 
       _updateLoadingStatus('Special event updated successfully!');
       if (response.statusCode == 200) {
-        return response.data!['data'] as Map<String, dynamic>;
+        final body = _responseBody(response.data, 'Invalid update response');
+        final event = body['data'];
+        if (event is Map) {
+          return Map<String, dynamic>.from(event);
+        }
+        throw Exception('Invalid update response');
       }
       throw Exception('Failed to update special event');
     } catch (e) {
       print('Error updating special event: $e');
       _updateLoadingStatus('Error: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -139,10 +187,34 @@ class SpecialEventService extends BaseService {
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Failed to delete special event');
       }
+      if (response.statusCode == 200) {
+        _responseBody(response.data, 'Invalid delete response');
+      }
     } catch (e) {
       print('Error deleting special event: $e');
       _updateLoadingStatus('Error: $e');
-      throw e;
+      rethrow;
     }
+  }
+
+  Map<String, dynamic> _responseBody(
+    dynamic responseData,
+    String fallbackMessage,
+  ) {
+    if (responseData is! Map) {
+      throw Exception(fallbackMessage);
+    }
+
+    final body = Map<String, dynamic>.from(responseData);
+    if (body['status'] != 'ok') {
+      throw Exception(body['message']?.toString() ?? fallbackMessage);
+    }
+    return body;
+  }
+
+  int _asInt(dynamic value, {required int fallback}) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? fallback;
   }
 }

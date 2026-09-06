@@ -119,14 +119,23 @@ class TownshipDetailRepository {
       _byTownship[township]?.places ?? const [];
 
   /// Find the structured entry for a place by (township, name), or null when the
-  /// value was free-typed / not in the dataset.
+  /// value was free-typed, missing, or ambiguous within the township.
+  ///
+  /// Place names can repeat under different towns in the same township. In that
+  /// case choosing the first match would silently attach a legacy flat address
+  /// to the wrong town, so callers must ask the user to select the place again.
   PlaceEntry? findPlace(String township, String name) {
     final places = _byTownship[township]?.places;
     if (places == null) return null;
+    PlaceEntry? match;
     for (final p in places) {
-      if (p.name == name) return p;
+      if (p.name != name) continue;
+      if (match != null && (match.type != p.type || match.group != p.group)) {
+        return null;
+      }
+      match ??= p;
     }
-    return null;
+    return match;
   }
 
   /// The town (မြို့) a ward belongs to, but only when it is unambiguous within

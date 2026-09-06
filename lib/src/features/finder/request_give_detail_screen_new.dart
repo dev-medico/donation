@@ -2,11 +2,13 @@ import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
+import 'package:donation/src/features/finder/request_give_list_screen.dart';
 
 // Provider for detailed report data - using String key for proper caching
 final requestGiveReportProvider =
     FutureProvider.family<Map<String, dynamic>, String>((ref, key) async {
   try {
+    ref.watch(requestGiveRevisionProvider);
     // Parse the key to extract year and month
     final parts = key.split('-');
     final year = int.parse(parts[0]);
@@ -383,10 +385,10 @@ class _RequestGiveDetailScreenNewState
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddEditDialog(null),
+        onPressed: _openWorksheet,
         backgroundColor: primaryColor,
-        child: Icon(Icons.add, color: Colors.white),
-        tooltip: 'အသစ်ထည့်မည်',
+        child: Icon(Icons.edit_calendar_outlined, color: Colors.white),
+        tooltip: 'နေ့စဉ်မှတ်တမ်း ဖြည့်မည်',
       ),
     );
   }
@@ -715,8 +717,8 @@ class _RequestGiveDetailScreenNewState
                           trailing: IconButton(
                             icon:
                                 Icon(Icons.edit, color: primaryColor, size: 20),
-                            onPressed: () => _showAddEditDialog(monthData,
-                                month: month, year: year),
+                            onPressed: () =>
+                                _openWorksheet(month: month, year: year),
                           ),
                         );
                       },
@@ -775,11 +777,7 @@ class _RequestGiveDetailScreenNewState
                     Spacer(),
                     IconButton(
                       icon: Icon(Icons.edit, color: primaryColor),
-                      onPressed: () => _showAddEditDialog(
-                        {'request': totalRequest, 'give': totalGive},
-                        month: month,
-                        year: year,
-                      ),
+                      onPressed: () => _openWorksheet(month: month, year: year),
                     ),
                   ],
                 ),
@@ -797,115 +795,18 @@ class _RequestGiveDetailScreenNewState
     );
   }
 
-  void _showAddEditDialog(Map<String, dynamic>? existingData,
-      {int? month, int? year}) async {
+  Future<void> _openWorksheet({int? month, int? year}) async {
     final selectedYear = year ?? int.parse(years[_yearSelected]);
     final selectedMonth = month ??
         (_monthSelected != null ? _monthSelected! + 1 : DateTime.now().month);
-
-    final requestController = TextEditingController(
-        text: existingData != null
-            ? (existingData['totalrequest'] ??
-                    existingData['totalRequest'] ??
-                    existingData['request'] ??
-                    0)
-                .toString()
-            : '0');
-    final giveController = TextEditingController(
-        text: existingData != null
-            ? (existingData['totalgive'] ??
-                    existingData['totalGive'] ??
-                    existingData['give'] ??
-                    0)
-                .toString()
-            : '0');
-
-    await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${monthsMM[selectedMonth - 1]} $selectedYear'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: requestController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'တောင်းခံမှု',
-                prefixIcon: Icon(Icons.call_received, color: Colors.orange),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: giveController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'လှူဒါန်းမှု',
-                prefixIcon: Icon(Icons.volunteer_activism, color: Colors.green),
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RequestGiveListScreen(
+          initialMonth: DateTime(selectedYear, selectedMonth),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('မလုပ်တော့ပါ'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final service = ref.read(requestGiveServiceProvider);
-              try {
-                // Check if record exists
-                final monthlyData = await service.getOrCreateMonthly(
-                  year: selectedYear,
-                  month: selectedMonth,
-                );
-
-                final data = monthlyData['data'];
-                final isNew = monthlyData['isNew'] ?? false;
-
-                final requestGiveData = {
-                  'request': int.tryParse(requestController.text) ?? 0,
-                  'give': int.tryParse(giveController.text) ?? 0,
-                  'date':
-                      '${selectedYear.toString().padLeft(4, '0')}-${selectedMonth.toString().padLeft(2, '0')}-01',
-                };
-
-                if (isNew) {
-                  await service.createRequestGive(requestGiveData);
-                } else {
-                  await service.updateRequestGive(
-                    data['id'].toString(),
-                    requestGiveData,
-                  );
-                }
-
-                // Refresh the data
-                ref.invalidate(requestGiveReportProvider);
-                Navigator.pop(context, true);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('အချက်အလက်သိမ်းဆည်းပြီးပါပြီ'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error: $e'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-            child: Text('သိမ်းဆည်းမည်'),
-          ),
-        ],
       ),
     );
+    if (mounted) ref.invalidate(requestGiveReportProvider);
   }
 }
