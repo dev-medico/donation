@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 .vercel
+
+# Local production QA captures may contain private application data.
+design-qa/live-*.png
