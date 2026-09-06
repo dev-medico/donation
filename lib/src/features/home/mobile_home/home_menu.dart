@@ -1,6 +1,7 @@
 import 'package:donation/core/api/api_client.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
+import 'package:donation/utils/app_version.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -131,7 +132,7 @@ class _HomeMenuScreenState extends ConsumerState<HomeMenuScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: Text(
-              'Version 1.5.1',
+              'Version $appVersion',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12,

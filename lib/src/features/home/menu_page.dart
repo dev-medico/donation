@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:donation/utils/app_version.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -91,7 +92,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   child: const Padding(
                     padding: EdgeInsets.all(12.0),
                     child: Text(
-                      "Log Out(V 1.5.1)",
+                      "Log Out(V $appVersion)",
                       style: TextStyle(fontSize: 16, color: Colors.black),
                     ),
                   ),

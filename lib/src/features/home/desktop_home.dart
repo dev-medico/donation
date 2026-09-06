@@ -1,5 +1,6 @@
 import 'package:donation/core/api/api_client.dart';
 import 'package:donation/responsive.dart';
+import 'package:donation/utils/app_version.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:donation/src/features/donar/donar_list_screen.dart';
@@ -38,7 +39,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     'အလှူရှင်များ',
     'လစဥ်ထောက်ပံ့သူများ',
     'Facebook ပို့စ်',
-    'Log Out(V 1.5.1)'
+    'Log Out(V $appVersion)'
   ];
   List<String> icons = [
     'assets/images/dashboard.png',

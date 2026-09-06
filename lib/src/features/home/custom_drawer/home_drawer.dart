@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/auth/login.dart';
 import 'package:donation/utils/Colors.dart';
+import 'package:donation/utils/app_version.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeDrawer extends StatefulWidget {
@@ -219,7 +220,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                       const Padding(
                         padding: EdgeInsets.only(right: 8.0),
                         child: Text(
-                          'V 1.5.1',
+                          'V $appVersion',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.black,
