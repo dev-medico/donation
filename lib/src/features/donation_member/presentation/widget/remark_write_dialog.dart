@@ -167,7 +167,7 @@ class _RemarkWriteDialogState extends ConsumerState<RemarkWriteDialog> {
                       Text(
                         checked
                             ? 'လှူဒါန်းခွင့် ဖွင့်ထားသည်'
-                            : 'လှူဒါန်းခွင့် ပိတ်ထားသည်',
+                            : 'မလှူဒါန်းနိုင်ပါ',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,

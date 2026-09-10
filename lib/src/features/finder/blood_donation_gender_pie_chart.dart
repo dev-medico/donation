@@ -1,4 +1,5 @@
 
+import 'package:donation/responsive.dart';
 import 'package:donation/src/features/finder/common_chart_data.dart';
 import 'package:donation/src/features/services/report_service.dart';
 import 'package:flutter/material.dart';
@@ -76,34 +77,40 @@ class _BloodDonationGenderPieChartState
             final totalMembers = data['totalMembers'] as int;
             final ageRanges = Map<String, int>.from(data['ageRanges']);
 
+            final mobile = Responsive.isMobile(context);
+
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // Wraps onto a second line on narrow phones instead of
+                // overflowing the card.
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 16,
+                  runSpacing: 4,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 4),
-                      child: Row(
-                        children: [
-                          Text("ပျမ်းမျှ အသက်"),
-                          SizedBox(height: 4),
-                          Text(
-                            "$averageAge နှစ်",
-                            style: TextStyle(
-                                fontSize: 17, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text("ပျမ်းမျှ အသက်"),
+                        SizedBox(width: 6),
+                        Text(
+                          "$averageAge နှစ်",
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Row(
-                        children: [
-                          Text("ကျား - ${maleData['quantity']}"),
-                          SizedBox(width: 8),
-                          Text("မ - ${femaleData['quantity']}"),
-                        ],
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("ကျား - ${maleData['quantity']}"),
+                        SizedBox(width: 12),
+                        Text("မ - ${femaleData['quantity']}"),
+                      ],
                     ),
                   ],
                 ),
@@ -125,17 +132,30 @@ class _BloodDonationGenderPieChartState
                 //   child: Text("အသက်အပိုင်းအခြား အလိုက် အဖွဲ့ဝင်များ"),
                 // ),
                 // SizedBox(height: 8),
-                Row(
-                  children: [
-                    Container(width: 0),
-                    Expanded(
-                      child: Container(
-                        height: 200,
-                        child: _buildAgeGroupPieChart(ageRanges, totalMembers),
-                      ),
-                    ),
-                  ],
+                SizedBox(
+                  height: mobile ? 220 : 200,
+                  child: _buildAgeGroupPieChart(
+                    ageRanges,
+                    totalMembers,
+                    mobile: mobile,
+                  ),
                 ),
+                // On phones the chart's own legend gets clipped at the card
+                // edge, so the entries are laid out here and wrap freely.
+                if (mobile) ...[
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 6,
+                    children: [
+                      for (final (index, entry) in ageRanges.entries.indexed)
+                        _LegendEntry(
+                          color: _getAgeRangeColor(index),
+                          label: "${entry.key} - ${entry.value}",
+                        ),
+                    ],
+                  ),
+                ],
               ],
             );
           },
@@ -155,7 +175,8 @@ class _BloodDonationGenderPieChartState
   }
 
   SfCircularChart _buildAgeGroupPieChart(
-      Map<String, int> ageRanges, int totalMembers) {
+      Map<String, int> ageRanges, int totalMembers,
+      {required bool mobile}) {
     List<ChartData> dataList = [];
 
     ageRanges.forEach((range, count) {
@@ -169,14 +190,19 @@ class _BloodDonationGenderPieChartState
     return SfCircularChart(
       tooltipBehavior: _tooltipBehavior,
       legend: Legend(
-        isVisible: true,
-        isResponsive: true,
+        // Phones draw their own wrapping legend under the chart instead.
+        // isResponsive must be off whenever the legend is hidden: the chart
+        // library's responsive check dereferences the (absent) legend box
+        // and throws a null-check error.
+        isVisible: !mobile,
+        isResponsive: !mobile,
       ),
       series: <CircularSeries<ChartData, String>>[
         DoughnutSeries<ChartData, String>(
           dataSource: dataList,
           enableTooltip: true,
-          radius: '80%',
+          // Leaves room for the outside labels on narrow phones.
+          radius: mobile ? '70%' : '80%',
           dataLabelSettings: DataLabelSettings(
               isVisible: true,
               labelIntersectAction: LabelIntersectAction.none,
@@ -188,6 +214,7 @@ class _BloodDonationGenderPieChartState
           pointColorMapper: (datum, index) => _getAgeRangeColor(index),
           xValueMapper: (ChartData data, _) => data.x,
           yValueMapper: (ChartData data, _) => data.y,
+          dataLabelMapper: (ChartData data, _) => '${data.y}%',
         )
       ],
     );
@@ -213,5 +240,32 @@ class _BloodDonationGenderPieChartState
     _tooltipBehavior =
         TooltipBehavior(enable: true, format: 'point.x : point.y%');
     super.initState();
+  }
+}
+
+/// A legend swatch (ring in the slice colour) followed by its label.
+class _LegendEntry extends StatelessWidget {
+  const _LegendEntry({required this.color, required this.label});
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 13,
+          height: 13,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: color, width: 3),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(label, style: const TextStyle(fontSize: 13)),
+      ],
+    );
   }
 }

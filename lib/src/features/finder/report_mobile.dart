@@ -92,22 +92,20 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
     }
   }
 
-  Widget _buildChartButton({
-    required Widget child,
-    VoidCallback? onPressed,
-  }) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            Responsive.isMobile(context) ? 12 : 16,
-          ),
-        ),
-        elevation: 4,
+  // A plain white card. The charts used to sit inside an ElevatedButton,
+  // which tinted their text with the button's foreground colour and spent
+  // 24px of horizontal padding on each side of a phone screen.
+  Widget _buildChartCard({required Widget child}) {
+    return Material(
+      elevation: 4,
+      borderRadius: BorderRadius.circular(
+        Responsive.isMobile(context) ? 12 : 16,
       ),
-      onPressed: onPressed ?? () {},
-      child: child,
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: child,
+      ),
     );
   }
 
@@ -180,7 +178,7 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
             left: 20,
             right: 20,
           ),
-          child: _buildChartButton(
+          child: _buildChartCard(
             child: BloodDonationPieChart(),
           ),
         ),
@@ -190,7 +188,7 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
             left: 20,
             right: 20,
           ),
-          child: _buildChartButton(
+          child: _buildChartCard(
             child: BloodDonationGenderPieChart(),
           ),
         ),
@@ -199,23 +197,12 @@ class _ReportMobileScreenState extends ConsumerState<ReportMobileScreen> {
           child: DonationChartByBlood(),
         ),
         Container(
-          margin: EdgeInsets.only(
-            left: 20,
-            right: 20,
-          ),
-          child: Container(
-            height: Responsive.isMobile(context)
-                ? MediaQuery.of(context).size.height * 0.65
-                : MediaQuery.of(context).size.height * 0.52,
-            width: Responsive.isMobile(context)
-                ? MediaQuery.of(context).size.width * 0.9
-                : MediaQuery.of(context).size.width * 0.43,
-            child: DonationChartByHospital(),
-          ),
+          margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+          child: DonationChartByHospital(),
         ),
         Container(
           margin: EdgeInsets.only(top: 4, left: 20, right: 20, bottom: 20),
-          child: _buildChartButton(
+          child: _buildChartCard(
             child:  BloodRequestGiveChartScreen(),
           ),
         ),
