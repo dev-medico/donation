@@ -8,6 +8,7 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:donation/src/features/dashboard/dashboard.dart';
 import 'package:donation/src/features/donation/blood_request_give_chart.dart';
 import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
 import 'package:donation/src/features/donation/donation_chart_by_hospital.dart';
@@ -99,12 +100,16 @@ List<Override> _fixtureOverrides() => [
           ]),
     ];
 
-/// Pumps the mobile report page for a [phone]-sized MediaQuery on a canvas
-/// tall enough to lay out every section at once, and returns any framework
-/// errors (overflows and the like) raised while doing so.
-Future<List<FlutterErrorDetails>> _pumpReport(
-    WidgetTester tester, Size phone) async {
-  await tester.binding.setSurfaceSize(Size(phone.width, 2600));
+/// Pumps [home] for a [phone]-sized MediaQuery on a canvas tall enough to lay
+/// out every section at once, and returns any framework errors (overflows and
+/// the like) raised while doing so.
+Future<List<FlutterErrorDetails>> _pumpPage(
+  WidgetTester tester,
+  Size phone,
+  Widget home, {
+  double canvasHeight = 2600,
+}) async {
+  await tester.binding.setSurfaceSize(Size(phone.width, canvasHeight));
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
   final errors = <FlutterErrorDetails>[];
@@ -118,10 +123,7 @@ Future<List<FlutterErrorDetails>> _pumpReport(
           theme: ThemeData(fontFamily: 'MyanUni'),
           home: MediaQuery(
             data: MediaQueryData(size: phone, devicePixelRatio: 1),
-            child: const Scaffold(
-              backgroundColor: Color(0xfff2f2f2),
-              body: ReportMobileScreen(),
-            ),
+            child: home,
           ),
         ),
       ),
@@ -137,6 +139,17 @@ Future<List<FlutterErrorDetails>> _pumpReport(
   }
   return errors;
 }
+
+Future<List<FlutterErrorDetails>> _pumpReport(
+        WidgetTester tester, Size phone) =>
+    _pumpPage(
+      tester,
+      phone,
+      const Scaffold(
+        backgroundColor: Color(0xfff2f2f2),
+        body: ReportMobileScreen(),
+      ),
+    );
 
 /// Unmounts the page. The chart library marks an already-disposed render
 /// object dirty while its elements unmount, which the test binding would
@@ -160,13 +173,14 @@ Future<void> _unmount(WidgetTester tester) async {
   }
 }
 
-Future<void> _capture(WidgetTester tester, Size phone) async {
+Future<void> _capture(WidgetTester tester, Size phone,
+    {String name = 'report'}) async {
   if (_captureDir.isEmpty) return;
   await tester.runAsync(() async {
     final image =
         await captureImage(find.byType(MaterialApp).evaluate().single);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-    final file = File('$_captureDir/report-${phone.width.toInt()}x'
+    final file = File('$_captureDir/$name-${phone.width.toInt()}x'
         '${phone.height.toInt()}.png');
     file.writeAsBytesSync(bytes!.buffer.asUint8List());
     // ignore: avoid_print
@@ -263,4 +277,28 @@ void main() {
       }
     });
   }
+
+  testWidgets('phone home dashboard shows the report sections',
+      (tester) async {
+    const phone = Size(390, 844);
+    if (_captureDir.isNotEmpty) debugDisableShadows = false;
+    try {
+      // The dashboard's own stats request hits the test HTTP stub (400) and
+      // is swallowed by the screen; the report widgets use the fixtures.
+      final errors = await _pumpPage(tester, phone, const DashBoardScreen(),
+          canvasHeight: 3200);
+      expect(errors.map((e) => e.exceptionAsString()), isEmpty);
+
+      expect(find.text('အသက်အပိုင်းအခြားအလိုက် အဖွဲ့ဝင်များ'), findsOneWidget);
+      _checkAgeChart(tester, phone);
+      expect(find.text('သွေးအုပ်စုအလိုက် လှူဒါန်းမှု မှတ်တမ်း'), findsOneWidget);
+      expect(find.text('လှူဒါန်းသည့်နေရာအလိုက် မှတ်တမ်း'), findsOneWidget);
+      _checkTables(tester, phone);
+
+      await _capture(tester, phone, name: 'dashboard');
+      await _unmount(tester);
+    } finally {
+      debugDisableShadows = true;
+    }
+  });
 }

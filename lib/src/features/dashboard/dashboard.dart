@@ -8,6 +8,9 @@ import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/ui/dashboard_card.dart';
 import 'package:donation/src/features/home/mobile_home.dart';
 import 'package:donation/src/features/donation/blood_request_give_chart.dart';
+import 'package:donation/src/features/donation/donation_chart_by_blood.dart';
+import 'package:donation/src/features/donation/donation_chart_by_hospital.dart';
+import 'package:donation/src/features/finder/blood_donation_gender_pie_chart.dart';
 import 'package:donation/src/features/finder/blood_donation_pie_chart.dart';
 import 'package:donation/src/features/finder/request_give_list_screen.dart';
 import 'package:donation/src/features/services/report_service.dart';
@@ -226,6 +229,25 @@ class _DashBoardScreenState extends ConsumerState<DashBoardScreen> {
                 Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: BloodDonationPieChart(),
+                ),
+                // The report sections the desktop dashboard shows, so phones
+                // get the same picture: members by age, then donations by
+                // blood group and by hospital.
+                const Padding(
+                  padding: EdgeInsets.only(left: 30, top: 16, right: 12),
+                  child: Text("အသက်အပိုင်းအခြားအလိုက် အဖွဲ့ဝင်များ"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 12),
+                  child: BloodDonationGenderPieChart(),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(top: 20, right: 12),
+                  child: DonationChartByBlood(fromDashboard: true),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(top: 20, right: 12),
+                  child: DonationChartByHospital(),
                 ),
               ],
             )
