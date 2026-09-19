@@ -224,12 +224,13 @@ class SmartSearchController
     bool clearDonorKind = false,
     bool clearHospital = false,
     bool clearNeeded = false,
+    bool clearText = false,
   }) async {
     final current = state.asData?.value;
     final base = current?.page.filters ?? const SmartFilters();
-    final keepQuery = current?.page.mode == 'fallback' ? base.q : '';
+    // the name or identifier typed beside the criteria stays until cleared
     final filters = base.copyWith(
-      q: keepQuery,
+      q: clearText ? '' : base.q,
       bloodGroups: clearBloodGroup
           ? const []
           : (bloodGroup != null ? [bloodGroup] : null),
