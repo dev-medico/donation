@@ -1,3 +1,4 @@
+import 'package:donation/src/features/smart_search/presentation/smart_search_screen.dart';
 import 'package:donation/core/api/api_client.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/utils/app_version.dart';
@@ -31,6 +32,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
   List<String> titles = [
     'မူလစာမျက်နှာ',
     'သွေးလှူရှင် ရှာမည်',
+    'စမတ် ရှာဖွေမှု (Beta)',
     'အဖွဲ့ဝင် စာရင်း',
     'သွေးလှူမှု မှတ်တမ်း',
     'လူနာစာရင်း',
@@ -43,6 +45,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
   ];
   List<String> icons = [
     'assets/images/dashboard.png',
+    'assets/images/search_list.png',
     'assets/images/search_list.png',
     'assets/images/members.png',
     'assets/images/donations.png',
@@ -63,6 +66,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
     pages = [
       ReportNewScreen(), // Home/Dashboard
       SearchMemberListScreen(), // Search Blood Donors
+      const SmartSearchScreen(), // Smart search (beta): parsed query + ranked donors
       MemberListScreen(), // Member List
       const DonationListScreen(), // Donation List
       const PatientListScreen(), // Patient List
