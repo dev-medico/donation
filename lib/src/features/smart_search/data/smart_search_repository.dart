@@ -34,6 +34,7 @@ class SmartSearchRepository {
     String? bloodGroup,
     String? township,
     String? ward,
+    String wardMode = 'prefer',
     String? gender,
     bool urgent = false,
     int page = 0,
@@ -43,9 +44,11 @@ class SmartSearchRepository {
   }) {
     return _load('$_base/rank', {
       'q': query,
-      if (bloodGroup != null && bloodGroup.isNotEmpty) 'blood_group': bloodGroup,
+      if (bloodGroup != null && bloodGroup.isNotEmpty)
+        'blood_group': bloodGroup,
       if (township != null && township.isNotEmpty) 'township': township,
       if (ward != null && ward.isNotEmpty) 'ward': ward,
+      if (ward != null && ward.isNotEmpty) 'ward_mode': wardMode,
       if (gender != null && gender.isNotEmpty) 'gender': gender,
       'urgent': urgent ? 1 : 0,
       'page': page,
@@ -54,6 +57,26 @@ class SmartSearchRepository {
         'availability': availability,
       'include_compatible': includeCompatible ? 1 : 0,
     });
+  }
+
+  /// Quarter / village keys with donor counts; optionally one township and a substring.
+  Future<List<WardOption>> wards({String? township, String? query}) async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '$_base/wards',
+      queryParameters: {
+        if (township != null && township.isNotEmpty) 'township': township,
+        if (query != null && query.isNotEmpty) 'q': query,
+        'limit': 400,
+      },
+    );
+    final data = response.data;
+    if (data == null || data['status'] != 'ok' || data['data'] is! List) {
+      throw Exception('Failed to load wards');
+    }
+    return (data['data'] as List)
+        .whereType<Map>()
+        .map((e) => WardOption.fromJson(Map<String, dynamic>.from(e)))
+        .toList(growable: false);
   }
 
   Future<List<TownshipOption>> townships() async {
@@ -70,7 +93,8 @@ class SmartSearchRepository {
         .toList(growable: false);
   }
 
-  Future<SmartSearchPage> _load(String path, Map<String, dynamic> params) async {
+  Future<SmartSearchPage> _load(
+      String path, Map<String, dynamic> params) async {
     final response = await _apiClient.get<Map<String, dynamic>>(
       path,
       queryParameters: params,

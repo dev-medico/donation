@@ -45,8 +45,9 @@ class SmartQuestion {
   final List<String> options;
   final List<String>? labels;
 
-  String labelFor(int index) =>
-      (labels != null && index < labels!.length) ? labels![index] : options[index];
+  String labelFor(int index) => (labels != null && index < labels!.length)
+      ? labels![index]
+      : options[index];
 }
 
 /// The filters the server actually applied.
@@ -57,6 +58,8 @@ class SmartFilters {
     this.township,
     this.townshipLabel,
     this.ward,
+    this.wardMode = 'prefer',
+    this.wardKind,
     this.gender,
     this.urgent = false,
   });
@@ -67,6 +70,8 @@ class SmartFilters {
         township: _nullable(json['township']),
         townshipLabel: _nullable(json['township_label']),
         ward: _nullable(json['ward']),
+        wardMode: json['ward_mode']?.toString() ?? 'prefer',
+        wardKind: _nullable(json['ward_kind']),
         gender: _nullable(json['gender']),
         urgent: json['urgent'] == true || json['urgent']?.toString() == '1',
       );
@@ -76,6 +81,10 @@ class SmartFilters {
   final String? township;
   final String? townshipLabel;
   final String? ward;
+
+  /// prefer = same quarter ranks first; only = hard filter.
+  final String wardMode;
+  final String? wardKind;
   final String? gender;
   final bool urgent;
 
@@ -93,16 +102,26 @@ class SmartFilters {
     List<String>? bloodGroups,
     String? township,
     bool clearTownship = false,
+    String? ward,
+    bool clearWard = false,
+    String? wardMode,
     String? gender,
     bool clearGender = false,
     bool? urgent,
   }) {
+    // Changing the township drops a quarter that belongs to the old one.
+    final wardStays = !clearWard &&
+        !clearTownship &&
+        (township == null || township == this.township);
     return SmartFilters(
       q: q ?? this.q,
       bloodGroups: bloodGroups ?? this.bloodGroups,
       township: clearTownship ? null : (township ?? this.township),
-      townshipLabel: clearTownship ? null : townshipLabel,
-      ward: ward,
+      townshipLabel:
+          clearTownship ? null : (township == null ? townshipLabel : null),
+      ward: ward ?? (wardStays ? this.ward : null),
+      wardMode: wardMode ?? this.wardMode,
+      wardKind: ward != null ? null : (wardStays ? wardKind : null),
       gender: clearGender ? null : (gender ?? this.gender),
       urgent: urgent ?? this.urgent,
     );
@@ -160,6 +179,7 @@ class RankedDonor {
     this.townshipKey,
     this.townshipLabel,
     this.wardKey,
+    this.wardKind,
     this.bloodGroup,
     this.compatibleOnly = false,
   });
@@ -173,6 +193,7 @@ class RankedDonor {
         townshipKey: _nullable(json['township_key']),
         townshipLabel: _nullable(json['township_label']),
         wardKey: _nullable(json['ward_key']),
+        wardKind: _nullable(json['ward_kind']),
         bloodGroup: _nullable(json['blood_group']),
         compatibleOnly: json['compatible_only'] == true,
       );
@@ -185,6 +206,7 @@ class RankedDonor {
   final String? townshipKey;
   final String? townshipLabel;
   final String? wardKey;
+  final String? wardKind;
   final String? bloodGroup;
   final bool compatibleOnly;
 
@@ -199,9 +221,57 @@ class RankedDonor {
         townshipKey: townshipKey,
         townshipLabel: townshipLabel,
         wardKey: wardKey,
+        wardKind: wardKind,
         bloodGroup: bloodGroup,
         compatibleOnly: compatibleOnly,
       );
+}
+
+/// How many of the matching donors live in the requested quarter / township.
+class SmartLocationCounts {
+  const SmartLocationCounts({
+    required this.sameWard,
+    required this.sameWardGreen,
+    required this.sameTownship,
+    required this.neighbour,
+  });
+
+  factory SmartLocationCounts.fromJson(Map<String, dynamic> json) =>
+      SmartLocationCounts(
+        sameWard: _toInt(json['same_ward']),
+        sameWardGreen: _toInt(json['same_ward_green']),
+        sameTownship: _toInt(json['same_township']),
+        neighbour: _toInt(json['neighbour']),
+      );
+
+  final int sameWard;
+  final int sameWardGreen;
+  final int sameTownship;
+  final int neighbour;
+}
+
+class WardOption {
+  const WardOption({
+    required this.key,
+    required this.township,
+    required this.townshipLabel,
+    required this.members,
+    required this.kind,
+  });
+
+  factory WardOption.fromJson(Map<String, dynamic> json) => WardOption(
+        key: json['key']?.toString() ?? '',
+        township: json['township']?.toString() ?? '',
+        townshipLabel: json['township_label']?.toString() ?? '',
+        members: _toInt(json['members']),
+        kind: json['kind']?.toString() ?? 'other',
+      );
+
+  final String key;
+  final String township;
+  final String townshipLabel;
+  final int members;
+  final String kind;
 }
 
 class SmartSearchPage {
@@ -219,10 +289,13 @@ class SmartSearchPage {
     required this.hasMore,
     this.parseError,
     this.weights,
+    this.location,
   });
 
   factory SmartSearchPage.fromJson(Map<String, dynamic> json) {
     final parsedJson = json['parsed'];
+    final analysisJson = json['analysis'];
+    final locationJson = analysisJson is Map ? analysisJson['location'] : null;
     return SmartSearchPage(
       mode: json['mode']?.toString() ?? 'rank',
       query: json['query']?.toString() ?? '',
@@ -244,6 +317,10 @@ class SmartSearchPage {
       hasMore: json['has_more'] == true,
       parseError: _nullable(json['parse_error']),
       weights: _nullable((json['classification'] as Map?)?['weights']),
+      location: locationJson is Map
+          ? SmartLocationCounts.fromJson(
+              Map<String, dynamic>.from(locationJson))
+          : null,
     );
   }
 
@@ -260,6 +337,7 @@ class SmartSearchPage {
   final bool hasMore;
   final String? parseError;
   final String? weights;
+  final SmartLocationCounts? location;
 
   static List<RankedDonor> _donors(dynamic list) => (list as List? ?? const [])
       .whereType<Map>()

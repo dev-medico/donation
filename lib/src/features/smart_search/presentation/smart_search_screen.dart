@@ -275,7 +275,8 @@ class _ErrorState extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.black54)),
             const SizedBox(height: 12),
-            OutlinedButton(onPressed: onRetry, child: const Text('ပြန်ကြိုးစားမည်')),
+            OutlinedButton(
+                onPressed: onRetry, child: const Text('ပြန်ကြိုးစားမည်')),
           ],
         ),
       ),
@@ -315,6 +316,12 @@ class _Results extends ConsumerWidget {
               ? notifier.applyOverride(clearGender: true)
               : notifier.applyOverride(gender: g),
           onToggleUrgent: (u) => notifier.applyOverride(urgent: u),
+          onChangeWard: (ward, township) => ward == null
+              ? notifier.applyOverride(clearWard: true)
+              : notifier.applyOverride(ward: ward, township: township),
+          loadWards: ({String? township, String? query}) => ref
+              .read(smartSearchRepositoryProvider)
+              .wards(township: township, query: query),
         ),
         if (page.parsed != null && page.parsed!.questions.isNotEmpty)
           SmartQuestionsBar(
@@ -324,6 +331,8 @@ class _Results extends ConsumerWidget {
                 notifier.applyOverride(bloodGroup: value);
               } else if (field == 'township') {
                 notifier.applyOverride(township: value);
+              } else if (field == 'ward') {
+                notifier.applyOverride(ward: value);
               }
             },
           ),
@@ -335,6 +344,7 @@ class _Results extends ConsumerWidget {
               style: const TextStyle(fontSize: 12, color: Colors.orange),
             ),
           ),
+        LocationCountsLine(filters: page.filters, location: page.location),
         const SizedBox(height: 8),
         AvailabilitySummary(
           analysis: analysis,
@@ -380,7 +390,8 @@ class _Results extends ConsumerWidget {
           const Divider(height: 32),
           Row(
             children: [
-              const Icon(Icons.bloodtype_outlined, size: 18, color: Colors.black54),
+              const Icon(Icons.bloodtype_outlined,
+                  size: 18, color: Colors.black54),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(

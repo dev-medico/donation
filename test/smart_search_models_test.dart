@@ -9,10 +9,19 @@ void main() {
       'query': 'B ရှိလား',
       'parsed': {
         'chips': [
-          {'field': 'blood_group', 'value': 'B', 'label': 'B (Rh ?)', 'confidence': 0.97},
+          {
+            'field': 'blood_group',
+            'value': 'B',
+            'label': 'B (Rh ?)',
+            'confidence': 0.97
+          },
         ],
         'questions': [
-          {'field': 'blood_group', 'prompt': 'Rh factor?', 'options': ['B+', 'B-']},
+          {
+            'field': 'blood_group',
+            'prompt': 'Rh factor?',
+            'options': ['B+', 'B-']
+          },
         ],
         'flags': <String>[],
         'urgent': false,
@@ -27,7 +36,9 @@ void main() {
         'blood_groups': ['B+', 'B-'],
         'township': null,
         'township_label': '',
-        'ward': null,
+        'ward': 'ဇေယျာသီရိရပ်ကွက်',
+        'ward_mode': 'prefer',
+        'ward_kind': 'ward',
         'gender': null,
         'urgent': false,
       },
@@ -57,7 +68,19 @@ void main() {
         },
       ],
       'total': 1326,
-      'analysis': {'total': 1326, 'green': 1300, 'yellow': 20, 'red': 6, 'calculated_on': '2026-09-19'},
+      'analysis': {
+        'total': 1326,
+        'green': 1300,
+        'yellow': 20,
+        'red': 6,
+        'calculated_on': '2026-09-19',
+        'location': {
+          'same_ward': 12,
+          'same_ward_green': 11,
+          'same_township': 455,
+          'neighbour': 0
+        }
+      },
       'page': 0,
       'limit': 50,
       'loaded': 1,
@@ -75,7 +98,11 @@ void main() {
           'compatible_only': true,
         },
       ],
-      'classification': {'as_of_date': '2026-09-19', 'waiting_period_months': 4, 'weights': 'normal'},
+      'classification': {
+        'as_of_date': '2026-09-19',
+        'waiting_period_months': 4,
+        'weights': 'normal'
+      },
     };
 
     test('parses chips, questions, filters, donors, and compatible rows', () {
@@ -97,6 +124,17 @@ void main() {
       expect(page.analysis!.green, 1300);
       expect(page.hasMore, isTrue);
       expect(page.weights, 'normal');
+      expect(page.filters.ward, 'ဇေယျာသီရိရပ်ကွက်');
+      expect(page.filters.wardMode, 'prefer');
+      expect(page.location!.sameWard, 12);
+      expect(page.location!.sameTownship, 455);
+    });
+
+    test('copyWith drops the quarter when the township changes', () {
+      const f = SmartFilters(township: 'mawlamyine', ward: 'ဇေယျာသီရိရပ်ကွက်');
+      expect(f.copyWith(township: 'mudon').ward, isNull);
+      expect(f.copyWith(gender: 'female').ward, 'ဇေယျာသီရိရပ်ကွက်');
+      expect(f.copyWith(clearWard: true).ward, isNull);
     });
 
     test('tolerates a fallback response without parsed data', () {
@@ -122,7 +160,8 @@ void main() {
     });
 
     test('copyWith clears and keeps filters as asked', () {
-      const f = SmartFilters(bloodGroups: ['A+'], township: 'mudon', gender: 'male', urgent: true);
+      const f = SmartFilters(
+          bloodGroups: ['A+'], township: 'mudon', gender: 'male', urgent: true);
       final cleared = f.copyWith(clearTownship: true, urgent: false);
       expect(cleared.township, isNull);
       expect(cleared.gender, 'male');

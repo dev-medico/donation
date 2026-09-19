@@ -22,8 +22,7 @@ class SmartSearchRequest {
       : filters = null,
         availability = null;
 
-  const SmartSearchRequest.rank(this.filters, {this.availability})
-      : query = '';
+  const SmartSearchRequest.rank(this.filters, {this.availability}) : query = '';
 
   const SmartSearchRequest._({
     required this.query,
@@ -112,6 +111,9 @@ class SmartSearchController
     bool clearBloodGroup = false,
     String? township,
     bool clearTownship = false,
+    String? ward,
+    bool clearWard = false,
+    String? wardMode,
     String? gender,
     bool clearGender = false,
     bool? urgent,
@@ -119,14 +121,19 @@ class SmartSearchController
     final current = state.asData?.value;
     final base = current?.page.filters ?? const SmartFilters();
     final keepQuery = current?.page.mode == 'fallback' ? base.q : '';
-    final filters = SmartFilters(
+    final filters = base.copyWith(
       q: keepQuery,
       bloodGroups: clearBloodGroup
           ? const []
-          : (bloodGroup != null ? [bloodGroup] : base.bloodGroups),
-      township: clearTownship ? null : (township ?? base.township),
-      gender: clearGender ? null : (gender ?? base.gender),
-      urgent: urgent ?? base.urgent,
+          : (bloodGroup != null ? [bloodGroup] : null),
+      township: township,
+      clearTownship: clearTownship,
+      ward: ward,
+      clearWard: clearWard,
+      wardMode: wardMode,
+      gender: gender,
+      clearGender: clearGender,
+      urgent: urgent,
     );
     await _run(SmartSearchRequest.rank(
       filters,
@@ -219,6 +226,8 @@ class SmartSearchController
             query: request.filters!.q,
             bloodGroup: request.filters!.bloodGroupParam,
             township: request.filters!.township,
+            ward: request.filters!.ward,
+            wardMode: request.filters!.wardMode,
             gender: request.filters!.gender,
             urgent: request.filters!.urgent,
             page: page,
