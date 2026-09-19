@@ -57,6 +57,7 @@ class SmartFilters {
     this.bloodGroups = const [],
     this.township,
     this.townshipLabel,
+    this.townshipMode = 'prefer',
     this.ward,
     this.wardMode = 'prefer',
     this.wardKind,
@@ -69,6 +70,7 @@ class SmartFilters {
         bloodGroups: _toStringList(json['blood_groups']),
         township: _nullable(json['township']),
         townshipLabel: _nullable(json['township_label']),
+        townshipMode: json['township_mode']?.toString() ?? 'prefer',
         ward: _nullable(json['ward']),
         wardMode: json['ward_mode']?.toString() ?? 'prefer',
         wardKind: _nullable(json['ward_kind']),
@@ -80,10 +82,15 @@ class SmartFilters {
   final List<String> bloodGroups;
   final String? township;
   final String? townshipLabel;
+
+  /// prefer = nearby townships follow; only = hard filter.
+  final String townshipMode;
   final String? ward;
 
   /// prefer = same quarter ranks first; only = hard filter.
   final String wardMode;
+
+  bool get includeNearby => townshipMode != 'only';
   final String? wardKind;
   final String? gender;
   final bool urgent;
@@ -102,6 +109,7 @@ class SmartFilters {
     List<String>? bloodGroups,
     String? township,
     bool clearTownship = false,
+    String? townshipMode,
     String? ward,
     bool clearWard = false,
     String? wardMode,
@@ -180,6 +188,7 @@ class RankedDonor {
     this.townshipLabel,
     this.wardKey,
     this.wardKind,
+    this.locationTier = '',
     this.bloodGroup,
     this.compatibleOnly = false,
   });
@@ -194,6 +203,7 @@ class RankedDonor {
         townshipLabel: _nullable(json['township_label']),
         wardKey: _nullable(json['ward_key']),
         wardKind: _nullable(json['ward_kind']),
+        locationTier: json['location_tier']?.toString() ?? '',
         bloodGroup: _nullable(json['blood_group']),
         compatibleOnly: json['compatible_only'] == true,
       );
@@ -207,6 +217,9 @@ class RankedDonor {
   final String? townshipLabel;
   final String? wardKey;
   final String? wardKind;
+
+  /// ward | near1 | near2 | township | adjacent | hop2 | ''
+  final String locationTier;
   final String? bloodGroup;
   final bool compatibleOnly;
 
@@ -222,6 +235,7 @@ class RankedDonor {
         townshipLabel: townshipLabel,
         wardKey: wardKey,
         wardKind: wardKind,
+        locationTier: locationTier,
         bloodGroup: bloodGroup,
         compatibleOnly: compatibleOnly,
       );
@@ -232,22 +246,150 @@ class SmartLocationCounts {
   const SmartLocationCounts({
     required this.sameWard,
     required this.sameWardGreen,
+    required this.nearWard1,
+    required this.nearWard1Green,
+    required this.nearWard2,
+    required this.nearWard2Green,
     required this.sameTownship,
-    required this.neighbour,
+    required this.sameTownshipGreen,
+    required this.adjacentTownship,
+    required this.adjacentTownshipGreen,
+    required this.secondHop,
+    required this.secondHopGreen,
   });
 
   factory SmartLocationCounts.fromJson(Map<String, dynamic> json) =>
       SmartLocationCounts(
         sameWard: _toInt(json['same_ward']),
         sameWardGreen: _toInt(json['same_ward_green']),
+        nearWard1: _toInt(json['near_ward_1']),
+        nearWard1Green: _toInt(json['near_ward_1_green']),
+        nearWard2: _toInt(json['near_ward_2']),
+        nearWard2Green: _toInt(json['near_ward_2_green']),
         sameTownship: _toInt(json['same_township']),
-        neighbour: _toInt(json['neighbour']),
+        sameTownshipGreen: _toInt(json['same_township_green']),
+        adjacentTownship: _toInt(json['adjacent_township']),
+        adjacentTownshipGreen: _toInt(json['adjacent_township_green']),
+        secondHop: _toInt(json['second_hop']),
+        secondHopGreen: _toInt(json['second_hop_green']),
       );
 
   final int sameWard;
   final int sameWardGreen;
+  final int nearWard1;
+  final int nearWard1Green;
+  final int nearWard2;
+  final int nearWard2Green;
   final int sameTownship;
-  final int neighbour;
+  final int sameTownshipGreen;
+  final int adjacentTownship;
+  final int adjacentTownshipGreen;
+  final int secondHop;
+  final int secondHopGreen;
+
+  /// the last "neighbour" name is kept for older callers
+  int get neighbour => adjacentTownship;
+}
+
+/// A quarter near the selected one, by degree (1 = directly linked).
+class NearbyWard {
+  const NearbyWard({
+    required this.ward,
+    required this.township,
+    required this.townshipLabel,
+    required this.degree,
+    required this.weight,
+  });
+
+  factory NearbyWard.fromJson(Map<String, dynamic> json) => NearbyWard(
+        ward: json['ward']?.toString() ?? '',
+        township: json['township']?.toString() ?? '',
+        townshipLabel: json['township_label']?.toString() ?? '',
+        degree: _toInt(json['degree'], fallback: 1),
+        weight: _toDouble(json['weight']),
+      );
+
+  final String ward;
+  final String township;
+  final String townshipLabel;
+  final int degree;
+  final double weight;
+}
+
+class NearbyTownship {
+  const NearbyTownship(
+      {required this.key, required this.label, required this.hops});
+
+  factory NearbyTownship.fromJson(Map<String, dynamic> json) => NearbyTownship(
+        key: json['key']?.toString() ?? '',
+        label: json['label']?.toString() ?? '',
+        hops: _toInt(json['hops'], fallback: 1),
+      );
+
+  final String key;
+  final String label;
+  final int hops;
+}
+
+class NearbyInfo {
+  const NearbyInfo({
+    required this.ward,
+    required this.township,
+    required this.wards,
+    required this.townships,
+  });
+
+  factory NearbyInfo.fromJson(Map<String, dynamic> json) => NearbyInfo(
+        ward: _nullable(json['ward']),
+        township: _nullable(json['township']),
+        wards: (json['wards'] as List? ?? const [])
+            .whereType<Map>()
+            .map((e) => NearbyWard.fromJson(Map<String, dynamic>.from(e)))
+            .toList(growable: false),
+        townships: (json['townships'] as List? ?? const [])
+            .whereType<Map>()
+            .map((e) => NearbyTownship.fromJson(Map<String, dynamic>.from(e)))
+            .toList(growable: false),
+      );
+
+  final String? ward;
+  final String? township;
+  final List<NearbyWard> wards;
+  final List<NearbyTownship> townships;
+}
+
+/// One stored link touching a quarter, for the manage sheet.
+class LocalityLink {
+  const LocalityLink({
+    required this.id,
+    required this.key,
+    required this.township,
+    required this.weight,
+    required this.source,
+    required this.confirmed,
+    required this.blocked,
+    this.evidence,
+  });
+
+  factory LocalityLink.fromJson(Map<String, dynamic> json) => LocalityLink(
+        id: _toInt(json['id']),
+        key: json['key']?.toString() ?? '',
+        township: json['township']?.toString() ?? '',
+        weight: _toDouble(json['weight']),
+        source: json['source']?.toString() ?? '',
+        confirmed: json['confirmed'] == true,
+        blocked: json['blocked'] == true,
+        evidence: _nullable(json['evidence']),
+      );
+
+  final int id;
+  final String key;
+  final String township;
+  final double weight;
+  final String source;
+  final bool confirmed;
+  final bool blocked;
+  final String? evidence;
 }
 
 class WardOption {

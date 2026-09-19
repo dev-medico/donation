@@ -316,6 +316,8 @@ class _Results extends ConsumerWidget {
               ? notifier.applyOverride(clearGender: true)
               : notifier.applyOverride(gender: g),
           onToggleUrgent: (u) => notifier.applyOverride(urgent: u),
+          onToggleNearby: (on) =>
+              notifier.applyOverride(townshipMode: on ? 'prefer' : 'only'),
           onChangeWard: (ward, township) => ward == null
               ? notifier.applyOverride(clearWard: true)
               : notifier.applyOverride(ward: ward, township: township),
@@ -344,6 +346,45 @@ class _Results extends ConsumerWidget {
               style: const TextStyle(fontSize: 12, color: Colors.orange),
             ),
           ),
+        NearbyRow(
+          filters: page.filters,
+          info: ref
+              .watch(smartNearbyProvider(
+                  (ward: page.filters.ward, township: page.filters.township)))
+              .asData
+              ?.value,
+          onPickWard: (ward, township) =>
+              notifier.applyOverride(ward: ward, township: township),
+          onManage: () async {
+            final ward = page.filters.ward;
+            final township = page.filters.township;
+            if (ward == null || township == null) return;
+            final repo = ref.read(smartSearchRepositoryProvider);
+            final changed = await showModalBottomSheet<bool>(
+              context: context,
+              isScrollControlled: true,
+              showDragHandle: true,
+              builder: (context) => NearbyLinksSheet(
+                ward: ward,
+                township: township,
+                loadLinks: () => repo.links(ward: ward, township: township),
+                setLink: (to, toTownship, action) => repo.setLink(
+                  from: ward,
+                  fromTownship: township,
+                  to: to,
+                  toTownship: toTownship,
+                  action: action,
+                ),
+                loadWards: ({String? township, String? query}) =>
+                    repo.wards(township: township, query: query),
+              ),
+            );
+            if (changed == true) {
+              ref.invalidate(smartNearbyProvider);
+              notifier.refresh();
+            }
+          },
+        ),
         LocationCountsLine(filters: page.filters, location: page.location),
         const SizedBox(height: 8),
         AvailabilitySummary(

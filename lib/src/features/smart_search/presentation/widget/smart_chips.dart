@@ -28,6 +28,7 @@ class SmartUnderstoodBar extends StatelessWidget {
     required this.onToggleUrgent,
     required this.onChangeWard,
     required this.loadWards,
+    required this.onToggleNearby,
   });
 
   final SmartSearchPage page;
@@ -39,6 +40,7 @@ class SmartUnderstoodBar extends StatelessWidget {
 
   /// (wardKey, townshipKey); null clears the quarter.
   final void Function(String? ward, String? township) onChangeWard;
+  final ValueChanged<bool> onToggleNearby;
   final Future<List<WardOption>> Function({String? township, String? query})
       loadWards;
 
@@ -132,6 +134,18 @@ class SmartUnderstoodBar extends StatelessWidget {
             selected: f.gender,
             onPicked: onChangeGender,
           ),
+        ),
+        FilterChip(
+          key: const ValueKey('smart-chip-nearby'),
+          visualDensity: VisualDensity.compact,
+          selected: f.includeNearby,
+          avatar: const Icon(Icons.near_me_outlined, size: 15),
+          label: const Text('အနီးအနားပါ', style: TextStyle(fontSize: 12)),
+          selectedColor: const Color(0xFFE8F5E9),
+          checkmarkColor: const Color(0xFF2E7D32),
+          tooltip:
+              'ဖွင့်ထားလျှင် မြို့နယ်တူ၊ ကပ်လျက်၊ အနီးအနား မြို့နယ်များကို အနီးဆုံးမှ စီပြသည်; ပိတ်လျှင် ရွေးထားသည့် မြို့နယ်သာ',
+          onSelected: onToggleNearby,
         ),
         FilterChip(
           key: const ValueKey('smart-chip-urgent'),
@@ -502,25 +516,328 @@ class LocationCountsLine extends StatelessWidget {
     if (loc == null || (filters.ward == null && filters.township == null)) {
       return const SizedBox.shrink();
     }
+    String tier(String label, int total, int green) =>
+        '$label $total (လှူနိုင် $green)';
     final parts = <String>[
       if (filters.ward != null)
-        'ရပ်ကွက်တူ ${loc.sameWard} (လှူနိုင် ${loc.sameWardGreen})',
-      if (filters.township != null) 'မြို့နယ်တူ ${loc.sameTownship}',
-      if (loc.neighbour > 0) 'အနီးအနား ${loc.neighbour}',
+        tier('ရပ်ကွက်တူ', loc.sameWard, loc.sameWardGreen),
+      if (filters.ward != null && loc.nearWard1 > 0)
+        tier('အနီးဆုံး ၁', loc.nearWard1, loc.nearWard1Green),
+      if (filters.ward != null && loc.nearWard2 > 0)
+        tier('အနီးအနား ၂', loc.nearWard2, loc.nearWard2Green),
+      if (filters.township != null)
+        tier('မြို့နယ်တူ', loc.sameTownship, loc.sameTownshipGreen),
+      if (filters.township != null &&
+          filters.includeNearby &&
+          loc.adjacentTownship > 0)
+        tier(
+            'ကပ်လျက်မြို့နယ်', loc.adjacentTownship, loc.adjacentTownshipGreen),
+      if (filters.township != null &&
+          filters.includeNearby &&
+          loc.secondHop > 0)
+        tier('အနီးအနားမြို့နယ်', loc.secondHop, loc.secondHopGreen),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.place_outlined, size: 15, color: Colors.black45),
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(Icons.place_outlined, size: 15, color: Colors.black45),
+          ),
           const SizedBox(width: 4),
           Expanded(
             child: Text(
               parts.join(' · '),
-              style: const TextStyle(fontSize: 12.5, color: Colors.black87),
+              style: const TextStyle(
+                  fontSize: 12.5, color: Colors.black87, height: 1.4),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Nearby quarters of the selected one, by degree; tap to search from there,
+/// long-press to manage the connections.
+class NearbyRow extends StatelessWidget {
+  const NearbyRow({
+    super.key,
+    required this.filters,
+    required this.info,
+    required this.onPickWard,
+    required this.onManage,
+  });
+
+  final SmartFilters filters;
+  final NearbyInfo? info;
+  final void Function(String ward, String township) onPickWard;
+  final VoidCallback onManage;
+
+  @override
+  Widget build(BuildContext context) {
+    final i = info;
+    if (i == null || filters.ward == null) return const SizedBox.shrink();
+    final wards = i.wards.take(12).toList(growable: false);
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const Text('အနီးအနား:',
+              style: TextStyle(fontSize: 12, color: Colors.black54)),
+          if (wards.isEmpty)
+            const Text('ချိတ်ဆက်ထားသည့် ရပ်ကွက် မရှိသေးပါ',
+                style: TextStyle(fontSize: 12, color: Colors.black38)),
+          for (final w in wards)
+            ActionChip(
+              key: ValueKey('smart-nearby-${w.ward}'),
+              visualDensity: VisualDensity.compact,
+              avatar: CircleAvatar(
+                radius: 9,
+                backgroundColor: w.degree == 1
+                    ? const Color(0xFF2E7D32)
+                    : const Color(0xFF9CCC65),
+                child: Text('${w.degree}',
+                    style: const TextStyle(fontSize: 10, color: Colors.white)),
+              ),
+              label: Text(w.ward, style: const TextStyle(fontSize: 12)),
+              onPressed: () => onPickWard(w.ward, w.township),
+            ),
+          ActionChip(
+            key: const ValueKey('smart-nearby-manage'),
+            visualDensity: VisualDensity.compact,
+            avatar: const Icon(Icons.edit_location_alt_outlined, size: 15),
+            label: const Text('ချိတ်ဆက်မှု ပြင်ရန်',
+                style: TextStyle(fontSize: 12)),
+            onPressed: onManage,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Manage the connections of one quarter: confirm, block, or add.
+class NearbyLinksSheet extends StatefulWidget {
+  const NearbyLinksSheet({
+    super.key,
+    required this.ward,
+    required this.township,
+    required this.loadLinks,
+    required this.setLink,
+    required this.loadWards,
+  });
+
+  final String ward;
+  final String township;
+  final Future<List<LocalityLink>> Function() loadLinks;
+  final Future<void> Function(String to, String toTownship, String action)
+      setLink;
+  final Future<List<WardOption>> Function({String? township, String? query})
+      loadWards;
+
+  @override
+  State<NearbyLinksSheet> createState() => _NearbyLinksSheetState();
+}
+
+class _NearbyLinksSheetState extends State<NearbyLinksSheet> {
+  List<LocalityLink> _links = const [];
+  bool _loading = true;
+  String? _error;
+  bool _changed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final rows = await widget.loadLinks();
+      if (!mounted) return;
+      setState(() {
+        _links = rows;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = '$e';
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _act(LocalityLink l, String action) async {
+    try {
+      await widget.setLink(l.key, l.township, action);
+      _changed = true;
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+    }
+  }
+
+  Future<void> _add() async {
+    final picked = await showModalBottomSheet<WardOption?>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => _WardPicker(
+        township: widget.township,
+        townshipLabel: null,
+        selected: null,
+        loadWards: widget.loadWards,
+      ),
+    );
+    if (picked == null || picked.key.isEmpty || picked.key == widget.ward)
+      return;
+    try {
+      await widget.setLink(picked.key, picked.township, 'add');
+      _changed = true;
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height * 0.75;
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, _) {},
+      child: SizedBox(
+        height: height,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text('${widget.ward} · အနီးအနား ချိတ်ဆက်မှု',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 15)),
+                  ),
+                  TextButton.icon(
+                    key: const ValueKey('smart-links-add'),
+                    onPressed: _add,
+                    icon: const Icon(Icons.add_link, size: 18),
+                    label: const Text('ထည့်ရန်'),
+                  ),
+                ],
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'အလိုအလျောက် ချိတ်ဆက်မှုများသည် လိပ်စာ၊ လမ်းအမည်နှင့် သွေးလှူမှတ်တမ်းမှ ရရှိသည်။ အတည်ပြုလျှင် အမြဲရေတွက်ပြီး ပိတ်လျှင် ဘယ်တော့မှ မရေတွက်ပါ။',
+                style: TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Divider(height: 1),
+            Expanded(
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _error != null
+                      ? Center(
+                          child: Text(_error!,
+                              style: const TextStyle(color: Colors.black54)))
+                      : _links.isEmpty
+                          ? const Center(
+                              child: Text('ချိတ်ဆက်မှု မရှိသေးပါ',
+                                  style: TextStyle(color: Colors.black54)))
+                          : ListView.builder(
+                              itemCount: _links.length,
+                              itemBuilder: (context, i) {
+                                final l = _links[i];
+                                final state = l.blocked
+                                    ? 'ပိတ်ထား'
+                                    : l.confirmed
+                                        ? 'အတည်ပြုပြီး'
+                                        : 'အလိုအလျောက် ${(l.weight * 100).round()}%';
+                                return ListTile(
+                                  key: ValueKey('smart-link-${l.id}'),
+                                  dense: true,
+                                  leading: Icon(
+                                    l.blocked
+                                        ? Icons.block
+                                        : l.confirmed
+                                            ? Icons.verified_outlined
+                                            : Icons.auto_awesome_outlined,
+                                    color: l.blocked
+                                        ? Colors.red
+                                        : l.confirmed
+                                            ? const Color(0xFF2E7D32)
+                                            : Colors.black45,
+                                  ),
+                                  title: Text(l.key),
+                                  subtitle: Text(
+                                      [
+                                        state,
+                                        if (l.evidence != null) l.evidence!
+                                      ].join(' · '),
+                                      style: const TextStyle(fontSize: 11.5)),
+                                  trailing: Wrap(
+                                    spacing: 4,
+                                    children: [
+                                      if (!l.confirmed && !l.blocked)
+                                        IconButton(
+                                          tooltip: 'အတည်ပြုမည်',
+                                          icon: const Icon(
+                                              Icons.check_circle_outline,
+                                              size: 20),
+                                          onPressed: () => _act(l, 'confirm'),
+                                        ),
+                                      if (!l.blocked)
+                                        IconButton(
+                                          tooltip: 'ပိတ်မည်',
+                                          icon:
+                                              const Icon(Icons.block, size: 20),
+                                          onPressed: () => _act(l, 'block'),
+                                        )
+                                      else
+                                        IconButton(
+                                          tooltip: 'ပြန်ဖွင့်မည်',
+                                          icon:
+                                              const Icon(Icons.undo, size: 20),
+                                          onPressed: () => _act(l, 'unblock'),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+            ),
+            SafeArea(
+              top: false,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context, _changed),
+                    child: const Text('ပိတ်မည်'),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -17,11 +17,13 @@ class SmartSearchRepository {
     int limit = 50,
     String? availability,
     bool includeCompatible = true,
+    bool includeNearby = true,
   }) {
     return _load('$_base/index', {
       'q': query,
       'page': page,
       'limit': limit,
+      'nearby': includeNearby ? 1 : 0,
       if (availability != null && availability.isNotEmpty)
         'availability': availability,
       'include_compatible': includeCompatible ? 1 : 0,
@@ -33,6 +35,7 @@ class SmartSearchRepository {
     String query = '',
     String? bloodGroup,
     String? township,
+    String townshipMode = 'prefer',
     String? ward,
     String wardMode = 'prefer',
     String? gender,
@@ -47,6 +50,8 @@ class SmartSearchRepository {
       if (bloodGroup != null && bloodGroup.isNotEmpty)
         'blood_group': bloodGroup,
       if (township != null && township.isNotEmpty) 'township': township,
+      if (township != null && township.isNotEmpty)
+        'township_mode': townshipMode,
       if (ward != null && ward.isNotEmpty) 'ward': ward,
       if (ward != null && ward.isNotEmpty) 'ward_mode': wardMode,
       if (gender != null && gender.isNotEmpty) 'gender': gender,
@@ -57,6 +62,67 @@ class SmartSearchRepository {
         'availability': availability,
       'include_compatible': includeCompatible ? 1 : 0,
     });
+  }
+
+  /// Quarters by degree and townships by hops around the selection.
+  Future<NearbyInfo> nearby({String? ward, String? township}) async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '$_base/nearby',
+      queryParameters: {
+        if (ward != null && ward.isNotEmpty) 'ward': ward,
+        if (township != null && township.isNotEmpty) 'township': township,
+      },
+    );
+    final data = response.data;
+    if (data == null || data['status'] != 'ok') {
+      throw Exception('Failed to load nearby places');
+    }
+    return NearbyInfo.fromJson(data);
+  }
+
+  Future<List<LocalityLink>> links(
+      {required String ward, String? township}) async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '$_base/links',
+      queryParameters: {
+        'kind': 'quarter',
+        'key': ward,
+        if (township != null && township.isNotEmpty) 'township': township,
+      },
+    );
+    final data = response.data;
+    if (data == null || data['status'] != 'ok' || data['data'] is! List) {
+      throw Exception('Failed to load links');
+    }
+    return (data['data'] as List)
+        .whereType<Map>()
+        .map((e) => LocalityLink.fromJson(Map<String, dynamic>.from(e)))
+        .toList(growable: false);
+  }
+
+  /// action: add | block | unblock | confirm
+  Future<void> setLink({
+    required String from,
+    required String fromTownship,
+    required String to,
+    required String toTownship,
+    required String action,
+  }) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      '$_base/link',
+      data: {
+        'kind': 'quarter',
+        'from': from,
+        'from_township': fromTownship,
+        'to': to,
+        'to_township': toTownship,
+        'action': action,
+      },
+    );
+    final data = response.data;
+    if (data == null || data['status'] != 'ok') {
+      throw Exception(data?['message']?.toString() ?? 'Failed to save link');
+    }
   }
 
   /// Quarter / village keys with donor counts; optionally one township and a substring.

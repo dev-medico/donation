@@ -16,6 +16,18 @@ final smartSearchTownshipsProvider =
   return ref.read(smartSearchRepositoryProvider).townships();
 });
 
+/// Nearby quarters and townships for the current selection.
+final smartNearbyProvider = FutureProvider.autoDispose
+    .family<NearbyInfo, ({String? ward, String? township})>((ref, key) async {
+  if ((key.ward ?? '').isEmpty && (key.township ?? '').isEmpty) {
+    return const NearbyInfo(
+        ward: null, township: null, wards: [], townships: []);
+  }
+  return ref
+      .read(smartSearchRepositoryProvider)
+      .nearby(ward: key.ward, township: key.township);
+});
+
 /// What the screen is currently asking the server for.
 class SmartSearchRequest {
   const SmartSearchRequest.smart(this.query)
@@ -111,6 +123,7 @@ class SmartSearchController
     bool clearBloodGroup = false,
     String? township,
     bool clearTownship = false,
+    String? townshipMode,
     String? ward,
     bool clearWard = false,
     String? wardMode,
@@ -128,6 +141,7 @@ class SmartSearchController
           : (bloodGroup != null ? [bloodGroup] : null),
       township: township,
       clearTownship: clearTownship,
+      townshipMode: townshipMode,
       ward: ward,
       clearWard: clearWard,
       wardMode: wardMode,
@@ -226,6 +240,7 @@ class SmartSearchController
             query: request.filters!.q,
             bloodGroup: request.filters!.bloodGroupParam,
             township: request.filters!.township,
+            townshipMode: request.filters!.townshipMode,
             ward: request.filters!.ward,
             wardMode: request.filters!.wardMode,
             gender: request.filters!.gender,
