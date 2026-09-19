@@ -95,7 +95,7 @@
       }
     }
   ],
-  "installCommand": "if [ -d flutter ]; then git -C flutter fetch --depth 1 origin tag 3.44.2 && git -C flutter checkout -q 3.44.2; else git clone --depth 1 -b 3.44.2 https://github.com/flutter/flutter.git; fi && flutter/bin/flutter config --no-analytics --enable-web && flutter/bin/flutter pub get",
+  "installCommand": "rm -rf flutter && git clone --depth 1 -b 3.44.2 https://github.com/flutter/flutter.git && flutter/bin/flutter config --enable-web && flutter/bin/flutter pub get",
   "buildCommand": "flutter/bin/flutter build web --release",
   "outputDirectory": "build/web"
 }
