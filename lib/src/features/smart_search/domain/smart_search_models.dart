@@ -223,6 +223,8 @@ class RankedDonor {
     this.locationTier = '',
     this.bloodGroup,
     this.compatibleOnly = false,
+    this.lastDonationDate,
+    this.lastHospital,
   });
 
   factory RankedDonor.fromJson(Map<String, dynamic> json) => RankedDonor(
@@ -238,6 +240,8 @@ class RankedDonor {
         locationTier: json['location_tier']?.toString() ?? '',
         bloodGroup: _nullable(json['blood_group']),
         compatibleOnly: json['compatible_only'] == true,
+        lastDonationDate: _nullable(json['last_donation_date']),
+        lastHospital: _nullable(json['last_hospital']),
       );
 
   final Member member;
@@ -255,7 +259,14 @@ class RankedDonor {
   final String? bloodGroup;
   final bool compatibleOnly;
 
+  /// Newest recorded donation (yyyy-MM-dd[ HH:mm:ss]) and where it was given.
+  final String? lastDonationDate;
+  final String? lastHospital;
+
   String get identity => member.id?.toString() ?? member.memberId ?? '';
+
+  /// Donations on record, counting the number carried over from the paper era.
+  int get donationTotal => int.tryParse(member.totalCount ?? '') ?? 0;
 
   RankedDonor withMember(Member updated) => RankedDonor(
         member: updated,
@@ -270,6 +281,8 @@ class RankedDonor {
         locationTier: locationTier,
         bloodGroup: bloodGroup,
         compatibleOnly: compatibleOnly,
+        lastDonationDate: lastDonationDate,
+        lastHospital: lastHospital,
       );
 }
 
@@ -531,6 +544,80 @@ class TownshipOption {
   final String key;
   final String my;
   final String en;
+}
+
+/// Donors on file per blood group and how many can give right now.
+class GroupAvailability {
+  const GroupAvailability({
+    required this.group,
+    required this.total,
+    required this.green,
+    required this.yellow,
+  });
+
+  factory GroupAvailability.fromJson(Map<String, dynamic> json) =>
+      GroupAvailability(
+        group: json['group']?.toString() ?? '',
+        total: _toInt(json['total']),
+        green: _toInt(json['green']),
+        yellow: _toInt(json['yellow']),
+      );
+
+  final String group;
+  final int total;
+  final int green;
+  final int yellow;
+
+  /// Rh-negative groups have only a handful of donors each.
+  bool get rare => total < 30;
+}
+
+class PlaceCount {
+  const PlaceCount(
+      {required this.key, required this.label, required this.count});
+
+  final String key;
+  final String label;
+  final int count;
+}
+
+/// What the home state shows before anything is typed.
+class SmartOverview {
+  const SmartOverview({
+    required this.groups,
+    required this.hospitals,
+    required this.townships,
+  });
+
+  factory SmartOverview.fromJson(Map<String, dynamic> json) => SmartOverview(
+        groups: (json['groups'] as List? ?? const [])
+            .whereType<Map>()
+            .map(
+                (e) => GroupAvailability.fromJson(Map<String, dynamic>.from(e)))
+            .toList(growable: false),
+        hospitals: (json['hospitals'] as List? ?? const [])
+            .whereType<Map>()
+            .map((e) => PlaceCount(
+                  key: e['name']?.toString() ?? '',
+                  label: e['name']?.toString() ?? '',
+                  count: _toInt(e['donations']),
+                ))
+            .where((p) => p.key.isNotEmpty)
+            .toList(growable: false),
+        townships: (json['townships'] as List? ?? const [])
+            .whereType<Map>()
+            .map((e) => PlaceCount(
+                  key: e['key']?.toString() ?? '',
+                  label: e['label']?.toString() ?? '',
+                  count: _toInt(e['members']),
+                ))
+            .where((p) => p.label.isNotEmpty)
+            .toList(growable: false),
+      );
+
+  final List<GroupAvailability> groups;
+  final List<PlaceCount> hospitals;
+  final List<PlaceCount> townships;
 }
 
 List<String> _toStringList(dynamic v) =>

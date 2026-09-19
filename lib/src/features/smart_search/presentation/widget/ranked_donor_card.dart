@@ -1,4 +1,6 @@
 import 'package:donation/src/features/smart_search/domain/smart_search_models.dart';
+import 'package:donation/src/features/smart_search/presentation/widget/compact_donor_row.dart'
+    show formatShortDate;
 import 'package:flutter/material.dart';
 
 Color availabilityColor(String state) => switch (state) {
@@ -102,6 +104,19 @@ class RankedDonorCard extends StatelessWidget {
                                 ),
                             ],
                           ),
+                          if ((donor.lastDonationDate ?? '').isNotEmpty ||
+                              (donor.lastHospital ?? '').isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            _Meta(
+                              icon: Icons.history,
+                              text: [
+                                if ((donor.lastDonationDate ?? '').isNotEmpty)
+                                  'နောက်ဆုံးလှူ ${formatShortDate(donor.lastDonationDate)}',
+                                if ((donor.lastHospital ?? '').isNotEmpty)
+                                  donor.lastHospital!,
+                              ].join(' · '),
+                            ),
+                          ],
                           if (donor.rankReasons.isNotEmpty) ...[
                             const SizedBox(height: 6),
                             Text(

@@ -63,6 +63,8 @@ void main() {
           'member_count': '2',
           'total_count': '5',
           'last_date': '2026-03-01 00:00:00',
+          'last_donation_date': '2026-03-01 00:00:00',
+          'last_hospital': 'ငွေမိုးဆေးရုံ',
           'can_donate': true,
           'availability_state': 'green',
           'eligible_again_at': '2026-07-01',
@@ -125,6 +127,9 @@ void main() {
       expect(page.donors.single.rankScore, 137);
       expect(page.donors.single.rankReasons.length, 3);
       expect(page.donors.single.townshipLabel, 'မော်လမြိုင်');
+      expect(page.donors.single.lastDonationDate, '2026-03-01 00:00:00');
+      expect(page.donors.single.lastHospital, 'ငွေမိုးဆေးရုံ');
+      expect(page.donors.single.donationTotal, 5);
       expect(page.compatible.single.compatibleOnly, isTrue);
       expect(page.total, 1326);
       expect(page.analysis!.green, 1300);
@@ -174,6 +179,27 @@ void main() {
       expect(page.parseError, 'jev not configured');
       expect(page.donors, isEmpty);
       expect(page.filters.bloodGroupParam, isNull);
+    });
+
+    test('overview parses groups and places', () {
+      final o = SmartOverview.fromJson({
+        'status': 'ok',
+        'groups': [
+          {'group': 'O-', 'total': 14, 'green': 11, 'yellow': 3},
+          {'group': 'B+', 'total': 1316, 'green': 1010, 'yellow': 300},
+        ],
+        'hospitals': [
+          {'name': 'ငွေမိုးဆေးရုံ', 'donations': 4128},
+        ],
+        'townships': [
+          {'key': 'mawlamyine', 'label': 'မော်လမြိုင်', 'members': 3200},
+        ],
+      });
+      expect(o.groups.first.rare, isTrue);
+      expect(o.groups.last.rare, isFalse);
+      expect(o.groups.last.green, 1010);
+      expect(o.hospitals.single.label, 'ငွေမိုးဆေးရုံ');
+      expect(o.townships.single.key, 'mawlamyine');
     });
 
     test('copyWith clears and keeps filters as asked', () {

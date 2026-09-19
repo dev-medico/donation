@@ -155,6 +155,18 @@ class SmartSearchRepository {
         .toList(growable: false);
   }
 
+  /// Donors per group who can give now, busiest hospitals and townships.
+  Future<SmartOverview> overview() async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '$_base/overview',
+    );
+    final data = response.data;
+    if (data == null || data['status'] != 'ok') {
+      throw Exception('Failed to load overview');
+    }
+    return SmartOverview.fromJson(data);
+  }
+
   Future<List<TownshipOption>> townships() async {
     final response = await _apiClient.get<Map<String, dynamic>>(
       '$_base/townships',

@@ -4,6 +4,7 @@ import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/smart_search/data/smart_search_repository.dart';
 import 'package:donation/src/features/smart_search/domain/smart_search_models.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const _pageSize = 50;
 const _requestTimeout = Duration(seconds: 40);
@@ -15,6 +16,88 @@ final smartSearchTownshipsProvider =
     FutureProvider<List<TownshipOption>>((ref) async {
   return ref.read(smartSearchRepositoryProvider).townships();
 });
+
+/// Counts per blood group and busy places for the home state.
+final smartOverviewProvider = FutureProvider<SmartOverview>((ref) async {
+  return ref.read(smartSearchRepositoryProvider).overview();
+});
+
+const _recentKey = 'smart_search_recent';
+const _compactKey = 'smart_search_compact';
+const _recentMax = 8;
+
+/// The last few typed searches on this device, newest first.
+class RecentSearches extends StateNotifier<List<String>> {
+  RecentSearches() : super(const []) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getStringList(_recentKey) ?? const [];
+      if (mounted) state = stored;
+    } catch (_) {
+      // no storage on this platform: the list just stays in memory
+    }
+  }
+
+  Future<void> add(String query) async {
+    final q = query.trim();
+    if (q.isEmpty) return;
+    final next = [q, ...state.where((e) => e != q)].take(_recentMax).toList();
+    state = next;
+    await _save(next);
+  }
+
+  Future<void> remove(String query) async {
+    final next = state.where((e) => e != query).toList();
+    state = next;
+    await _save(next);
+  }
+
+  Future<void> clear() async {
+    state = const [];
+    await _save(const []);
+  }
+
+  Future<void> _save(List<String> list) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_recentKey, list);
+    } catch (_) {}
+  }
+}
+
+final smartRecentSearchesProvider =
+    StateNotifierProvider<RecentSearches, List<String>>(
+        (ref) => RecentSearches());
+
+/// Compact rows (default) or the older spacious cards; remembered per device.
+class DensitySetting extends StateNotifier<bool> {
+  DensitySetting() : super(true) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getBool(_compactKey);
+      if (stored != null && mounted) state = stored;
+    } catch (_) {}
+  }
+
+  Future<void> toggle() async {
+    state = !state;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_compactKey, state);
+    } catch (_) {}
+  }
+}
+
+final smartCompactProvider =
+    StateNotifierProvider<DensitySetting, bool>((ref) => DensitySetting());
 
 /// Nearby quarters and townships for the current selection.
 final smartNearbyProvider = FutureProvider.autoDispose
@@ -111,10 +194,17 @@ class SmartSearchController
   Future<void> search(String query) async {
     final q = query.trim();
     if (q.isEmpty) {
-      state = const AsyncData(null);
+      reset();
       return;
     }
     await _run(SmartSearchRequest.smart(q));
+  }
+
+  /// Drops the query and every filter and returns to the home state. Any
+  /// request still in flight is ignored when it lands.
+  void reset() {
+    _generation++;
+    state = const AsyncData(null);
   }
 
   /// Re-query with explicit filters derived from the current result plus one change.

@@ -17,6 +17,21 @@ const bloodGroupOptions = <String>[
 
 /// What the server understood, as tappable chips. Tapping opens a picker and
 /// re-queries with explicit filters, so the user always has the last word.
+/// One horizontally scrollable line of chips for the compact layout.
+Widget hScrollRow(List<Widget> children, {double gap = 6}) {
+  return SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Row(
+      children: [
+        for (var i = 0; i < children.length; i++) ...[
+          if (i > 0) SizedBox(width: gap),
+          children[i],
+        ],
+      ],
+    ),
+  );
+}
+
 class SmartUnderstoodBar extends StatelessWidget {
   const SmartUnderstoodBar({
     super.key,
@@ -30,8 +45,11 @@ class SmartUnderstoodBar extends StatelessWidget {
     required this.loadWards,
     required this.onToggleNearby,
     required this.onClearExtra,
+    this.compact = false,
   });
 
+  /// One scrollable line instead of a wrapping cloud.
+  final bool compact;
   final SmartSearchPage page;
 
   /// Clears one of the understood extras: hospital | age | donor_kind | needed.
@@ -75,127 +93,127 @@ class SmartUnderstoodBar extends StatelessWidget {
       _ => null,
     };
 
+    final children = <Widget>[
+      Chip(
+        visualDensity: VisualDensity.compact,
+        avatar: const Icon(Icons.auto_awesome, size: 15),
+        label: Text(modeLabel, style: const TextStyle(fontSize: 12)),
+        backgroundColor: const Color(0xFFF3F4F6),
+        side: BorderSide.none,
+      ),
+      _FilterChip(
+        keyName: 'blood_group',
+        label: groupLabel ?? 'သွေးအုပ်စု',
+        set: groupLabel != null,
+        confidence: _confidence('blood_group'),
+        onTap: () => _pickFromList(
+          context,
+          title: 'သွေးအုပ်စု',
+          options: bloodGroupOptions,
+          labels: bloodGroupOptions,
+          selected: f.bloodGroups.length == 1 ? f.bloodGroups.first : null,
+          onPicked: onChangeBloodGroup,
+        ),
+      ),
+      _FilterChip(
+        keyName: 'township',
+        label: f.townshipLabel ?? (f.township ?? 'မြို့နယ်'),
+        set: f.township != null,
+        confidence: _confidence('township'),
+        onTap: () => _pickFromList(
+          context,
+          title: 'မြို့နယ်',
+          options: townships.map((t) => t.key).toList(growable: false),
+          labels:
+              townships.map((t) => '${t.my} · ${t.en}').toList(growable: false),
+          selected: f.township,
+          onPicked: onChangeTownship,
+        ),
+      ),
+      _FilterChip(
+        keyName: 'ward',
+        label: f.ward ?? 'ရပ်ကွက် / ကျေးရွာ',
+        set: f.ward != null,
+        confidence: _confidence('ward'),
+        onTap: () => _pickWard(context, township: f.township, selected: f.ward),
+      ),
+      _FilterChip(
+        keyName: 'gender',
+        label: genderLabel ?? 'ကျား/မ',
+        set: genderLabel != null,
+        confidence: _confidence('gender'),
+        onTap: () => _pickFromList(
+          context,
+          title: 'ကျား/မ',
+          options: const ['female', 'male'],
+          labels: const ['အမျိုးသမီး', 'အမျိုးသား'],
+          selected: f.gender,
+          onPicked: onChangeGender,
+        ),
+      ),
+      if (f.hospital != null)
+        _ExtraChip(
+          keyName: 'hospital',
+          icon: Icons.local_hospital_outlined,
+          label: f.hospital!,
+          onClear: () => onClearExtra('hospital'),
+        ),
+      if (f.ageMin != null || f.ageMax != null)
+        _ExtraChip(
+          keyName: 'age',
+          icon: Icons.cake_outlined,
+          label: 'အသက် ${f.ageMin ?? ''}–${f.ageMax ?? ''}',
+          onClear: () => onClearExtra('age'),
+        ),
+      if (f.donorKind != null)
+        _ExtraChip(
+          keyName: 'donor_kind',
+          icon: Icons.history_outlined,
+          label: f.donorKind == 'regular' ? 'ပုံမှန်လှူသူ' : 'ပထမဆုံးအကြိမ်',
+          onClear: () => onClearExtra('donor_kind'),
+        ),
+      if (f.needed != null)
+        _ExtraChip(
+          keyName: 'needed',
+          icon: Icons.groups_outlined,
+          label: '${f.needed} ဦး လိုအပ်',
+          onClear: () => onClearExtra('needed'),
+        ),
+      if (f.bloodGroups.length > 2)
+        _ExtraChip(
+          keyName: 'groups',
+          icon: Icons.bloodtype_outlined,
+          label: f.bloodGroups.join(' / '),
+          onClear: () => onChangeBloodGroup(null),
+        ),
+      FilterChip(
+        key: const ValueKey('smart-chip-nearby'),
+        visualDensity: VisualDensity.compact,
+        selected: f.includeNearby,
+        avatar: const Icon(Icons.near_me_outlined, size: 15),
+        label: const Text('အနီးအနားပါ', style: TextStyle(fontSize: 12)),
+        selectedColor: const Color(0xFFE8F5E9),
+        checkmarkColor: const Color(0xFF2E7D32),
+        tooltip:
+            'ဖွင့်ထားလျှင် မြို့နယ်တူ၊ ကပ်လျက်၊ အနီးအနား မြို့နယ်များကို အနီးဆုံးမှ စီပြသည်; ပိတ်လျှင် ရွေးထားသည့် မြို့နယ်သာ',
+        onSelected: onToggleNearby,
+      ),
+      FilterChip(
+        key: const ValueKey('smart-chip-urgent'),
+        visualDensity: VisualDensity.compact,
+        selected: f.urgent,
+        label: const Text('အရေးပေါ်', style: TextStyle(fontSize: 12)),
+        selectedColor: const Color(0xFFFDECEC),
+        checkmarkColor: const Color(0xFFA70507),
+        onSelected: onToggleUrgent,
+      ),
+    ];
+    if (compact) return hScrollRow(children);
     return Wrap(
       spacing: 6,
       runSpacing: 6,
       crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        Chip(
-          visualDensity: VisualDensity.compact,
-          avatar: const Icon(Icons.auto_awesome, size: 15),
-          label: Text(modeLabel, style: const TextStyle(fontSize: 12)),
-          backgroundColor: const Color(0xFFF3F4F6),
-          side: BorderSide.none,
-        ),
-        _FilterChip(
-          keyName: 'blood_group',
-          label: groupLabel ?? 'သွေးအုပ်စု',
-          set: groupLabel != null,
-          confidence: _confidence('blood_group'),
-          onTap: () => _pickFromList(
-            context,
-            title: 'သွေးအုပ်စု',
-            options: bloodGroupOptions,
-            labels: bloodGroupOptions,
-            selected: f.bloodGroups.length == 1 ? f.bloodGroups.first : null,
-            onPicked: onChangeBloodGroup,
-          ),
-        ),
-        _FilterChip(
-          keyName: 'township',
-          label: f.townshipLabel ?? (f.township ?? 'မြို့နယ်'),
-          set: f.township != null,
-          confidence: _confidence('township'),
-          onTap: () => _pickFromList(
-            context,
-            title: 'မြို့နယ်',
-            options: townships.map((t) => t.key).toList(growable: false),
-            labels: townships
-                .map((t) => '${t.my} · ${t.en}')
-                .toList(growable: false),
-            selected: f.township,
-            onPicked: onChangeTownship,
-          ),
-        ),
-        _FilterChip(
-          keyName: 'ward',
-          label: f.ward ?? 'ရပ်ကွက် / ကျေးရွာ',
-          set: f.ward != null,
-          confidence: _confidence('ward'),
-          onTap: () =>
-              _pickWard(context, township: f.township, selected: f.ward),
-        ),
-        _FilterChip(
-          keyName: 'gender',
-          label: genderLabel ?? 'ကျား/မ',
-          set: genderLabel != null,
-          confidence: _confidence('gender'),
-          onTap: () => _pickFromList(
-            context,
-            title: 'ကျား/မ',
-            options: const ['female', 'male'],
-            labels: const ['အမျိုးသမီး', 'အမျိုးသား'],
-            selected: f.gender,
-            onPicked: onChangeGender,
-          ),
-        ),
-        if (f.hospital != null)
-          _ExtraChip(
-            keyName: 'hospital',
-            icon: Icons.local_hospital_outlined,
-            label: f.hospital!,
-            onClear: () => onClearExtra('hospital'),
-          ),
-        if (f.ageMin != null || f.ageMax != null)
-          _ExtraChip(
-            keyName: 'age',
-            icon: Icons.cake_outlined,
-            label: 'အသက် ${f.ageMin ?? ''}–${f.ageMax ?? ''}',
-            onClear: () => onClearExtra('age'),
-          ),
-        if (f.donorKind != null)
-          _ExtraChip(
-            keyName: 'donor_kind',
-            icon: Icons.history_outlined,
-            label: f.donorKind == 'regular' ? 'ပုံမှန်လှူသူ' : 'ပထမဆုံးအကြိမ်',
-            onClear: () => onClearExtra('donor_kind'),
-          ),
-        if (f.needed != null)
-          _ExtraChip(
-            keyName: 'needed',
-            icon: Icons.groups_outlined,
-            label: '${f.needed} ဦး လိုအပ်',
-            onClear: () => onClearExtra('needed'),
-          ),
-        if (f.bloodGroups.length > 2)
-          _ExtraChip(
-            keyName: 'groups',
-            icon: Icons.bloodtype_outlined,
-            label: f.bloodGroups.join(' / '),
-            onClear: () => onChangeBloodGroup(null),
-          ),
-        FilterChip(
-          key: const ValueKey('smart-chip-nearby'),
-          visualDensity: VisualDensity.compact,
-          selected: f.includeNearby,
-          avatar: const Icon(Icons.near_me_outlined, size: 15),
-          label: const Text('အနီးအနားပါ', style: TextStyle(fontSize: 12)),
-          selectedColor: const Color(0xFFE8F5E9),
-          checkmarkColor: const Color(0xFF2E7D32),
-          tooltip:
-              'ဖွင့်ထားလျှင် မြို့နယ်တူ၊ ကပ်လျက်၊ အနီးအနား မြို့နယ်များကို အနီးဆုံးမှ စီပြသည်; ပိတ်လျှင် ရွေးထားသည့် မြို့နယ်သာ',
-          onSelected: onToggleNearby,
-        ),
-        FilterChip(
-          key: const ValueKey('smart-chip-urgent'),
-          visualDensity: VisualDensity.compact,
-          selected: f.urgent,
-          label: const Text('အရေးပေါ်', style: TextStyle(fontSize: 12)),
-          selectedColor: const Color(0xFFFDECEC),
-          checkmarkColor: const Color(0xFFA70507),
-          onSelected: onToggleUrgent,
-        ),
-      ],
+      children: children,
     );
   }
 
@@ -572,9 +590,14 @@ class SmartQuestionsBar extends StatelessWidget {
 
 /// "12 in the same quarter, 455 in the township": what the ranking put first.
 class LocationCountsLine extends StatelessWidget {
-  const LocationCountsLine(
-      {super.key, required this.filters, required this.location});
+  const LocationCountsLine({
+    super.key,
+    required this.filters,
+    required this.location,
+    this.compact = false,
+  });
 
+  final bool compact;
   final SmartFilters filters;
   final SmartLocationCounts? location;
 
@@ -585,7 +608,7 @@ class LocationCountsLine extends StatelessWidget {
       return const SizedBox.shrink();
     }
     String tier(String label, int total, int green) =>
-        '$label $total (လှူနိုင် $green)';
+        compact ? '$label $total ($green)' : '$label $total (လှူနိုင် $green)';
     final parts = <String>[
       if (filters.ward != null)
         tier('ရပ်ကွက်တူ', loc.sameWard, loc.sameWardGreen),
@@ -618,8 +641,12 @@ class LocationCountsLine extends StatelessWidget {
           Expanded(
             child: Text(
               parts.join(' · '),
-              style: const TextStyle(
-                  fontSize: 12.5, color: Colors.black87, height: 1.4),
+              maxLines: compact ? 1 : null,
+              overflow: compact ? TextOverflow.ellipsis : null,
+              style: TextStyle(
+                  fontSize: compact ? 11.5 : 12.5,
+                  color: Colors.black87,
+                  height: 1.4),
             ),
           ),
         ],
@@ -637,8 +664,10 @@ class NearbyRow extends StatelessWidget {
     required this.info,
     required this.onPickWard,
     required this.onManage,
+    this.compact = false,
   });
 
+  final bool compact;
   final SmartFilters filters;
   final NearbyInfo? info;
   final void Function(String ward, String township) onPickWard;
@@ -648,44 +677,55 @@ class NearbyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final i = info;
     if (i == null || filters.ward == null) return const SizedBox.shrink();
-    final wards = i.wards.take(12).toList(growable: false);
-    return Padding(
-      padding: const EdgeInsets.only(top: 6),
-      child: Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          const Text('အနီးအနား:',
-              style: TextStyle(fontSize: 12, color: Colors.black54)),
-          if (wards.isEmpty)
-            const Text('ချိတ်ဆက်ထားသည့် ရပ်ကွက် မရှိသေးပါ',
-                style: TextStyle(fontSize: 12, color: Colors.black38)),
-          for (final w in wards)
-            ActionChip(
-              key: ValueKey('smart-nearby-${w.ward}'),
-              visualDensity: VisualDensity.compact,
-              avatar: CircleAvatar(
-                radius: 9,
-                backgroundColor: w.degree == 1
-                    ? const Color(0xFF2E7D32)
-                    : const Color(0xFF9CCC65),
-                child: Text('${w.degree}',
-                    style: const TextStyle(fontSize: 10, color: Colors.white)),
-              ),
-              label: Text(w.ward, style: const TextStyle(fontSize: 12)),
-              onPressed: () => onPickWard(w.ward, w.township),
-            ),
-          ActionChip(
-            key: const ValueKey('smart-nearby-manage'),
-            visualDensity: VisualDensity.compact,
-            avatar: const Icon(Icons.edit_location_alt_outlined, size: 15),
-            label: const Text('ချိတ်ဆက်မှု ပြင်ရန်',
-                style: TextStyle(fontSize: 12)),
-            onPressed: onManage,
+    final wards = i.wards.take(compact ? 8 : 12).toList(growable: false);
+    final hidden = i.wards.length - wards.length;
+    final children = <Widget>[
+      const Text('အနီးအနား:',
+          style: TextStyle(fontSize: 12, color: Colors.black54)),
+      if (wards.isEmpty)
+        const Text('ချိတ်ဆက်ထားသည့် ရပ်ကွက် မရှိသေးပါ',
+            style: TextStyle(fontSize: 12, color: Colors.black38)),
+      for (final w in wards)
+        ActionChip(
+          key: ValueKey('smart-nearby-${w.ward}'),
+          visualDensity: VisualDensity.compact,
+          avatar: CircleAvatar(
+            radius: 9,
+            backgroundColor: w.degree == 1
+                ? const Color(0xFF2E7D32)
+                : const Color(0xFF9CCC65),
+            child: Text('${w.degree}',
+                style: const TextStyle(fontSize: 10, color: Colors.white)),
           ),
-        ],
+          label: Text(w.ward, style: const TextStyle(fontSize: 12)),
+          onPressed: () => onPickWard(w.ward, w.township),
+        ),
+      ActionChip(
+        key: const ValueKey('smart-nearby-manage'),
+        visualDensity: VisualDensity.compact,
+        avatar: const Icon(Icons.edit_location_alt_outlined, size: 15),
+        label:
+            const Text('ချိတ်ဆက်မှု ပြင်ရန်', style: TextStyle(fontSize: 12)),
+        onPressed: onManage,
       ),
+    ];
+    if (hidden > 0) {
+      children.insert(
+        children.length - 1,
+        Text('+$hidden',
+            style: const TextStyle(fontSize: 12, color: Colors.black54)),
+      );
+    }
+    return Padding(
+      padding: EdgeInsets.only(top: compact ? 4 : 6),
+      child: compact
+          ? hScrollRow(children)
+          : Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: children,
+            ),
     );
   }
 }
@@ -919,8 +959,10 @@ class AvailabilitySummary extends StatelessWidget {
     required this.total,
     required this.selected,
     required this.onSelected,
+    this.compact = false,
   });
 
+  final bool compact;
   final SearchMemberAnalysis? analysis;
   final int total;
   final String? selected;
@@ -950,16 +992,14 @@ class AvailabilitySummary extends StatelessWidget {
       );
     }
 
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: [
-        chip(null, 'အားလုံး', a?.total ?? total, Colors.black54),
-        chip('green', 'လှူနိုင်', a?.green ?? 0, availabilityColor('green')),
-        chip('yellow', 'စောင့်ဆိုင်း', a?.yellow ?? 0,
-            availabilityColor('yellow')),
-        chip('red', 'ပိတ်ထား', a?.red ?? 0, availabilityColor('red')),
-      ],
-    );
+    final children = <Widget>[
+      chip(null, 'အားလုံး', a?.total ?? total, Colors.black54),
+      chip('green', 'လှူနိုင်', a?.green ?? 0, availabilityColor('green')),
+      chip('yellow', 'စောင့်ဆိုင်း', a?.yellow ?? 0,
+          availabilityColor('yellow')),
+      chip('red', 'ပိတ်ထား', a?.red ?? 0, availabilityColor('red')),
+    ];
+    if (compact) return hScrollRow(children);
+    return Wrap(spacing: 6, runSpacing: 6, children: children);
   }
 }
