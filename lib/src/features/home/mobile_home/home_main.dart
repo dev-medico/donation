@@ -8,6 +8,7 @@ import 'package:donation/src/features/home/mobile_home/home_menu.dart';
 import 'package:donation/src/features/money_donor/money_donor_list_screen.dart';
 import 'package:donation/src/features/monthly_sponsor/monthly_sponsor_list_screen.dart';
 import 'package:donation/src/features/patient/patient_list_screen.dart';
+import 'package:donation/src/features/smart_search/presentation/smart_search_screen.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -31,6 +32,9 @@ class _HomeMainScreenState extends ConsumerState<HomeMainScreen> {
     SearchMemberListScreen(
       fromHome: true,
     ),
+
+    // Smart search (beta): parsed query + ranked donors, separate endpoint
+    const SmartSearchScreen(fromHome: true),
 
     // Member List
     MemberListScreen(

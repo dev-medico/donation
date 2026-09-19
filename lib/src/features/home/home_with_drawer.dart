@@ -1,3 +1,4 @@
+import 'package:donation/src/features/smart_search/presentation/smart_search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/dashboard/dashboard.dart';
@@ -77,6 +78,10 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen>
         setState(() {
           // Using SearchMemberListScreen which is the actual class name
           screenView = const SearchMemberListScreen();
+        });
+      } else if (drawerIndex == DrawerIndex.SMARTSEARCH) {
+        setState(() {
+          screenView = const SmartSearchScreen();
         });
       } else {
         setState(() {

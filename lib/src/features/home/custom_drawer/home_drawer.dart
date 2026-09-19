@@ -63,6 +63,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
         imageName: 'assets/images/search.svg',
       ),
       DrawerList(
+        index: DrawerIndex.SMARTSEARCH,
+        labelName: 'စမတ် ရှာဖွေမှု (Beta)',
+        isAssetsImage: true,
+        imageName: 'assets/images/search.svg',
+      ),
+      DrawerList(
         index: DrawerIndex.NEWMEMBER,
         labelName: 'အဖွဲ့ဝင်စာရင်း',
         isAssetsImage: true,
@@ -357,6 +363,7 @@ enum DrawerIndex {
   HOME,
   DASHBOARD,
   SEARCH,
+  SMARTSEARCH,
   NEWMEMBER,
   RECORDS,
   // REPORT,

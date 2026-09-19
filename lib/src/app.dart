@@ -11,6 +11,7 @@ import 'package:donation/src/features/money_donor/money_donor_list_screen.dart';
 import 'package:donation/src/features/money_donor/money_donor_detail_screen.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:donation/src/features/smart_search/presentation/smart_search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/auth/login.dart';
@@ -239,6 +240,9 @@ class _MyAppState extends ConsumerState<MyApp> {
                 
               case MemberListScreen.routeName:
                 return const MemberListScreen();
+
+              case SmartSearchScreen.routeName:
+                return const SmartSearchScreen();
 
               case DonationListScreen.routeName:
                 return const DonationListScreen();
