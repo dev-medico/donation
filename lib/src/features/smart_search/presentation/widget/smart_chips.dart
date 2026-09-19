@@ -29,9 +29,13 @@ class SmartUnderstoodBar extends StatelessWidget {
     required this.onChangeWard,
     required this.loadWards,
     required this.onToggleNearby,
+    required this.onClearExtra,
   });
 
   final SmartSearchPage page;
+
+  /// Clears one of the understood extras: hospital | age | donor_kind | needed.
+  final ValueChanged<String> onClearExtra;
   final List<TownshipOption> townships;
   final ValueChanged<String?> onChangeBloodGroup;
   final ValueChanged<String?> onChangeTownship;
@@ -135,6 +139,41 @@ class SmartUnderstoodBar extends StatelessWidget {
             onPicked: onChangeGender,
           ),
         ),
+        if (f.hospital != null)
+          _ExtraChip(
+            keyName: 'hospital',
+            icon: Icons.local_hospital_outlined,
+            label: f.hospital!,
+            onClear: () => onClearExtra('hospital'),
+          ),
+        if (f.ageMin != null || f.ageMax != null)
+          _ExtraChip(
+            keyName: 'age',
+            icon: Icons.cake_outlined,
+            label: 'အသက် ${f.ageMin ?? ''}–${f.ageMax ?? ''}',
+            onClear: () => onClearExtra('age'),
+          ),
+        if (f.donorKind != null)
+          _ExtraChip(
+            keyName: 'donor_kind',
+            icon: Icons.history_outlined,
+            label: f.donorKind == 'regular' ? 'ပုံမှန်လှူသူ' : 'ပထမဆုံးအကြိမ်',
+            onClear: () => onClearExtra('donor_kind'),
+          ),
+        if (f.needed != null)
+          _ExtraChip(
+            keyName: 'needed',
+            icon: Icons.groups_outlined,
+            label: '${f.needed} ဦး လိုအပ်',
+            onClear: () => onClearExtra('needed'),
+          ),
+        if (f.bloodGroups.length > 2)
+          _ExtraChip(
+            keyName: 'groups',
+            icon: Icons.bloodtype_outlined,
+            label: f.bloodGroups.join(' / '),
+            onClear: () => onChangeBloodGroup(null),
+          ),
         FilterChip(
           key: const ValueKey('smart-chip-nearby'),
           visualDensity: VisualDensity.compact,
@@ -405,6 +444,35 @@ class _WardPickerState extends State<_WardPicker> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ExtraChip extends StatelessWidget {
+  const _ExtraChip({
+    required this.keyName,
+    required this.icon,
+    required this.label,
+    required this.onClear,
+  });
+
+  final String keyName;
+  final IconData icon;
+  final String label;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    return InputChip(
+      key: ValueKey('smart-chip-$keyName'),
+      visualDensity: VisualDensity.compact,
+      avatar: Icon(icon, size: 15, color: const Color(0xFFA70507)),
+      label: Text(label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+      backgroundColor: const Color(0xFFFDECEC),
+      side: const BorderSide(color: Color(0xFFF5C2C2)),
+      deleteIcon: const Icon(Icons.close, size: 14),
+      onDeleted: onClear,
     );
   }
 }

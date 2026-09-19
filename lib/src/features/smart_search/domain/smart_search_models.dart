@@ -63,6 +63,12 @@ class SmartFilters {
     this.wardKind,
     this.gender,
     this.urgent = false,
+    this.availability,
+    this.ageMin,
+    this.ageMax,
+    this.donorKind,
+    this.hospital,
+    this.needed,
   });
 
   factory SmartFilters.fromJson(Map<String, dynamic> json) => SmartFilters(
@@ -76,6 +82,12 @@ class SmartFilters {
         wardKind: _nullable(json['ward_kind']),
         gender: _nullable(json['gender']),
         urgent: json['urgent'] == true || json['urgent']?.toString() == '1',
+        availability: _nullable(json['availability']),
+        ageMin: json['age_min'] == null ? null : _toInt(json['age_min']),
+        ageMax: json['age_max'] == null ? null : _toInt(json['age_max']),
+        donorKind: _nullable(json['donor_kind']),
+        hospital: _nullable(json['hospital']),
+        needed: json['needed'] == null ? null : _toInt(json['needed']),
       );
 
   final String q;
@@ -89,6 +101,16 @@ class SmartFilters {
 
   /// prefer = same quarter ranks first; only = hard filter.
   final String wardMode;
+
+  /// green when the query asked for donors who can give right now.
+  final String? availability;
+  final int? ageMin;
+  final int? ageMax;
+
+  /// regular | first_time
+  final String? donorKind;
+  final String? hospital;
+  final int? needed;
 
   bool get includeNearby => townshipMode != 'only';
   final String? wardKind;
@@ -116,6 +138,10 @@ class SmartFilters {
     String? gender,
     bool clearGender = false,
     bool? urgent,
+    bool clearAge = false,
+    bool clearDonorKind = false,
+    bool clearHospital = false,
+    bool clearNeeded = false,
   }) {
     // Changing the township drops a quarter that belongs to the old one.
     final wardStays = !clearWard &&
@@ -132,6 +158,12 @@ class SmartFilters {
       wardKind: ward != null ? null : (wardStays ? wardKind : null),
       gender: clearGender ? null : (gender ?? this.gender),
       urgent: urgent ?? this.urgent,
+      availability: availability,
+      ageMin: clearAge ? null : ageMin,
+      ageMax: clearAge ? null : ageMax,
+      donorKind: clearDonorKind ? null : donorKind,
+      hospital: clearHospital ? null : hospital,
+      needed: clearNeeded ? null : needed,
     );
   }
 }

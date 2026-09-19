@@ -26,8 +26,10 @@ class _SmartSearchScreenState extends ConsumerState<SmartSearchScreen> {
   final _focus = FocusNode();
   static const _examples = <String>[
     'B+ မော်လမြိုင် အမျိုးသမီး',
-    'O- အရေးပေါ် မုဒုံ',
-    'AB+ ကျိုက်မရော',
+    'O- အရေးပေါ် ငွေမိုးဆေးရုံ',
+    'AB+ ဆေးရုံကြီး ဒီည ချက်ချင်း',
+    'A+ or O+ ဇေယျာသီရိ 3 ဦး',
+    'B positive regular donors age 20-40',
     'A ရှိလား',
   ];
 
@@ -231,7 +233,7 @@ class _IdleState extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
         const Text(
-          'သွေးအုပ်စု၊ မြို့နယ်၊ ကျား/မ၊ အရေးပေါ် စသည်တို့ကို စာကြောင်းတစ်ကြောင်းတည်းဖြင့် ရိုက်ထည့်ပါ။ '
+          'သွေးအုပ်စု (B+, B+ve, ဘီပေါ့စ်)၊ မြို့နယ်၊ ရပ်ကွက်/ကျေးရွာ၊ ဆေးရုံ၊ ကျား/မ၊ အသက်၊ အရေးပေါ်၊ ချက်ချင်းလှူနိုင်သူ စသည်တို့ကို စကားပြောသလို ရိုက်ထည့်ပါ။ '
           'ရှာဖွေမှုကို နားလည်ထားသည့်အတိုင်း chip များဖြင့် ပြပေးပြီး လှူနိုင်မှု၊ နေရာ၊ လှူခဲ့သည့်အကြိမ်အရေအတွက်တို့ဖြင့် အစီအစဉ်တကျ ပြပါမည်။',
           style: TextStyle(fontSize: 13.5, color: Colors.black87, height: 1.5),
         ),
@@ -318,6 +320,12 @@ class _Results extends ConsumerWidget {
           onToggleUrgent: (u) => notifier.applyOverride(urgent: u),
           onToggleNearby: (on) =>
               notifier.applyOverride(townshipMode: on ? 'prefer' : 'only'),
+          onClearExtra: (field) => notifier.applyOverride(
+            clearHospital: field == 'hospital',
+            clearAge: field == 'age',
+            clearDonorKind: field == 'donor_kind',
+            clearNeeded: field == 'needed',
+          ),
           onChangeWard: (ward, township) => ward == null
               ? notifier.applyOverride(clearWard: true)
               : notifier.applyOverride(ward: ward, township: township),
@@ -335,6 +343,8 @@ class _Results extends ConsumerWidget {
                 notifier.applyOverride(township: value);
               } else if (field == 'ward') {
                 notifier.applyOverride(ward: value);
+              } else if (field == 'hospital') {
+                notifier.search('${page.query} $value');
               }
             },
           ),

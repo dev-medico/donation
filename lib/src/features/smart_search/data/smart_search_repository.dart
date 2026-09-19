@@ -34,6 +34,7 @@ class SmartSearchRepository {
   Future<SmartSearchPage> rank({
     String query = '',
     String? bloodGroup,
+    List<String> groups = const [],
     String? township,
     String townshipMode = 'prefer',
     String? ward,
@@ -44,8 +45,17 @@ class SmartSearchRepository {
     int limit = 50,
     String? availability,
     bool includeCompatible = true,
+    int? ageMin,
+    int? ageMax,
+    String? donorKind,
+    String? hospital,
   }) {
     return _load('$_base/rank', {
+      if (groups.length > 1) 'groups': groups.join(','),
+      if (ageMin != null) 'age_min': ageMin,
+      if (ageMax != null) 'age_max': ageMax,
+      if (donorKind != null && donorKind.isNotEmpty) 'donor_kind': donorKind,
+      if (hospital != null && hospital.isNotEmpty) 'hospital': hospital,
       'q': query,
       if (bloodGroup != null && bloodGroup.isNotEmpty)
         'blood_group': bloodGroup,

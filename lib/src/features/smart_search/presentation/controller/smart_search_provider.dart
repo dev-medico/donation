@@ -130,6 +130,10 @@ class SmartSearchController
     String? gender,
     bool clearGender = false,
     bool? urgent,
+    bool clearAge = false,
+    bool clearDonorKind = false,
+    bool clearHospital = false,
+    bool clearNeeded = false,
   }) async {
     final current = state.asData?.value;
     final base = current?.page.filters ?? const SmartFilters();
@@ -148,6 +152,10 @@ class SmartSearchController
       gender: gender,
       clearGender: clearGender,
       urgent: urgent,
+      clearAge: clearAge,
+      clearDonorKind: clearDonorKind,
+      clearHospital: clearHospital,
+      clearNeeded: clearNeeded,
     );
     await _run(SmartSearchRequest.rank(
       filters,
@@ -217,8 +225,13 @@ class SmartSearchController
     try {
       final page = await _fetch(request, 0);
       if (!mounted || generation != _generation) return;
+      final effective = request.isSmart &&
+              request.availability == null &&
+              page.filters.availability != null
+          ? request.withAvailability(page.filters.availability)
+          : request;
       state = AsyncData(SmartSearchState(
-        request: request,
+        request: effective,
         page: page,
         donors: page.donors,
       ));
@@ -239,6 +252,11 @@ class SmartSearchController
         : _repository.rank(
             query: request.filters!.q,
             bloodGroup: request.filters!.bloodGroupParam,
+            groups: request.filters!.bloodGroups,
+            ageMin: request.filters!.ageMin,
+            ageMax: request.filters!.ageMax,
+            donorKind: request.filters!.donorKind,
+            hospital: request.filters!.hospital,
             township: request.filters!.township,
             townshipMode: request.filters!.townshipMode,
             ward: request.filters!.ward,

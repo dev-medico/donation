@@ -41,6 +41,12 @@ void main() {
         'ward_kind': 'ward',
         'gender': null,
         'urgent': false,
+        'availability': 'green',
+        'age_min': 18,
+        'age_max': 30,
+        'donor_kind': 'regular',
+        'hospital': 'ငွေမိုးဆေးရုံ',
+        'needed': 2,
       },
       'data': [
         {
@@ -128,6 +134,17 @@ void main() {
       expect(page.filters.wardMode, 'prefer');
       expect(page.location!.sameWard, 12);
       expect(page.location!.sameTownship, 455);
+      expect(page.filters.availability, 'green');
+      expect(page.filters.ageMin, 18);
+      expect(page.filters.ageMax, 30);
+      expect(page.filters.donorKind, 'regular');
+      expect(page.filters.hospital, 'ငွေမိုးဆေးရုံ');
+      expect(page.filters.needed, 2);
+      final cleared =
+          page.filters.copyWith(clearAge: true, clearHospital: true);
+      expect(cleared.ageMin, isNull);
+      expect(cleared.hospital, isNull);
+      expect(cleared.donorKind, 'regular');
     });
 
     test('copyWith drops the quarter when the township changes', () {
