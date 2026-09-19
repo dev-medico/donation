@@ -403,6 +403,7 @@ class _Results extends ConsumerWidget {
       onToggleNearby: (on) =>
           notifier.applyOverride(townshipMode: on ? 'prefer' : 'only'),
       onClearExtra: (field) => notifier.applyOverride(
+        clearText: field == 'q',
         clearHospital: field == 'hospital',
         clearAge: field == 'age',
         clearDonorKind: field == 'donor_kind',
@@ -539,6 +540,14 @@ class _Results extends ConsumerWidget {
     final notifier = ref.read(smartSearchControllerProvider.notifier);
     final f = state.page.filters;
     final level = state.request.availability;
+    final hasCriteria = f.bloodGroups.isNotEmpty ||
+        f.township != null ||
+        f.ward != null ||
+        f.gender != null ||
+        f.hospital != null ||
+        f.ageMin != null ||
+        f.ageMax != null ||
+        f.donorKind != null;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 28, 16, 28),
       child: Column(
@@ -573,6 +582,18 @@ class _Results extends ConsumerWidget {
                   onPressed: () => notifier.applyOverride(clearWard: true),
                   icon: const Icon(Icons.location_off_outlined, size: 16),
                   label: const Text('ရပ်ကွက် ဖြုတ်မည်'),
+                ),
+              if (f.q.isNotEmpty && hasCriteria)
+                OutlinedButton.icon(
+                  onPressed: () => notifier.search(f.q),
+                  icon: const Icon(Icons.person_search_outlined, size: 16),
+                  label: Text('"${f.q}" ကိုသာ ရှာမည်'),
+                ),
+              if (f.q.isNotEmpty && hasCriteria)
+                OutlinedButton.icon(
+                  onPressed: () => notifier.applyOverride(clearText: true),
+                  icon: const Icon(Icons.backspace_outlined, size: 16),
+                  label: const Text('အမည်/စာသား ဖြုတ်မည်'),
                 ),
               TextButton.icon(
                 onPressed: onReset,

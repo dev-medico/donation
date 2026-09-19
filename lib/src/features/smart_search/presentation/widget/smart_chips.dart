@@ -52,7 +52,7 @@ class SmartUnderstoodBar extends StatelessWidget {
   final bool compact;
   final SmartSearchPage page;
 
-  /// Clears one of the understood extras: hospital | age | donor_kind | needed.
+  /// Clears one of the understood extras: q | hospital | age | donor_kind | needed.
   final ValueChanged<String> onClearExtra;
   final List<TownshipOption> townships;
   final ValueChanged<String?> onChangeBloodGroup;
@@ -151,6 +151,13 @@ class SmartUnderstoodBar extends StatelessWidget {
           onPicked: onChangeGender,
         ),
       ),
+      if (f.q.isNotEmpty)
+        _ExtraChip(
+          keyName: 'q',
+          icon: Icons.person_search_outlined,
+          label: f.q,
+          onClear: () => onClearExtra('q'),
+        ),
       if (f.hospital != null)
         _ExtraChip(
           keyName: 'hospital',

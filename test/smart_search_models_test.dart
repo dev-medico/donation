@@ -202,6 +202,12 @@ void main() {
       expect(o.townships.single.key, 'mawlamyine');
     });
 
+    test('copyWith keeps or clears the typed name', () {
+      const f = SmartFilters(q: 'ကိုအေးအာကာ', bloodGroups: ['B+']);
+      expect(f.copyWith(gender: 'male').q, 'ကိုအေးအာကာ');
+      expect(f.copyWith(q: '').q, '');
+    });
+
     test('copyWith clears and keeps filters as asked', () {
       const f = SmartFilters(
           bloodGroups: ['A+'], township: 'mudon', gender: 'male', urgent: true);
