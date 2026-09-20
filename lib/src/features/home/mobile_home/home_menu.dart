@@ -11,7 +11,7 @@ final drawerIndexProvider = StateProvider<int?>((ref) => 0);
 const mobileHomeMenuTitles = <String>[
   'မူလစာမျက်နှာ',
   'သွေးလှူရှင် ရှာမည်',
-  'Smart search (Beta)',
+  'စမတ် ရှာဖွေမှု (Beta)',
   'အဖွဲ့ဝင် စာရင်း',
   'သွေးလှူမှု မှတ်တမ်း',
   'လူနာစာရင်း',

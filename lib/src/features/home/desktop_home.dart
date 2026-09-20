@@ -32,7 +32,7 @@ class _DesktopHomeScreenState extends ConsumerState<DesktopHomeScreen> {
   List<String> titles = [
     'မူလစာမျက်နှာ',
     'သွေးလှူရှင် ရှာမည်',
-    'Smart search (Beta)',
+    'စမတ် ရှာဖွေမှု (Beta)',
     'အဖွဲ့ဝင် စာရင်း',
     'သွေးလှူမှု မှတ်တမ်း',
     'လူနာစာရင်း',

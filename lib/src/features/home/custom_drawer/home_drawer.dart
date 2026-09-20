@@ -64,7 +64,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
       ),
       DrawerList(
         index: DrawerIndex.SMARTSEARCH,
-        labelName: 'Smart search (Beta)',
+        labelName: 'စမတ် ရှာဖွေမှု (Beta)',
         isAssetsImage: true,
         imageName: 'assets/images/search.svg',
       ),

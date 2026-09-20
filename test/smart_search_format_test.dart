@@ -15,4 +15,14 @@ void main() {
     expect(tierLabel('hop2'), isNotEmpty);
     expect(tierLabel(''), '');
   });
+
+  test('rankReasonCaption keeps the server wording and order', () {
+    expect(
+      rankReasonCaption(['လှူနိုင်', 'ရပ်ကွက်တူ', '5 ကြိမ်လှူပြီး']),
+      'လှူနိုင် · ရပ်ကွက်တူ · 5 ကြိမ်လှူပြီး',
+    );
+    expect(rankReasonCaption(['ဖုန်းနံပါတ် မပြည့်စုံ']), 'ဖုန်းနံပါတ် မပြည့်စုံ');
+    expect(rankReasonCaption(['  ', 'လှူနိုင်']), 'လှူနိုင်');
+    expect(rankReasonCaption(const []), '');
+  });
 }

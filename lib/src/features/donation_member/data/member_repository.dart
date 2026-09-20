@@ -154,7 +154,7 @@ class MemberRepository {
       final response = await _apiClient.post<Map<String, dynamic>>(
         '$_baseUrl/update',
         queryParameters: {'id': id},
-        data: member.toJson(),
+        data: member.toUpdateJson(),
       );
 
       if (response.data == null) {

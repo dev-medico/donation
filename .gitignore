@@ -47,3 +47,10 @@ app.*.map.json
 
 # Local production QA captures may contain private application data.
 design-qa/live-*.png
+
+# Donor/member data dumps must never be committed: they carry names, NRC
+# (national ID), phone numbers, addresses and patient details.
+lib/*.json
+lib/**/*.json
+*z_back_member*.json
+*z_back_donation*.json

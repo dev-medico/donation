@@ -47,6 +47,14 @@ String tierLabel(String tier) => switch (tier) {
       _ => '',
     };
 
+/// The server's ranking reasons as one line, in the order it sent them.
+///
+/// The wording is the server's own (`လှူနိုင်`,
+/// `ရပ်ကွက်တူ`, `{n} ကြိမ်လှူပြီး`, …) so the caption stays
+/// consistent with the chips and the detail card.
+String rankReasonCaption(List<String> reasons) =>
+    reasons.map((r) => r.trim()).where((r) => r.isNotEmpty).join(' · ');
+
 Future<void> dial(String phone) async {
   final p = phone.trim();
   if (p.isEmpty) return;
@@ -81,6 +89,7 @@ class CompactDonorRow extends StatelessWidget {
     final date = formatShortDate(donor.lastDonationDate);
     final hospital = (donor.lastHospital ?? '').trim();
     final tier = tierLabel(donor.locationTier);
+    final why = rankReasonCaption(donor.rankReasons);
     final count = donor.donationTotal;
     final waiting = donor.availabilityState == 'yellow' &&
         (donor.eligibleAgainAt ?? '').isNotEmpty;
@@ -195,6 +204,21 @@ class CompactDonorRow extends StatelessWidget {
                           ),
                       ],
                     ),
+                    if (why.isNotEmpty) ...[
+                      const SizedBox(height: 1),
+                      _Line(
+                        icon: Icons.auto_awesome_outlined,
+                        children: [
+                          Flexible(
+                            child: ReasonCaption(
+                              caption: why,
+                              score: donor.rankScore,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     if (waiting)
                       Padding(
                         padding: const EdgeInsets.only(left: 20, top: 1),
@@ -236,8 +260,11 @@ class DonorTableLayout {
   double get count => 44;
   double get tier => wide ? 112 : 0;
   double get actions => 74;
-  int get nameFlex => 12;
-  int get placeFlex => 15;
+  /// The name cell stacks the reason caption under the name, so it takes a
+  /// little of the place column's share; the totals are unchanged, which keeps
+  /// [DonorTableHeader] aligned with the rows.
+  int get nameFlex => 14;
+  int get placeFlex => 13;
   int get lastFlex => wide ? 15 : 13;
 }
 
@@ -319,6 +346,7 @@ class DonorTableRow extends StatelessWidget {
     final date = formatShortDate(donor.lastDonationDate);
     final hospital = (donor.lastHospital ?? '').trim();
     final tier = tierLabel(donor.locationTier);
+    final why = rankReasonCaption(donor.rankReasons);
     final count = donor.donationTotal;
     final waiting = donor.availabilityState == 'yellow' &&
         (donor.eligibleAgainAt ?? '').isNotEmpty;
@@ -355,19 +383,31 @@ class DonorTableRow extends StatelessWidget {
               ),
               Expanded(
                 flex: layout.nameFlex,
-                child: Row(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Flexible(
-                      child: Text(
-                        member.name ?? '-',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w700),
-                      ),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            member.name ?? '-',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GroupPill(group: group),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    GroupPill(group: group),
+                    if (why.isNotEmpty)
+                      ReasonCaption(
+                        caption: why,
+                        score: donor.rankScore,
+                        fontSize: 10.5,
+                      ),
                   ],
                 ),
               ),
@@ -387,10 +427,13 @@ class DonorTableRow extends StatelessWidget {
                       ),
                     ),
                     if (ward.isNotEmpty && township.isNotEmpty)
-                      Text(' · $township',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 12, color: _muted)),
+                      Flexible(
+                        child: Text(' · $township',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                const TextStyle(fontSize: 12, color: _muted)),
+                      ),
                   ],
                 ),
               ),
@@ -424,14 +467,22 @@ class DonorTableRow extends StatelessWidget {
                     const Icon(Icons.history, size: 13, color: _muted),
                     const SizedBox(width: 3),
                     if (date.isEmpty)
-                      const Text('မှတ်တမ်းမရှိ',
-                          style: TextStyle(fontSize: 12, color: _muted))
+                      const Flexible(
+                        child: Text('မှတ်တမ်းမရှိ',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12, color: _muted)),
+                      )
                     else
-                      Text(date,
-                          style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black87)),
+                      Flexible(
+                        child: Text(date,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black87)),
+                      ),
                     if (hospital.isNotEmpty)
                       Flexible(
                         child: Text(
@@ -551,6 +602,42 @@ class TierChip extends StatelessWidget {
     );
     if (reasons.isEmpty) return chip;
     return Tooltip(message: reasons.join(' · '), child: chip);
+  }
+}
+
+/// Why a donor ranks where they do, on one ellipsized line.
+///
+/// Unlike [TierChip] this does not depend on a location tier, so every row
+/// that has reasons shows them; the full list and the score stay on the
+/// tooltip for the ones that do not fit.
+class ReasonCaption extends StatelessWidget {
+  const ReasonCaption({
+    super.key,
+    required this.caption,
+    required this.score,
+    this.fontSize = 11,
+  });
+
+  final String caption;
+  final int score;
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    if (caption.isEmpty) return const SizedBox.shrink();
+    return Tooltip(
+      message: score > 0 ? 'ရမှတ် $score · $caption' : caption,
+      child: Text(
+        caption,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: fontSize,
+          height: 1.2,
+          color: const Color(0xFF1B5E20),
+        ),
+      ),
+    );
   }
 }
 

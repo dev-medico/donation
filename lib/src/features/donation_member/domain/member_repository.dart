@@ -65,7 +65,7 @@ class MemberRepository {
       final response = await _apiClient.put<Map<String, dynamic>>(
         'member/update',
         queryParameters: {'id': member.id},
-        data: member.toJson(),
+        data: member.toUpdateJson(),
       );
 
       if (response.data != null && response.data!['status'] == 'ok') {

@@ -133,6 +133,9 @@ class Member {
     return null;
   }
 
+  /// Full serialisation, including the server-derived fields.
+  ///
+  /// Do not send this to `member/update`: use [toUpdateJson] instead.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -154,5 +157,19 @@ class Member {
       'total_count': totalCount,
       'profile_url': profileUrl,
     };
+  }
+
+  /// The payload for `member/update`, with the server-derived lifetime
+  /// donation count left out.
+  ///
+  /// `total_count` is computed by the server (carried-over paper count plus
+  /// recorded donations), so a client that echoes the value it was shown
+  /// writes a derived number back into the stored column. Records edited that
+  /// way ended up with an inflated count, so the update payload omits it and
+  /// the field stays read-only on this side.
+  Map<String, dynamic> toUpdateJson() {
+    final data = toJson();
+    data.remove('total_count');
+    return data;
   }
 }
