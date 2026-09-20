@@ -273,6 +273,20 @@ void main() {
       service: service,
     );
 
+    // On the narrowest phone the settings tab scrolls beneath the pinned copy
+    // bar, and the first group's time field starts straddling that fold — its
+    // centre lands on the copy button, so tapping it there would press that
+    // instead. Scroll it clear first, as a user would.
+    final timeField = find.byType(DropdownButtonFormField<String>).first;
+    await tester.ensureVisible(timeField);
+    await tester.pumpAndSettle();
+    expect(
+      tester.getRect(timeField).bottom,
+      lessThanOrEqualTo(
+        tester.getRect(find.byType(SingleChildScrollView).first).bottom,
+      ),
+    );
+
     await tester.tap(find.text(kDefaultPostTime).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('ဒီနေ့ညနေ').last);
