@@ -32,7 +32,11 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
 
   Future<List<Member>> _load() async {
     final raw =
-        await ref.read(memberServiceProvider).getHonorableDonors(min: 30);
+        // 30 was calibrated against a donation count that added the stale
+        // member.member_count on top of the real one, roughly doubling it. With
+        // the true count the busiest donor in the registry has 14, so 30 listed
+        // nobody. 10 lists about 102 donors — roughly the top 2%.
+        await ref.read(memberServiceProvider).getHonorableDonors(min: 10);
     return raw
         .map<Member>((e) => Member.fromJson(e as Map<String, dynamic>))
         .toList();
