@@ -17,6 +17,18 @@
 - `test/honour_roll_test.dart`: bands, tie ranks, breakdown parsing, and the screen at 390×844 and 320×568 with no overflow; captures in `design-qa/honour-roll-*.png` (made-up donors).
 - Backend `tests/unit/models/MemberTest.php` covers reading the previous count (Burmese digits, junk). The 10 `RequestGiveControllerTest` errors predate this release.
 
+## Production web
+
+- Website: https://donation-coral-five.vercel.app
+- Application-code revision: `2a2368e` (Release 1.5.15). Vercel reported the deployment as successful on September 26, 2026; the live bundle carries version `1.5.15` and the banded honour roll.
+
+## Native release
+
+- Marketing version: `1.5.15`; build number: `190`.
+- iOS archive: `build/ios/archive/Runner.xcarchive` (local, excluded from Git), built by `flutter build ipa --release` with automatic signing for team `V66GW9RJ44` and an upload-only export (`manageAppVersionAndBuildNumber` off, so the build keeps number 190).
+- App Store Connect upload succeeded on September 26, 2026 at 16:08:59 (+07:00): Xcode's distribution log records `UPLOAD SUCCEEDED with no errors` and `Uploaded package is processing`, delivery UUID `209c8f24-f29d-4fa5-91f3-6373335af8e7`. TestFlight distributes it to the internal group "Red Juniors" once processing completes. Flutter then exited with its usual `PathNotFoundException` for `build/ios/ipa/`, which an upload-only export never creates.
+- Android was not built for this release; Play stays on `189 (1.5.14)`. The backend fixes already reach it; the banded honour roll needs a Play release (1.5.14 shows one list of donors with 30 or more).
+
 ## Open for the group
 
 - Card numbers B-0801 and D-0266 are each held by two donors. Until one of each pair is renumbered, `php yii migrate` stops at `m260920_000001` (the unique card-number index).
