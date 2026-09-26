@@ -1,2 +1,2 @@
 /// Keep the visible release label in sync with the version in pubspec.yaml.
-const appVersion = '1.5.14';
+const appVersion = '1.5.15';
