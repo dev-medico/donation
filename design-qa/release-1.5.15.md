@@ -27,7 +27,10 @@
 - Marketing version: `1.5.15`; build number: `190`.
 - iOS archive: `build/ios/archive/Runner.xcarchive` (local, excluded from Git), built by `flutter build ipa --release` with automatic signing for team `V66GW9RJ44` and an upload-only export (`manageAppVersionAndBuildNumber` off, so the build keeps number 190).
 - App Store Connect upload succeeded on September 26, 2026 at 16:08:59 (+07:00): Xcode's distribution log records `UPLOAD SUCCEEDED with no errors` and `Uploaded package is processing`, delivery UUID `209c8f24-f29d-4fa5-91f3-6373335af8e7`. TestFlight distributes it to the internal group "Red Juniors" once processing completes. Flutter then exited with its usual `PathNotFoundException` for `build/ios/ipa/`, which an upload-only export never creates.
-- Android was not built for this release; Play stays on `189 (1.5.14)`. The backend fixes already reach it; the banded honour roll needs a Play release (1.5.14 shows one list of donors with 30 or more).
+- Android bundle: `build/app/outputs/bundle/release/app-release.aab`, 67,814,299 bytes, signed by `CN=Medico`; manifest carries versionCode `190`, versionName `1.5.15`, package `com.red.juniors`. Copy at `~/Downloads/red-juniors-1.5.15-190.aab`.
+- AAB SHA256: `a9528d4401bddec6cb15e4bd044b41752928b2fe8c15333d536a9466fe2ec9b6`.
+- Play Console (September 26, 2026, driven through the signed-in Chrome session of the "Sithu (STA 01)" profile, whose account has release access to the Medico developer account): bundle `190 (1.5.15)` uploaded to Production release 45 with en-US release notes, saved, and sent for review as a full rollout. Publishing overview shows **Changes in review** while the quick checks run (up to 14 minutes); managed publishing is off, so it goes live once approved. Same non-blocking advertising-ID advisory as before.
+- Build note: the project's Gradle 8.14.2 was not cached, so the bundle build downloaded it and filled the disk to 747 MB free; the unused 8.11.1 and 8.12 Gradle caches (other projects) were deleted mid-build to finish it.
 
 ## Open for the group
 
