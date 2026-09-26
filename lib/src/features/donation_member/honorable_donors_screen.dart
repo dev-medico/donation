@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:donation/src/features/donation_member/domain/honour_roll.dart';
 import 'package:donation/src/features/donation_member/domain/member.dart';
 import 'package:donation/src/features/services/member_service.dart';
 import 'package:donation/utils/Colors.dart';
@@ -6,8 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// Honorable donors: members who have donated blood more than 30 times,
-/// ordered most -> least.
+/// Honour roll: donors with 10 or more lifetime donations, in the bands the
+/// group asked for (10–19, 20–29, 30–39, 40–49, and 50+ once reached), most
+/// first within each band.
 class HonorableDonorsScreen extends ConsumerStatefulWidget {
   const HonorableDonorsScreen({super.key});
   static const routeName = '/honorable-donors';
@@ -18,8 +20,9 @@ class HonorableDonorsScreen extends ConsumerStatefulWidget {
 }
 
 class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
-  late Future<List<Member>> _future;
+  late Future<List<HonourRollEntry>> _future;
   dynamic _uploadingId;
+  int _tierIndex = 0;
   // Local messenger so snackbars never look up a deactivated Scaffold from the
   // surrounding desktop shell.
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -30,16 +33,17 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
     _future = _load();
   }
 
-  Future<List<Member>> _load() async {
-    final raw =
-        // 30 was calibrated against a donation count that added the stale
-        // member.member_count on top of the real one, roughly doubling it. With
-        // the true count the busiest donor in the registry has 14, so 30 listed
-        // nobody. 10 lists about 102 donors — roughly the top 2%.
-        await ref.read(memberServiceProvider).getHonorableDonors(min: 10);
+  Future<List<HonourRollEntry>> _load() async {
+    // One request for every band: the server returns everyone at or above the
+    // minimum, most first, and the bands are cut here.
+    final raw = await ref
+        .read(memberServiceProvider)
+        .getHonorableDonors(min: honourRollMinimum);
     return raw
-        .map<Member>((e) => Member.fromJson(e as Map<String, dynamic>))
-        .toList();
+        .map((e) => HonourRollEntry.fromJson(e as Map<String, dynamic>))
+        .where((e) => e.total >= honourRollMinimum)
+        .toList()
+      ..sort((a, b) => b.total.compareTo(a.total));
   }
 
   void _refresh() {
@@ -109,7 +113,7 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
               style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
-          body: FutureBuilder<List<Member>>(
+          body: FutureBuilder<List<HonourRollEntry>>(
             future: _future,
             builder: (context, snap) {
               if (snap.connectionState == ConnectionState.waiting) {
@@ -119,31 +123,89 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Text('ရယူ၍ မရပါ — ${snap.error}',
-                        textAlign: TextAlign.center),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('ရယူ၍ မရပါ — ${snap.error}',
+                            textAlign: TextAlign.center),
+                        const SizedBox(height: 12),
+                        TextButton(
+                          onPressed: _refresh,
+                          child: const Text('ပြန်ရယူမည်'),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }
-              final donors = snap.data ?? [];
-              if (donors.isEmpty) {
-                return const Center(
-                    child: Text('၃၀ ကြိမ်အထက် လှူဒါန်းထားသူ မရှိသေးပါ'));
-              }
-              return RefreshIndicator(
-                onRefresh: () async => _refresh(),
-                child: ListView.separated(
-                  padding: const EdgeInsets.all(12),
-                  itemCount: donors.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, i) => _donorTile(donors[i], i + 1),
-                ),
-              );
+              return _roll(snap.data ?? const []);
             },
           ),
         ));
   }
 
-  Widget _donorTile(Member m, int rank) {
+  Widget _roll(List<HonourRollEntry> donors) {
+    final tiers = honourTiersFor(donors.map((e) => e.total));
+    final tierIndex = _tierIndex.clamp(0, tiers.length - 1);
+    final tier = tiers[tierIndex];
+    final counts = [
+      for (final t in tiers) donors.where((e) => t.contains(e.total)).length,
+    ];
+    final inTier = donors.where((e) => tier.contains(e.total)).toList();
+    final ranks = competitionRanks([for (final e in inTier) e.total]);
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 760),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+              child: _TierStrip(
+                tiers: tiers,
+                counts: counts,
+                selected: tierIndex,
+                onSelect: (i) => setState(() => _tierIndex = i),
+              ),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async => _refresh(),
+                child: inTier.isEmpty
+                    ? ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(24, 64, 24, 24),
+                            child: Text(
+                              '${tier.label} ကြိမ် လှူဒါန်းထားသူ မရှိသေးပါ',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey[600]),
+                            ),
+                          ),
+                        ],
+                      )
+                    : ListView.separated(
+                        key: PageStorageKey('honour-tier-${tier.label}'),
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+                        itemCount: inTier.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, i) =>
+                            _donorTile(inTier[i], ranks[i]),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _donorTile(HonourRollEntry entry, int rank) {
+    final m = entry.member;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -180,29 +242,27 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
               children: [
                 Text(
                   m.name ?? '-',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                       fontWeight: FontWeight.w600, fontSize: 15),
                 ),
                 const SizedBox(height: 2),
                 _buildDonorMetadata(m),
+                if (entry.hasBreakdown) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    'ယခင် ${entry.previous} + အဖွဲ့နှင့် ${entry.recorded}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              '${m.totalCount ?? 0} ကြိမ်',
-              style: TextStyle(
-                color: primaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-              ),
-            ),
-          ),
+          const SizedBox(width: 8),
+          _TotalMark(total: entry.total),
         ],
       ),
     );
@@ -212,44 +272,23 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
     final hasBloodType = (member.bloodType ?? '').isNotEmpty;
     final hasMemberId = (member.memberId ?? '').isNotEmpty;
 
-    if (MediaQuery.of(context).size.width < 480) {
-      return Wrap(
-        spacing: 10,
-        runSpacing: 2,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          if (hasBloodType)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.bloodtype, size: 14, color: primaryColor),
-                const SizedBox(width: 2),
-                Text(
-                  member.bloodType!,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                ),
-              ],
-            ),
-          if (hasMemberId)
-            Text(
-              member.memberId!,
-              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-            ),
-        ],
-      );
-    }
-
-    return Row(
+    return Wrap(
+      spacing: 10,
+      runSpacing: 2,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        if (hasBloodType) ...[
-          Icon(Icons.bloodtype, size: 14, color: primaryColor),
-          const SizedBox(width: 2),
-          Text(
-            member.bloodType!,
-            style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+        if (hasBloodType)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.bloodtype, size: 14, color: primaryColor),
+              const SizedBox(width: 2),
+              Text(
+                member.bloodType!,
+                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-        ],
         if (hasMemberId)
           Text(
             member.memberId!,
@@ -307,6 +346,184 @@ class _HonorableDonorsScreenState extends ConsumerState<HonorableDonorsScreen> {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// The bands as one row of equal tabs: the range large, the number of donors
+/// in it underneath. Scrolls sideways only if a phone is too narrow to fit
+/// them all.
+class _TierStrip extends StatelessWidget {
+  const _TierStrip({
+    required this.tiers,
+    required this.counts,
+    required this.selected,
+    required this.onSelect,
+  });
+
+  final List<HonourTier> tiers;
+  final List<int> counts;
+  final int selected;
+  final ValueChanged<int> onSelect;
+
+  static const _gap = 6.0;
+  // Five bands fit a 320-pixel phone at this width.
+  static const _minTabWidth = 52.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final fits = constraints.maxWidth >=
+          tiers.length * _minTabWidth + (tiers.length - 1) * _gap;
+      final tabs = [
+        for (var i = 0; i < tiers.length; i++)
+          _TierTab(
+            key: ValueKey('honour-tier-${tiers[i].label}'),
+            tier: tiers[i],
+            count: counts[i],
+            selected: i == selected,
+            onTap: () => onSelect(i),
+          ),
+      ];
+      if (fits) {
+        return Row(
+          children: [
+            for (var i = 0; i < tabs.length; i++) ...[
+              if (i > 0) const SizedBox(width: _gap),
+              Expanded(child: tabs[i]),
+            ],
+          ],
+        );
+      }
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (var i = 0; i < tabs.length; i++) ...[
+              if (i > 0) const SizedBox(width: _gap),
+              SizedBox(width: _minTabWidth + 8, child: tabs[i]),
+            ],
+          ],
+        ),
+      );
+    });
+  }
+}
+
+class _TierTab extends StatelessWidget {
+  const _TierTab({
+    super.key,
+    required this.tier,
+    required this.count,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final HonourTier tier;
+  final int count;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ink = selected ? Colors.white : Colors.black87;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '${tier.spokenLabel} $count ဦး',
+      excludeSemantics: true,
+      child: Material(
+        color: selected ? primaryColor : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: selected
+              ? BorderSide.none
+              : const BorderSide(color: Color(0xFFE0E0E0)),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 56),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      tier.label,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        height: 1.15,
+                        color: ink,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '$count ဦး',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 1.2,
+                        fontWeight: FontWeight.w600,
+                        color: selected ? Colors.white70 : Colors.grey[600],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A donor's lifetime total: the number carries the row, the unit sits under
+/// it.
+class _TotalMark extends StatelessWidget {
+  const _TotalMark({required this.total});
+
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      label: '$total ကြိမ်',
+      excludeSemantics: true,
+      child: SizedBox(
+        width: 44,
+        child: Column(
+          children: [
+            Text(
+              '$total',
+              style: TextStyle(
+                fontSize: 22,
+                height: 1.1,
+                fontWeight: FontWeight.w800,
+                color: primaryColor,
+              ),
+            ),
+            Text(
+              'ကြိမ်',
+              style: TextStyle(
+                fontSize: 11,
+                height: 1.3,
+                color: primaryColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
