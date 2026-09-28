@@ -21,7 +21,7 @@ List<Map<String, dynamic>> _rowsFor(DateTime day) {
       'patient_address':
           'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
       'hospital': 'မော်လမြိုင်ဆေးရုံကြီး',
-      'memberObj': {'name': 'ကိုအောင်အောင်', 'blood_type': 'O (Rh +)'},
+      'memberObj': {'name': 'ကိုအောင်အောင်', 'blood_type': 'O (Rh -)'},
     },
     {
       'id': 102,
@@ -30,7 +30,7 @@ List<Map<String, dynamic>> _rowsFor(DateTime day) {
       'patient_address':
           'ရွှေတောင်ရပ်ကွက်၊မော်လမြိုင်မြို့၊မော်လမြိုင်မြို့နယ်',
       'hospital': 'မော်လမြိုင်ဆေးရုံကြီး',
-      'memberObj': {'name': 'ကိုမျိုးမင်း', 'blood_type': 'O (Rh +)'},
+      'memberObj': {'name': 'ကိုမျိုးမင်း', 'blood_type': 'O (Rh -)'},
     },
     {
       'id': 201,
@@ -359,6 +359,7 @@ void main() {
     expect(copied, isNotNull);
     expect(copied, contains('ဒေါ်ခင်မြင့်'));
     expect(copied, contains('မခင်သီတာ'));
+    expect(copied, contains('(O-)သွေး(၂)လုံး'));
     expect(find.text('ပို့စ်စာသား ကူးယူပြီးပါပြီ'), findsOneWidget);
   });
 

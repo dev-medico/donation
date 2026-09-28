@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:donation/utils/blood_type_label.dart';
 
 /// Compact blood-type badge used across phone list rows.
 ///
@@ -17,18 +18,8 @@ class BloodChip extends StatelessWidget {
   /// "B (Rh +)" -> "B+", "AB (Rh -)" -> "AB−", already-short values pass
   /// through. Returns "—" when unknown.
   static String short(String? raw) {
-    final v = (raw ?? '').trim();
-    if (v.isEmpty) return '—';
-    final upper = v.toUpperCase();
-    final group = RegExp(r'^(AB|A|B|O)').firstMatch(upper)?.group(0);
-    if (group == null) {
-      // Not a standard label; show first characters as-is (e.g. rare types).
-      return v.length <= 3 ? v : v.substring(0, 3);
-    }
-    final isNegative = upper.contains('-');
-    final hasSign = upper.contains('+') || isNegative;
-    if (!hasSign) return group;
-    return '$group${isNegative ? '−' : '+'}';
+    final label = compactBloodType(raw);
+    return label.isEmpty ? '—' : label;
   }
 
   @override
@@ -43,13 +34,16 @@ class BloodChip extends StatelessWidget {
         color: known ? _bg : const Color(0xFFF0EDED),
         borderRadius: BorderRadius.circular(9),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: known ? _fg : Colors.grey[500],
-          fontSize: size * 0.32,
-          fontWeight: FontWeight.w700,
-          height: 1.0,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: known ? _fg : Colors.grey[500],
+            fontSize: size * 0.32,
+            fontWeight: FontWeight.w700,
+            height: 1.0,
+          ),
         ),
       ),
     );

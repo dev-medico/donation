@@ -9,6 +9,8 @@
 /// Everything here is pure Dart so it can be unit tested without a widget tree.
 library;
 
+import 'package:donation/utils/blood_type_label.dart';
+
 /// Complete time-of-day phrases. The ledger stores only a data-entry timestamp,
 /// not the hour the donation actually happened, so this is chosen per patient
 /// rather than derived from `donation_date`.
@@ -107,13 +109,11 @@ String formatPostDate(DateTime date) {
   return '$day၊ $month၊ $year (${burmeseWeekday(date)})';
 }
 
-/// `A (Rh +)` -> `A`, `AB (Rh -)` -> `AB`. The post names only the group
-/// letter, not the rhesus factor.
-String bloodLetter(String? raw) {
-  if (raw == null) return '';
-  final match = RegExp(r'^\s*(AB|A|B|O)').firstMatch(raw.toUpperCase());
-  return match?.group(1) ?? raw.trim();
-}
+/// `A (Rh +)` -> `A`, `O (Rh -)` -> `O-`. A positive group is named by its
+/// letter alone, as the post always has; a negative one keeps its minus so
+/// the post reads `(O-)သွေး`, the way the group writes it.
+String bloodLetter(String? raw) =>
+    compactBloodType(raw, omitPositive: true).replaceAll('−', '-');
 
 /// Reorders a stored `patient_address` into the order the post uses.
 ///
@@ -218,16 +218,20 @@ List<DonationPostGroup> groupDonationsForPost(
     final hospital = (row['hospital'] ?? '').toString().trim();
     if (patientName.isEmpty) continue;
 
-    // A patient treated at two hospitals on the same day is two paragraphs.
-    final patientId = row['patient_id']?.toString();
-    final key = '${patientId?.isNotEmpty == true ? patientId : patientName}'
-        '|$hospital';
-
     final member = row['memberObj'] ?? row['member0'];
     final donorName = member is Map
         ? donorDisplayName((member['name'] ?? '').toString())
         : '';
     final donorBlood = member is Map ? member['blood_type']?.toString() : null;
+    // A patient treated at two hospitals on the same day is two paragraphs.
+    // So is a Rh-negative donation beside positive ones for the same patient:
+    // the paragraph is named after its first donor's group, and a positive
+    // first row must not hide the `-`. Replacement donors of another ABO
+    // group still share the patient's paragraph, as they always have.
+    final patientId = row['patient_id']?.toString();
+    final negative = bloodLetter(donorBlood).endsWith('-');
+    final key = '${patientId?.isNotEmpty == true ? patientId : patientName}'
+        '|$hospital${negative ? '|-' : ''}';
     final donationId = row['id'] is int
         ? row['id'] as int
         : int.tryParse(row['id']?.toString() ?? '');

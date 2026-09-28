@@ -114,10 +114,79 @@ void main() {
       expect(formatPostDate(date), '၂၅၊ ၈၊ ၂၀၂၆ (အင်္ဂါနေ့)');
     });
 
-    test('reduces a blood type to its group letter', () {
+    test('names a positive group by its letter and keeps a negative minus', () {
       expect(bloodLetter('A (Rh +)'), 'A');
-      expect(bloodLetter('AB (Rh -)'), 'AB');
+      expect(bloodLetter('AB (Rh -)'), 'AB-');
       expect(bloodLetter('O (Rh +)'), 'O');
+      for (final group in ['A', 'B', 'AB', 'O']) {
+        for (final raw in [
+          '$group (Rh -)',
+          '$group(-)',
+          '$group−',
+          '$group -ve',
+          '$group negative'
+        ]) {
+          expect(bloodLetter(raw), '$group-', reason: raw);
+        }
+      }
+      expect(bloodLetter(null), '');
+      expect(bloodLetter('Bombay'), 'Bombay');
+    });
+
+    test(
+        'a positive donor cannot hide a negative donation for the same patient',
+        () {
+      final rows = [
+        for (final blood in ['O (Rh +)', 'O (Rh -)', 'O−'])
+          {
+            'id': ['O (Rh +)', 'O (Rh -)', 'O−'].indexOf(blood) + 1,
+            'donation_date': '2026-08-25 12:00:00',
+            'patient_id': 1,
+            'patient_name': 'နမူနာ',
+            'hospital': 'နမူနာ ဆေးရုံ',
+            'memberObj': {'name': 'နမူနာ အလှူရှင်', 'blood_type': blood},
+          },
+      ];
+      final groups = groupDonationsForPost(rows, date);
+      expect(groups, hasLength(2));
+      expect(groups.map((g) => g.bloodType), ['O', 'O-']);
+      expect(groups.last.unitCount, 2);
+      expect(groups.last.donationIds, [2, 3]);
+      expect(buildFacebookPostText(date: date, groups: groups),
+          contains('(O-)သွေး(၂)လုံး'));
+    });
+
+    test('a Rh-negative donation is written (O-), not (O)', () {
+      final groups = groupDonationsForPost(const <Map<String, dynamic>>[
+        {
+          'id': 1,
+          'donation_date': '2026-08-25 13:46:52',
+          'patient_id': 1,
+          'patient_name': 'မနမူနာ',
+          'hospital': 'အမေရိကန်ဆေးရုံ',
+          'memberObj': {'name': 'ကိုနမူနာ', 'blood_type': 'O (Rh -)'},
+        },
+      ], date);
+      expect(buildFacebookPostText(date: date, groups: groups),
+          contains('မနမူနာအတွက် လိုအပ်နေတဲ့(O-)သွေး(၁)လုံးကို ကိုနမူနာက'));
+    });
+
+    test('replacement donors of another group share the patient paragraph', () {
+      final rows = [
+        for (final (id, blood) in [(1, 'AB (Rh +)'), (2, 'A (Rh +)')])
+          {
+            'id': id,
+            'donation_date': '2026-08-25 14:11:40',
+            'patient_id': 1,
+            'patient_name': 'ဒေါ်နမူနာ',
+            'hospital': 'နမူနာ ဆေးရုံ',
+            'memberObj': {'name': 'အလှူရှင် $id', 'blood_type': blood},
+          },
+      ];
+      final groups = groupDonationsForPost(rows, date);
+      expect(groups, hasLength(1));
+      expect(groups.single.bloodType, 'AB');
+      expect(groups.single.unitCount, 2);
     });
 
     test('reorders a village address broadest-first', () {
