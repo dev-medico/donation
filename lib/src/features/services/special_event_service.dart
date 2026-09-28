@@ -1,4 +1,5 @@
 import 'package:donation/src/features/services/base_service.dart';
+import 'package:donation/src/features/special_event/special_event_summary.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final specialEventLoadingStatusProvider = StateProvider<String>((ref) => '');
@@ -12,6 +13,7 @@ class SpecialEventPage {
     required this.limit,
     required this.total,
     required this.hasMore,
+    this.summary,
   });
 
   final List<Map<String, dynamic>> events;
@@ -19,6 +21,7 @@ class SpecialEventPage {
   final int limit;
   final int total;
   final bool hasMore;
+  final SpecialEventSummary? summary;
 }
 
 class SpecialEventService extends BaseService {
@@ -78,6 +81,10 @@ class SpecialEventService extends BaseService {
         page: responsePage,
         limit: responseLimit,
         total: total,
+        summary: body['summary'] is Map
+            ? SpecialEventSummary.fromJson(
+                Map<String, dynamic>.from(body['summary']))
+            : null,
         hasMore: body['hasMore'] == true ||
             ((responsePage + 1) * responseLimit) < total,
       );

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:donation/src/features/services/special_event_service.dart';
+import 'package:donation/src/features/special_event/special_event_summary.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const _unsetLoadMoreError = Object();
@@ -12,6 +13,7 @@ class SpecialEventListState {
     required this.page,
     required this.total,
     required this.hasMore,
+    this.summary,
     this.isRefreshing = false,
     this.isLoadingMore = false,
     this.loadMoreError,
@@ -22,6 +24,7 @@ class SpecialEventListState {
   final int page;
   final int total;
   final bool hasMore;
+  final SpecialEventSummary? summary;
   final bool isRefreshing;
   final bool isLoadingMore;
   final String? loadMoreError;
@@ -42,6 +45,7 @@ class SpecialEventListState {
       page: page ?? this.page,
       total: total ?? this.total,
       hasMore: hasMore ?? this.hasMore,
+      summary: summary,
       isRefreshing: isRefreshing ?? this.isRefreshing,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       loadMoreError: identical(loadMoreError, _unsetLoadMoreError)
@@ -102,6 +106,7 @@ class SpecialEventListController
         page: result.page,
         total: result.total,
         hasMore: result.hasMore,
+        summary: result.summary,
       ));
     } catch (error, stackTrace) {
       if (generation != _requestGeneration) return;

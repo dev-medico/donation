@@ -1,11 +1,43 @@
+// Pass --dart-define=EVENT_CAPTURE_DIR=design-qa to also write
+// special-event-<tab>-<w>x<h>.png phone captures for visual QA.
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:donation/src/features/dashboard/dashboard.dart';
 import 'package:donation/src/features/services/report_service.dart';
 import 'package:donation/src/features/services/special_event_service.dart';
 import 'package:donation/src/features/special_event/providers/special_event_provider.dart';
 import 'package:donation/src/features/special_event/special_event_list_screen.dart';
+import 'package:donation/src/features/special_event/special_event_summary.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+const _captureDir =
+    String.fromEnvironment('EVENT_CAPTURE_DIR', defaultValue: '');
+
+/// The app's Burmese font, so text measures as it does on a device.
+Future<void> _loadBurmeseFont() async {
+  final bytes =
+      await File('assets/fonts/MyanUni/pds_regular.ttf').readAsBytes();
+  final loader = FontLoader('MyanUni')
+    ..addFont(Future.value(ByteData.view(bytes.buffer)));
+  await loader.load();
+}
+
+Future<void> _capture(WidgetTester tester, String name) async {
+  if (_captureDir.isEmpty) return;
+  await tester.runAsync(() async {
+    final image =
+        await captureImage(find.byType(MaterialApp).evaluate().single);
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    final file = File('$_captureDir/$name.png');
+    file.writeAsBytesSync(bytes!.buffer.asUint8List());
+    // ignore: avoid_print
+    print('wrote ${file.path}');
+  });
+}
 
 typedef _PageHandler = Future<SpecialEventPage> Function(
   int page,
@@ -72,6 +104,7 @@ SpecialEventPage _page({
   int page = 0,
   int? total,
   bool hasMore = false,
+  SpecialEventSummary? summary,
 }) {
   return SpecialEventPage(
     events: events,
@@ -79,6 +112,7 @@ SpecialEventPage _page({
     limit: SpecialEventListController.pageSize,
     total: total ?? events.length,
     hasMore: hasMore,
+    summary: summary,
   );
 }
 
@@ -86,6 +120,7 @@ Future<void> _pumpSpecialEventScreen(
   WidgetTester tester,
   SpecialEventService service, {
   Size size = const Size(390, 844),
+  ThemeData? theme,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -97,13 +132,129 @@ Future<void> _pumpSpecialEventScreen(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [specialEventServiceProvider.overrideWithValue(service)],
-      child: const MaterialApp(home: SpecialEventListScreen()),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: theme,
+        home: const SpecialEventListScreen(),
+      ),
     ),
   );
   await tester.pumpAndSettle();
 }
 
 void main() {
+  final allTimeSummary = SpecialEventSummary.fromJson({
+    'recordCount': '124',
+    'haemoglobin': '48',
+    'hbs_ag': 96,
+    'hcv_ab': 37,
+    'mp_ict': null,
+    'retro_test': 9,
+    'vdrl_test': 24,
+  });
+
+  test('summary survives pagination and updates when the list refreshes',
+      () async {
+    var summary = allTimeSummary;
+    final service =
+        _FakeSpecialEventService((page, limit, query) async => _page(
+              events: [_event(id: page + 1, lab: 'Example Lab')],
+              page: page,
+              total: 2,
+              hasMore: page == 0,
+              summary: page == 0 ? summary : null,
+            ));
+    final controller =
+        SpecialEventListController(service, loadImmediately: false);
+    addTearDown(controller.dispose);
+    await controller.refresh();
+    await controller.loadMore();
+    expect(controller.state.asData!.value.summary!.recordCount, 124);
+    summary = SpecialEventSummary.fromJson({'recordCount': 125, 'hbs_ag': 100});
+    await controller.search('Example');
+    expect(controller.state.asData!.value.summary!.recordCount, 125);
+    expect(controller.state.asData!.value.summary!.totalFindings, 100);
+  });
+
+  for (final size in [
+    const Size(320, 568),
+    const Size(390, 844),
+    const Size(1280, 800)
+  ]) {
+    testWidgets('all-time summary is distinct from visible rows at $size',
+        (tester) async {
+      final service =
+          _FakeSpecialEventService((page, limit, query) async => _page(
+                events: [_event(id: 1, lab: 'Example Lab', hcv: 2)],
+                summary: allTimeSummary,
+              ));
+      await _pumpSpecialEventScreen(tester, service, size: size);
+      await tester.tap(find.byKey(const ValueKey('special-event-summary-tab')));
+      await tester.pumpAndSettle();
+      expect(find.text('ကာလအားလုံး၊ ဓာတ်ခွဲခန်းအားလုံး'), findsOneWidget);
+      expect(find.text('မှတ်တမ်း 124 ခုမှ'), findsOneWidget);
+      expect(find.text('214'), findsOneWidget);
+      final vdrl = find.byKey(const ValueKey('special-event-total-vdrl_test'));
+      await tester.ensureVisible(vdrl);
+      expect(tester.widget<Text>(vdrl).data, '24');
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  group('in the app font', () {
+    setUpAll(_loadBurmeseFont);
+
+    for (final phone in const [Size(320, 568), Size(390, 844)]) {
+      final size = '${phone.width.toInt()}x${phone.height.toInt()}';
+      testWidgets('both tabs lay out on a $size phone', (tester) async {
+        // Captures show real elevation shadows rather than the test
+        // renderer's outlines; the flag must be reset before the body ends.
+        if (_captureDir.isNotEmpty) debugDisableShadows = false;
+        try {
+          final service =
+              _FakeSpecialEventService((page, limit, query) async => _page(
+                    events: [
+                      for (var id = 12; id > 0; id--)
+                        _event(
+                          id: id,
+                          lab: 'နမူနာ ဓာတ်ခွဲခန်း (${id.isEven ? '၁' : '၂'})',
+                          hcv: id % 3 == 0 ? 1 : 0,
+                          vdrl: 1,
+                        ),
+                    ],
+                    summary: allTimeSummary,
+                  ));
+          await _pumpSpecialEventScreen(tester, service,
+              size: phone, theme: ThemeData(fontFamily: 'MyanUni'));
+          await _capture(tester, 'special-event-records-$size');
+
+          await tester
+              .tap(find.byKey(const ValueKey('special-event-summary-tab')));
+          await tester.pumpAndSettle();
+          expect(find.byKey(const ValueKey('special-event-findings-total')),
+              findsOneWidget);
+          await _capture(tester, 'special-event-summary-$size');
+        } finally {
+          debugDisableShadows = true;
+        }
+      });
+    }
+  });
+
+  testWidgets('missing summary offers retry instead of a misleading zero',
+      (tester) async {
+    final service = _FakeSpecialEventService(
+        (page, limit, query) async => _page(events: []));
+    await _pumpSpecialEventScreen(tester, service);
+    await tester.tap(find.byKey(const ValueKey('special-event-summary-tab')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('special-event-findings-total')),
+        findsNothing);
+    await tester.tap(find.text('ပြန်ယူမည်'));
+    await tester.pumpAndSettle();
+    expect(service.calls.length, 2);
+  });
+
   test('list controller appends pages once and refresh replaces stale rows',
       () async {
     var firstPage = _page(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:donation/responsive.dart';
 import 'package:donation/src/features/special_event/providers/special_event_provider.dart';
 import 'package:donation/src/features/special_event/special_event_data_source.dart';
+import 'package:donation/src/features/special_event/special_event_summary.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/myanmar_number_input_formatter.dart';
 import 'package:donation/utils/utils.dart';
@@ -23,26 +24,34 @@ class SpecialEventListScreen extends ConsumerStatefulWidget {
       _SpecialEventListScreenState();
 }
 
-class _SpecialEventListScreenState
-    extends ConsumerState<SpecialEventListScreen> {
+class _SpecialEventListScreenState extends ConsumerState<SpecialEventListScreen>
+    with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
+  // Adding a record belongs to the records tab; on the summary tab the button
+  // would only cover the totals.
+  late final TabController _tabController;
   Timer? _searchDebounce;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this)
+      ..addListener(_onTabChanged);
     _scrollController.addListener(_scrollListener);
   }
 
   @override
   void dispose() {
     _searchDebounce?.cancel();
+    _tabController.dispose();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
   }
+
+  void _onTabChanged() => setState(() {});
 
   void _scrollListener() {
     if (_scrollController.hasClients &&
@@ -90,18 +99,48 @@ class _SpecialEventListScreenState
           "ထူးခြားဖြစ်စဉ်",
           style: TextStyle(fontSize: 17, color: Colors.white),
         ),
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
+          labelStyle: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+          unselectedLabelStyle: const TextStyle(fontSize: 13),
+          tabs: const [
+            Tab(height: 40, text: 'မှတ်တမ်းများ'),
+            Tab(
+              key: ValueKey('special-event-summary-tab'),
+              height: 40,
+              text: 'မှတ်တမ်းချုပ်',
+            ),
+          ],
+        ),
       ),
       body: specialEventsAsync.when(
-        data: _buildLoadedBody,
+        data: (state) => TabBarView(
+          controller: _tabController,
+          children: [
+            _buildLoadedBody(state),
+            SpecialEventSummaryView(
+              summary: state.summary,
+              onRefresh: ref.read(specialEventListProvider.notifier).refresh,
+            ),
+          ],
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _buildErrorBody(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddEventDialog,
-        backgroundColor: primaryColor,
-        tooltip: 'ထူးခြားဖြစ်စဉ် အသစ်ထည့်မည်',
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      floatingActionButton: _tabController.index == 0
+          ? FloatingActionButton(
+              onPressed: _showAddEventDialog,
+              backgroundColor: primaryColor,
+              tooltip: 'ထူးခြားဖြစ်စဉ် အသစ်ထည့်မည်',
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
     );
   }
 
