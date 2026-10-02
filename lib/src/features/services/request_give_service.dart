@@ -255,9 +255,9 @@ class RequestGiveService extends BaseService {
   ///
   /// The backend keeps historical, monthly-only records read-only and returns
   /// [legacyOnly] for those months. With `automaticGive`, donation counts come
-  /// from donation records and only requests are entered by staff. Historical
-  /// months include a reconciliation against donation records without changing
-  /// their saved figures. A null request remains distinct from an entered zero.
+  /// from donation records in every month and only requests are entered by
+  /// staff. Legacy monthly request totals remain intact when their daily
+  /// breakdown is unknown. A null request differs from an entered zero.
   Future<Map<String, dynamic>> getMonthEntry({
     required int year,
     required int month,

@@ -63,7 +63,6 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
   DateTime? _serverToday;
   String? _loadError;
   Map<String, dynamic>? _legacySummary;
-  Map<String, dynamic>? _reconciliation;
 
   @override
   void initState() {
@@ -262,10 +261,6 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
           : DateTime(parsedToday.year, parsedToday.month, parsedToday.day);
       final legacy = payload['legacySummary'];
       _legacySummary = legacy is Map ? Map<String, dynamic>.from(legacy) : null;
-      final reconciliation = payload['reconciliation'];
-      _reconciliation = reconciliation is Map
-          ? Map<String, dynamic>.from(reconciliation)
-          : null;
       _isLoading = false;
       _isDirty = requestDraft != null;
       _loadError = null;
@@ -310,7 +305,6 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
       _legacyOnly = false;
       _automaticGive = false;
       _legacySummary = null;
-      _reconciliation = null;
       _replaceDayControllers(const {});
     });
     await _loadMonth();
@@ -525,16 +519,15 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
                           _buildMonthSelector(),
                           const SizedBox(height: 12),
                           _buildSummary(),
-                          if (_loadError == null &&
-                              _reconciliation != null) ...[
-                            const SizedBox(height: 12),
-                            _buildReconciliation(),
-                          ],
                           const SizedBox(height: 12),
                           if (_loadError != null) ...[
                             _buildErrorBanner(),
                           ] else if (_legacyOnly) ...[
                             _buildLegacyBanner(),
+                            if (_automaticGive) ...[
+                              const SizedBox(height: 12),
+                              _buildWorksheet(),
+                            ],
                           ] else ...[
                             _buildEntryHint(),
                             const SizedBox(height: 12),
@@ -719,58 +712,6 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
     );
   }
 
-  Widget _buildReconciliation() {
-    final comparison = _reconciliation!;
-    final difference = comparison['difference'] ?? 0;
-    final days = (comparison['days'] as List?) ?? const [];
-    return Card(
-      key: const Key('donation-reconciliation'),
-      margin: EdgeInsets.zero,
-      child: ExpansionTile(
-        title: const Text('လှူဒါန်းမှုစာရင်း နှိုင်းယှဉ်ရန်',
-            style: TextStyle(fontSize: 13)),
-        subtitle: Text(
-            'ကွာခြားချက်: $difference${days.isEmpty ? '' : ' • ${days.length} ရက် စစ်ဆေးရန်'}',
-            style: const TextStyle(fontSize: 12)),
-        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        children: [
-          Text(
-              'သိမ်းထားသောစာရင်း: ${comparison['recordedGive']}  •  သွေးလှူမှတ်တမ်း: ${comparison['donationGive']}',
-              style: const TextStyle(fontSize: 12.5, height: 1.5)),
-          if (days.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: [
-                const TableRow(children: [
-                  Text('ရက်', style: TextStyle(fontSize: 12)),
-                  Text('သိမ်းထား', style: TextStyle(fontSize: 12)),
-                  Text('သွေးလှူ', style: TextStyle(fontSize: 12)),
-                ]),
-                for (final day in days)
-                  TableRow(children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Text(day['date'].toString(),
-                          style: const TextStyle(fontSize: 12)),
-                    ),
-                    Text('${day['recordedGive'] ?? '—'}',
-                        style: const TextStyle(fontSize: 12)),
-                    Text('${day['donationGive']}',
-                        style: const TextStyle(fontSize: 12)),
-                  ]),
-              ],
-            ),
-          ],
-          const SizedBox(height: 6),
-          const Text(
-              'ယခင်လ၏ သိမ်းထားသောကိန်းဂဏန်းများကို ဆက်လက်အသုံးပြုထားပါသည်။ ပြင်ဆင်မီ သွေးလှူမှတ်တမ်းများ ပြည့်စုံမှုကို စစ်ဆေးပါ။',
-              style: TextStyle(fontSize: 12, height: 1.5)),
-        ],
-      ),
-    );
-  }
-
   Widget _buildLegacyBanner() {
     return Container(
       key: const Key('legacy-month-banner'),
@@ -787,7 +728,7 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'ဤလတွင် ယခင်လချုပ်မှတ်တမ်းသာရှိပြီး နေ့စဉ်အသေးစိတ် မရှိပါ။ မူလလချုပ်ကိန်းဂဏန်း မပြောင်းလဲစေရန် ဖတ်ရှုရန်သာ ပြထားပါသည်။',
+              'ဤလ၏ တောင်းခံမှုတွင် လချုပ်သာရှိပြီး နေ့စဉ်အသေးစိတ် မရှိပါ။ တောင်းခံမှုလချုပ်ကို ဆက်လက်အသုံးပြုထားပြီး လှူဒါန်းမှုကို သွေးလှူမှတ်တမ်းများမှ အလိုအလျောက် တွက်ပေးပါသည်။',
               style: TextStyle(fontSize: 12.5, height: 1.45),
             ),
           ),

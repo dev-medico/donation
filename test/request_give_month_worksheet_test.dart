@@ -307,12 +307,46 @@ void main() {
     );
     expect(find.byKey(const Key('save-request-give-month')), findsNothing);
     expect(_fieldFor('request-day-1'), findsNothing);
-    expect(
-        find.byKey(const Key('donation-reconciliation'), skipOffstage: false),
-        findsOneWidget);
-    expect(find.textContaining('ကွာခြားချက်: -2', skipOffstage: false),
-        findsOneWidget);
     expect(service.savedRecords, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'historical requests retain monthly totals with actual daily donations',
+      (tester) async {
+    final service = _FakeRequestGiveService(payload: {
+      'automaticGive': true,
+      'today': '2026-10-02',
+      'revision': 0,
+      'legacyOnly': true,
+      'editable': false,
+      'legacySummary': {'id': 2, 'request': 267, 'give': 3},
+      'rows': [
+        {'date': '2024-02-01', 'request': null, 'give': 3},
+        {'date': '2024-02-02', 'request': null, 'give': 0},
+      ],
+    });
+    await _pumpWorksheet(tester, service);
+    expect(
+        find.descendant(
+            of: find.byKey(const Key('request-total')),
+            matching: find.textContaining('267')),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byKey(const Key('give-total')),
+            matching: find.textContaining('3')),
+        findsOneWidget);
+    expect(
+        tester.widget<TextField>(_fieldFor('request-day-1')).enabled, isFalse);
+    expect(_fieldFor('give-day-1'), findsNothing);
+    expect(
+        tester
+            .widget<TextButton>(find.byKey(const Key('automatic-give-day-1'),
+                skipOffstage: false))
+            .onPressed,
+        isNotNull);
+    expect(find.byKey(const Key('save-request-give-month')), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
