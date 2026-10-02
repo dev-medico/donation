@@ -5,8 +5,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final requestGiveLoadingStatusProvider = StateProvider<String>((ref) => '');
 
 /// Incremented after a successful worksheet save so every report/chart that
-/// depends on the monthly aggregates can refresh without tightly coupling UI
-/// screens to one another.
+/// depends on the monthly requests can refresh without tightly coupling UI
+/// screens to one another. Reports also watch donationMutationRevisionProvider
+/// because automatic donation totals change independently of worksheet saves.
 final requestGiveRevisionProvider = StateProvider<int>((ref) => 0);
 final requestGiveServiceProvider =
     Provider<RequestGiveService>((ref) => RequestGiveService(ref));
@@ -253,8 +254,10 @@ class RequestGiveService extends BaseService {
   /// Loads the daily worksheet for one calendar month.
   ///
   /// The backend keeps historical, monthly-only records read-only and returns
-  /// [legacyOnly] for those months. Newer months return the saved daily rows,
-  /// with `null` kept distinct from an explicitly recorded zero.
+  /// [legacyOnly] for those months. With `automaticGive`, donation counts come
+  /// from donation records and only requests are entered by staff. Historical
+  /// months include a reconciliation against donation records without changing
+  /// their saved figures. A null request remains distinct from an entered zero.
   Future<Map<String, dynamic>> getMonthEntry({
     required int year,
     required int month,
@@ -286,7 +289,8 @@ class RequestGiveService extends BaseService {
   }
 
   /// Replaces the daily worksheet for one month in a single server
-  /// transaction and refreshes that month's aggregate report totals.
+  /// transaction and refreshes that month's aggregate report totals. Automatic
+  /// worksheets send only requests; the server derives donation counts.
   Future<Map<String, dynamic>> saveMonth({
     required int year,
     required int month,

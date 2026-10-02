@@ -22,6 +22,7 @@ final donationsByYearProvider =
 
 final donationsByDateProvider =
     FutureProvider.family<List<Donation>, DateTime>((ref, date) async {
+  ref.watch(donationMutationRevisionProvider);
   final donationService = ref.read(donationServiceProvider);
   final donationsData = await donationService.getDonationsByDate(date);
 

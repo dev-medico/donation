@@ -1,3 +1,6 @@
+import 'package:donation/src/features/donation/donations_by_date_screen.dart';
+import 'package:donation/src/features/donation/providers/donation_providers.dart';
+import 'package:donation/src/features/services/donation_service.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
 import 'package:donation/utils/Colors.dart';
 import 'package:donation/utils/age_utils.dart';
@@ -54,11 +57,13 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
   bool _isDirty = false;
   bool _editable = false;
   bool _legacyOnly = false;
+  bool _automaticGive = false;
   int _revision = 0;
   int _loadGeneration = 0;
   DateTime? _serverToday;
   String? _loadError;
   Map<String, dynamic>? _legacySummary;
+  Map<String, dynamic>? _reconciliation;
 
   @override
   void initState() {
@@ -107,7 +112,7 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
           .where(
             (day) =>
                 day.request.text.trim().isNotEmpty ||
-                day.give.text.trim().isNotEmpty,
+                (!_automaticGive && day.give.text.trim().isNotEmpty),
           )
           .length;
 
@@ -169,8 +174,17 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
     setState(() => _isDirty = true);
   }
 
-  Future<void> _loadMonth() async {
+  Future<void> _loadMonth({bool preserveRequests = false}) async {
     if (_isSaving) return;
+    final requestDraft = preserveRequests && _automaticGive && _isDirty
+        ? {
+            for (final day in _days)
+              _dateFormat.format(day.date): day.request.text,
+          }
+        : null;
+    // Keep the revision belonging to the draft. Adopting a newer revision here
+    // would let a count refresh overwrite another staff member's request edits.
+    final draftRevision = _revision;
     final requestedMonth = _selectedMonth;
     final generation = ++_loadGeneration;
     setState(() {
@@ -189,7 +203,11 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
           requestedMonth != _selectedMonth) {
         return;
       }
-      _applyPayload(payload);
+      _applyPayload(
+        payload,
+        requestDraft: requestDraft,
+        draftRevision: draftRevision,
+      );
     } catch (_) {
       if (!mounted ||
           generation != _loadGeneration ||
@@ -205,7 +223,11 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
     }
   }
 
-  void _applyPayload(Map<String, dynamic> payload) {
+  void _applyPayload(
+    Map<String, dynamic> payload, {
+    Map<String, String>? requestDraft,
+    int? draftRevision,
+  }) {
     final rowsByDate = <String, Map<String, dynamic>>{};
     final rawRows = payload['rows'];
     if (rawRows is List) {
@@ -218,13 +240,21 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
     }
 
     _replaceDayControllers(rowsByDate);
+    if (requestDraft != null) {
+      for (final day in _days) {
+        day.request.text = requestDraft[_dateFormat.format(day.date)] ?? '';
+      }
+    }
     setState(() {
       _legacyOnly = payload['legacyOnly'] == true;
+      _automaticGive = payload['automaticGive'] == true;
       _editable = payload['editable'] == true && !_legacyOnly;
       final rawRevision = payload['revision'];
-      _revision = rawRevision is num
-          ? rawRevision.toInt()
-          : int.tryParse(rawRevision?.toString() ?? '') ?? 0;
+      _revision = requestDraft != null
+          ? draftRevision!
+          : rawRevision is num
+              ? rawRevision.toInt()
+              : int.tryParse(rawRevision?.toString() ?? '') ?? 0;
       final rawToday = payload['today']?.toString();
       final parsedToday = rawToday == null ? null : DateTime.tryParse(rawToday);
       _serverToday = parsedToday == null
@@ -232,8 +262,12 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
           : DateTime(parsedToday.year, parsedToday.month, parsedToday.day);
       final legacy = payload['legacySummary'];
       _legacySummary = legacy is Map ? Map<String, dynamic>.from(legacy) : null;
+      final reconciliation = payload['reconciliation'];
+      _reconciliation = reconciliation is Map
+          ? Map<String, dynamic>.from(reconciliation)
+          : null;
       _isLoading = false;
-      _isDirty = false;
+      _isDirty = requestDraft != null;
       _loadError = null;
     });
   }
@@ -274,7 +308,9 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
       _selectedMonth = normalized;
       _isDirty = false;
       _legacyOnly = false;
+      _automaticGive = false;
       _legacySummary = null;
+      _reconciliation = null;
       _replaceDayControllers(const {});
     });
     await _loadMonth();
@@ -310,11 +346,11 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
     for (final day in _days) {
       final request = _valueOf(day.request);
       final give = _valueOf(day.give);
-      if (request == null && give == null) continue;
+      if (request == null && (_automaticGive || give == null)) continue;
       records.add({
         'date': _dateFormat.format(day.date),
         'request': request,
-        'give': give,
+        if (!_automaticGive) 'give': give,
       });
     }
 
@@ -391,9 +427,25 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
 
   Future<void> _refreshMonth() async {
     if (_isSaving) return;
+    if (_automaticGive) {
+      await _loadMonth(preserveRequests: true);
+      return;
+    }
     if (!await _confirmDiscardChanges() || !mounted) return;
     setState(() => _isDirty = false);
     await _loadMonth();
+  }
+
+  Future<void> _openDonations(_DayEntry day) async {
+    if (_isLoading || _isSaving || day.date.isAfter(_businessToday)) return;
+    ref.invalidate(donationsByDateProvider(day.date));
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DonationsByDateScreen(initialDate: day.date),
+      ),
+    );
+    if (mounted) await _loadMonth(preserveRequests: true);
   }
 
   Future<void> _handleSystemBack(bool didPop, Object? result) async {
@@ -403,6 +455,11 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(donationMutationRevisionProvider, (previous, next) {
+      if (_automaticGive && !_isSaving) {
+        _loadMonth(preserveRequests: true);
+      }
+    });
     final isNarrow = MediaQuery.sizeOf(context).width < 360;
     return PopScope(
       canPop: !_isDirty && !_isSaving,
@@ -424,6 +481,14 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
               ),
             ),
           ),
+          actions: [
+            IconButton(
+              key: const Key('refresh-month'),
+              tooltip: 'စာရင်း ပြန်လည်ရယူမည်',
+              onPressed: _isLoading || _isSaving ? null : _refreshMonth,
+              icon: const Icon(Icons.refresh, color: Colors.white),
+            ),
+          ],
           centerTitle: true,
           title: Text(
             isNarrow
@@ -433,13 +498,6 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 16, color: Colors.white),
           ),
-          actions: [
-            IconButton(
-              onPressed: _isLoading || _isSaving ? null : _refreshMonth,
-              icon: const Icon(Icons.refresh, color: Colors.white),
-              tooltip: 'ပြန်လည်ရယူမည်',
-            ),
-          ],
         ),
         body: RefreshIndicator(
           onRefresh: _refreshMonth,
@@ -467,6 +525,11 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
                           _buildMonthSelector(),
                           const SizedBox(height: 12),
                           _buildSummary(),
+                          if (_loadError == null &&
+                              _reconciliation != null) ...[
+                            const SizedBox(height: 12),
+                            _buildReconciliation(),
+                          ],
                           const SizedBox(height: 12),
                           if (_loadError != null) ...[
                             _buildErrorBanner(),
@@ -638,17 +701,71 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFBFDBFE)),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, size: 20, color: Color(0xFF2563EB)),
-          SizedBox(width: 10),
+          const Icon(Icons.info_outline, size: 20, color: Color(0xFF2563EB)),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'အလွတ်ထားခြင်းသည် မမှတ်ရသေးခြင်းဖြစ်ပြီး “၀” ထည့်ခြင်းသည် ထိုနေ့တွင် မရှိကြောင်း အတည်ပြုခြင်းဖြစ်ပါသည်။',
-              style: TextStyle(fontSize: 12.5, height: 1.45),
+              _automaticGive
+                  ? 'တောင်းခံမှုကိုသာ ဖြည့်ပါ။ လှူဒါန်းမှုကို သွေးလှူမှတ်တမ်းများမှ အလိုအလျောက် တွက်ပေးပါသည်။ ကိန်းဂဏန်းကို နှိပ်၍ ထိုနေ့၏ လှူဒါန်းမှုများကို ကြည့်နိုင်ပါသည်။'
+                  : 'အလွတ်ထားခြင်းသည် မမှတ်ရသေးခြင်းဖြစ်ပြီး “၀” ထည့်ခြင်းသည် ထိုနေ့တွင် မရှိကြောင်း အတည်ပြုခြင်းဖြစ်ပါသည်။',
+              style: const TextStyle(fontSize: 12.5, height: 1.45),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReconciliation() {
+    final comparison = _reconciliation!;
+    final difference = comparison['difference'] ?? 0;
+    final days = (comparison['days'] as List?) ?? const [];
+    return Card(
+      key: const Key('donation-reconciliation'),
+      margin: EdgeInsets.zero,
+      child: ExpansionTile(
+        title: const Text('လှူဒါန်းမှုစာရင်း နှိုင်းယှဉ်ရန်',
+            style: TextStyle(fontSize: 13)),
+        subtitle: Text(
+            'ကွာခြားချက်: $difference${days.isEmpty ? '' : ' • ${days.length} ရက် စစ်ဆေးရန်'}',
+            style: const TextStyle(fontSize: 12)),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        children: [
+          Text(
+              'သိမ်းထားသောစာရင်း: ${comparison['recordedGive']}  •  သွေးလှူမှတ်တမ်း: ${comparison['donationGive']}',
+              style: const TextStyle(fontSize: 12.5, height: 1.5)),
+          if (days.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Table(
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                const TableRow(children: [
+                  Text('ရက်', style: TextStyle(fontSize: 12)),
+                  Text('သိမ်းထား', style: TextStyle(fontSize: 12)),
+                  Text('သွေးလှူ', style: TextStyle(fontSize: 12)),
+                ]),
+                for (final day in days)
+                  TableRow(children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Text(day['date'].toString(),
+                          style: const TextStyle(fontSize: 12)),
+                    ),
+                    Text('${day['recordedGive'] ?? '—'}',
+                        style: const TextStyle(fontSize: 12)),
+                    Text('${day['donationGive']}',
+                        style: const TextStyle(fontSize: 12)),
+                  ]),
+              ],
+            ),
+          ],
+          const SizedBox(height: 6),
+          const Text(
+              'ယခင်လ၏ သိမ်းထားသောကိန်းဂဏန်းများကို ဆက်လက်အသုံးပြုထားပါသည်။ ပြင်ဆင်မီ သွေးလှူမှတ်တမ်းများ ပြည့်စုံမှုကို စစ်ဆေးပါ။',
+              style: TextStyle(fontSize: 12, height: 1.5)),
         ],
       ),
     );
@@ -699,7 +816,7 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
             ),
           ),
           TextButton(
-            onPressed: _loadMonth,
+            onPressed: _refreshMonth,
             child: const Text('ထပ်ကြိုးစားမည်'),
           ),
         ],
@@ -858,13 +975,44 @@ class _RequestGiveListScreenState extends ConsumerState<RequestGiveListScreen> {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: _CountField(
-              key: Key('give-day-${day.date.day}'),
-              controller: day.give,
-              enabled: enabled,
-              color: const Color(0xFF067647),
-              semanticLabel: '${day.date.day} ရက်နေ့ လှူဒါန်းမှု အရေအတွက်',
-            ),
+            child: _automaticGive
+                ? Semantics(
+                    label:
+                        '${day.date.day} ရက်နေ့ အလိုအလျောက် လှူဒါန်းမှု ${day.give.text}',
+                    button: true,
+                    child: TextButton(
+                      key: Key('automatic-give-day-${day.date.day}'),
+                      onPressed: _isLoading ||
+                              _isSaving ||
+                              day.date.isAfter(_businessToday)
+                          ? null
+                          : () => _openDonations(day),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF067647),
+                        backgroundColor: const Color(0xFFF0FDF4),
+                        minimumSize: const Size(0, 44),
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(day.give.text.isEmpty ? '—' : day.give.text,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w700)),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.chevron_right, size: 16),
+                        ],
+                      ),
+                    ),
+                  )
+                : _CountField(
+                    key: Key('give-day-${day.date.day}'),
+                    controller: day.give,
+                    enabled: enabled,
+                    color: const Color(0xFF067647),
+                    semanticLabel:
+                        '${day.date.day} ရက်နေ့ လှူဒါန်းမှု အရေအတွက်',
+                  ),
           ),
         ],
       ),

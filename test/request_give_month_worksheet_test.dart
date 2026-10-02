@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+import 'package:flutter/services.dart';
+import 'package:donation/src/features/services/donation_service.dart';
 import 'package:donation/src/features/finder/request_give_list_screen.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +32,10 @@ class _FakeRequestGiveService extends RequestGiveService {
   }) async {
     savedRecords = records.map(Map<String, dynamic>.from).toList();
     savedExpectedRevision = expectedRevision;
+    if (payload['automaticGive'] == true) {
+      payload = {...payload, 'revision': expectedRevision + 1};
+      return payload;
+    }
     final requestTotal = records.fold<int>(
       0,
       (sum, row) => sum + ((row['request'] as int?) ?? 0),
@@ -57,10 +65,11 @@ class _FakeRequestGiveService extends RequestGiveService {
 
 Future<void> _pumpWorksheet(
   WidgetTester tester,
-  _FakeRequestGiveService service,
-) async {
+  _FakeRequestGiveService service, {
+  Size size = const Size(390, 844),
+}) async {
   tester.view.devicePixelRatio = 1;
-  tester.view.physicalSize = const Size(390, 844);
+  tester.view.physicalSize = size;
   addTearDown(() {
     tester.view.resetDevicePixelRatio();
     tester.view.resetPhysicalSize();
@@ -70,6 +79,7 @@ Future<void> _pumpWorksheet(
     ProviderScope(
       overrides: [requestGiveServiceProvider.overrideWithValue(service)],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(fontFamily: 'MyanUni'),
         home: RequestGiveListScreen(
           initialMonth: DateTime(2024, 2),
@@ -87,6 +97,85 @@ Finder _fieldFor(String key) => find.descendant(
     );
 
 void main() {
+  setUpAll(() async {
+    final bytes =
+        await File('assets/fonts/MyanUni/pds_regular.ttf').readAsBytes();
+    final loader = FontLoader('MyanUni')
+      ..addFont(Future.value(ByteData.view(bytes.buffer)));
+    await loader.load();
+    final icons = FontLoader('MaterialIcons')
+      ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
+    await icons.load();
+  });
+  for (final size in [const Size(390, 844), const Size(320, 568)]) {
+    testWidgets('automatic counts preserve draft requests at $size',
+        (tester) async {
+      final service = _FakeRequestGiveService(payload: {
+        'automaticGive': true,
+        'today': '2024-02-03',
+        'revision': 4,
+        'legacyOnly': false,
+        'editable': true,
+        'rows': [
+          {'date': '2024-02-01', 'request': null, 'give': 2},
+          {'date': '2024-02-02', 'request': null, 'give': 0},
+          {'date': '2024-02-03', 'request': null, 'give': 1},
+        ],
+      });
+      await _pumpWorksheet(tester, service, size: size);
+      expect(_fieldFor('give-day-1'), findsNothing);
+      expect(find.byKey(const Key('automatic-give-day-1'), skipOffstage: false),
+          findsOneWidget);
+      expect(find.bySemanticsLabel('မှတ်တမ်းရက်: 0/ 29', skipOffstage: false),
+          findsOneWidget);
+      expect(
+          tester
+              .widget<FilledButton>(
+                  find.byKey(const Key('save-request-give-month')))
+              .onPressed,
+          isNull);
+      expect(tester.widget<TextField>(_fieldFor('request-day-4')).enabled,
+          isFalse);
+      if (const bool.fromEnvironment('WORKSHEET_CAPTURE')) {
+        await tester.runAsync(() async {
+          final image =
+              await captureImage(find.byType(MaterialApp).evaluate().single);
+          final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+          File('design-qa/automatic-donations-${size.width.toInt()}x${size.height.toInt()}.png')
+              .writeAsBytesSync(bytes!.buffer.asUint8List());
+        });
+      }
+      await tester.ensureVisible(_fieldFor('request-day-1'));
+      await tester.enterText(_fieldFor('request-day-1'), '၄');
+      await tester.pump();
+      service.payload = {
+        ...service.payload,
+        'revision': 9,
+        'rows': [
+          {'date': '2024-02-01', 'request': 99, 'give': 5},
+          {'date': '2024-02-02', 'request': null, 'give': 0},
+          {'date': '2024-02-03', 'request': null, 'give': 1},
+        ]
+      };
+      final container = ProviderScope.containerOf(
+          tester.element(find.byType(RequestGiveListScreen)));
+      container.read(donationMutationRevisionProvider.notifier).state++;
+      await tester.pumpAndSettle();
+      expect(
+          tester.widget<TextField>(_fieldFor('request-day-1')).controller!.text,
+          '4');
+      expect(find.bySemanticsLabel('လှူဒါန်း: 6 ကြိမ်', skipOffstage: false),
+          findsOneWidget);
+      await tester.tap(find.byKey(const Key('save-request-give-month')));
+      await tester.pumpAndSettle();
+      expect(service.savedRecords, [
+        {'date': '2024-02-01', 'request': 4}
+      ]);
+      expect(service.savedExpectedRevision, 4);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets(
     'shows every day and saves Myanmar-digit daily entries as integers',
     (tester) async {
@@ -192,6 +281,11 @@ void main() {
           'give': 13,
           'recordCount': 1,
         },
+        'reconciliation': {
+          'recordedGive': 13,
+          'donationGive': 11,
+          'difference': -2
+        },
         'legacyOnly': true,
         'editable': false,
       },
@@ -213,6 +307,11 @@ void main() {
     );
     expect(find.byKey(const Key('save-request-give-month')), findsNothing);
     expect(_fieldFor('request-day-1'), findsNothing);
+    expect(
+        find.byKey(const Key('donation-reconciliation'), skipOffstage: false),
+        findsOneWidget);
+    expect(find.textContaining('ကွာခြားချက်: -2', skipOffstage: false),
+        findsOneWidget);
     expect(service.savedRecords, isNull);
     expect(tester.takeException(), isNull);
   });

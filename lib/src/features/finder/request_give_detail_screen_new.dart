@@ -2,6 +2,7 @@ import 'package:donation/utils/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:donation/src/features/services/request_give_service.dart';
+import 'package:donation/src/features/services/donation_service.dart';
 import 'package:donation/src/features/finder/request_give_list_screen.dart';
 
 // Provider for detailed report data - using String key for proper caching
@@ -9,6 +10,7 @@ final requestGiveReportProvider =
     FutureProvider.family<Map<String, dynamic>, String>((ref, key) async {
   try {
     ref.watch(requestGiveRevisionProvider);
+    ref.watch(donationMutationRevisionProvider);
     // Parse the key to extract year and month
     final parts = key.split('-');
     final year = int.parse(parts[0]);
