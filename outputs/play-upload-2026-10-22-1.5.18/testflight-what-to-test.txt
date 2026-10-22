@@ -1,0 +1,6 @@
+Facebook post donor names now keep the nickname written after the alias marker (kha), exactly as entered. The donor finder is sorted by last donation date, newest first.
+
+Please verify:
+• Generate a Facebook post for a day with a donor entered with an alias (Name, alias marker, nickname): the post shows the full name including the nickname.
+• Several donors for one patient are joined with every alias intact.
+• Find Blood Donors lists the most recent donors first, and the blood-type and availability filters keep that order.

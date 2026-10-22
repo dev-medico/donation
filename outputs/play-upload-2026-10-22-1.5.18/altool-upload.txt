@@ -1,0 +1,8 @@
+Running altool at path '/Applications/Xcode.app/Contents/SharedFrameworks/ContentDelivery.framework/Resources/altool'...
+2026-10-22 08:17:47.300  INFO: [ContentDelivery.Uploader.1017CE5B0] 
+==========================================
+UPLOAD SUCCEEDED with no errors
+Delivery UUID: f43f1dc6-bd52-4fe3-a1e3-58e4366e2414
+Transferred 28026339 bytes in 4.162 seconds (6.7MB/s, 53.872Mbps)
+==========================================
+No errors uploading archive at 'build/ios/ipa/donation.ipa'.

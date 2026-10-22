@@ -1,0 +1,3 @@
+1.5.18
+• Facebook post: donor names keep the nickname written after (ခ), exactly as entered, so donors who share a name can be told apart.
+• Find blood donors (သွေးလှူရှင်ရှာမည်): the list follows the last donation date, newest first.

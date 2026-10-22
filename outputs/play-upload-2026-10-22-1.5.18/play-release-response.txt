@@ -1,0 +1,14 @@
+app-release.aab (65.2 MB) → com.red.juniors production, rollout 100%, notes en-US
+live tracks before:
+production: completed  codes 192  "192 (1.5.17)"  notes en-US
+beta: (no releases)
+alpha: (no releases)
+internal: (no releases)
+uploading…
+uploaded: version code 193, sha256 bc9df2dc962fd5f9483de70e74fde1a6eaa9998559c771fb35b57c950cb19499
+committed: production release 193 completed (sent for Google review; live when it passes)
+live tracks after:
+production: completed  codes 193  "1.5.18"  notes en-US
+beta: (no releases)
+alpha: (no releases)
+internal: (no releases)
