@@ -134,13 +134,6 @@ String patientLocation(String? raw) {
   return parts.reversed.join('၊ ');
 }
 
-/// Burmese member records often carry an alias after `(ခ)`. The post uses the
-/// primary name only: `ကိုခိုင်မျိုးထွန်း(ခ)သဲကုန်း` -> `ကိုခိုင်မျိုးထွန်း`
-String donorDisplayName(String raw) {
-  final index = raw.indexOf('(ခ)');
-  return (index > 0 ? raw.substring(0, index) : raw).trim();
-}
-
 final RegExp _hospitalPlace = RegExp(r'^(.+?)\s*\((.+?)\)\s*$');
 
 /// Drops a trailing place qualifier: `အောင်ရတနာဆေးရုံ(ရန်ကုန်)` -> `အောင်ရတနာဆေးရုံ`
@@ -219,9 +212,10 @@ List<DonationPostGroup> groupDonationsForPost(
     if (patientName.isEmpty) continue;
 
     final member = row['memberObj'] ?? row['member0'];
-    final donorName = member is Map
-        ? donorDisplayName((member['name'] ?? '').toString())
-        : '';
+    // As entered, `(ခ)` alias included: the alias is how readers tell apart
+    // donors who share a name.
+    final donorName =
+        member is Map ? (member['name'] ?? '').toString().trim() : '';
     final donorBlood = member is Map ? member['blood_type']?.toString() : null;
     // A patient treated at two hospitals on the same day is two paragraphs.
     // So is a Rh-negative donation beside positive ones for the same patient:

@@ -211,12 +211,6 @@ void main() {
       );
     });
 
-    test('drops the (ခ) alias from a donor name', () {
-      expect(donorDisplayName('ကိုခိုင်မျိုးထွန်း(ခ)သဲကုန်း'),
-          'ကိုခိုင်မျိုးထွန်း');
-      expect(donorDisplayName('ကိုစိုးရာဇာ'), 'ကိုစိုးရာဇာ');
-    });
-
     test('moves a hospital place qualifier to the front on first mention', () {
       expect(
         hospitalFullName('အောင်ရတနာဆေးရုံ(ရန်ကုန်)'),
@@ -249,6 +243,36 @@ void main() {
       expect(groups.first.donationIds, [15415, 15417]);
       expect(groups.first.unitCount, 2);
       expect(groups.first.bloodType, 'A');
+    });
+
+    test('keeps the (ခ) alias of every donor', () {
+      final ledgerGroups = groupDonationsForPost(kAug25Rows, date);
+      expect(
+        ledgerGroups
+            .singleWhere((g) => g.patientName == 'ဒေါ်လှဝင်း')
+            .donorNames,
+        ['ကိုခိုင်မျိုးထွန်း(ခ)သဲကုန်း'],
+      );
+
+      final rows = [
+        for (final (id, name) in [
+          (1, 'မနမူနာ(ခ)ဖောဖော'),
+          (2, ' ကိုနမူနာ(ခ)ဂျူးဂျူး '),
+        ])
+          {
+            'id': id,
+            'donation_date': '2026-08-25 10:00:00',
+            'patient_id': 1,
+            'patient_name': 'ဒေါ်နမူနာ',
+            'hospital': 'နမူနာ ဆေးရုံ',
+            'memberObj': {'name': name, 'blood_type': 'B (Rh +)'},
+          },
+      ];
+      final groups = groupDonationsForPost(rows, date);
+      expect(
+          groups.single.donorNames, ['မနမူနာ(ခ)ဖောဖော', 'ကိုနမူနာ(ခ)ဂျူးဂျူး']);
+      expect(buildFacebookPostText(date: date, groups: groups),
+          contains('မနမူနာ(ခ)ဖောဖော နဲ့ ကိုနမူနာ(ခ)ဂျူးဂျူး တို့က'));
     });
 
     test('hydrates a persisted time for every donation in one paragraph', () {
