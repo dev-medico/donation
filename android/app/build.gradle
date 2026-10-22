@@ -24,6 +24,8 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace "com.red.juniors"
     compileSdk flutter.compileSdkVersion
+    // The one NDK shared by every Android/Flutter project on this machine.
+    ndkVersion = "30.0.16248370"
 
     compileOptions {
         // Flag to enable support for the new language APIs
